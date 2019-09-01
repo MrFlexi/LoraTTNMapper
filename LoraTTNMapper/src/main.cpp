@@ -10,6 +10,11 @@
 #include "esp_sleep.h"
 #include "WiFi.h"
 #include "gps.h"
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
+
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 // T-Beam specific hardware
 #undef BUILTIN_LED
@@ -34,16 +39,26 @@ int runmode = 0;
 int aliveCounter = 0;
 String stringOne = "";
 
+//--------------------------------------------------------------------------
+// U8G2 Display Setup
+//--------------------------------------------------------------------------
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // ESP32 Thing, HW I2C with pin remapping
+// Create a U8g2log object
+U8G2LOG u8g2log;
+
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32
-#define U8LOG_HEIGHT 8
-
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // ESP32 Thing, HW I2C with pin remapping
+#define U8LOG_HEIGHT 6
 
 // allocate memory
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
-// Create a U8g2log object
-U8G2LOG u8g2log;
+
+Adafruit_BME280 bme; // I2C   PIN 21 + 22
+
+// local Tag for logging
+static const char TAG[] = __FILE__;
+
+
 
 
 // LoRaWAN NwkSKey, network session key // msb
@@ -117,7 +132,90 @@ void setup_display(void)
   u8g2.enableUTF8Print();
   log_display("Display loaded...");
   log_display("TTN-ABP-Mapper");
+  Serial.println( SDA );
+  Serial.println( SCL );
+
 }
+
+
+void i2c_scan()
+{
+
+Serial.println ();
+  Serial.println ("I2C scanner. Scanning ...");
+  byte count = 0;
+
+  Wire.begin(21,22);  // for T-Beam pass SDA and SCL GPIO pins
+  for (byte i = 8; i < 120; i++)
+  {
+    Wire.beginTransmission (i);
+    if (Wire.endTransmission () == 0)
+      {
+      Serial.print ("Found address: ");
+      Serial.print (i, DEC);
+      Serial.print (" (0x");
+      Serial.print (i, HEX);
+      Serial.println (")");
+      count++;
+      delay (1);  // maybe unneeded?
+      } // end of good response
+  } // end of for loop
+  Serial.println ("Done.");
+  Serial.print ("Found ");
+  Serial.print (count, DEC);
+  Serial.println (" device(s).");
+
+}
+
+void setup_sensors()
+{
+
+ #if (USE_BME280) 
+  ESP_LOGI(TAG, "BME280 Setup...");   
+     unsigned status;      
+     
+    // https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/issues/62
+
+    //bool wire_status = Wire1.begin( GPIO_NUM_4, GPIO_NUM_15);
+    //if(!wire_status)
+    //{
+    //  Serial.println("Could not finitialize Wire1"); 
+    //}
+
+
+     //status = bme.begin(0x76, &Wire1);  
+     status = bme.begin(0x76); 
+     if (!status) { 
+         Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!"); 
+         Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16); 
+         Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n"); 
+         Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n"); 
+         Serial.print("        ID of 0x60 represents a BME 280.\n"); 
+         Serial.print("        ID of 0x61 represents a BME 680.\n"); 
+         while (1); 
+     } 
+     
+     Serial.println(); 
+     Serial.print("Temperature = "); 
+     Serial.print(bme.readTemperature()); 
+     Serial.println(" *C");  
+     Serial.print("Pressure = "); 
+     Serial.print(bme.readPressure() / 100.0F); 
+     Serial.println(" hPa");   
+     Serial.print("Approx. Altitude = "); 
+     Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA)); 
+     Serial.println(" m");   
+     Serial.print("Humidity = "); 
+     Serial.print(bme.readHumidity()); 
+     Serial.println(" %");  
+     Serial.println(); 
+#endif
+
+  }
+
+
+
+
 
 
 
@@ -229,7 +327,10 @@ void onEvent (ev_t ev) {
 void setup() {
   Serial.begin(115200);
   Serial.println(F("TTN Mapper"));
+  i2c_scan();
+
   setup_display();
+  setup_sensors();
   setup_wifi();
   
   //Turn off WiFi and Bluetooth
