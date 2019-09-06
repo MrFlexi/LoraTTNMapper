@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "LoraTTNMapper",
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.windows": {
+			"PATH": "C:\\Users\\szarolettas\\.platformio\\penv\\Scripts;C:\\Users\\szarolettas\\.platformio\\penv;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files (x86)\\Skype\\Phone\\;C:\\Program Files\\Git\\cmd;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Python\\Python37\\;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files (x86)\\Skype\\Phone\\;C:\\Program Files\\Git\\cmd;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Python\\Python37\\;C:\\Users\\szarolettas\\AppData\\Local\\Programs\\Microsoft VS Code\\bin",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}

@@ -1,6 +1,17 @@
 #define USE_WIFI        0
 #define USE_BME280      1
-#define USE_CAYENNE     1
+#define USE_CAYENNE     0
+#define HAS_LORA        1
+
+#define HAS_PMU
+#define PMU_INT         35  
+
+
+#define HAS_DISPLAY
+#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
+#include "esp_log.h"
+
+
 
 #include <lmic.h>
 #include <hal/hal.h>
@@ -8,10 +19,25 @@
 #include <U8g2lib.h>
 #include <Ticker.h>
 #include "esp_sleep.h"
+#include <Wire.h>
 #include "WiFi.h"
 #include "gps.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include "i2cscan.h"
+#include "axp20x.h"
+
+
+
+
+static const char TAG[] = __FILE__;
+
+//----------------------------------------------------------
+// T Beam Power Management
+//----------------------------------------------------------
+  #define AXP192_PRIMARY_ADDRESS (0x34)
+
+ AXP20X_Class axp;
 
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -54,14 +80,13 @@ U8G2LOG u8g2log;
 // allocate memory
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
+
+
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 
-// local Tag for logging
-static const char TAG[] = __FILE__;
-
-
-
-
+//--------------------------------------------------------------------------
+// LORA Settings
+//--------------------------------------------------------------------------
 // LoRaWAN NwkSKey, network session key // msb
 
 static PROGMEM u1_t NWKSKEY[16] = { 0x88, 0x06, 0xDA, 0xCF, 0x30, 0xFB, 0x44, 0xDC, 0x69, 0x0E, 0x15, 0xF8, 0xAD, 0xCB, 0x40, 0x6C };
@@ -131,42 +156,12 @@ void setup_display(void)
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
   u8g2.enableUTF8Print();
-  log_display("Display loaded...");
   log_display("TTN-ABP-Mapper");
-  Serial.println( SDA );
-  Serial.println( SCL );
+
 
 }
 
 
-void i2c_scan()
-{
-
-Serial.println ();
-  Serial.println ("I2C scanner. Scanning ...");
-  byte count = 0;
-
-  Wire.begin(21,22);  // for T-Beam pass SDA and SCL GPIO pins
-  for (byte i = 8; i < 120; i++)
-  {
-    Wire.beginTransmission (i);
-    if (Wire.endTransmission () == 0)
-      {
-      Serial.print ("Found address: ");
-      Serial.print (i, DEC);
-      Serial.print (" (0x");
-      Serial.print (i, HEX);
-      Serial.println (")");
-      count++;
-      delay (1);  // maybe unneeded?
-      } // end of good response
-  } // end of for loop
-  Serial.println ("Done.");
-  Serial.print ("Found ");
-  Serial.print (count, DEC);
-  Serial.println (" device(s).");
-
-}
 
 void setup_sensors()
 {
@@ -216,16 +211,26 @@ void setup_sensors()
 
 
 
+void t_alive() {
+  static char volbuffer[128];
 
-
-
-
-void alive() {
   String stringOne;
   aliveCounter++;
   stringOne = "Alive: ";
   stringOne = stringOne + aliveCounter;   
   log_display(stringOne);
+
+  // Battery
+  if (axp.isBatteryConnect()) {
+        snprintf(volbuffer, sizeof(volbuffer), "%.2fV/%.2fmA", axp.getBattVoltage() / 1000.0, axp.isChargeing() ? axp.getBattChargeCurrent() : axp.getBattDischargeCurrent());
+         log_display(volbuffer);
+    }
+
+  // Temperatur
+  snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
+         log_display(volbuffer);
+
+  
 }
 
 
@@ -285,6 +290,7 @@ void onEvent (ev_t ev) {
       Serial.println(F("EV_REJOIN_FAILED"));
       break;
     case EV_TXCOMPLETE:
+      log_display("EV_TXCOMPLETE");
       Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
       digitalWrite(BUILTIN_LED, LOW);
       if (LMIC.txrxFlags & TXRX_ACK) {
@@ -297,8 +303,9 @@ void onEvent (ev_t ev) {
         Serial.println(s);
       }
       // Schedule next transmission
-      esp_sleep_enable_timer_wakeup(TX_INTERVAL*1000000);
-      esp_deep_sleep_start();
+      //esp_sleep_enable_timer_wakeup(TX_INTERVAL*1000000);
+      //esp_deep_sleep_start();
+      log_display("Next TX started");
       do_send(&sendjob);
       break;
     case EV_LOST_TSYNC:
@@ -323,21 +330,8 @@ void onEvent (ev_t ev) {
   }
 }
 
-
-
-void setup() {
-  Serial.begin(115200);
-  Serial.println(F("TTN Mapper"));
-  i2c_scan();
-
-  setup_display();
-  setup_sensors();
-  setup_wifi();
-  
-  //Turn off WiFi and Bluetooth
-  //WiFi.mode(WIFI_OFF);
-  btStop();
-  gps.init();
+void setup_lora()
+{
 
   // LMIC init
   os_init();
@@ -373,6 +367,68 @@ void setup() {
   
 }
 
+void PMU_init()
+{
+ESP_LOGI(TAG, "AXP192 PMU initialization");
+
+  if (axp.begin(Wire, AXP192_PRIMARY_ADDRESS))
+    ESP_LOGW(TAG, "AXP192 PMU initialization failed");
+  else {
+
+    axp.setPowerOutPut(AXP192_LDO2, AXP202_ON);
+    axp.setPowerOutPut(AXP192_LDO3, AXP202_ON);
+    axp.setPowerOutPut(AXP192_DCDC2, AXP202_ON);
+    axp.setPowerOutPut(AXP192_EXTEN, AXP202_ON);
+    axp.setPowerOutPut(AXP192_DCDC1, AXP202_ON);
+    axp.setDCDC1Voltage(3300);
+    axp.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    //axp.setChgLEDMode(AXP20X_LED_OFF);
+    axp.adc1Enable(AXP202_BATT_CUR_ADC1, 1);
+
+#ifdef PMU_INT
+    pinMode(PMU_INT, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT),
+                    [] {
+                    log_display("Power source changed");
+                      /* put your code here */
+                    },
+                    FALLING);
+    axp.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
+                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ,
+                  1);
+    axp.clearIRQ();
+#endif // PMU_INT
+
+    ESP_LOGI(TAG, "AXP192 PMU initialized.");
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  //esp_log_level_set("*", LOG_LOCAL_LEVEL);
+  ESP_LOGI(TAG, "Starting..");    
+  Serial.println(F("TTN Mapper"));
+  i2c_scan();
+  PMU_init();
+  setup_display();
+  setup_sensors();
+  setup_wifi();
+  
+  //Turn off WiFi and Bluetooth
+  //WiFi.mode(WIFI_OFF);
+  //btStop();
+  gps.init();
+
+  #if (HAS_LORA)
+  setup_lora();
+  #endif
+
+  aliveTicker.attach(alivePeriod, t_alive);
+}
+
+
 void loop() {
+  #if (HAS_LORA)
     os_runloop_once();
+  #endif
 }
