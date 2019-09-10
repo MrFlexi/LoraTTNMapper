@@ -1,13 +1,9 @@
 #pragma once
 
 
+#include "globals.h"
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
-
-
-#define GPS_TX 34
-#define GPS_RX 12
-
 
 class gps
 {

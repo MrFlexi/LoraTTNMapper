@@ -3,41 +3,45 @@
 #define USE_CAYENNE     0
 #define HAS_LORA        1
 
-#define HAS_PMU
+#define HAS_PMU         0
 #define PMU_INT         35  
 
 
 #define HAS_DISPLAY
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
-#include "esp_log.h"
 
+#include "globals.h"
 
-
-#include <lmic.h>
-#include <hal/hal.h>
-#include <SPI.h>
-#include <U8g2lib.h>
-#include <Ticker.h>
-#include "esp_sleep.h"
-#include <Wire.h>
-#include "WiFi.h"
-#include "gps.h"
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#include "i2cscan.h"
+#if (HAS_PMU)
 #include "axp20x.h"
+#endif
 
-
-
+int runmode = 0;
+int aliveCounter = 0;
+String stringOne = "";
 
 static const char TAG[] = __FILE__;
+
+//--------------------------------------------------------------------------
+// U8G2 Display Setup
+//--------------------------------------------------------------------------
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // ESP32 Thing, HW I2C with pin remapping
+// Create a U8g2log object
+U8G2LOG u8g2log;
+// assume 4x6 font, define width and height
+#define U8LOG_WIDTH 32
+#define U8LOG_HEIGHT 6
+// allocate memory
+uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
 //----------------------------------------------------------
 // T Beam Power Management
 //----------------------------------------------------------
+#if (HAS_PMU)
   #define AXP192_PRIMARY_ADDRESS (0x34)
 
  AXP20X_Class axp;
+#endif
 
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -61,26 +65,9 @@ const char wifiPassword[] = "Linde-123";
 Ticker aliveTicker;
 const float alivePeriod = 30; //seconds
 
-int runmode = 0;
-int aliveCounter = 0;
-String stringOne = "";
-
 //--------------------------------------------------------------------------
-// U8G2 Display Setup
+// Sensors
 //--------------------------------------------------------------------------
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // ESP32 Thing, HW I2C with pin remapping
-
-// Create a U8g2log object
-U8G2LOG u8g2log;
-
-// assume 4x6 font, define width and height
-#define U8LOG_WIDTH 32
-#define U8LOG_HEIGHT 6
-
-// allocate memory
-uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
-
-
 
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 
@@ -88,7 +75,6 @@ Adafruit_BME280 bme; // I2C   PIN 21 + 22
 // LORA Settings
 //--------------------------------------------------------------------------
 // LoRaWAN NwkSKey, network session key // msb
-
 static PROGMEM u1_t NWKSKEY[16] = { 0x88, 0x06, 0xDA, 0xCF, 0x30, 0xFB, 0x44, 0xDC, 0x69, 0x0E, 0x15, 0xF8, 0xAD, 0xCB, 0x40, 0x6C };
 
 // LoRaWAN AppSKey, application session key // msb
@@ -110,7 +96,6 @@ const lmic_pinmap lmic_pins = {
   .rst = LMIC_UNUSED_PIN, // was "14,"
   .dio = {26, 33, 32},
 };
-
 
 void do_send(osjob_t* j) {  
 
@@ -138,6 +123,7 @@ void do_send(osjob_t* j) {
   // Next TX is scheduled after TX_COMPLETE event.
 }
 
+
 void log_display(String s)
 {
   Serial.println(s);
@@ -157,8 +143,6 @@ void setup_display(void)
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
   u8g2.enableUTF8Print();
   log_display("TTN-ABP-Mapper");
-
-
 }
 
 
@@ -212,7 +196,7 @@ void setup_sensors()
 
 
 void t_alive() {
-  static char volbuffer[128];
+  static char volbuffer[20];
 
   String stringOne;
   aliveCounter++;
@@ -221,14 +205,17 @@ void t_alive() {
   log_display(stringOne);
 
   // Battery
+  #if (HAS_PMU)
   if (axp.isBatteryConnect()) {
         snprintf(volbuffer, sizeof(volbuffer), "%.2fV/%.2fmA", axp.getBattVoltage() / 1000.0, axp.isChargeing() ? axp.getBattChargeCurrent() : axp.getBattDischargeCurrent());
          log_display(volbuffer);
     }
-
+  #endif
   // Temperatur
+  #if (USE_BME280) 
   snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
          log_display(volbuffer);
+  #endif
 
   
 }
@@ -246,15 +233,9 @@ void setup_wifi()
     delay(1000);
       ESP_LOGI(TAG, "Connecting to WiFi..");    
   }
-
-  ESP_LOGI(TAG, WiFi.localIP() );  
-  
+ESP_LOGI(TAG, WiFi.localIP() );  
 #endif
 }
-
-
-
-
 
 
 void onEvent (ev_t ev) {
@@ -332,16 +313,11 @@ void onEvent (ev_t ev) {
 
 void setup_lora()
 {
-
   // LMIC init
   os_init();
   // Reset the MAC state. Session and pending data transfers will be discarded.
   LMIC_reset();
-  
-  
   LMIC_setSession (0x1, DEVADDR, NWKSKEY, APPSKEY);
-
-  
   LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
   LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
   LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
@@ -364,9 +340,9 @@ void setup_lora()
   do_send(&sendjob);
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, LOW);
-  
-}
+  }
 
+#if (HAS_PMU)
 void PMU_init()
 {
 ESP_LOGI(TAG, "AXP192 PMU initialization");
@@ -403,13 +379,17 @@ ESP_LOGI(TAG, "AXP192 PMU initialization");
   }
 }
 
+#endif
+
 void setup() {
   Serial.begin(115200);
   //esp_log_level_set("*", LOG_LOCAL_LEVEL);
   ESP_LOGI(TAG, "Starting..");    
   Serial.println(F("TTN Mapper"));
   i2c_scan();
+  #if (HAS_PMU)
   PMU_init();
+  #endif
   setup_display();
   setup_sensors();
   setup_wifi();
