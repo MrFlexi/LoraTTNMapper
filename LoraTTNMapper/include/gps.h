@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _GPS_H
+#define _GPS_H
 
 
 #include "globals.h"
@@ -20,3 +21,5 @@ class gps
         char t[32]; // used to sprintf for Serial output
         TinyGPSPlus tGps;
 };
+
+#endif
