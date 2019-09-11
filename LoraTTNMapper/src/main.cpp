@@ -364,7 +364,10 @@ void setup() {
   #if (HAS_LORA)
   setup_lora();
   #endif
-  aliveTicker.attach(alivePeriod, t_alive);  
+  aliveTicker.attach(alivePeriod, t_alive); 
+
+  
+  //dataBuffer.data.message = "Ich bin da";
   showPage( 1 );
   delay(5000);
 }

@@ -31,7 +31,25 @@ void showPage(int page)
 {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_ncenB14_tr);
-  u8g2.drawStr(0,20,"Hello World!");
+  u8g2.drawStr(0,0,"Hello World!");
+  u8g2.drawStr(0,20, dataBuffer.data.message );
+  
   u8g2.sendBuffer();
 }
   
+
+DataBuffer::DataBuffer()
+{ 
+}
+
+void DataBuffer::set(bmeStatus_t input  )
+{  
+  data = input;
+}
+
+void DataBuffer::get()
+{  
+}
+
+ DataBuffer dataBuffer;
+ bmeStatus_t sensorValues;

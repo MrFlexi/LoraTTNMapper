@@ -19,9 +19,7 @@
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
 
-#include "display.h"
-#include "gps.h"
-#include "i2cscan.h"
+
 
 typedef struct {
   float iaq;             // IAQ signal
@@ -32,7 +30,14 @@ typedef struct {
   float raw_temperature; // raw temperature signal
   float raw_humidity;    // raw humidity signal
   float gas;             // raw gas sensor signal
+  char message[20];
 } bmeStatus_t;
+
+
+#include "display.h"
+#include "gps.h"
+#include "i2cscan.h"
+
 
   
 #endif
