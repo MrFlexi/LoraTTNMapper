@@ -50,7 +50,7 @@ const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 
 Ticker aliveTicker;
-const float alivePeriod = 30; //seconds
+const float alivePeriod = 2; //seconds
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -103,10 +103,11 @@ void do_send(osjob_t* j) {
     else
     {
       //try again in 3 seconds
-      os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(10), do_send);
+      //os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(10), do_send);
     }
   }
   // Next TX is scheduled after TX_COMPLETE event.
+  os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(60), do_send);
 }
 
 
