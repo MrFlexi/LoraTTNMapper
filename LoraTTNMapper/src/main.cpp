@@ -41,7 +41,7 @@ static const char TAG[] = __FILE__;
 
 char s[32]; // used to sprintf for Serial output
 uint8_t txBuffer[9];
-gps gps;
+//gps gps;
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 // #define SLEEP_ESP32
@@ -163,6 +163,9 @@ void t_alive() {
 
   String stringOne;
   aliveCounter++;
+
+  dataBuffer.data.aliveCounter = aliveCounter;
+
   stringOne = "Alive: ";
   stringOne = stringOne + aliveCounter;   
   log_display(stringOne);
@@ -364,10 +367,10 @@ void setup() {
   #if (HAS_LORA)
   setup_lora();
   #endif
-  aliveTicker.attach(alivePeriod, t_alive); 
-
+  aliveTicker.attach(alivePeriod, t_alive);   
   
-  //dataBuffer.data.message = "Ich bin da";
+  dataBuffer.data.aliveCounter = 10;
+
   showPage( 1 );
   delay(5000);
 }

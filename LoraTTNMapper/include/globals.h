@@ -30,6 +30,7 @@ typedef struct {
   float raw_temperature; // raw temperature signal
   float raw_humidity;    // raw humidity signal
   float gas;             // raw gas sensor signal
+  uint8_t aliveCounter;   // aliveCounter   
   char message[20];
 } bmeStatus_t;
 

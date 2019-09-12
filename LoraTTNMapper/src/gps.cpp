@@ -1,14 +1,14 @@
-#include "gps.h"
+#include "globals.h"
 
 HardwareSerial GPSSerial(1);
 
-void gps::init()
+void gps_jogi::init()
 {
   GPSSerial.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
   GPSSerial.setTimeout(2);
 }
 
-void gps::encode()
+void gps_jogi::encode()
 {       
     int data;
     int previousMillis = millis();
@@ -25,7 +25,7 @@ void gps::encode()
     Serial.println("");
 }
 
-void gps::buildPacket(uint8_t txBuffer[9])
+void gps_jogi::buildPacket(uint8_t txBuffer[9])
 {
   LatitudeBinary = ((tGps.location.lat() + 90) / 180.0) * 16777215;
   LongitudeBinary = ((tGps.location.lng() + 180) / 360.0) * 16777215;
@@ -52,7 +52,7 @@ void gps::buildPacket(uint8_t txBuffer[9])
   txBuffer[8] = hdopGps & 0xFF;
 }
 
-bool gps::checkGpsFix()
+bool gps_jogi::checkGpsFix()
 {
   encode();
   if (tGps.location.isValid() && 
@@ -88,3 +88,5 @@ bool gps::checkGpsFix()
     return false;
   }
 }
+
+gps_jogi gps;

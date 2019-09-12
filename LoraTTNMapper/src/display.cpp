@@ -29,11 +29,13 @@ void setup_display(void)
 
 void showPage(int page)
 {
+  static int const digits = 4;
   u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_ncenB14_tr);
-  u8g2.drawStr(0,0,"Hello World!");
-  u8g2.drawStr(0,20, dataBuffer.data.message );
-  
+  // u8g2.setFont(u8g2_font_ncenB14_tr);
+  u8g2.drawStr(0,12,"SAP GTT");
+
+  u8g2.setCursor(0, 24);  
+  u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
   u8g2.sendBuffer();
 }
   
