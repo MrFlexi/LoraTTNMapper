@@ -2,10 +2,7 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
-#define GPS_TX          12
-#define GPS_RX          15
-
-#define HAS_DISPLAY     U8G2_SSD1306_128X64_NONAME_F_HW_I2C
+#define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
 
 #include <Arduino.h>
 #include <lmic.h>
@@ -19,8 +16,6 @@
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
 
-
-
 typedef struct {
   float iaq;             // IAQ signal
   uint8_t iaq_accuracy;  // accuracy of IAQ signal
@@ -33,15 +28,17 @@ typedef struct {
   uint8_t aliveCounter;   // aliveCounter   
   uint8_t bytesReceived;   
   lmic_t  lmic;
-  char message[20];
+  uint16_t bat_voltage = 0;
 } bmeStatus_t;
 
 
 extern int runmode;
 
+#include "../src/hal/ttgobeam.h"
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
+#include "power.h"
 
 
   

@@ -6,15 +6,10 @@
 #define HAS_PMU         0
 #define PMU_INT         35  
 
-
-#define HAS_DISPLAY
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 
 #include "globals.h"
 
-#if (HAS_PMU)
-#include "axp20x.h"
-#endif
 
 int runmode = 0;
 int aliveCounter = 0;
@@ -23,14 +18,6 @@ String stringOne = "";
 static const char TAG[] = __FILE__;
 
 
-//----------------------------------------------------------
-// T Beam Power Management
-//----------------------------------------------------------
-#if (HAS_PMU)
-  #define AXP192_PRIMARY_ADDRESS (0x34)
-
- AXP20X_Class axp;
-#endif
 
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -166,6 +153,8 @@ void t_alive() {
   aliveCounter++;
 
   dataBuffer.data.aliveCounter = aliveCounter;
+  dataBuffer.data.bat_voltage = read_voltage();
+  Serial.println(dataBuffer.data.bat_voltage);
 
   stringOne = "Alive: ";
   stringOne = stringOne + aliveCounter;   
@@ -363,6 +352,7 @@ void setup() {
   setup_display();
   setup_sensors();
   setup_wifi();
+  calibrate_voltage();
   
   //Turn off WiFi and Bluetooth
   //WiFi.mode(WIFI_OFF);

@@ -24,7 +24,9 @@
 
 // GPS settings
 #define HAS_GPS 1 // use on board GPS
-#define GPS_SERIAL 9600, SERIAL_8N1, GPIO_NUM_12, GPIO_NUM_15 // UBlox NEO 6M
+#define GPS_TX          12
+#define GPS_RX          15
+
 //#define GPS_INT GPIO_NUM_34 // 30ns accurary timepulse, to be external wired on pcb: NEO 6M Pin#3 -> GPIO34
 
 // enable only if device has these sensors, otherwise comment these lines
@@ -34,7 +36,8 @@
 //#define BME680_ADDR BME680_I2C_ADDR_PRIMARY // !! connect SDIO of BME680 to GND !!
 
 // display (if connected)
-#define HAS_DISPLAY U8X8_SSD1306_128X64_NONAME_HW_I2C
+
+
 #define MY_OLED_SDA SDA
 #define MY_OLED_SCL SCL
 #define MY_OLED_RST U8X8_PIN_NONE

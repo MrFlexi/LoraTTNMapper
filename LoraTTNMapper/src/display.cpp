@@ -30,7 +30,8 @@ void setup_display(void)
 
 void showPage(int page)
 {
-  static int const digits = 4;
+
+
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_ncenB14_tr);  
   u8g2.drawStr(1,15,"   SAP GTT  ");
@@ -40,8 +41,14 @@ void showPage(int page)
   u8g2.setCursor(64, 30 );u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
 
   u8g2.setCursor(1, 40); u8g2.printf("Alt:%.2d", gps.tGps.altitude.meters());  
-  u8g2.setCursor(1, 50); u8g2.printf("DataLen:%.2d", dataBuffer.data.lmic.dataLen);  
-
+  u8g2.setCursor(1, 50); u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen); 
+  
+  #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
+    u8g2.setCursor(1, 60);
+    u8g2.printf("B:%.2fV", dataBuffer.data.bat_voltage / 1000.0);
+#endif
+  
+  
   u8g2.sendBuffer();
 }
   

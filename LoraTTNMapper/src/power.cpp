@@ -1,4 +1,7 @@
-// Basic config
+//----------------------------------------------------------
+// T Beam Power Management
+//----------------------------------------------------------
+
 #include "globals.h"
 #include "power.h"
 
@@ -121,7 +124,8 @@ uint8_t getBattLevel() {
   case 0xffff:
     return MCMD_DEVS_EXT_POWER;
   default:
-    return (voltage > OTA_MIN_BATT ? MCMD_DEVS_BATT_MAX : MCMD_DEVS_BATT_MIN);
+    //return (voltage > OTA_MIN_BATT ? MCMD_DEVS_BATT_MAX : MCMD_DEVS_BATT_MIN);
+    return MCMD_DEVS_BATT_MIN;
   }
 #else // we don't have any info on battery level
   return MCMD_DEVS_BATT_NOINFO;
