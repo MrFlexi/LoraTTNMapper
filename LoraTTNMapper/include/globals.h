@@ -31,6 +31,8 @@ typedef struct {
   float raw_humidity;    // raw humidity signal
   float gas;             // raw gas sensor signal
   uint8_t aliveCounter;   // aliveCounter   
+  uint8_t bytesReceived;   
+  lmic_t  lmic;
   char message[20];
 } bmeStatus_t;
 

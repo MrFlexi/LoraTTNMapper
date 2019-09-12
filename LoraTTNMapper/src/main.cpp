@@ -248,6 +248,7 @@ void onEvent (ev_t ev) {
       if (LMIC.dataLen) {
         sprintf(s, "Received %i bytes of payload", LMIC.dataLen);
         Serial.println(s);
+        dataBuffer.data.lmic = LMIC;
         sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
         Serial.println(s);
       }

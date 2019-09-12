@@ -40,7 +40,7 @@ void showPage(int page)
   u8g2.setCursor(64, 30 );u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
 
   u8g2.setCursor(1, 40); u8g2.printf("Alt:%.2d", gps.tGps.altitude.meters());  
-  
+  u8g2.setCursor(1, 50); u8g2.printf("DataLen:%.2d", dataBuffer.data.lmic.dataLen);  
 
   u8g2.sendBuffer();
 }
