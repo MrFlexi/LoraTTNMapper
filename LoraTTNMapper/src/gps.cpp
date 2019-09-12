@@ -69,7 +69,7 @@ bool gps_jogi::checkGpsFix()
   else
   {
      
-     //log_display("no GPS fix");
+    log_display("no GPS fix");
     // sprintf(t, "location valid: %i" , tGps.location.isValid());
     // Serial.println(t);
     // sprintf(t, "location age: %i" , tGps.location.age());

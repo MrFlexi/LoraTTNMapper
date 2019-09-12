@@ -103,7 +103,7 @@ void do_send(osjob_t* j) {
     else
     {
       //try again in 3 seconds
-      os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(3), do_send);
+      os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(10), do_send);
     }
   }
   // Next TX is scheduled after TX_COMPLETE event.
@@ -182,6 +182,9 @@ void t_alive() {
   snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
          log_display(volbuffer);
   #endif
+
+  gps.encode();
+  showPage( 1 );
 
 }
 
@@ -368,9 +371,8 @@ void setup() {
   setup_lora();
   #endif
   aliveTicker.attach(alivePeriod, t_alive);   
-  
-  dataBuffer.data.aliveCounter = 10;
-
+   
+  runmode = 1;    // Switch from Terminal Mode to page Display
   showPage( 1 );
   delay(5000);
 }

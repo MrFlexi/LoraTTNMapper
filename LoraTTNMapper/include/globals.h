@@ -35,6 +35,8 @@ typedef struct {
 } bmeStatus_t;
 
 
+extern int runmode;
+
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
