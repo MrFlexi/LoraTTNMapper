@@ -7,8 +7,26 @@
 #define PMU_INT         35  
 
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
+#define ESP_SLEEP       1    
 
 #include "globals.h"
+
+
+//--------------------------------------------------------------------------
+// Store preferences in NVS Flash
+//--------------------------------------------------------------------------
+Preferences preferences;
+char lastword[10];
+
+unsigned long uptime_seconds_old;
+unsigned long uptime_seconds_new;
+unsigned long uptime_seconds_actual;
+
+//--------------------------------------------------------------------------
+// ESP Sleep Mode
+//--------------------------------------------------------------------------
+#define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP 60       // sleep for 1 minute
 
 
 int runmode = 0;
@@ -60,7 +78,7 @@ void os_getDevKey (u1_t* buf) { }
 
 static osjob_t sendjob;
 // Schedule TX every this many seconds (might become longer due to duty cycle limitations).
-const unsigned TX_INTERVAL = 120;
+const unsigned TX_INTERVAL = 60;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -93,10 +111,44 @@ void do_send(osjob_t* j) {
       //os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(10), do_send);
     }
   }
-  // Next TX is scheduled after TX_COMPLETE event.
-  os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(60), do_send);
+  
 }
 
+void save_uptime()
+{
+  uptime_seconds_new = uptime_seconds_old + uptime_seconds_actual;
+  preferences.putULong("uptime", uptime_seconds_new);
+  Serial.println("ESP32 total uptime" + String(uptime_seconds_new) + " Seconds");
+}
+
+void print_wakeup_reason()
+{
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch (wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0:
+      Serial.println("Wakeup caused by external signal using RTC_IO");
+      break;
+    case ESP_SLEEP_WAKEUP_EXT1:
+      Serial.println("Wakeup caused by external signal using RTC_CNTL");
+      break;
+    case ESP_SLEEP_WAKEUP_TIMER:
+      Serial.println("Wakeup caused by timer");
+      break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD:
+      Serial.println("Wakeup caused by touchpad");
+      break;
+    case ESP_SLEEP_WAKEUP_ULP:
+      Serial.println("Wakeup caused by ULP program");
+      break;
+    default:
+      Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+      break;
+  }
+}
 
 void setup_sensors()
 {
@@ -154,7 +206,6 @@ void t_alive() {
 
   dataBuffer.data.aliveCounter = aliveCounter;
   dataBuffer.data.bat_voltage = read_voltage();
-  Serial.println(dataBuffer.data.bat_voltage);
 
   stringOne = "Alive: ";
   stringOne = stringOne + aliveCounter;   
@@ -175,6 +226,24 @@ void t_alive() {
 
   gps.encode();
   showPage( 1 );
+
+  //-----------------------------------------------------
+  // Deep sleep
+  //-----------------------------------------------------
+#if (ESP_SLEEP)
+  if (aliveCounter > 10)
+  {
+    runmode = 0;
+    log_display("Going to sleep now");
+    preferences.putString("info", "Hallo");
+
+    //drawRawValue(SLEEP, 1, 1);
+    drawSymbol(1,1, SLEEP);
+    Serial.flush();
+    esp_deep_sleep_start();
+    Serial.println("This will never be printed");
+  }
+#endif
 
 }
 
@@ -230,6 +299,7 @@ void onEvent (ev_t ev) {
       break;
     case EV_TXCOMPLETE:
       log_display("EV_TXCOMPLETE");
+      dataBuffer.data.txCounter++;
       Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
       digitalWrite(BUILTIN_LED, LOW);
       if (LMIC.txrxFlags & TXRX_ACK) {
@@ -241,12 +311,20 @@ void onEvent (ev_t ev) {
         dataBuffer.data.lmic = LMIC;
         sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
         Serial.println(s);
+        Serial.println("");
+        Serial.println("Payload");
+        for (int i = 0; i < LMIC.dataLen; i++) {
+          if (LMIC.frame[LMIC.dataBeg + i] < 0x10) {
+            Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
+            }
+        }
       }
       // Schedule next transmission
       //esp_sleep_enable_timer_wakeup(TX_INTERVAL*1000000);
       //esp_deep_sleep_start();
       log_display("Next TX started");
-      do_send(&sendjob);
+      // Next TX is scheduled after TX_COMPLETE event.
+      os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
       break;
     case EV_LOST_TSYNC:
       Serial.println(F("EV_LOST_TSYNC"));
@@ -342,13 +420,25 @@ ESP_LOGI(TAG, "AXP192 PMU initialization");
 
 void setup() {
   Serial.begin(115200);
-  //esp_log_level_set("*", LOG_LOCAL_LEVEL);
+  print_wakeup_reason();
+
+  //---------------------------------------------------------------
+  // Get preferences from Flash
+  //---------------------------------------------------------------
+  preferences.begin("config", false); // NVS Flash RW mode
+  preferences.getULong("uptime", uptime_seconds_old);
+  Serial.println("Uptime old: " + String(uptime_seconds_old));
+  preferences.getString("info", lastword, sizeof(lastword));
+
   ESP_LOGI(TAG, "Starting..");    
   Serial.println(F("TTN Mapper"));
   i2c_scan();
   #if (HAS_PMU)
   PMU_init();
   #endif
+
+  dataBuffer.data.txCounter = 0;
+
   setup_display();
   setup_sensors();
   setup_wifi();
@@ -367,6 +457,15 @@ void setup() {
   runmode = 1;    // Switch from Terminal Mode to page Display
   showPage( 1 );
   delay(5000);
+
+
+  //---------------------------------------------------------------
+  // Deep sleep settings
+  //---------------------------------------------------------------
+  
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  Serial.println("Setup ESP32 to wake-up via timer after " + String(TIME_TO_SLEEP) +
+                 " Seconds");
 }
 
 
@@ -374,4 +473,5 @@ void loop() {
   #if (HAS_LORA)
     os_runloop_once();
   #endif
+
 }

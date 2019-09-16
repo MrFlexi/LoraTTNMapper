@@ -26,26 +26,59 @@ void setup_display(void)
   log_display("TTN-ABP-Mapper");
 }
 
-
+void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
+{
+  // fonts used:
+  // u8g2_font_open_iconic_embedded_6x_t
+  // u8g2_font_open_iconic_weather_6x_t
+  // encoding values, see: https://github.com/olikraus/u8g2/wiki/fntgrpiconic
+  
+  switch(symbol)
+  {
+    case SUN:
+      u8g2.setFont(u8g2_font_open_iconic_weather_6x_t);
+      u8g2.drawGlyph(x, y, 69);	
+      break;
+    case SUN_CLOUD:
+      u8g2.setFont(u8g2_font_open_iconic_weather_6x_t);
+      u8g2.drawGlyph(x, y, 65);	
+      break;
+    case CLOUD:
+      u8g2.setFont(u8g2_font_open_iconic_weather_6x_t);
+      u8g2.drawGlyph(x, y, 64);	
+      break;
+    case RAIN:
+      u8g2.setFont(u8g2_font_open_iconic_weather_6x_t);
+      u8g2.drawGlyph(x, y, 67);	
+      break;    
+    case THUNDER:
+      u8g2.setFont(u8g2_font_open_iconic_embedded_6x_t);
+      u8g2.drawGlyph(x, y, 67);
+      break;
+   case SLEEP:
+      u8g2.setFont( u8g2_font_open_iconic_all_8x_t);
+      u8g2.drawGlyph(x, y, 67);  
+      break;         
+  }
+}
 
 void showPage(int page)
 {
-
-
   u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_ncenB14_tr);  
+  u8g2.setFont(u8g2_font_ncenB12_tr);  
   u8g2.drawStr(1,15,"   SAP GTT  ");
     
   u8g2.setFont(u8g2_font_profont11_mf);
   u8g2.setCursor(1, 30); u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
   u8g2.setCursor(64, 30 );u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
 
-  u8g2.setCursor(1, 40); u8g2.printf("Alt:%.2d", gps.tGps.altitude.meters());  
+  u8g2.setCursor(1, 40); u8g2.printf("Alt:%.4d", gps.tGps.altitude.meters());  
   u8g2.setCursor(1, 50); u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen); 
+  u8g2.setCursor(64, 50); u8g2.printf("TX:%.3d", dataBuffer.data.txCounter); 
   
   #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
     u8g2.setCursor(1, 60);
-    u8g2.printf("B:%.2fV", dataBuffer.data.bat_voltage / 1000.0);
+    u8g2.printf("%.2fV", dataBuffer.data.bat_voltage / 1000.0);
 #endif
   
   

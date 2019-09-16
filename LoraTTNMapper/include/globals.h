@@ -15,6 +15,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
+#include <Preferences.h>
 
 typedef struct {
   float iaq;             // IAQ signal
@@ -25,7 +26,8 @@ typedef struct {
   float raw_temperature; // raw temperature signal
   float raw_humidity;    // raw humidity signal
   float gas;             // raw gas sensor signal
-  uint8_t aliveCounter;   // aliveCounter   
+  uint8_t aliveCounter;   // aliveCounter  
+  uint8_t txCounter;   // aliveCounter    
   uint8_t bytesReceived;   
   lmic_t  lmic;
   uint16_t bat_voltage = 0;
