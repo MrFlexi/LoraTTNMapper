@@ -238,7 +238,9 @@ void t_alive() {
     preferences.putString("info", "Hallo");
 
     //drawRawValue(SLEEP, 1, 1);
-    drawSymbol(1,1, SLEEP);
+    u8g2.clearBuffer();
+    drawSymbol(1,48, SLEEP);
+    u8g2.sendBuffer();
     Serial.flush();
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
