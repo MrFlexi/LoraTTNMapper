@@ -14,6 +14,11 @@
 #define RAIN 3
 #define THUNDER 4
 #define SLEEP 10
+#define ICON_NOTES 11
+
+
+#define PAGE_VALUES 1
+#define PAGE_SLEEP 2
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32

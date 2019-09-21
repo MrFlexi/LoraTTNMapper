@@ -7,7 +7,7 @@
 #define PMU_INT         35  
 
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
-#define ESP_SLEEP       1    
+ 
 
 #include "globals.h"
 
@@ -25,18 +25,17 @@ unsigned long uptime_seconds_actual;
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
+#define ESP_SLEEP       1       // Main switch
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 60       // sleep for 1 minute
+
+
+#define display_refresh     1   // every second
 
 
 int runmode = 0;
-int aliveCounter = 0;
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
-
-
-
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -46,16 +45,16 @@ static const char TAG[] = __FILE__;
 
 char s[32]; // used to sprintf for Serial output
 uint8_t txBuffer[9];
-//gps gps;
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-// #define SLEEP_ESP32
 
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 
-Ticker aliveTicker;
-const float alivePeriod = 2; //seconds
+Ticker sleepTicker;
+Ticker displayTicker;
+
+const float sleepPeriod = 2; //seconds
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -198,18 +197,31 @@ void setup_sensors()
 
 
 
-void t_alive() {
+void t_sleep() {
+  dataBuffer.data.sleepCounter--;
+ 
+  //-----------------------------------------------------
+  // Deep sleep
+  //-----------------------------------------------------
+#if (ESP_SLEEP)
+  if (dataBuffer.data.sleepCounter <= 0  || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT )
+  {
+    runmode = 0;
+    gps.enable_sleep();
+    Serial.flush();
+    showPage(PAGE_SLEEP);
+    esp_deep_sleep_start();
+    Serial.println("This will never be printed");
+  }
+#endif
+
+}
+
+void t_display() {
   static char volbuffer[20];
 
   String stringOne;
-  aliveCounter++;
-
-  dataBuffer.data.aliveCounter = aliveCounter;
   dataBuffer.data.bat_voltage = read_voltage();
-
-  stringOne = "Alive: ";
-  stringOne = stringOne + aliveCounter;   
-  log_display(stringOne);
 
   // Battery
   #if (HAS_PMU)
@@ -225,27 +237,7 @@ void t_alive() {
   #endif
 
   gps.encode();
-  showPage( 1 );
-
-  //-----------------------------------------------------
-  // Deep sleep
-  //-----------------------------------------------------
-#if (ESP_SLEEP)
-  if (aliveCounter > 10)
-  {
-    runmode = 0;
-    log_display("Going to sleep now");
-    preferences.putString("info", "Hallo");
-
-    //drawRawValue(SLEEP, 1, 1);
-    u8g2.clearBuffer();
-    drawSymbol(1,48, SLEEP);
-    u8g2.sendBuffer();
-    Serial.flush();
-    esp_deep_sleep_start();
-    Serial.println("This will never be printed");
-  }
-#endif
+  showPage( PAGE_VALUES );
 
 }
 
@@ -342,7 +334,7 @@ void onEvent (ev_t ev) {
       Serial.println(F("EV_LINK_DEAD"));
       break;
     case EV_LINK_ALIVE:
-      Serial.println(F("EV_LINK_ALIVE"));
+      Serial.println(F("EV_LINK_sleep"));
       break;
     default:
       Serial.println(F("Unknown event"));
@@ -439,7 +431,8 @@ void setup() {
   PMU_init();
   #endif
 
-  dataBuffer.data.txCounter = 0;
+  dataBuffer.data.txCounter        = 0;
+  dataBuffer.data.sleepCounter     =  TIME_TO_NEXT_SLEEP;
 
   setup_display();
   setup_sensors();
@@ -450,24 +443,27 @@ void setup() {
   //WiFi.mode(WIFI_OFF);
   //btStop();
   gps.init();
+  gps.wakeup();
+  gps.ecoMode();
 
   #if (HAS_LORA)
   setup_lora();
   #endif
-  aliveTicker.attach(alivePeriod, t_alive);   
+
+  // Tasks
+  sleepTicker.attach(60, t_sleep); 
+  displayTicker.attach(display_refresh, t_display);   
+
    
   runmode = 1;    // Switch from Terminal Mode to page Display
   showPage( 1 );
-  delay(5000);
-
-
+  
   //---------------------------------------------------------------
   // Deep sleep settings
   //---------------------------------------------------------------
-  
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   Serial.println("Setup ESP32 to wake-up via timer after " + String(TIME_TO_SLEEP) +
-                 " Seconds");
+                 " Minutes");
 }
 
 
