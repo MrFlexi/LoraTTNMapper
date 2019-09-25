@@ -42,12 +42,12 @@ class DataBuffer
 {
   public:
     DataBuffer();
-    void set( bmeStatus_t input );
+    void set( deviceStatus_t input );
     void get();  
-    bmeStatus_t data ;
+    deviceStatus_t data ;
 };
 
 extern DataBuffer dataBuffer;
-extern bmeStatus_t sensorValues;
+//extern deviceStatus_t sensorValues;
 
 #endif

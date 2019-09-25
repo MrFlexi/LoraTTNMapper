@@ -36,7 +36,7 @@ typedef struct {
   uint8_t bytesReceived;   
   lmic_t  lmic;
   uint16_t bat_voltage = 0;
-} bmeStatus_t;
+} deviceStatus_t;
 
 
 extern int runmode;

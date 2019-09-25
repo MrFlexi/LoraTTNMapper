@@ -128,7 +128,7 @@ DataBuffer::DataBuffer()
 {
 }
 
-void DataBuffer::set(bmeStatus_t input)
+void DataBuffer::set(deviceStatus_t input)
 {
   data = input;
 }
@@ -138,4 +138,4 @@ void DataBuffer::get()
 }
 
 DataBuffer dataBuffer;
-bmeStatus_t sensorValues;
+deviceStatus_t sensorValues;
