@@ -1,7 +1,8 @@
-#define USE_WIFI 0
+#define USE_WIFI 1
 #define USE_BME280 1
 #define USE_CAYENNE 0
-#define HAS_LORA 1
+#define HAS_LORA 0
+#define USE_MQTT 1
 
 #define HAS_PMU 0
 #define PMU_INT 35
@@ -23,10 +24,10 @@ unsigned long uptime_seconds_actual;
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
-#define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
+#define ESP_SLEEP      0            // Main switch
+#define uS_TO_S_FACTOR 1000000      //* Conversion factor for micro seconds to seconds */
 
-#define display_refresh 1 // every second
+#define display_refresh 1           // every second
 
 int runmode = 0;
 String stringOne = "";
@@ -44,8 +45,92 @@ uint8_t txBuffer[9];
 
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
+//--------------------------------------------------------------------------
+// Wifi Settings
+//--------------------------------------------------------------------------
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
+WiFiClient wifiClient;
+
+//--------------------------------------------------------------------------
+// MQTT
+//--------------------------------------------------------------------------
+#if (USE_MQTT)
+#include <PubSubClient.h>
+#endif
+//const char *mqtt_server = "192.168.1.144"; // Laptop
+//const char *mqtt_server = "test.mosquitto.org"; // Laptop
+const char *mqtt_server = "192.168.1.100"; // Raspberry
+const char *mqtt_topic = "mrflexi/solarserver/";
+
+#if (USE_MQTT)
+PubSubClient client(wifiClient);
+long lastMsgAlive = 0;
+long lastMsgDist = 0;
+#endif
+
+#if (USE_MQTT)
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  
+  u8g2log.print(topic);u8g2log.print("\n");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+    u8g2log.print((char)payload[i]);
+  }
+  Serial.println();
+  u8g2log.print("\n");
+
+  // Switch on the LED if an 1 was received as first character
+  if ((char)payload[0] == '1') {
+    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    // but actually the LED is on; this is because
+    // it is acive low on the ESP-01)
+  } else {
+    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("Mqtt Client")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      client.publish("MrFlexi/nodemcu", "connected");
+      // ... and resubscribe
+      client.subscribe(mqtt_topic);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void setup_mqtt()
+{
+
+ client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+
+  if (!client.connected())
+  {
+    reconnect();
+  }
+
+  log_display("Mqtt connected");
+  client.publish("mrflexi/solarserver/info", "ESP32 is alive...");
+
+}
+#endif
 
 Ticker sleepTicker;
 Ticker displayTicker;
@@ -238,7 +323,7 @@ void setup_wifi()
     delay(1000);
     ESP_LOGI(TAG, "Connecting to WiFi..");
   }
-  ESP_LOGI(TAG, WiFi.localIP());
+  //ESP_LOGI(TAG, String(WiFi.localIP()) );
 #endif
 }
 
@@ -441,6 +526,10 @@ void setup()
   setup_lora();
 #endif
 
+#if (USE_MQTT)
+setup_mqtt();
+#endif
+
   // Tasks
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(display_refresh, t_display);
@@ -460,5 +549,14 @@ void loop()
 {
 #if (HAS_LORA)
   os_runloop_once();
+#endif
+
+#if (USE_MQTT)
+  // MQTT Connection
+  if (!client.connected())
+  {
+    reconnect();
+  }
+  client.loop();
 #endif
 }
