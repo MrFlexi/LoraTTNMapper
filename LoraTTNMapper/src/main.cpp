@@ -25,9 +25,6 @@ unsigned long uptime_seconds_old;
 unsigned long uptime_seconds_new;
 unsigned long uptime_seconds_actual;
 
-
-
-
 #define display_refresh 5   // every second
 
 int runmode = 0;
@@ -274,15 +271,6 @@ void setup_sensors()
   ESP_LOGI(TAG, "BME280 Setup...");
   unsigned status;
 
-  // https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/issues/62
-
-  //bool wire_status = Wire1.begin( GPIO_NUM_4, GPIO_NUM_15);
-  //if(!wire_status)
-  //{
-  //  Serial.println("Could not finitialize Wire1");
-  //}
-
-  //status = bme.begin(0x76, &Wire1);
   status = bme.begin(0x76);
   if (!status)
   {
@@ -341,18 +329,26 @@ void t_display()
   log_display(volbuffer);
 #endif
 
-#if (HAS_PMU)
+// read battery voltage into global variable
+#if (defined BAT_MEASURE_ADC || defined HAS_PMU)
+  uint16_t batt_voltage = read_voltage();
+  if (batt_voltage == 0xffff)
+    ESP_LOGI(TAG, "Battery: external power");
+  else
+    ESP_LOGI(TAG, "Battery: %dmV", batt_voltage);
+#ifdef HAS_PMU
   AXP192_showstatus();
+#endif
 #endif
 
 #if (HAS_INA)
   print_ina();
 #endif
 
-  gps.encode();
-  delay(1000);
-  showPage(PAGE_VALUES);
-  delay(1000);
+  //gps.encode();
+  
+  //showPage(PAGE_VALUES);
+  
 }
 
 void setup_wifi()
@@ -522,9 +518,10 @@ void setup()
   print_ina();
 #endif
 
-#if (HAS_PMU)
+ #if (HAS_PMU)
   AXP192_init();
-#endif
+  AXP192_showstatus();
+  #endif
 
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
@@ -542,6 +539,9 @@ void setup()
   setup_lora();
 #endif
 
+
+
+
 #if (USE_MQTT)
   setup_mqtt();
 #endif
@@ -550,8 +550,11 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(display_refresh, t_display);
 
+
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
+  ESP_LOGI(TAG, "Status");
+  AXP192_showstatus();
 
   //---------------------------------------------------------------
   // Deep sleep settings

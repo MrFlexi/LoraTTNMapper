@@ -102,7 +102,7 @@ void showPage(int page)
 
 #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
       u8g2.setCursor(1, 60);
-      u8g2.printf("%.2fV", dataBuffer.data.bat_voltage / 1000.0);
+      //u8g2.printf("%.2fV", dataBuffer.data.bat_voltage / 1000.0);
 #endif
       break;
 
