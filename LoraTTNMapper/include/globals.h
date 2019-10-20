@@ -2,13 +2,27 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
+#include <Arduino.h>
+
 #define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
 
+#define I2CMUTEXREFRES_MS  40
+
+#define I2C_MUTEX_LOCK()                                                       \
+  (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
+
+#define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
+
+//--------------------------------------------------------------------------
+// ESP Sleep Mode
+//--------------------------------------------------------------------------
+#define ESP_SLEEP 0            // Main switch
+#define uS_TO_S_FACTOR 1000000 //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 1         // sleep for 1 minute
 #define TIME_TO_NEXT_SLEEP  2      // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 2   // after n Lora TX events
 
-#include <Arduino.h>
+
 #include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
@@ -40,13 +54,13 @@ typedef struct {
 
 
 extern int runmode;
+extern SemaphoreHandle_t I2Caccess;
 
-#include "../src/hal/ttgobeam.h"
+#include "../src/hal/ttgobeam10.h"
+#include "power.h"
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
-#include "power.h"
+#include "INA3221.h"
 
-
-  
 #endif

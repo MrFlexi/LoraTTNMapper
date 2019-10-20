@@ -1,15 +1,19 @@
-#define USE_WIFI 1
-#define USE_BME280 1
+#define USE_WIFI 0
+#define USE_BME280 0
 #define USE_CAYENNE 0
-#define HAS_LORA 0
-#define USE_MQTT 1
+#define HAS_LORA 1
+#define USE_MQTT 0
 
-#define HAS_PMU 0
-#define PMU_INT 35
+#define HAS_INA 0
 
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 
+// I2C bus access control
+#include <FreeRTOS.h>
+
 #include "globals.h"
+
+SemaphoreHandle_t I2Caccess;
 
 //--------------------------------------------------------------------------
 // Store preferences in NVS Flash
@@ -21,13 +25,10 @@ unsigned long uptime_seconds_old;
 unsigned long uptime_seconds_new;
 unsigned long uptime_seconds_actual;
 
-//--------------------------------------------------------------------------
-// ESP Sleep Mode
-//--------------------------------------------------------------------------
-#define ESP_SLEEP      0            // Main switch
-#define uS_TO_S_FACTOR 1000000      //* Conversion factor for micro seconds to seconds */
 
-#define display_refresh 1           // every second
+
+
+#define display_refresh 5   // every second
 
 int runmode = 0;
 String stringOne = "";
@@ -52,6 +53,38 @@ const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 WiFiClient wifiClient;
 
+#if (HAS_INA)
+void print_ina()
+{
+  Serial.println("------------------------------");
+  float shuntvoltage1 = 0;
+  float busvoltage1 = 0;
+  float current_mA1 = 0;
+  float loadvoltage1 = 0;
+
+  busvoltage1 = ina3221.getBusVoltage_V(1);
+  shuntvoltage1 = ina3221.getShuntVoltage_mV(1);
+  current_mA1 = -ina3221.getCurrent_mA(1); // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
+  loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
+
+  Serial.print("LIPO_Battery Bus Voltage:   ");
+  Serial.print(busvoltage1);
+  Serial.println(" V");
+  Serial.print("LIPO_Battery Shunt Voltage: ");
+  Serial.print(shuntvoltage1);
+  Serial.println(" mV");
+  Serial.print("LIPO_Battery Load Voltage:  ");
+  Serial.print(loadvoltage1);
+  Serial.println(" V");
+  Serial.print("LIPO_Battery Current 1:       ");
+  Serial.print(current_mA1);
+  Serial.println(" mA");
+  Serial.println("");
+
+  Serial.println("h");
+}
+#endif
+
 //--------------------------------------------------------------------------
 // MQTT
 //--------------------------------------------------------------------------
@@ -70,13 +103,16 @@ long lastMsgDist = 0;
 #endif
 
 #if (USE_MQTT)
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
   Serial.print("Message arrived [");
-  
-  u8g2log.print(topic);u8g2log.print("\n");
+
+  u8g2log.print(topic);
+  u8g2log.print("\n");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     Serial.print((char)payload[i]);
     u8g2log.print((char)payload[i]);
   }
@@ -84,28 +120,35 @@ void callback(char* topic, byte* payload, unsigned int length) {
   u8g2log.print("\n");
 
   // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  if ((char)payload[0] == '1')
+  {
+    digitalWrite(BUILTIN_LED, LOW); // Turn the LED on (Note that LOW is the voltage level
     // but actually the LED is on; this is because
     // it is acive low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
   }
-
+  else
+  {
+    digitalWrite(BUILTIN_LED, HIGH); // Turn the LED off by making the voltage HIGH
+  }
 }
 
-void reconnect() {
+void reconnect()
+{
   // Loop until we're reconnected
-  while (!client.connected()) {
+  while (!client.connected())
+  {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("Mqtt Client")) {
+    if (client.connect("Mqtt Client"))
+    {
       Serial.println("connected");
       // Once connected, publish an announcement...
       client.publish("MrFlexi/nodemcu", "connected");
       // ... and resubscribe
       client.subscribe(mqtt_topic);
-    } else {
+    }
+    else
+    {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
@@ -118,7 +161,7 @@ void reconnect() {
 void setup_mqtt()
 {
 
- client.setServer(mqtt_server, 1883);
+  client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
   if (!client.connected())
@@ -128,7 +171,6 @@ void setup_mqtt()
 
   log_display("Mqtt connected");
   client.publish("mrflexi/solarserver/info", "ESP32 is alive...");
-
 }
 #endif
 
@@ -291,24 +333,26 @@ void t_display()
   static char volbuffer[20];
 
   String stringOne;
-  dataBuffer.data.bat_voltage = read_voltage();
+  // dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000.0
 
-// Battery
-#if (HAS_PMU)
-  if (axp.isBatteryConnect())
-  {
-    snprintf(volbuffer, sizeof(volbuffer), "%.2fV/%.2fmA", axp.getBattVoltage() / 1000.0, axp.isChargeing() ? axp.getBattChargeCurrent() : axp.getBattDischargeCurrent());
-    log_display(volbuffer);
-  }
-#endif
 // Temperatur
 #if (USE_BME280)
   snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
   log_display(volbuffer);
 #endif
 
+#if (HAS_PMU)
+  AXP192_showstatus();
+#endif
+
+#if (HAS_INA)
+  print_ina();
+#endif
+
   gps.encode();
+  delay(1000);
   showPage(PAGE_VALUES);
+  delay(1000);
 }
 
 void setup_wifi()
@@ -447,64 +491,39 @@ void setup_lora()
   digitalWrite(BUILTIN_LED, LOW);
 }
 
-#if (HAS_PMU)
-void PMU_init()
-{
-  ESP_LOGI(TAG, "AXP192 PMU initialization");
-
-  if (axp.begin(Wire, AXP192_PRIMARY_ADDRESS))
-    ESP_LOGW(TAG, "AXP192 PMU initialization failed");
-  else
-  {
-
-    axp.setPowerOutPut(AXP192_LDO2, AXP202_ON);
-    axp.setPowerOutPut(AXP192_LDO3, AXP202_ON);
-    axp.setPowerOutPut(AXP192_DCDC2, AXP202_ON);
-    axp.setPowerOutPut(AXP192_EXTEN, AXP202_ON);
-    axp.setPowerOutPut(AXP192_DCDC1, AXP202_ON);
-    axp.setDCDC1Voltage(3300);
-    axp.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
-    //axp.setChgLEDMode(AXP20X_LED_OFF);
-    axp.adc1Enable(AXP202_BATT_CUR_ADC1, 1);
-
-#ifdef PMU_INT
-    pinMode(PMU_INT, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PMU_INT),
-                    [] {
-                      log_display("Power source changed");
-                      /* put your code here */
-                    },
-                    FALLING);
-    axp.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
-                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ,
-                  1);
-    axp.clearIRQ();
-#endif // PMU_INT
-
-    ESP_LOGI(TAG, "AXP192 PMU initialized.");
-  }
-}
-
-#endif
-
 void setup()
 {
   Serial.begin(115200);
   print_wakeup_reason();
 
+   // create some semaphores for syncing / mutexing tasks
+  I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
+  assert(I2Caccess != NULL);
+  I2C_MUTEX_UNLOCK();
+
   //---------------------------------------------------------------
   // Get preferences from Flash
   //---------------------------------------------------------------
-  preferences.begin("config", false); // NVS Flash RW mode
-  preferences.getULong("uptime", uptime_seconds_old);
-  Serial.println("Uptime old: " + String(uptime_seconds_old));
-  preferences.getString("info", lastword, sizeof(lastword));
+  //preferences.begin("config", false); // NVS Flash RW mode
+  //preferences.getULong("uptime", uptime_seconds_old);
+  //Serial.println("Uptime old: " + String(uptime_seconds_old));
+  //preferences.getString("info", lastword, sizeof(lastword));
 
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
+
+#if (HAS_INA)
+  ina3221.begin();
+  Serial.print("Manufactures ID=0x");
+  int MID;
+  MID = ina3221.getManufID();
+  Serial.println(MID, HEX);
+  print_ina();
+#endif
+
 #if (HAS_PMU)
-  PMU_init();
+  AXP192_init();
 #endif
 
   dataBuffer.data.txCounter = 0;
@@ -518,16 +537,13 @@ void setup()
   //Turn off WiFi and Bluetooth
   //WiFi.mode(WIFI_OFF);
   //btStop();
-  gps.init();
-  gps.wakeup();
-  gps.ecoMode();
 
 #if (HAS_LORA)
   setup_lora();
 #endif
 
 #if (USE_MQTT)
-setup_mqtt();
+  setup_mqtt();
 #endif
 
   // Tasks
@@ -540,9 +556,15 @@ setup_mqtt();
   //---------------------------------------------------------------
   // Deep sleep settings
   //---------------------------------------------------------------
+  #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   Serial.println("Setup ESP32 to wake-up via timer after " + String(TIME_TO_SLEEP) +
                  " Minutes");
+  #endif               
+
+  gps.init();
+  gps.wakeup();
+  gps.ecoMode();
 }
 
 void loop()

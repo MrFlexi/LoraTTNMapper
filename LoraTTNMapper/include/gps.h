@@ -1,7 +1,7 @@
 #ifndef _GPS_H
 #define _GPS_H
 
-#include "globals.h"
+//#include "globals.h"
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
 

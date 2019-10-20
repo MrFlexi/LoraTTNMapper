@@ -1,7 +1,4 @@
-//----------------------------------------------------------
-// T Beam Power Management
-//----------------------------------------------------------
-
+// Basic config
 #include "globals.h"
 #include "power.h"
 
@@ -12,58 +9,192 @@ static const char TAG[] = __FILE__;
 
 AXP20X_Class pmu;
 
-void AXP192_init(void) {
+void power_event_IRQ(void)
+{
 
-  // block i2c bus access
-  if (I2C_MUTEX_LOCK()) {
+  pmu.readIRQ();
 
-    if (pmu.begin(Wire, AXP192_PRIMARY_ADDRESS))
-      ESP_LOGI(TAG, "AXP192 PMU initialization failed");
-    else {
+  if (pmu.isVbusOverVoltageIRQ())
+    ESP_LOGI(TAG, "USB voltage %.2fV too high.", pmu.getVbusVoltage() / 1000);
+  if (pmu.isVbusPlugInIRQ())
+    ESP_LOGI(TAG, "USB plugged, %.2fV @ %.0mA", pmu.getVbusVoltage() / 1000,
+             pmu.getVbusCurrent());
+  if (pmu.isVbusRemoveIRQ())
+    ESP_LOGI(TAG, "USB unplugged.");
 
-      pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);
-      pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);
-      pmu.setPowerOutPut(AXP192_DCDC2, AXP202_ON);
-      pmu.setPowerOutPut(AXP192_EXTEN, AXP202_ON);
-      pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON);
-      pmu.setDCDC1Voltage(3300);
-      pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
-      pmu.adc1Enable(AXP202_BATT_CUR_ADC1, 1);
+  if (pmu.isBattPlugInIRQ())
+    ESP_LOGI(TAG, "Battery is connected.");
+  if (pmu.isBattRemoveIRQ())
+    ESP_LOGI(TAG, "Battery was removed.");
+  if (pmu.isChargingIRQ())
+    ESP_LOGI(TAG, "Battery charging.");
+  if (pmu.isChargingDoneIRQ())
+    ESP_LOGI(TAG, "Battery charging done.");
+  if (pmu.isBattTempLowIRQ())
+    ESP_LOGI(TAG, "Battery high temperature.");
+  if (pmu.isBattTempHighIRQ())
+    ESP_LOGI(TAG, "Battery low temperature.");
 
-      /*
-        // I2C access of AXP202X library currently is not mutexable
-        // so we need to disable AXP interrupts
-        
+  // display on/off
+  // if (pmu.isPEKShortPressIRQ()) {
+  //  cfg.screenon = !cfg.screenon;
+  //}
 
-        #ifdef PMU_INT
-            pinMode(PMU_INT, INPUT_PULLUP);
-            attachInterrupt(digitalPinToInterrupt(PMU_INT),
-                            [] {
-                              ESP_LOGI(TAG, "Power source changed");
-                              // put your code here
-                            },
-                            FALLING);
-            pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
-                              AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ,
-                          1);
-            pmu.clearIRQ();
-        #endif // PMU_INT
-        */
+  // shutdown power
+  if (pmu.isPEKLongtPressIRQ())
+  {
+    AXP192_power(false); // switch off Lora, GPS, display
+    pmu.shutdown();      // switch off device
+  }
 
-      ESP_LOGI(TAG, "AXP192 PMU initialized.");
+  pmu.clearIRQ();
 
-      if (pmu.isBatteryConnect())
-        if (pmu.isChargeing())
-          ESP_LOGI(TAG, "Battery deteced, charging.");
-        else
-          ESP_LOGI(TAG, "Battery deteced, not charging.");
-      else
-        ESP_LOGI(TAG, "No Battery deteced.");
-    }
-    I2C_MUTEX_UNLOCK(); // release i2c bus access
-  } else
-    ESP_LOGE(TAG, "I2c bus busy - PMU initialization error");
+  // refresh stored voltage value
+  read_voltage();
 }
+
+void AXP192_power(bool on)
+{
+  if (on)
+  {
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
+    pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
+    pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
+    // pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+  }
+  else
+  {
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
+    pmu.setPowerOutPut(AXP192_DCDC1, AXP202_OFF);
+    pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF);
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
+  }
+}
+
+void AXP192_showstatus(void)
+{
+
+  ESP_LOGI(TAG, "%.2fV/%.2fmA", pmu.getBattVoltage() / 1000.0, pmu.isChargeing() ? pmu.getBattChargeCurrent() : pmu.getBattDischargeCurrent());
+
+  if (pmu.isBatteryConnect())
+    if (pmu.isChargeing())
+      ESP_LOGI(TAG, "Battery charging, %.2fV @ %.0fmAh",
+               pmu.getBattVoltage() / 1000, pmu.getBattChargeCurrent());
+    else
+      ESP_LOGI(TAG, "Battery not charging");
+  else
+    ESP_LOGI(TAG, "No Battery");
+
+  if (pmu.isVBUSPlug())
+    ESP_LOGI(TAG, "USB powered, %.0fmW",
+             pmu.getVbusVoltage() / 1000 * pmu.getVbusCurrent());
+  else
+    ESP_LOGI(TAG, "USB not present");
+
+  Serial.printf("DCDC1: %s\n", pmu.isDCDC1Enable() ? "ENABLE" : "DISABLE");
+  Serial.printf("DCDC2: %s\n", pmu.isDCDC2Enable() ? "ENABLE" : "DISABLE");
+  Serial.printf("LDO2: %s\n", pmu.isLDO2Enable() ? "ENABLE" : "DISABLE");
+  Serial.printf("LDO3: %s\n", pmu.isLDO3Enable() ? "ENABLE" : "DISABLE");
+  Serial.printf("DCDC3: %s\n", pmu.isDCDC3Enable() ? "ENABLE" : "DISABLE");
+  Serial.printf("Exten: %s\n", pmu.isExtenEnable() ? "ENABLE" : "DISABLE");
+}
+
+void AXP192_init(void)
+{
+
+  if (pmu.begin(i2c_readBytes, i2c_writeBytes, AXP192_PRIMARY_ADDRESS) ==
+      AXP_FAIL)
+    ESP_LOGI(TAG, "AXP192 PMU initialization failed");
+  else
+  {
+
+    // configure AXP192
+    pmu.setDCDC1Voltage(3300);              // for external OLED display
+    pmu.setTimeOutShutdown(false);          // no automatic shutdown
+    pmu.setTSmode(AXP_TS_PIN_MODE_DISABLE); // TS pin mode off to save power
+
+    // switch ADCs on
+    pmu.adc1Enable(AXP202_BATT_VOL_ADC1, true);
+    pmu.adc1Enable(AXP202_BATT_CUR_ADC1, true);
+    pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
+    pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
+
+    // switch power rails on
+    AXP192_power(true);
+
+#if (PMU_INT)
+    pinMode(PMU_INT, INPUT_PULLUP);
+    //attachInterrupt(digitalPinToInterrupt(PMU_INT), PMUIRQ, FALLING);
+    pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
+                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
+                      AXP202_CHARGING_FINISHED_IRQ,
+                  1);
+    pmu.clearIRQ();
+#endif // PMU_INT
+
+    ESP_LOGI(TAG, "AXP192 PMU initialized");
+  }
+}
+
+// helper functions for mutexing i2c access
+uint8_t i2c_readBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len)
+{
+  if (I2C_MUTEX_LOCK())
+  {
+    uint8_t ret = 0;
+    Wire.beginTransmission(addr);
+    Wire.write(reg);
+    Wire.endTransmission(false);
+    uint8_t cnt = Wire.requestFrom(addr, (uint8_t)len, (uint8_t)1);
+    if (!cnt)
+      ret = 0xFF;
+    uint16_t index = 0;
+    while (Wire.available())
+    {
+      if (index > len)
+      {
+        ret = 0xFF;
+        goto finish;
+      }
+      data[index++] = Wire.read();
+    }
+
+  finish:
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
+    return ret;
+  }
+  else
+  {
+    ESP_LOGW(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    return 0xFF;
+  }
+}
+
+uint8_t i2c_writeBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len)
+{
+  if (I2C_MUTEX_LOCK())
+  {
+
+    uint8_t ret = 0;
+    Wire.beginTransmission(addr);
+    Wire.write(reg);
+    for (uint16_t i = 0; i < len; i++)
+    {
+      Wire.write(data[i]);
+    }
+    ret = Wire.endTransmission();
+
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
+    return ret ? ret : 0xFF;
+  }
+  else
+  {
+    ESP_LOGW(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    return 0xFF;
+  }
+}
+
 #endif // HAS_PMU
 
 #ifdef BAT_MEASURE_ADC
@@ -81,61 +212,51 @@ static const adc_unit_t unit = ADC_UNIT_1;
 
 #endif // BAT_MEASURE_ADC
 
-void calibrate_voltage(void) {
+void calibrate_voltage(void)
+{
 #ifdef BAT_MEASURE_ADC
 // configure ADC
 #ifndef BAT_MEASURE_ADC_UNIT // ADC1
   ESP_ERROR_CHECK(adc1_config_width(ADC_WIDTH_BIT_12));
   ESP_ERROR_CHECK(adc1_config_channel_atten(adc_channel, atten));
-#else // ADC2
-  // ESP_ERROR_CHECK(adc2_config_width(ADC_WIDTH_BIT_12));
+#else // ADC2 \
+      // ESP_ERROR_CHECK(adc2_config_width(ADC_WIDTH_BIT_12));
   ESP_ERROR_CHECK(adc2_config_channel_atten(adc_channel, atten));
 #endif
   // calibrate ADC
   esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
       unit, atten, ADC_WIDTH_BIT_12, DEFAULT_VREF, adc_characs);
   // show ADC characterization base
-  if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP) {
+  if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP)
+  {
     ESP_LOGI(TAG,
              "ADC characterization based on Two Point values stored in eFuse");
-  } else if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
+  }
+  else if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF)
+  {
     ESP_LOGI(TAG,
              "ADC characterization based on reference voltage stored in eFuse");
-  } else {
+  }
+  else
+  {
     ESP_LOGI(TAG, "ADC characterization based on default reference voltage");
   }
 #endif
 }
 
-uint8_t getBattLevel() {
-  /*
-  return values:
-  MCMD_DEVS_EXT_POWER   = 0x00, // external power supply
-  MCMD_DEVS_BATT_MIN    = 0x01, // min battery value
-  MCMD_DEVS_BATT_MAX    = 0xFE, // max battery value
-  MCMD_DEVS_BATT_NOINFO = 0xFF, // unknown battery level
-  */
+bool batt_sufficient()
+{
 #if (defined HAS_PMU || defined BAT_MEASURE_ADC)
-  uint16_t voltage = read_voltage();
-
-  switch (voltage) {
-  case 0:
-    return MCMD_DEVS_BATT_NOINFO;
-  case 0xffff:
-    return MCMD_DEVS_EXT_POWER;
-  default:
-    //return (voltage > OTA_MIN_BATT ? MCMD_DEVS_BATT_MAX : MCMD_DEVS_BATT_MIN);
-    return MCMD_DEVS_BATT_MIN;
-  }
-#else // we don't have any info on battery level
-  return MCMD_DEVS_BATT_NOINFO;
+  uint16_t volts = read_voltage();
+  return ((volts < 1000) ||
+          (volts > 1)); // no battery or battery sufficient
+#else
+  return true;
 #endif
-} // getBattLevel()
+}
 
-// u1_t os_getBattLevel(void) { return getBattLevel(); };
-
-uint16_t read_voltage() {
-
+uint16_t read_voltage()
+{
   uint16_t voltage = 0;
 
 #ifdef HAS_PMU
@@ -145,19 +266,23 @@ uint16_t read_voltage() {
 #ifdef BAT_MEASURE_ADC
   // multisample ADC
   uint32_t adc_reading = 0;
-  int adc_buf = 0;
-  for (int i = 0; i < NO_OF_SAMPLES; i++) {
 #ifndef BAT_MEASURE_ADC_UNIT // ADC1
+  for (int i = 0; i < NO_OF_SAMPLES; i++)
+  {
     adc_reading += adc1_get_raw(adc_channel);
+  }
 #else                        // ADC2
+  int adc_buf = 0;
+  for (int i = 0; i < NO_OF_SAMPLES; i++)
+  {
     ESP_ERROR_CHECK(adc2_get_raw(adc_channel, ADC_WIDTH_BIT_12, &adc_buf));
     adc_reading += adc_buf;
-#endif
   }
+#endif                       // BAT_MEASURE_ADC_UNIT
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-#endif // BAT_MEASURE_ADC
+#endif                       // BAT_MEASURE_ADC
 
 #ifdef BAT_VOLTAGE_DIVIDER
   voltage *= BAT_VOLTAGE_DIVIDER;

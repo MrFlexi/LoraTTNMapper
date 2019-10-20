@@ -2,7 +2,6 @@
 //#include "globals.h"
 #include <Wire.h>
 #include "i2cscan.h"
-#include "axp20x.h"
 
 // Local logging tag
 //static const char TAG[] = __FILE__;
@@ -15,8 +14,6 @@
 #define MCP_24AA02E64_PRIMARY_ADDRESS (0x50)
 #define QUECTEL_GPS_PRIMARY_ADDRESS (0x10)
 
-#define HAS_PMU
-#define PMU_INT   35
 
 int i2c_scan(void) {
 
@@ -51,9 +48,7 @@ int i2c_scan(void) {
 
       case AXP192_PRIMARY_ADDRESS:
         ESP_LOGI(TAG, "0x%X: AXP192 power management", addr);
-#ifdef HAS_PMU
-        // AXP192_init();
-#endif
+
         break;
 
       case QUECTEL_GPS_PRIMARY_ADDRESS:
