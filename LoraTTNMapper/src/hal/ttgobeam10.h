@@ -22,8 +22,8 @@
 
 // GPS settings
 #define HAS_GPS 1 // use on board GPS
-#define GPS_TX          12
-#define GPS_RX          15
+#define GPS_TX          34
+#define GPS_RX          12
 
 // enable only if device has these sensors, otherwise comment these lines
 // BME680 sensor on I2C bus

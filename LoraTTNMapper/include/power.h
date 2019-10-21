@@ -12,6 +12,7 @@
 #define AXP192_PRIMARY_ADDRESS (0x34)
 
 uint16_t read_voltage(void);
+float read_current(void);
 void calibrate_voltage(void);
 bool batt_sufficient(void);
 

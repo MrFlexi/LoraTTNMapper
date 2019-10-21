@@ -31,10 +31,10 @@ void gps_jogi::buildPacket(uint8_t txBuffer[9])
   LongitudeBinary = ((tGps.location.lng() + 180) / 360.0) * 16777215;
 
   sprintf(t, "Lat: %f", tGps.location.lat());
-  //Serial.println(t);
+  Serial.println(t);
 
   sprintf(t, "Lng: %f", tGps.location.lng());
-  //Serial.println(t);
+  Serial.println(t);
 
   txBuffer[0] = (LatitudeBinary >> 16) & 0xFF;
   txBuffer[1] = (LatitudeBinary >> 8) & 0xFF;
@@ -90,7 +90,7 @@ bool gps_jogi::checkGpsFix()
 }
 
   void gps_jogi::wakeup() {
-    Serial.println("Wake");
+    Serial.println("GPS wake up");
     int data = -1;
     do
     {

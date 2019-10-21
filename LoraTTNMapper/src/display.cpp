@@ -97,12 +97,12 @@ void showPage(int page)
       u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(64, 50);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      u8g2.setCursor(1, 50);
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
+      //u8g2.setCursor(1, 50);
+      //u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
 
 #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
       u8g2.setCursor(1, 60);
-      //u8g2.printf("%.2fV", dataBuffer.data.bat_voltage / 1000.0);
+      u8g2.printf("BAT: %.2fV %.0fmA ", dataBuffer.data.bat_voltage / 1000.0, dataBuffer.data.bat_current);
 #endif
       break;
 

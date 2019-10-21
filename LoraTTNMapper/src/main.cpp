@@ -3,13 +3,17 @@
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
-
 #define HAS_INA 0
-
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 
-// I2C bus access control
-#include <FreeRTOS.h>
+// T-Beam specific hardware
+#undef BUILTIN_LED
+#define BUILTIN_LED 14
+#define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
+
+#define display_refresh 5   // every second
+const float sleepPeriod = 2; //seconds
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 #include "globals.h"
 
@@ -25,23 +29,12 @@ unsigned long uptime_seconds_old;
 unsigned long uptime_seconds_new;
 unsigned long uptime_seconds_actual;
 
-#define display_refresh 5   // every second
-
 int runmode = 0;
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
-
-#define SEALEVELPRESSURE_HPA (1013.25)
-
-// T-Beam specific hardware
-#undef BUILTIN_LED
-#define BUILTIN_LED 21
-
 char s[32]; // used to sprintf for Serial output
 uint8_t txBuffer[9];
-
-#define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
 //--------------------------------------------------------------------------
 // Wifi Settings
@@ -87,19 +80,16 @@ void print_ina()
 //--------------------------------------------------------------------------
 #if (USE_MQTT)
 #include <PubSubClient.h>
-#endif
+
 //const char *mqtt_server = "192.168.1.144"; // Laptop
 //const char *mqtt_server = "test.mosquitto.org"; // Laptop
 const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_topic = "mrflexi/solarserver/";
 
-#if (USE_MQTT)
 PubSubClient client(wifiClient);
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
-#endif
 
-#if (USE_MQTT)
 void callback(char *topic, byte *payload, unsigned int length)
 {
   Serial.print("Message arrived [");
@@ -174,8 +164,6 @@ void setup_mqtt()
 Ticker sleepTicker;
 Ticker displayTicker;
 
-const float sleepPeriod = 2; //seconds
-
 //--------------------------------------------------------------------------
 // Sensors
 //--------------------------------------------------------------------------
@@ -225,6 +213,8 @@ void do_send(osjob_t *j)
       Serial.println(F("Packet queued"));
       digitalWrite(BUILTIN_LED, HIGH);
     }
+    else
+      ESP_LOGV(TAG, "GPS no fix");
   }
 }
 
@@ -238,9 +228,7 @@ void save_uptime()
 void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
-
   wakeup_reason = esp_sleep_get_wakeup_cause();
-
   switch (wakeup_reason)
   {
   case ESP_SLEEP_WAKEUP_EXT0:
@@ -266,7 +254,6 @@ void print_wakeup_reason()
 
 void setup_sensors()
 {
-
 #if (USE_BME280)
   ESP_LOGI(TAG, "BME280 Setup...");
   unsigned status;
@@ -298,12 +285,12 @@ void setup_sensors()
 
 void t_sleep()
 {
-  dataBuffer.data.sleepCounter--;
-
-  //-----------------------------------------------------
+   //-----------------------------------------------------
   // Deep sleep
   //-----------------------------------------------------
+  
 #if (ESP_SLEEP)
+dataBuffer.data.sleepCounter--;
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
   {
     runmode = 0;
@@ -316,38 +303,30 @@ void t_sleep()
 #endif
 }
 
-void t_display()
+void t_cyclic()
 {
-  static char volbuffer[20];
-
-  String stringOne;
-  // dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000.0
-
+ String stringOne;
+ 
 // Temperatur
 #if (USE_BME280)
   snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
   log_display(volbuffer);
 #endif
 
-// read battery voltage into global variable
-#if (defined BAT_MEASURE_ADC || defined HAS_PMU)
-  uint16_t batt_voltage = read_voltage();
-  if (batt_voltage == 0xffff)
-    ESP_LOGI(TAG, "Battery: external power");
-  else
-    ESP_LOGI(TAG, "Battery: %dmV", batt_voltage);
 #ifdef HAS_PMU
+  dataBuffer.data.bat_voltage = read_voltage();
+  dataBuffer.data.bat_current = read_current();
   AXP192_showstatus();
-#endif
 #endif
 
 #if (HAS_INA)
   print_ina();
 #endif
 
-  //gps.encode();
-  
-  //showPage(PAGE_VALUES);
+gps.encode();
+
+// Refresh Display
+showPage(PAGE_VALUES);
   
 }
 
@@ -458,6 +437,7 @@ void onEvent(ev_t ev)
 
 void setup_lora()
 {
+  log_display("Setup LORA");
   // LMIC init
   os_init();
   // Reset the MAC state. Session and pending data transfers will be discarded.
@@ -484,7 +464,7 @@ void setup_lora()
 
   do_send(&sendjob);
   pinMode(BUILTIN_LED, OUTPUT);
-  digitalWrite(BUILTIN_LED, LOW);
+  //digitalWrite(BUILTIN_LED, LOW);
 }
 
 void setup()
@@ -532,6 +512,7 @@ void setup()
   calibrate_voltage();
 
   //Turn off WiFi and Bluetooth
+  //log_display("Stop Bluethooth");
   //WiFi.mode(WIFI_OFF);
   //btStop();
 
@@ -539,22 +520,11 @@ void setup()
   setup_lora();
 #endif
 
-
-
-
 #if (USE_MQTT)
   setup_mqtt();
 #endif
 
-  // Tasks
-  sleepTicker.attach(60, t_sleep);
-  displayTicker.attach(display_refresh, t_display);
-
-
-  runmode = 1; // Switch from Terminal Mode to page Display
-  showPage(1);
-  ESP_LOGI(TAG, "Status");
-  AXP192_showstatus();
+  
 
   //---------------------------------------------------------------
   // Deep sleep settings
@@ -568,12 +538,29 @@ void setup()
   gps.init();
   gps.wakeup();
   gps.ecoMode();
+
+
+  // Tasks
+  ESP_LOGV(TAG, "---------------------------------------");
+  ESP_LOGV(TAG, "-- Starting Tasks                    --");
+  ESP_LOGV(TAG, "---------------------------------------");
+
+  sleepTicker.attach(60, t_sleep);
+  displayTicker.attach(display_refresh, t_cyclic);
+
+  ESP_LOGV(TAG, "---------------------------------------");
+  ESP_LOGV(TAG, "-- Setup done -                      --");
+  ESP_LOGV(TAG, "---------------------------------------");
+
+  runmode = 1; // Switch from Terminal Mode to page Display
+  showPage(1);
+ 
 }
 
 void loop()
 {
 #if (HAS_LORA)
-  os_runloop_once();
+  //os_runloop_once();
 #endif
 
 #if (USE_MQTT)
