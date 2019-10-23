@@ -62,6 +62,7 @@ void AXP192_power(bool on)
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
     // pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
     pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    ESP_LOGI(TAG, "AXP power ON");
   }
   else
   {
@@ -69,8 +70,39 @@ void AXP192_power(bool on)
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_OFF);
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF);
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
+    ESP_LOGI(TAG, "AXP power OFF");
   }
 }
+
+void AXP192_power_lora(bool on)
+{
+  if (on)
+  {
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
+    ESP_LOGI(TAG, "Lora power ON");
+  }
+  else
+  {
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
+    ESP_LOGI(TAG, "Lora power OFF");
+  }
+}
+
+
+void AXP192_power_gps(bool on)
+{
+  if (on)
+  {
+   pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
+   ESP_LOGI(TAG, "GPS power ON");
+  }
+  else
+  {
+   pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF);
+   ESP_LOGI(TAG, "GPS power OFF");
+   }
+}
+
 
 void AXP192_showstatus(void)
 {
@@ -92,9 +124,7 @@ void AXP192_showstatus(void)
 
 void AXP192_init(void)
 {
-
-  //if (pmu.begin(i2c_readBytes, i2c_writeBytes, AXP192_PRIMARY_ADDRESS) ==
-
+  
   if (pmu.begin(Wire, AXP192_PRIMARY_ADDRESS) ==
       AXP_FAIL)
     ESP_LOGI(TAG, "AXP192 PMU initialization failed");

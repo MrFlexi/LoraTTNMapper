@@ -10,6 +10,8 @@
 #define NO_OF_SAMPLES 64  // we do some multisampling to get better values
 
 #define AXP192_PRIMARY_ADDRESS (0x34)
+#define ON true
+#define OFF false
 
 uint16_t read_voltage(void);
 float read_current(void);
@@ -20,6 +22,8 @@ bool batt_sufficient(void);
 #include <axp20x.h>
 void power_event_IRQ(void);
 void AXP192_power(bool on);
+void AXP192_power_gps(bool on);
+void AXP192_power_lora(bool on);
 void AXP192_init(void);
 void AXP192_showstatus(void);
 uint8_t i2c_writeBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len);

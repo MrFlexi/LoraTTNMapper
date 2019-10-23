@@ -283,26 +283,6 @@ void setup_sensors()
 #endif
 }
 
-void t_sleep()
-{
-  //-----------------------------------------------------
-  // Deep sleep
-  //-----------------------------------------------------
-
-#if (ESP_SLEEP)
-  dataBuffer.data.sleepCounter--;
-  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
-  {
-    runmode = 0;
-    gps.enable_sleep();
-    Serial.flush();
-    showPage(PAGE_SLEEP);
-    esp_deep_sleep_start();
-    Serial.println("This will never be printed");
-  }
-#endif
-}
-
 void t_cyclic()
 {
   String stringOne;
@@ -328,6 +308,36 @@ void t_cyclic()
   // Refresh Display
   showPage(PAGE_VALUES);
 }
+
+
+void t_sleep()
+{
+  //-----------------------------------------------------
+  // Deep sleep
+  //-----------------------------------------------------
+
+#if (ESP_SLEEP)
+  dataBuffer.data.sleepCounter--;
+  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
+  {
+    AXP192_power_gps(OFF);
+    AXP192_power_lora(OFF);
+    delay(1000);
+    t_cyclic(); // Aktuelle Messwerte anzeigen
+        delay(5000);
+    runmode = 0;
+    // gps.enable_sleep();
+    Serial.flush();
+    showPage(PAGE_SLEEP);
+    delay(5000);
+    AXP192_power(OFF);
+    esp_deep_sleep_start();
+    Serial.println("This will never be printed");
+  }
+#endif
+}
+
+
 
 void setup_wifi()
 {
@@ -488,6 +498,11 @@ void setup()
   Serial.println(F("TTN Mapper"));
   i2c_scan();
 
+  #if (HAS_PMU)
+  AXP192_init();
+  AXP192_showstatus();
+#endif
+
 #if (HAS_INA)
   ina3221.begin();
   Serial.print("Manufactures ID=0x");
@@ -495,11 +510,6 @@ void setup()
   MID = ina3221.getManufID();
   Serial.println(MID, HEX);
   print_ina();
-#endif
-
-#if (HAS_PMU)
-  AXP192_init();
-  AXP192_showstatus();
 #endif
 
   dataBuffer.data.txCounter = 0;
@@ -513,7 +523,7 @@ void setup()
   //Turn off WiFi and Bluetooth
   //log_display("Stop Bluethooth");
   //WiFi.mode(WIFI_OFF);
-  //btStop();
+  btStop();
 
 #if (USE_MQTT)
   setup_mqtt();
