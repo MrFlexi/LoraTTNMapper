@@ -93,12 +93,14 @@ void showPage(int page)
 
       u8g2.setCursor(1, 40);
       u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
+      u8g2.setCursor(64, 40);
+      
+      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
       u8g2.setCursor(1, 50);
       u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(64, 50);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      //u8g2.setCursor(1, 50);
-      //u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
+      
 
 #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
       u8g2.setCursor(1, 60);

@@ -1,6 +1,6 @@
-#define USE_WIFI 0
+#define USE_WIFI 1
 #define USE_BME280 0
-#define USE_CAYENNE 0
+#define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
@@ -18,6 +18,38 @@ const float sleepPeriod = 2; //seconds
 #include "globals.h"
 
 SemaphoreHandle_t I2Caccess;
+
+//--------------------------------------------------------------------------
+// Cayenne MyDevices Integration
+//--------------------------------------------------------------------------
+#if (USE_CAYENNE)
+#define CAYENNE_PRINT Serial
+#include <CayenneMQTTESP32.h>
+
+char username[] = "ecddac20-a0eb-11e9-94e9-493d67fd755e";
+char password[] = "0010d05f8ccd918d0f8a45451950f8b80200e594";
+char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2";
+
+#endif
+
+#if (USE_CAYENNE)
+CAYENNE_OUT_DEFAULT()
+{
+  // Write data to Cayenne here. This example just sends the current uptime in milliseconds on virtual channel 0.
+  //Cayenne.virtualWrite(0, millis());
+  Cayenne.celsiusWrite(1, 20);
+  //Cayenne.pascalWrite(2, bme.readPressure() / 100);
+  //Cayenne.virtualWrite(3, bme.readHumidity(), TYPE_RELATIVE_HUMIDITY, UNIT_PERCENT);
+}
+
+// Default function for processing actuator commands from the Cayenne Dashboard.
+// You can also use functions for specific channels, e.g CAYENNE_IN(1) for channel 1 commands.
+CAYENNE_IN_DEFAULT()
+{
+  CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
+  //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+}
+#endif
 
 //--------------------------------------------------------------------------
 // Store preferences in NVS Flash
@@ -309,7 +341,6 @@ void t_cyclic()
   showPage(PAGE_VALUES);
 }
 
-
 void t_sleep()
 {
   //-----------------------------------------------------
@@ -324,20 +355,25 @@ void t_sleep()
     AXP192_power_lora(OFF);
     delay(1000);
     t_cyclic(); // Aktuelle Messwerte anzeigen
-        delay(5000);
+    delay(5000);
     runmode = 0;
     // gps.enable_sleep();
     Serial.flush();
     showPage(PAGE_SLEEP);
-    delay(5000);
-    AXP192_power(OFF);
+
+    //AXP192_power(OFF);   // funktioniert nicht, I2C Bus wird nicht freigegeben
+    //delay(100);
+    //Wire.flush();
+    //Wire.~TwoWire();
+    //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
+    //pinMode(SCL, INPUT);
+    
+    ESP_LOGI(TAG, "ESP32 Deep Sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
 #endif
 }
-
-
 
 void setup_wifi()
 {
@@ -498,7 +534,7 @@ void setup()
   Serial.println(F("TTN Mapper"));
   i2c_scan();
 
-  #if (HAS_PMU)
+#if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
 #endif
@@ -527,6 +563,12 @@ void setup()
 
 #if (USE_MQTT)
   setup_mqtt();
+#endif
+
+#if (USE_CAYENNE)
+  Cayenne.begin(username, password, clientID, ssid, wifiPassword);
+  u8g2log.print("Cayenne connected...");
+  u8g2log.print("\n");
 #endif
 
 //---------------------------------------------------------------
@@ -568,6 +610,10 @@ void loop()
 {
 #if (HAS_LORA)
   os_runloop_once();
+#endif
+
+#if (USE_CAYENNE)
+  Cayenne.loop();
 #endif
 
 #if (USE_MQTT)
