@@ -5,7 +5,7 @@
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
 
-class gps_jogi
+class Neo6m
 {
 
 public:
@@ -34,4 +34,4 @@ private:
 
 #endif
 
-extern gps_jogi gps;
+extern Neo6m gps;

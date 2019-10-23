@@ -2,13 +2,13 @@
 
 HardwareSerial GPSSerial(1);
 
-void gps_jogi::init()
+void Neo6m::init()
 {
   GPSSerial.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
   GPSSerial.setTimeout(2);
 }
 
-void gps_jogi::encode()
+void Neo6m::encode()
 {
   int data;
   int previousMillis = millis();
@@ -25,7 +25,7 @@ void gps_jogi::encode()
   Serial.println("");
 }
 
-void gps_jogi::buildPacket(uint8_t txBuffer[9])
+void Neo6m::buildPacket(uint8_t txBuffer[9])
 {
   LatitudeBinary = ((tGps.location.lat() + 90) / 180.0) * 16777215;
   LongitudeBinary = ((tGps.location.lng() + 180) / 360.0) * 16777215;
@@ -52,7 +52,7 @@ void gps_jogi::buildPacket(uint8_t txBuffer[9])
   txBuffer[8] = hdopGps & 0xFF;
 }
 
-bool gps_jogi::checkGpsFix()
+bool Neo6m::checkGpsFix()
 {
   encode();
   if (tGps.location.isValid() &&
@@ -89,7 +89,7 @@ bool gps_jogi::checkGpsFix()
   }
 }
 
-  void gps_jogi::wakeup() {
+  void Neo6m::wakeup() {
     Serial.println("GPS wake up");
     int data = -1;
     do
@@ -104,13 +104,13 @@ bool gps_jogi::checkGpsFix()
   }
 
 
-  void gps_jogi::enable_sleep()
+  void Neo6m::enable_sleep()
   { //TODO implement  UBX-ACK
     do
     {
       //We cannot read UBX ack therefore try to sleep gps until it does not send data anymore
       Serial.println("try to sleep gps!");
-      gps_jogi::softwareReset(); //sleep_mode can only be activated at start up
+      Neo6m::softwareReset(); //sleep_mode can only be activated at start up
       delay(600);                //give some time to restart //TODO wait for ack
       GPSSerial.write(RXM_PMREQ, sizeof(RXM_PMREQ));
       unsigned long startTime = millis();
@@ -138,14 +138,14 @@ bool gps_jogi::checkGpsFix()
   }
 
 
-  void gps_jogi::ecoMode()
+  void Neo6m::ecoMode()
   {
     GPSSerial.write(CFG_RXM, sizeof(CFG_RST));      // Eco Mode
   }
 
-  void gps_jogi::softwareReset()
+  void Neo6m::softwareReset()
   {
     GPSSerial.write(CFG_RST, sizeof(CFG_RST));
   }
 
-gps_jogi gps;
+Neo6m gps;

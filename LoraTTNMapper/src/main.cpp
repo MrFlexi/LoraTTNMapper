@@ -11,7 +11,7 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define display_refresh 5   // every second
+#define display_refresh 5    // every second
 const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -285,12 +285,12 @@ void setup_sensors()
 
 void t_sleep()
 {
-   //-----------------------------------------------------
+  //-----------------------------------------------------
   // Deep sleep
   //-----------------------------------------------------
-  
+
 #if (ESP_SLEEP)
-dataBuffer.data.sleepCounter--;
+  dataBuffer.data.sleepCounter--;
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
   {
     runmode = 0;
@@ -305,8 +305,8 @@ dataBuffer.data.sleepCounter--;
 
 void t_cyclic()
 {
- String stringOne;
- 
+  String stringOne;
+
 // Temperatur
 #if (USE_BME280)
   snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
@@ -323,11 +323,10 @@ void t_cyclic()
   print_ina();
 #endif
 
-gps.encode();
+  gps.encode();
 
-// Refresh Display
-showPage(PAGE_VALUES);
-  
+  // Refresh Display
+  showPage(PAGE_VALUES);
 }
 
 void setup_wifi()
@@ -472,7 +471,7 @@ void setup()
   Serial.begin(115200);
   print_wakeup_reason();
 
-   // create some semaphores for syncing / mutexing tasks
+  // create some semaphores for syncing / mutexing tasks
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
@@ -498,10 +497,10 @@ void setup()
   print_ina();
 #endif
 
- #if (HAS_PMU)
+#if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
-  #endif
+#endif
 
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
@@ -516,29 +515,28 @@ void setup()
   //WiFi.mode(WIFI_OFF);
   //btStop();
 
-#if (HAS_LORA)
-  setup_lora();
-#endif
-
 #if (USE_MQTT)
   setup_mqtt();
 #endif
 
-  
-
-  //---------------------------------------------------------------
-  // Deep sleep settings
-  //---------------------------------------------------------------
-  #if (ESP_SLEEP)
+//---------------------------------------------------------------
+// Deep sleep settings
+//---------------------------------------------------------------
+#if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   Serial.println("Setup ESP32 to wake-up via timer after " + String(TIME_TO_SLEEP) +
                  " Minutes");
-  #endif               
+#endif
 
   gps.init();
   gps.wakeup();
   gps.ecoMode();
 
+  delay(2000); // Wait for GPS beeing stable
+
+#if (HAS_LORA)
+  setup_lora();
+#endif
 
   // Tasks
   ESP_LOGV(TAG, "---------------------------------------");
@@ -554,13 +552,12 @@ void setup()
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
- 
 }
 
 void loop()
 {
 #if (HAS_LORA)
-  //os_runloop_once();
+  os_runloop_once();
 #endif
 
 #if (USE_MQTT)
