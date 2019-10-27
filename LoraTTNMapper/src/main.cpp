@@ -3,7 +3,8 @@
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA 0
+#define HAS_INA 1
+#define USE_DASH 1
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 
 // T-Beam specific hardware
@@ -18,6 +19,8 @@ const float sleepPeriod = 2; //seconds
 #include "globals.h"
 
 SemaphoreHandle_t I2Caccess;
+
+
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -35,11 +38,29 @@ char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2";
 #if (USE_CAYENNE)
 CAYENNE_OUT_DEFAULT()
 {
-  // Write data to Cayenne here. This example just sends the current uptime in milliseconds on virtual channel 0.
-  //Cayenne.virtualWrite(0, millis());
-  Cayenne.celsiusWrite(1, 20);
-  //Cayenne.pascalWrite(2, bme.readPressure() / 100);
-  //Cayenne.virtualWrite(3, bme.readHumidity(), TYPE_RELATIVE_HUMIDITY, UNIT_PERCENT);
+
+Cayenne.virtualWrite(10, ina3221.getBusVoltage_V(1)*1000, "voltage", "Millivolts" );
+Serial.println(ina3221.getBusVoltage_V(1));
+Cayenne.virtualWrite(12, ina3221.getCurrent_mA(1), "current", "Milliampere" );
+//Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
+ 
+Cayenne.virtualWrite(20, pmu.getVbusVoltage(), "voltage", "Volts" );
+Cayenne.virtualWrite(21, pmu.getVbusCurrent(), "current", "Milliampere" );
+//Cayenne.virtualWrite(22, pmu.getVbusCurrent()/1000*pmu.getVbusVoltage(), "pow", "Watts");
+ 
+
+Cayenne.virtualWrite(30, pmu.getBattVoltage(), "voltage", "Volts" );
+Cayenne.virtualWrite(31, pmu.getBattChargeCurrent(), "current", "Milliampere" );
+//Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
+Cayenne.virtualWrite(33, pmu.getBattDischargeCurrent(), "current", "Milliampere" );
+ 
+
+   // ESPDash.updateNumberCard("BAT_VOLTAGE", pmu.getBattVoltage());
+   // ESPDash.updateNumberCard("BAT_CHR_CURRENT", pmu.getBattChargeCurrent());
+   // ESPDash.updateNumberCard("BAT_CHR_WATT", pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000);
+   // ESPDash.updateNumberCard("BAT_DIS_CURRENT", pmu.getBattDischargeCurrent());
+
+
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -326,6 +347,7 @@ void t_cyclic()
 #endif
 
 #ifdef HAS_PMU
+  dataBuffer.data.bat_voltage = pmu.getVbusVoltage() / 1000;
   dataBuffer.data.bat_voltage = read_voltage();
   dataBuffer.data.bat_current = read_current();
   AXP192_showstatus();
@@ -338,7 +360,10 @@ void t_cyclic()
   gps.encode();
 
   // Refresh Display
-  showPage(PAGE_VALUES);
+  showPage(PAGE_SOLAR);
+#if (USE_DASH)
+  update_web_dash();
+#endif
 }
 
 void t_sleep()
@@ -367,7 +392,7 @@ void t_sleep()
     //Wire.~TwoWire();
     //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
     //pinMode(SCL, INPUT);
-    
+
     ESP_LOGI(TAG, "ESP32 Deep Sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
@@ -387,7 +412,9 @@ void setup_wifi()
     delay(1000);
     ESP_LOGI(TAG, "Connecting to WiFi..");
   }
-  //ESP_LOGI(TAG, String(WiFi.localIP()) );
+  ESP_LOGV(TAG, String(WiFi.localIP()));
+  log_display(String(WiFi.localIP()));
+  delay(2000);
 #endif
 }
 
@@ -590,6 +617,10 @@ void setup()
   setup_lora();
 #endif
 
+#if (USE_DASH)
+  create_web_dash();
+#endif
+
   // Tasks
   ESP_LOGV(TAG, "---------------------------------------");
   ESP_LOGV(TAG, "-- Starting Tasks                    --");
@@ -613,7 +644,7 @@ void loop()
 #endif
 
 #if (USE_CAYENNE)
-  Cayenne.loop();
+  Cayenne.loop(5000);
 #endif
 
 #if (USE_MQTT)

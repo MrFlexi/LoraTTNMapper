@@ -78,12 +78,12 @@ void showPage(int page)
     u8g2.clearBuffer();
     uint8_t icon = 0;
 
-    u8g2.setFont(u8g2_font_ncenB12_tr);
-    u8g2.drawStr(1, 15, "   SAP GTT  ");
-
     switch (page)
     {
     case PAGE_VALUES:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "   SAP GTT  ");
 
       u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
@@ -94,18 +94,36 @@ void showPage(int page)
       u8g2.setCursor(1, 40);
       u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
       u8g2.setCursor(64, 40);
-      
+
       u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
       u8g2.setCursor(1, 50);
       u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(64, 50);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      
+      break;
 
-#if (defined BAT_MEASURE_ADC || defined HAS_PMU)
+    case PAGE_SOLAR:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "   Sun Panel  ");
+      u8g2.setFont(u8g2_font_profont11_mf);
+
+    
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Sol: %.2fV %.0fmA ", ina3221.getBusVoltage_V(1), ina3221.getCurrent_mA(1));
+
+
+#if (HAS_PMU)
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Bus: %.2fV %.0fmA ", pmu.getVbusVoltage(), pmu.getVbusCurrent());
+
+      u8g2.setCursor(1, 50);
+      u8g2.printf("Bat: %.2fV %.0fmA ", pmu.getBattVoltage(), pmu.getBattChargeCurrent());
+
       u8g2.setCursor(1, 60);
-      u8g2.printf("BAT: %.2fV %.0fmA ", dataBuffer.data.bat_voltage / 1000.0, dataBuffer.data.bat_current);
+      u8g2.printf("Bat: %.2fV %.0fmA ", pmu.getBattVoltage(), pmu.getBattDischargeCurrent());
 #endif
+
       break;
 
     case PAGE_SLEEP:
@@ -135,7 +153,6 @@ void showPage(int page)
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
 }
-
 
 DataBuffer::DataBuffer()
 {

@@ -17,10 +17,10 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
+#define ESP_SLEEP 0            // Main switch
 #define uS_TO_S_FACTOR 1000000 //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 1        // sleep for 1 minute
-#define TIME_TO_NEXT_SLEEP  2      // sleep after n minutes or
+#define TIME_TO_SLEEP 5        // sleep for 1 minute
+#define TIME_TO_NEXT_SLEEP  5      // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 2   // after n Lora TX events
 
 
@@ -35,6 +35,7 @@
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
 #include <Preferences.h>
+
 
 typedef struct {
   float iaq;             // IAQ signal
@@ -58,11 +59,16 @@ typedef struct {
 extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
 
+
 #include "../src/hal/ttgobeam10.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
 #include "INA3221.h"
+
+#if (USE_DASH)
+#include "dash.h"
+#endif
 
 #endif

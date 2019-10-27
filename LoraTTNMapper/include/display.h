@@ -19,6 +19,7 @@
 
 #define PAGE_VALUES 1
 #define PAGE_SLEEP 2
+#define PAGE_SOLAR 3
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32

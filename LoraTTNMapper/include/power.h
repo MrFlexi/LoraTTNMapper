@@ -31,3 +31,5 @@ uint8_t i2c_readBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len);
 #endif // HAS_PMU
 
 #endif
+
+extern AXP20X_Class pmu;
