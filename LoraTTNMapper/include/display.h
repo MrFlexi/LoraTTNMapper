@@ -2,7 +2,6 @@
 // U8G2 Display Setup  Definition
 //--------------------------------------------------------------------------
 
-
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 

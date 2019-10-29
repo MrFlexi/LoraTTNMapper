@@ -1,12 +1,3 @@
-#define USE_WIFI 1
-#define USE_BME280 0
-#define USE_CAYENNE 1
-#define HAS_LORA 1
-#define USE_MQTT 0
-#define HAS_INA 1
-#define USE_DASH 1
-#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
-
 // T-Beam specific hardware
 #undef BUILTIN_LED
 #define BUILTIN_LED 14
@@ -15,61 +6,58 @@
 #define display_refresh 5    // every second
 const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
-
 #include "globals.h"
 
+//--------------------------------------------------------------------------
+// Initialize globals
+//--------------------------------------------------------------------------
+PayloadConvert payload(PAYLOAD_BUFFER_SIZE);
+QueueHandle_t LoraSendQueue;
 SemaphoreHandle_t I2Caccess;
+int runmode = 0;
 
 
+uint8_t msgWaiting = 0;
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
 //--------------------------------------------------------------------------
+
 #if (USE_CAYENNE)
 #define CAYENNE_PRINT Serial
-#include <CayenneMQTTESP32.h>
 
+#include <CayenneMQTTESP32.h>
 char username[] = "ecddac20-a0eb-11e9-94e9-493d67fd755e";
 char password[] = "0010d05f8ccd918d0f8a45451950f8b80200e594";
 char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2";
 
-#endif
-
-#if (USE_CAYENNE)
 CAYENNE_OUT_DEFAULT()
 {
 
-Cayenne.virtualWrite(10, ina3221.getBusVoltage_V(1)*1000, "voltage", "Millivolts" );
-Serial.println(ina3221.getBusVoltage_V(1));
-Cayenne.virtualWrite(12, ina3221.getCurrent_mA(1), "current", "Milliampere" );
-//Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
- 
-Cayenne.virtualWrite(20, pmu.getVbusVoltage(), "voltage", "Volts" );
-Cayenne.virtualWrite(21, pmu.getVbusCurrent(), "current", "Milliampere" );
-//Cayenne.virtualWrite(22, pmu.getVbusCurrent()/1000*pmu.getVbusVoltage(), "pow", "Watts");
- 
+  ESP_LOGI(TAG, "Cayenne send data to Server");
+  Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
+  Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
+  //Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
 
-Cayenne.virtualWrite(30, pmu.getBattVoltage(), "voltage", "Volts" );
-Cayenne.virtualWrite(31, pmu.getBattChargeCurrent(), "current", "Milliampere" );
-//Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
-Cayenne.virtualWrite(33, pmu.getBattDischargeCurrent(), "current", "Milliampere" );
- 
+  Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
+  Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
+  //Cayenne.virtualWrite(22, pmu.getVbusCurrent()/1000*pmu.getVbusVoltage(), "pow", "Watts");
 
-   // ESPDash.updateNumberCard("BAT_VOLTAGE", pmu.getBattVoltage());
-   // ESPDash.updateNumberCard("BAT_CHR_CURRENT", pmu.getBattChargeCurrent());
-   // ESPDash.updateNumberCard("BAT_CHR_WATT", pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000);
-   // ESPDash.updateNumberCard("BAT_DIS_CURRENT", pmu.getBattDischargeCurrent());
-
-
+  Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
+  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
+  //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
+  Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
 // You can also use functions for specific channels, e.g CAYENNE_IN(1) for channel 1 commands.
 CAYENNE_IN_DEFAULT()
 {
+  ESP_LOGI(TAG, "Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
   //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
 }
+
 #endif
 
 //--------------------------------------------------------------------------
@@ -82,7 +70,7 @@ unsigned long uptime_seconds_old;
 unsigned long uptime_seconds_new;
 unsigned long uptime_seconds_actual;
 
-int runmode = 0;
+
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
@@ -347,14 +335,19 @@ void t_cyclic()
 #endif
 
 #ifdef HAS_PMU
-  dataBuffer.data.bat_voltage = pmu.getVbusVoltage() / 1000;
-  dataBuffer.data.bat_voltage = read_voltage();
-  dataBuffer.data.bat_current = read_current();
+  dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
+  dataBuffer.data.bus_current = pmu.getVbusCurrent();
+
+  dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+  dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
+  dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
   AXP192_showstatus();
 #endif
 
 #if (HAS_INA)
   print_ina();
+  dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
+  dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
   gps.encode();
@@ -364,6 +357,24 @@ void t_cyclic()
 #if (USE_DASH)
   update_web_dash();
 #endif
+
+#if (HAS_LORA)
+ payload.reset();
+ payload.addVoltage(12);
+ payload.enqueue(2);
+ msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
+ ESP_LOGI(TAG, "Lora Message Queue: %d",msgWaiting );
+ Serial.print("Queuesize: ");
+ Serial.println(msgWaiting );
+
+ if (LoraSendQueue == 0)
+    {
+      ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
+    }
+
+#endif
+
+
 }
 
 void t_sleep()
@@ -615,6 +626,7 @@ void setup()
 
 #if (HAS_LORA)
   setup_lora();
+  lora_queue_init();
 #endif
 
 #if (USE_DASH)
@@ -644,7 +656,7 @@ void loop()
 #endif
 
 #if (USE_CAYENNE)
-  Cayenne.loop(5000);
+  Cayenne.loop(60000);
 #endif
 
 #if (USE_MQTT)

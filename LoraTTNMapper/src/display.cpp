@@ -103,26 +103,25 @@ void showPage(int page)
       break;
 
     case PAGE_SOLAR:
-
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "   Sun Panel  ");
       u8g2.setFont(u8g2_font_profont11_mf);
 
-    
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Sol: %.2fV %.0fmA ", ina3221.getBusVoltage_V(1), ina3221.getCurrent_mA(1));
+      #if (HAS_INA)
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Sol: %.2fV %.0fmA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
+      #endif
 
-
-#if (HAS_PMU)
+      #if (HAS_PMU)
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bus: %.2fV %.0fmA ", pmu.getVbusVoltage(), pmu.getVbusCurrent());
+      u8g2.printf("Bus: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("Bat: %.2fV %.0fmA ", pmu.getBattVoltage(), pmu.getBattChargeCurrent());
+      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("Bat: %.2fV %.0fmA ", pmu.getBattVoltage(), pmu.getBattDischargeCurrent());
-#endif
+      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      #endif
 
       break;
 

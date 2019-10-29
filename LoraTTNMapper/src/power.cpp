@@ -117,7 +117,7 @@ void AXP192_showstatus(void)
     ESP_LOGI(TAG, "No Battery");
 
   if (pmu.isVBUSPlug())
-    ESP_LOGI(TAG, "USB powered %.2fV @ %.0fmAh  %.0fmW", (pmu.getVbusVoltage() / 1000) , pmu.getVbusCurrent(), pmu.getVbusVoltage() / 1000 * pmu.getVbusCurrent() );
+    ESP_LOGI(TAG, "USB powered %.2fV @ %.0fmAh", (pmu.getVbusVoltage() / 1000) , pmu.getVbusCurrent() );
   else
     ESP_LOGI(TAG, "USB not present");
 }

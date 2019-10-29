@@ -5,8 +5,20 @@
 #include <Arduino.h>
 #include <FreeRTOS.h>
 
-#define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
+#define USE_WIFI 1
+#define USE_BME280 0
+#define USE_CAYENNE 1
+#define HAS_LORA 1
+#define USE_MQTT 0
+#define HAS_INA 1
+#define USE_DASH 1
 
+#define PAYLOAD_ENCODER 3
+#define PAYLOAD_BUFFER_SIZE             51 
+#define SEND_QUEUE_SIZE                 10 
+
+#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
+#define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
 #define I2CMUTEXREFRES_MS  40
 
 #define I2C_MUTEX_LOCK()                                                       \
@@ -37,6 +49,8 @@
 #include <Preferences.h>
 
 
+
+
 typedef struct {
   float iaq;             // IAQ signal
   uint8_t iaq_accuracy;  // accuracy of IAQ signal
@@ -51,14 +65,31 @@ typedef struct {
   uint8_t txCounter;   // aliveCounter    
   uint8_t bytesReceived;   
   lmic_t  lmic;
+  float    panel_voltage =0;
+  float    panel_current =0;
+  float    bus_voltage =0;
+  float    bus_current =0;
   float    bat_voltage = 0;
-  float    bat_current = 0;
+  float    bat_charge_current = 0;
+  float    bat_discharge_current = 0;
 } deviceStatus_t;
+
+// Struct holding payload for data send queue
+typedef struct {
+  uint8_t MessageSize;
+  uint8_t MessagePort;
+  uint8_t MessagePrio;
+  uint8_t Message[PAYLOAD_BUFFER_SIZE];
+} MessageBuffer_t;
 
 
 extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
+extern QueueHandle_t LoraSendQueue;
 
+//#if (USE_CAYENNE)
+//#include "cayenne.h"
+//#endif
 
 #include "../src/hal/ttgobeam10.h"
 #include "power.h"
@@ -66,9 +97,11 @@ extern SemaphoreHandle_t I2Caccess;
 #include "gps.h"
 #include "i2cscan.h"
 #include "INA3221.h"
+#include "payload.h"
 
 #if (USE_DASH)
 #include "dash.h"
 #endif
+
 
 #endif
