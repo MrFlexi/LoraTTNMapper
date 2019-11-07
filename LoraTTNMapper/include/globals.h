@@ -17,11 +17,13 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0            // Main switch
-#define uS_TO_S_FACTOR 1000000 //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 1         // sleep for 1 minute
-#define TIME_TO_NEXT_SLEEP  2      // sleep after n minutes or
-#define SLEEP_AFTER_N_TX_COUNT 2   // after n Lora TX events
+#define ESP_SLEEP           1           // Main switch
+#define uS_TO_S_FACTOR      1000000     //* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP       5           // sleep for 1 minute
+#define TIME_TO_NEXT_SLEEP  2           // sleep after n minutes or
+#define SLEEP_AFTER_N_TX_COUNT 2        // after n Lora TX events
+
+#define display_refresh 5    // every second
 
 
 #include <lmic.h>
@@ -64,5 +66,6 @@ extern SemaphoreHandle_t I2Caccess;
 #include "gps.h"
 #include "i2cscan.h"
 #include "INA3221.h"
+#include "button.h"
 
 #endif

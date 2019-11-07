@@ -1,9 +1,9 @@
-#define USE_WIFI 0
-#define USE_BME280 0
-#define USE_CAYENNE 0
-#define HAS_LORA 1
-#define USE_MQTT 0
-#define HAS_INA 0
+#define USE_WIFI    1
+#define USE_BME280  1
+#define USE_CAYENNE 1
+#define HAS_LORA    1
+#define USE_MQTT    0
+#define HAS_INA     1
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 
 // T-Beam specific hardware
@@ -11,16 +11,13 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define display_refresh 5    // every second
-const float sleepPeriod = 2; //seconds
+
+// const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 #include "globals.h"
-#include "button.h"
 
 SemaphoreHandle_t I2Caccess;
-
-static Button *b = NULL;
 
 //--------------------------------------------------------------------------
 // Store preferences in NVS Flash
@@ -46,29 +43,7 @@ const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 WiFiClient wifiClient;
 
-void button_init(int pin)
-{
-#ifdef BUTTON_PULLDOWN
-  b = new Button(pin);
-#else
-  b = new ButtonPullup(pin);
-#endif
 
-  // attach events to the button
-
-  b->setOnDoubleClicked([]() {});
-
-  b->setOnClicked([]() {
-
-  });
-
-  b->setOnHolding([]() {
-
-  });
-
-  // attach interrupt to the button
-  attachInterrupt(digitalPinToInterrupt(pin), ButtonIRQ, CHANGE);
-}
 
 #if (HAS_INA)
 void print_ina()
