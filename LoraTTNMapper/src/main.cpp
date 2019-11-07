@@ -84,6 +84,8 @@ const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 WiFiClient wifiClient;
 
+
+
 #if (HAS_INA)
 void print_ina()
 {
