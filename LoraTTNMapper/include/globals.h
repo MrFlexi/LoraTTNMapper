@@ -6,12 +6,12 @@
 #include <FreeRTOS.h>
 
 #define USE_WIFI 1
-#define USE_BME280 0
+#define USE_BME280 1
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 1
-#define USE_DASH 1
+#define USE_DASH 0
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE             51 
@@ -29,11 +29,11 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0            // Main switch
-#define uS_TO_S_FACTOR 1000000 //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5        // sleep for 1 minute
-#define TIME_TO_NEXT_SLEEP  5      // sleep after n minutes or
-#define SLEEP_AFTER_N_TX_COUNT 2   // after n Lora TX events
+#define ESP_SLEEP               1           // Main switch
+#define uS_TO_S_FACTOR          1000000     //* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP           10          // sleep for n minute
+#define TIME_TO_NEXT_SLEEP      3           // sleep after n minutes or
+#define SLEEP_AFTER_N_TX_COUNT  2           // after n Lora TX events
 
 
 #include <lmic.h>
@@ -46,7 +46,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
-#include <Preferences.h>
+//#include <Preferences.h>
 
 
 
@@ -98,6 +98,10 @@ extern QueueHandle_t LoraSendQueue;
 #include "i2cscan.h"
 #include "INA3221.h"
 #include "payload.h"
+
+#if (HAS_BUTTON)
+#include "button.h"
+#endif
 
 #if (USE_DASH)
 #include "dash.h"

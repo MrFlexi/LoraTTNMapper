@@ -4,7 +4,7 @@
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
 #define display_refresh 5    // every second
-const float sleepPeriod = 2; //seconds
+//const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 #include "globals.h"
 
@@ -29,12 +29,35 @@ uint8_t msgWaiting = 0;
 #include <CayenneMQTTESP32.h>
 char username[] = "ecddac20-a0eb-11e9-94e9-493d67fd755e";
 char password[] = "0010d05f8ccd918d0f8a45451950f8b80200e594";
-char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2";
+char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2"; // DE001-Balkon
+
+CAYENNE_CONNECTED() {
+  Serial.println("Cayenne connected...");
+}
+
+CAYENNE_DISCONNECTED() {
+  Serial.println("Cayenne connection lost...");
+  bool disconnected = true;
+  while (disconnected)
+  {
+    if( WiFi.status() == WL_CONNECTED ){
+      Serial.println("Wifi is back...");
+      disconnected = false;
+    } else {
+      Serial.println("No wifi...");
+    }
+    delay(2000); 
+  }
+}
 
 CAYENNE_OUT_DEFAULT()
 {
 
-  ESP_LOGI(TAG, "Cayenne send data to Server");
+  ESP_LOGI(TAG, "Cayenne send data");
+  
+  Cayenne.celsiusWrite(1, 10.0);
+  Cayenne.virtualWrite(2, dataBuffer.data.humidity, TYPE_RELATIVE_HUMIDITY);
+
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
   //Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
@@ -47,6 +70,11 @@ CAYENNE_OUT_DEFAULT()
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+
+ 
+ Cayenne.virtualWrite(40, 25.5, "temp", "c");
+  //Cayenne.virtualWrite(1, dataBuffer.data.temperature, "temp", "c");
+  //Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -63,7 +91,7 @@ CAYENNE_IN_DEFAULT()
 //--------------------------------------------------------------------------
 // Store preferences in NVS Flash
 //--------------------------------------------------------------------------
-Preferences preferences;
+//Preferences preferences;
 char lastword[10];
 
 unsigned long uptime_seconds_old;
@@ -89,7 +117,7 @@ WiFiClient wifiClient;
 #if (HAS_INA)
 void print_ina()
 {
-  Serial.println("------------------------------");
+  Serial.println("");
   float shuntvoltage1 = 0;
   float busvoltage1 = 0;
   float current_mA1 = 0;
@@ -100,16 +128,16 @@ void print_ina()
   current_mA1 = -ina3221.getCurrent_mA(1); // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
   loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
 
-  Serial.print("LIPO_Battery Bus Voltage:   ");
+  Serial.print("Bus Voltage:");
   Serial.print(busvoltage1);
   Serial.println(" V");
-  Serial.print("LIPO_Battery Shunt Voltage: ");
+  Serial.print("Shunt Voltage:");
   Serial.print(shuntvoltage1);
   Serial.println(" mV");
-  Serial.print("LIPO_Battery Load Voltage:  ");
+  Serial.print("Battery Load Voltage:");
   Serial.print(loadvoltage1);
   Serial.println(" V");
-  Serial.print("LIPO_Battery Current 1:       ");
+  Serial.print("Battery Current 1:");
   Serial.print(current_mA1);
   Serial.println(" mA");
   Serial.println("");
@@ -261,33 +289,36 @@ void do_send(osjob_t *j)
   }
 }
 
+#if (USE_PREFERENCES)
 void save_uptime()
 {
   uptime_seconds_new = uptime_seconds_old + uptime_seconds_actual;
   preferences.putULong("uptime", uptime_seconds_new);
   Serial.println("ESP32 total uptime" + String(uptime_seconds_new) + " Seconds");
 }
+#endif
 
 void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
+  Serial.print("WakeUp caused by: ");
   switch (wakeup_reason)
   {
   case ESP_SLEEP_WAKEUP_EXT0:
-    Serial.println("Wakeup caused by external signal using RTC_IO");
+    Serial.println("external signal using RTC_IO");
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
-    Serial.println("Wakeup caused by external signal using RTC_CNTL");
+    Serial.println("external signal using RTC_CNTL");
     break;
   case ESP_SLEEP_WAKEUP_TIMER:
-    Serial.println("Wakeup caused by timer");
+    Serial.println("by timer");
     break;
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
-    Serial.println("Wakeup caused by touchpad");
+    Serial.println("touchpad");
     break;
   case ESP_SLEEP_WAKEUP_ULP:
-    Serial.println("Wakeup caused by ULP program");
+    Serial.println("ULP program");
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
@@ -304,7 +335,7 @@ void setup_sensors()
   status = bme.begin(0x76);
   if (!status)
   {
-    ESP_LOGI(TAG, "Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+    ESP_LOGI(TAG, "Could not find a valid BME280 sensor");
   }
   else
   {
@@ -332,8 +363,12 @@ void t_cyclic()
 
 // Temperatur
 #if (USE_BME280)
-  snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
-  log_display(volbuffer);
+  //snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
+  //log_display(volbuffer);
+  dataBuffer.data.temperature = bme.readTemperature();
+  dataBuffer.data.humidity = bme.readHumidity();
+
+
 #endif
 
 #ifdef HAS_PMU
@@ -356,6 +391,7 @@ void t_cyclic()
 
   // Refresh Display
   showPage(PAGE_SOLAR);
+
 #if (USE_DASH)
   update_web_dash();
 #endif
@@ -468,7 +504,7 @@ void onEvent(ev_t ev)
   case EV_TXCOMPLETE:
     log_display("EV_TXCOMPLETE");
     dataBuffer.data.txCounter++;
-    Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
+    Serial.println(F("EV_TXCOMPLETE (waiting for RX windows)"));
     digitalWrite(BUILTIN_LED, LOW);
     if (LMIC.txrxFlags & TXRX_ACK)
     {
@@ -476,7 +512,7 @@ void onEvent(ev_t ev)
     }
     if (LMIC.dataLen)
     {
-      sprintf(s, "Received %i bytes of payload", LMIC.dataLen);
+      sprintf(s, "Received %i bytes payload", LMIC.dataLen);
       Serial.println(s);
       dataBuffer.data.lmic = LMIC;
       sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
@@ -581,7 +617,7 @@ void setup()
 
 #if (HAS_INA)
   ina3221.begin();
-  Serial.print("Manufactures ID=0x");
+  Serial.print("Manufact. ID=0x");
   int MID;
   MID = ina3221.getManufID();
   Serial.println(MID, HEX);
@@ -636,19 +672,24 @@ void setup()
 #endif
 
   // Tasks
-  ESP_LOGV(TAG, "---------------------------------------");
-  ESP_LOGV(TAG, "-- Starting Tasks                    --");
-  ESP_LOGV(TAG, "---------------------------------------");
+  
+  ESP_LOGV(TAG, "-- Starting Tasks --");
+  
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(display_refresh, t_cyclic);
 
-  ESP_LOGV(TAG, "---------------------------------------");
-  ESP_LOGV(TAG, "-- Setup done -                      --");
-  ESP_LOGV(TAG, "---------------------------------------");
+  
+  ESP_LOGV(TAG, "-- Setup done --");
+
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
+
+#if (HAS_BUTTON)
+  button_init(HAS_BUTTON);
+#endif
+
 }
 
 void loop()
@@ -658,7 +699,10 @@ void loop()
 #endif
 
 #if (USE_CAYENNE)
-  Cayenne.loop(60000);
+if (WiFi.status() == WL_CONNECTED) 
+    { 
+      Cayenne.loop(60000); 
+    }
 #endif
 
 #if (USE_MQTT)
