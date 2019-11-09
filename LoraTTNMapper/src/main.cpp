@@ -3,7 +3,9 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define display_refresh 5    // every second
+#define displayRefreshIntervall 5 // every second
+#define sendMessagesIntervall 60  // every minute
+
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 #include "globals.h"
@@ -15,7 +17,6 @@ PayloadConvert payload(PAYLOAD_BUFFER_SIZE);
 QueueHandle_t LoraSendQueue;
 SemaphoreHandle_t I2Caccess;
 int runmode = 0;
-
 
 uint8_t msgWaiting = 0;
 
@@ -31,32 +32,41 @@ char username[] = "ecddac20-a0eb-11e9-94e9-493d67fd755e";
 char password[] = "0010d05f8ccd918d0f8a45451950f8b80200e594";
 char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2"; // DE001-Balkon
 
-CAYENNE_CONNECTED() {
+CAYENNE_CONNECTED()
+{
   Serial.println("Cayenne connected...");
 }
 
-CAYENNE_DISCONNECTED() {
+CAYENNE_DISCONNECTED()
+{
   Serial.println("Cayenne connection lost...");
   bool disconnected = true;
   while (disconnected)
   {
-    if( WiFi.status() == WL_CONNECTED ){
+    if (WiFi.status() == WL_CONNECTED)
+    {
       Serial.println("Wifi is back...");
       disconnected = false;
-    } else {
+    }
+    else
+    {
       Serial.println("No wifi...");
     }
-    delay(2000); 
+    delay(2000);
   }
 }
 
 CAYENNE_OUT_DEFAULT()
 {
+}
+
+void Cayenne_send(void)
+{
 
   ESP_LOGI(TAG, "Cayenne send data");
-  
-  Cayenne.celsiusWrite(1, 10.0);
-  Cayenne.virtualWrite(2, dataBuffer.data.humidity, TYPE_RELATIVE_HUMIDITY);
+
+  Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
+  Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
@@ -70,11 +80,7 @@ CAYENNE_OUT_DEFAULT()
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
-
  
- Cayenne.virtualWrite(40, 25.5, "temp", "c");
-  //Cayenne.virtualWrite(1, dataBuffer.data.temperature, "temp", "c");
-  //Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -98,7 +104,6 @@ unsigned long uptime_seconds_old;
 unsigned long uptime_seconds_new;
 unsigned long uptime_seconds_actual;
 
-
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
@@ -111,8 +116,6 @@ uint8_t txBuffer[9];
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 WiFiClient wifiClient;
-
-
 
 #if (HAS_INA)
 void print_ina()
@@ -232,8 +235,13 @@ void setup_mqtt()
 }
 #endif
 
+//--------------------------------------------------------------------------
+// Tasks/Ticker
+//--------------------------------------------------------------------------
+
 Ticker sleepTicker;
 Ticker displayTicker;
+Ticker sendMessageTicker;
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -256,7 +264,7 @@ void os_getDevKey(u1_t *buf) {}
 
 static osjob_t sendjob;
 // Schedule TX every this many seconds (might become longer due to duty cycle limitations).
-const unsigned TX_INTERVAL = 60;
+const unsigned TX_INTERVAL = 30;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -288,6 +296,37 @@ void do_send(osjob_t *j)
       ESP_LOGV(TAG, "GPS no fix");
   }
 }
+
+void do_send_from_queue(osjob_t *j)
+{
+  MessageBuffer_t SendBuffer;
+  ESP_LOGI(TAG, "Send Lora MSG from Queue");
+
+  // Check if there is not a current TX/RX job running
+  if (LMIC.opmode & OP_TXRXPEND)
+  {
+    Serial.println(F("OP_TXRXPEND, not sending"));
+  }
+  else
+  {
+
+    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) != pdTRUE) 
+    {
+      ESP_LOGE(TAG, "Premature return from xQueueReceive() with no data!");
+    }
+    else
+    {
+      LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, sizeof(SendBuffer.Message), 0);
+      Serial.println(F("Packet queued"));
+    }
+    
+  }
+}
+
+
+
+
+
 
 #if (USE_PREFERENCES)
 void save_uptime()
@@ -363,12 +402,9 @@ void t_cyclic()
 
 // Temperatur
 #if (USE_BME280)
-  //snprintf(volbuffer, sizeof(volbuffer), "%.1fC/%.1f%", bme.readTemperature(), bme.readHumidity());
-  //log_display(volbuffer);
   dataBuffer.data.temperature = bme.readTemperature();
   dataBuffer.data.humidity = bme.readHumidity();
-
-
+  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #ifdef HAS_PMU
@@ -391,28 +427,33 @@ void t_cyclic()
 
   // Refresh Display
   showPage(PAGE_SOLAR);
+}
+
+void t_message_send()
+{
+  String stringOne;
 
 #if (USE_DASH)
   update_web_dash();
 #endif
 
 #if (HAS_LORA)
- payload.reset();
- payload.addVoltage(12);
- payload.enqueue(2);
- msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
- ESP_LOGI(TAG, "Lora Message Queue: %d",msgWaiting );
- Serial.print("Queuesize: ");
- Serial.println(msgWaiting );
+  payload.reset();
+  payload.addVoltage(12);
+  payload.enqueue(2);
+  msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
+  ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);
 
- if (LoraSendQueue == 0)
-    {
-      ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
-    }
+  if (LoraSendQueue == 0)
+  {
+    ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
+  }
 
 #endif
 
-
+#if (USE_CAYENNE)
+  Cayenne_send();
+#endif
 }
 
 void t_sleep()
@@ -532,7 +573,7 @@ void onEvent(ev_t ev)
     //esp_deep_sleep_start();
     log_display("Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send_from_queue);
     break;
   case EV_LOST_TSYNC:
     Serial.println(F("EV_LOST_TSYNC"));
@@ -583,9 +624,9 @@ void setup_lora()
   // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
   LMIC_setDrTxpow(DR_SF7, 14);
 
-  do_send(&sendjob);
-  pinMode(BUILTIN_LED, OUTPUT);
-  //digitalWrite(BUILTIN_LED, LOW);
+  //do_send(&sendjob);
+  do_send_from_queue(&sendjob);
+
 }
 
 void setup()
@@ -671,25 +712,21 @@ void setup()
   create_web_dash();
 #endif
 
-  // Tasks
-  
-  ESP_LOGV(TAG, "-- Starting Tasks --");
-  
-
-  sleepTicker.attach(60, t_sleep);
-  displayTicker.attach(display_refresh, t_cyclic);
-
-  
-  ESP_LOGV(TAG, "-- Setup done --");
-
-
-  runmode = 1; // Switch from Terminal Mode to page Display
-  showPage(1);
-
-#if (HAS_BUTTON)
+#ifdef HAS_BUTTON
   button_init(HAS_BUTTON);
 #endif
 
+  // Tasks
+  ESP_LOGV(TAG, "-- Starting Tasks --");
+
+  sleepTicker.attach(60, t_sleep);
+  displayTicker.attach(displayRefreshIntervall, t_cyclic);
+  sendMessageTicker.attach(sendMessagesIntervall, t_message_send);
+
+  ESP_LOGV(TAG, "-- Setup done --");
+
+  runmode = 1; // Switch from Terminal Mode to page Display
+  showPage(1);
 }
 
 void loop()
@@ -699,10 +736,10 @@ void loop()
 #endif
 
 #if (USE_CAYENNE)
-if (WiFi.status() == WL_CONNECTED) 
-    { 
-      Cayenne.loop(60000); 
-    }
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Cayenne.loop();
+  }
 #endif
 
 #if (USE_MQTT)
@@ -712,5 +749,9 @@ if (WiFi.status() == WL_CONNECTED)
     reconnect();
   }
   client.loop();
+#endif
+
+#if (HAS_BUTTON)
+  readButton();
 #endif
 }

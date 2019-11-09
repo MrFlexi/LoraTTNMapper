@@ -1,9 +1,8 @@
 #include "globals.h"
 #include "button.h"
 
-using namespace simplebutton;
 
-static Button *b = NULL;
+Button *b = NULL;
 
 // Local logging tag
 static const char TAG[] = __FILE__;
@@ -26,10 +25,15 @@ void button_init(int pin)
 
   b->setOnHolding([]() {
 
+    ESP_LOGI(TAG, "Button Holding");
+
   });
 
   // attach interrupt to the button
   // attachInterrupt(digitalPinToInterrupt(pin), ButtonIRQ, CHANGE);
 }
 
-void readButton() { b->update(); }
+void readButton() 
+  { 
+  b->update(); 
+  }

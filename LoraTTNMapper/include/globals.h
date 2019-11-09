@@ -99,7 +99,7 @@ extern QueueHandle_t LoraSendQueue;
 #include "INA3221.h"
 #include "payload.h"
 
-#if (HAS_BUTTON)
+#ifdef HAS_BUTTON
 #include "button.h"
 #endif
 

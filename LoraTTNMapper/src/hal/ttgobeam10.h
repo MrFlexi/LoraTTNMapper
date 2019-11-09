@@ -11,12 +11,12 @@
 // (only) for newer T-Beam version T22_V10
 // pinouts taken from https://github.com/lewisxhe/TTGO-T-Beam
 
-#define HAS_LORA 1              // comment out if device shall not send data via LoRa
-#define CFG_sx1276_radio 1      // HPD13A LoRa SoC
-#define BOARD_HAS_PSRAM         // use extra 4MB external RAM
-#define HAS_BUTTON GPIO_NUM_38  // middle on board button
-#define HAS_PMU 1               // AXP192 power management chip
-#define PMU_INT GPIO_NUM_35     // AXP192 interrupt
+#define HAS_LORA                1               // comment out if device shall not send data via LoRa
+#define CFG_sx1276_radio        1               // HPD13A LoRa SoC
+#define BOARD_HAS_PSRAM                         // use extra 4MB external RAM
+#define HAS_BUTTON              GPIO_NUM_38     // middle on board button
+#define HAS_PMU                 1               // AXP192 power management chip
+#define PMU_INT                 GPIO_NUM_35     // AXP192 interrupt
 
 #define HAS_LED NOT_A_PIN
 
