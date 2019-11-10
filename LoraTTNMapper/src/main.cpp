@@ -80,7 +80,6 @@ void Cayenne_send(void)
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
- 
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -264,7 +263,7 @@ void os_getDevKey(u1_t *buf) {}
 
 static osjob_t sendjob;
 // Schedule TX every this many seconds (might become longer due to duty cycle limitations).
-const unsigned TX_INTERVAL = 30;
+const unsigned TX_INTERVAL = 60;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -310,23 +309,24 @@ void do_send_from_queue(osjob_t *j)
   else
   {
 
-    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) != pdTRUE) 
+    if (LoraSendQueue == 0)
     {
-      ESP_LOGE(TAG, "Premature return from xQueueReceive() with no data!");
+      ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
     }
     else
     {
-      LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, sizeof(SendBuffer.Message), 0);
-      Serial.println(F("Packet queued"));
+      if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) != pdTRUE)
+      {
+        ESP_LOGE(TAG, "xQueueReceive()--> no data!");
+      }
+      else
+      {
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, sizeof(SendBuffer.Message), 0);
+        ESP_LOGI(TAG, "LORA package queued: Port %, Size %",SendBuffer.MessagePort,sizeof(SendBuffer.Message) );
+      }
     }
-    
   }
 }
-
-
-
-
-
 
 #if (USE_PREFERENCES)
 void save_uptime()
@@ -424,9 +424,10 @@ void t_cyclic()
 #endif
 
   gps.encode();
+  gps.checkGpsFix();
 
   // Refresh Display
-  showPage(PAGE_SOLAR);
+  showPage(PAGE_VALUES);
 }
 
 void t_message_send()
@@ -573,7 +574,7 @@ void onEvent(ev_t ev)
     //esp_deep_sleep_start();
     log_display("Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send_from_queue);
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
     break;
   case EV_LOST_TSYNC:
     Serial.println(F("EV_LOST_TSYNC"));
@@ -625,8 +626,7 @@ void setup_lora()
   LMIC_setDrTxpow(DR_SF7, 14);
 
   //do_send(&sendjob);
-  do_send_from_queue(&sendjob);
-
+  do_send(&sendjob);
 }
 
 void setup()
@@ -654,6 +654,7 @@ void setup()
 #if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
+  AXP192_power_gps(ON);
 #endif
 
 #if (HAS_INA)
@@ -698,8 +699,9 @@ void setup()
 #endif
 
   gps.init();
+  gps.softwareReset();
   gps.wakeup();
-  gps.ecoMode();
+  //gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
 
@@ -751,7 +753,7 @@ void loop()
   client.loop();
 #endif
 
-#if (HAS_BUTTON)
+#ifdef HAS_BUTTON
   readButton();
 #endif
 }
