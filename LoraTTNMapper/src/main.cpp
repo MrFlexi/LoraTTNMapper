@@ -298,7 +298,7 @@ void do_send(osjob_t *j)
   }
 }
 
-void t_LORA_send_from_queue()
+void t_LORA_send_from_queue(osjob_t *j)
 {
   MessageBuffer_t SendBuffer;
   ESP_LOGI(TAG, "Send Lora MSG from Queue");
@@ -323,21 +323,16 @@ void t_LORA_send_from_queue()
       }
       else
       {
-        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, sizeof(SendBuffer.Message), 0);
-        ESP_LOGI(TAG, "LORA package queued: Port %, Size %", SendBuffer.MessagePort, sizeof(SendBuffer.Message));
+        ESP_LOGI(TAG, "LORA package queued: Port %d, Size %d", SendBuffer.MessagePort, SendBuffer.MessageSize);
+        ESP_LOGI(TAG, "SendBuffer[0..8]: %d %d %d %d %d %d %d %d ", SendBuffer.Message[0], SendBuffer.Message[1], SendBuffer.Message[2], SendBuffer.Message[3], SendBuffer.Message[4], SendBuffer.Message[5], SendBuffer.Message[6], SendBuffer.Message[7]);
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
+        ESP_LOGI(TAG, "done...");
       }
     }
+    ESP_LOGE(TAG, "New callback scheduled...");
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
-
-#if (USE_PREFERENCES)
-void save_uptime()
-{
-  uptime_seconds_new = uptime_seconds_old + uptime_seconds_actual;
-  preferences.putULong("uptime", uptime_seconds_new);
-  Serial.println("ESP32 total uptime" + String(uptime_seconds_new) + " Seconds");
-}
-#endif
 
 void print_wakeup_reason()
 {
@@ -436,12 +431,6 @@ void t_enqueue_LORA_messages()
 {
   String stringOne;
 
-#if (USE_DASH)
-  update_web_dash();
-#endif
-
-#if (HAS_LORA)
-
   if (LoraSendQueue == 0)
   {
     ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
@@ -460,29 +449,25 @@ void t_enqueue_LORA_messages()
       payload.enqueue_port(1);
     }
     else
+    {
       ESP_LOGV(TAG, "GPS no fix");
-  }
+    }
 #endif
 
 #if (USE_BME280)
-  payload.reset();
-  payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
-  payload.enqueue_port(2);
+    payload.reset();
+    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
+    payload.enqueue_port(2);
 #endif
 
-  payload.reset();
-  payload.addTemperature(1, 18.8);
-  payload.enqueue_port(2);
+    payload.reset();
+    payload.addTemperature(1, 5.11);
+    payload.enqueue_port(2);
 
-  msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
-  ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);
+    msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);
+  }
 }
-
-#endif
-
-#if (USE_CAYENNE)
-Cayenne_send();
-#endif
 
 void t_sleep()
 {
@@ -601,7 +586,7 @@ void onEvent(ev_t ev)
     //esp_deep_sleep_start();
     log_display("Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
-    // os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
     break;
   case EV_LOST_TSYNC:
     Serial.println(F("EV_LOST_TSYNC"));
@@ -652,7 +637,7 @@ void setup_lora()
   // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
   LMIC_setDrTxpow(DR_SF7, 14);
 
-  //do_send(&sendjob);
+  t_LORA_send_from_queue(&sendjob);
 }
 
 void setup()
@@ -750,7 +735,7 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  LORAsendMessageTicker.attach(LORAsendMessagesIntervall, t_LORA_send_from_queue);
+  //LORAsendMessageTicker.attach(LORAsendMessagesIntervall, t_LORA_send_from_queue);
 
   ESP_LOGV(TAG, "-- Setup done --");
 

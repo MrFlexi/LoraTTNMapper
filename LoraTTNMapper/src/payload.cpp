@@ -21,7 +21,7 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
   void PayloadConvert::addVoltage(uint16_t value)
   {
-    uint16_t volt = value / 10;
+    uint16_t volt = value;
     buffer[cursor++] = LPP_BATT_CHANNEL;
     buffer[cursor++] = LPP_ANALOG_INPUT;
     buffer[cursor++] = highByte(volt);
@@ -97,7 +97,7 @@ void PayloadConvert::addGPS(TinyGPSPlus tGps)
     SendBuffer.MessagePort = port;
 
     memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
-    ESP_LOGI(TAG, "SendBuffer[0,1,2,3,4]: %d %d %d %d ", SendBuffer.Message[0], SendBuffer.Message[1], SendBuffer.Message[2], SendBuffer.Message[3]);
+    ESP_LOGI(TAG, "SendBuffer[0..8]: %d %d %d %d %d %d %d %d ", SendBuffer.Message[0], SendBuffer.Message[1], SendBuffer.Message[2], SendBuffer.Message[3], SendBuffer.Message[4], SendBuffer.Message[5], SendBuffer.Message[6], SendBuffer.Message[7]);
     ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
 
     if (ret != 1)

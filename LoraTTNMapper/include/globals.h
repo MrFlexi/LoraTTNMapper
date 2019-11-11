@@ -6,7 +6,7 @@
 #include <FreeRTOS.h>
 
 #define USE_WIFI 0
-#define USE_BME280  1
+#define USE_BME280  0
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
@@ -30,7 +30,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP               1           // Main switch
+#define ESP_SLEEP               0           // Main switch
 #define uS_TO_S_FACTOR          1000000     //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP           10          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP      10         // sleep after n minutes or
