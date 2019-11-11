@@ -2,6 +2,7 @@
 #define _PAYLOAD_H_
 
 #include "globals.h"
+#include "gps.h"
 
 extern void SendPayload(uint8_t port);
 extern void lora_queue_init(void);
@@ -44,19 +45,19 @@ public:
   PayloadConvert(uint8_t size);
   ~PayloadConvert();
 
-  void enqueue(uint8_t port);
+  void enqueue_port(uint8_t port);
   void reset(void);
   uint8_t getSize(void);
   uint8_t *getBuffer(void);
   void addByte(uint8_t value);
-  void addCount(uint16_t value, uint8_t sniffytpe);
-  //void addConfig(configData_t value);
+  void addCount(uint16_t value, uint8_t sniffytpe);  
   void addStatus(uint16_t voltage, uint64_t uptime, float cputemp, uint32_t mem,
                  uint8_t reset1, uint8_t reset2);
   void addAlarm(int8_t rssi, uint8_t message);
   void addVoltage(uint16_t value);
-  //void addGPS(gpsStatus_t value);
-  //void addBME(bmeStatus_t value);
+  void addTemperature(uint8_t channel, float value);
+  void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
+  void addGPS(TinyGPSPlus tGps);  
   void addButton(uint8_t value);
   void addSensor(uint8_t[]);
   void addTime(time_t value);

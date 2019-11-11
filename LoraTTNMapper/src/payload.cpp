@@ -19,12 +19,6 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 #if (PAYLOAD_ENCODER == 3)
 
-void PayloadConvert::addByte(uint8_t value)
-{
-  /* 
-  not implemented
-  */ }
-
   void PayloadConvert::addVoltage(uint16_t value)
   {
     uint16_t volt = value / 10;
@@ -34,9 +28,64 @@ void PayloadConvert::addByte(uint8_t value)
     buffer[cursor++] = lowByte(volt);
   }
 
-#endif
+void PayloadConvert::addTemperature(uint8_t channel, float value)
+  {
+    uint16_t val = value * 100;
+    buffer[cursor++] = channel;
+    buffer[cursor++] = LPP_TEMPERATURE;
+    buffer[cursor++] = highByte(val);
+    buffer[cursor++] = lowByte(val);
+  }
 
-  void PayloadConvert::enqueue(uint8_t port)
+
+
+void PayloadConvert::addBMETemp(uint8_t channel,  DataBuffer dataBuffer) {
+#if (USE_BME280)
+  int16_t temperature = (int16_t)(dataBuffer.data.temperature * 100 ); // float -> int
+  uint16_t humidity = (uint16_t)(dataBuffer.data.humidity * 100);     // float -> int
+
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_TEMPERATURE;
+  buffer[cursor++] = highByte(temperature);
+  buffer[cursor++] = lowByte(temperature);
+
+  //buffer[cursor++] = highByte(humidity);
+  //buffer[cursor++] = lowByte(humidity);
+
+#endif
+}
+
+
+void PayloadConvert::addGPS(TinyGPSPlus tGps)
+{
+
+#if (USE_GPS)
+  uint32_t LatitudeBinary, LongitudeBinary;
+  uint16_t altitudeGps;
+  uint8_t hdopGps;
+
+  LatitudeBinary = ((tGps.location.lat() + 90) / 180.0) * 16777215;
+  LongitudeBinary = ((tGps.location.lng() + 180) / 360.0) * 16777215;
+
+  buffer[cursor++] = (LatitudeBinary >> 16) & 0xFF;
+  buffer[cursor++] = (LatitudeBinary >> 8) & 0xFF;
+  buffer[cursor++] = LatitudeBinary & 0xFF;
+
+  buffer[cursor++] = (LongitudeBinary >> 16) & 0xFF;
+  buffer[cursor++] = (LongitudeBinary >> 8) & 0xFF;
+  buffer[cursor++]= LongitudeBinary & 0xFF;
+
+  altitudeGps = tGps.altitude.meters();
+  buffer[cursor++]= (altitudeGps >> 8) & 0xFF;
+  buffer[cursor++] = altitudeGps & 0xFF;
+
+  hdopGps = tGps.hdop.value() / 10;
+  buffer[cursor++]= hdopGps & 0xFF;
+ #endif 
+}
+
+
+  void PayloadConvert::enqueue_port(uint8_t port)
   {
     int ret;
     MessageBuffer_t
@@ -57,6 +106,9 @@ void PayloadConvert::addByte(uint8_t value)
     }
   }
 
+#endif
+
+
   void lora_queue_init(void)
   {
     assert(SEND_QUEUE_SIZE);
@@ -68,3 +120,5 @@ void PayloadConvert::addByte(uint8_t value)
     ESP_LOGI(TAG, "LORA send queue created, size %d Bytes",
              SEND_QUEUE_SIZE * sizeof(MessageBuffer_t));
   }
+
+

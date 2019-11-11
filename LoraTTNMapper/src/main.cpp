@@ -3,8 +3,9 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 5 // every second
-#define sendMessagesIntervall 60  // every minute
+#define displayRefreshIntervall 5    // every second
+#define sendMessagesIntervall 60     // every minute
+#define LORAsendMessagesIntervall 20 // every 20 seconds
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -241,6 +242,7 @@ void setup_mqtt()
 Ticker sleepTicker;
 Ticker displayTicker;
 Ticker sendMessageTicker;
+Ticker LORAsendMessageTicker;
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -296,7 +298,7 @@ void do_send(osjob_t *j)
   }
 }
 
-void do_send_from_queue(osjob_t *j)
+void t_LORA_send_from_queue()
 {
   MessageBuffer_t SendBuffer;
   ESP_LOGI(TAG, "Send Lora MSG from Queue");
@@ -311,18 +313,18 @@ void do_send_from_queue(osjob_t *j)
 
     if (LoraSendQueue == 0)
     {
-      ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
+      ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
     }
     else
     {
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) != pdTRUE)
       {
-        ESP_LOGE(TAG, "xQueueReceive()--> no data!");
+        ESP_LOGE(TAG, "Queue is empty...");
       }
       else
       {
         LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, sizeof(SendBuffer.Message), 0);
-        ESP_LOGI(TAG, "LORA package queued: Port %, Size %",SendBuffer.MessagePort,sizeof(SendBuffer.Message) );
+        ESP_LOGI(TAG, "LORA package queued: Port %, Size %", SendBuffer.MessagePort, sizeof(SendBuffer.Message));
       }
     }
   }
@@ -430,7 +432,7 @@ void t_cyclic()
   showPage(PAGE_VALUES);
 }
 
-void t_message_send()
+void t_enqueue_LORA_messages()
 {
   String stringOne;
 
@@ -439,23 +441,48 @@ void t_message_send()
 #endif
 
 #if (HAS_LORA)
-  payload.reset();
-  payload.addVoltage(12);
-  payload.enqueue(2);
-  msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
-  ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);
 
   if (LoraSendQueue == 0)
   {
-    ESP_LOGE(TAG, "Could not create LORA send queue. Aborting.");
+    ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
   }
+  else
+  {
+    payload.reset();
+    payload.addVoltage(12);
+    payload.enqueue_port(2); // Cayenne format will be generated in TTN Payload converter
+
+#if (USE_GPS)
+    if (gps.checkGpsFix())
+    {
+      payload.reset();
+      payload.addGPS(gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
+      payload.enqueue_port(1);
+    }
+    else
+      ESP_LOGV(TAG, "GPS no fix");
+  }
+#endif
+
+#if (USE_BME280)
+  payload.reset();
+  payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
+  payload.enqueue_port(2);
+#endif
+
+  payload.reset();
+  payload.addTemperature(1, 18.8);
+  payload.enqueue_port(2);
+
+  msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
+  ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);
+}
 
 #endif
 
 #if (USE_CAYENNE)
-  Cayenne_send();
+Cayenne_send();
 #endif
-}
 
 void t_sleep()
 {
@@ -574,7 +601,7 @@ void onEvent(ev_t ev)
     //esp_deep_sleep_start();
     log_display("Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
+    // os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
     break;
   case EV_LOST_TSYNC:
     Serial.println(F("EV_LOST_TSYNC"));
@@ -626,7 +653,6 @@ void setup_lora()
   LMIC_setDrTxpow(DR_SF7, 14);
 
   //do_send(&sendjob);
-  do_send(&sendjob);
 }
 
 void setup()
@@ -723,7 +749,8 @@ void setup()
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
-  sendMessageTicker.attach(sendMessagesIntervall, t_message_send);
+  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
+  LORAsendMessageTicker.attach(LORAsendMessagesIntervall, t_LORA_send_from_queue);
 
   ESP_LOGV(TAG, "-- Setup done --");
 

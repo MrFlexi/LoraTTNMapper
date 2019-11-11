@@ -6,12 +6,13 @@
 #include <FreeRTOS.h>
 
 #define USE_WIFI 0
-#define USE_BME280 0
+#define USE_BME280  1
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
 #define USE_DASH 0
+#define USE_GPS 1
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE             51 
