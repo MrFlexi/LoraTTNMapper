@@ -710,7 +710,7 @@ void setup()
 #endif
 
   gps.init();
-  gps.softwareReset();
+  //gps.softwareReset();
   gps.wakeup();
   //gps.ecoMode();
 
