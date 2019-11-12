@@ -437,9 +437,6 @@ void t_enqueue_LORA_messages()
   }
   else
   {
-    payload.reset();
-    payload.addVoltage(12);
-    payload.enqueue_port(2); // Cayenne format will be generated in TTN Payload converter
 
 #if (USE_GPS)
     if (gps.checkGpsFix())
@@ -463,6 +460,24 @@ void t_enqueue_LORA_messages()
     payload.reset();
     payload.addTemperature(1, 5.11);
     payload.enqueue_port(2);
+
+#if (HAS_PMU)
+    payload.reset();
+    payload.addVoltage(20, dataBuffer.data.bus_voltage);
+    payload.enqueue_port(2);
+
+    payload.reset();
+    payload.addVoltage(30, dataBuffer.data.bat_voltage);
+    payload.enqueue_port(2);
+
+    payload.reset();
+    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
+    payload.enqueue_port(2);
+
+    payload.reset();
+    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
+    payload.enqueue_port(2);
+#endif
 
     msgWaiting = uxQueueMessagesWaiting(LoraSendQueue);
     ESP_LOGI(TAG, "Lora Message Queue: %d", msgWaiting);

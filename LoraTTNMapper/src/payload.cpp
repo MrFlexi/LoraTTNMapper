@@ -19,10 +19,20 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 #if (PAYLOAD_ENCODER == 3)
 
-  void PayloadConvert::addVoltage(uint16_t value)
+  void PayloadConvert::addVoltage(uint8_t channel, float value)
   {
-    uint16_t volt = value;
-    buffer[cursor++] = LPP_BATT_CHANNEL;
+    uint16_t volt = value*100;
+    buffer[cursor++] = channel;
+    buffer[cursor++] = LPP_ANALOG_INPUT;
+    buffer[cursor++] = highByte(volt);
+    buffer[cursor++] = lowByte(volt);
+  }
+
+
+  void PayloadConvert::addCurrent(uint8_t channel, float value)
+  {
+    uint16_t volt = value*100;
+    buffer[cursor++] = channel;
     buffer[cursor++] = LPP_ANALOG_INPUT;
     buffer[cursor++] = highByte(volt);
     buffer[cursor++] = lowByte(volt);
@@ -53,6 +63,19 @@ void PayloadConvert::addBMETemp(uint8_t channel,  DataBuffer dataBuffer) {
   //buffer[cursor++] = lowByte(humidity);
 
 #endif
+}
+
+void PayloadConvert::addBatVoltage(uint8_t channel,  DataBuffer dataBuffer) {
+
+  int16_t voltage = (int16_t)(dataBuffer.data.bat_voltage ); // float -> int
+
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_TEMPERATURE;
+  buffer[cursor++] = highByte(voltage);
+  buffer[cursor++] = lowByte(voltage);
+
+
+
 }
 
 

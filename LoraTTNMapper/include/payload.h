@@ -54,9 +54,11 @@ public:
   void addStatus(uint16_t voltage, uint64_t uptime, float cputemp, uint32_t mem,
                  uint8_t reset1, uint8_t reset2);
   void addAlarm(int8_t rssi, uint8_t message);
-  void addVoltage(uint16_t value);
+  void addVoltage(uint8_t channel, float value);
+  void addCurrent(uint8_t channel, float value);
   void addTemperature(uint8_t channel, float value);
   void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
+  void addBatVoltage(uint8_t channel,  DataBuffer dataBuffer);
   void addGPS(TinyGPSPlus tGps);  
   void addButton(uint8_t value);
   void addSensor(uint8_t[]);
