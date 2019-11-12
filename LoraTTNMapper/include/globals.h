@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <FreeRTOS.h>
 
-#define USE_WIFI 0
+#define USE_WIFI 1
 #define USE_BME280  0
 #define USE_CAYENNE 0
 #define HAS_LORA 1
@@ -48,6 +48,14 @@
 #include <Adafruit_BME280.h>
 #include "esp_log.h"
 //#include <Preferences.h>
+
+
+//--------------------------------------------------------------------------
+// Wifi Settings
+//--------------------------------------------------------------------------
+const char ssid[] = "MrFlexi";
+const char wifiPassword[] = "Linde-123";
+extern WiFiClient wifiClient;
 
 
 
@@ -99,6 +107,7 @@ extern QueueHandle_t LoraSendQueue;
 #include "i2cscan.h"
 #include "INA3221.h"
 #include "payload.h"
+#include "mqtt.h"
 
 #ifdef HAS_BUTTON
 #include "button.h"
