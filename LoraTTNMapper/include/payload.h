@@ -59,7 +59,9 @@ public:
   void addTemperature(uint8_t channel, float value);
   void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
   void addBatVoltage(uint8_t channel,  DataBuffer dataBuffer);
-  void addGPS(TinyGPSPlus tGps);  
+  void addGPS_Lora(TinyGPSPlus tGps);
+  void addGPS_LPP(uint8_t channel, TinyGPSPlus tGps);    
+
   void addButton(uint8_t value);
   void addSensor(uint8_t[]);
   void addTime(time_t value);
