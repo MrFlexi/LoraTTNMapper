@@ -34,11 +34,11 @@ void t_enqueue_LORA_messages()
     if (gps.checkGpsFix())
     {
       payload.reset();
-      payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
+      payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
       payload.enqueue_port(1);
 
       payload.reset();
-      payload.addGPS_LPP(LPP_GPS_CHANNEL, gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
+      payload.addGPS_LPP(LPP_GPS_CHANNEL, gps.tGps); // Format for Cayenne LPP Message
       payload.enqueue_port(2);
     }
     else
