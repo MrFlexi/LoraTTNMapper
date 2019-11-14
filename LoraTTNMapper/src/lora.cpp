@@ -19,7 +19,6 @@ void os_getArtEui(u1_t *buf) {}
 void os_getDevEui(u1_t *buf) {}
 void os_getDevKey(u1_t *buf) {}
 
-
 void t_enqueue_LORA_messages()
 {
   String stringOne;
@@ -35,8 +34,12 @@ void t_enqueue_LORA_messages()
     if (gps.checkGpsFix())
     {
       payload.reset();
-      payload.addGPS(gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
+      payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
       payload.enqueue_port(1);
+
+      payload.reset();
+      payload.addGPS_LPP(LPP_GPS_CHANNEL, gps.tGps); // TTN-Mapper format will be generated in TTN Payload converter
+      payload.enqueue_port(2);
     }
     else
     {
@@ -70,11 +73,10 @@ void t_enqueue_LORA_messages()
     payload.reset();
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.enqueue_port(2);
-#endif   
+#endif
     ESP_LOGI(TAG, "Lora Message Queue: %d", uxQueueMessagesWaiting(LoraSendQueue));
   }
 }
-
 
 void do_send(osjob_t *j)
 {
