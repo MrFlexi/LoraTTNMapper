@@ -3,6 +3,10 @@
 		{
 			"name": "LoraTTNMapper",
 			"path": "."
+		},
+		{
+			"name": "GPS_USART",
+			"path": "C:\\Users\\TTv060\\Desktop\\Projects\\LoraTTNMapper\\GPS_USART"
 		}
 	],
 	"settings": {

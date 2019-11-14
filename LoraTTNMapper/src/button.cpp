@@ -21,6 +21,18 @@ void button_init(int pin)
 
   b->setOnClicked([]() {
     ESP_LOGI(TAG, "Button pressed");
+
+    if ( PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }
+
+
+
   });
 
   b->setOnHolding([]() {

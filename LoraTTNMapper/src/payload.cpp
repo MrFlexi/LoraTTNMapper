@@ -74,8 +74,6 @@ void PayloadConvert::addBatVoltage(uint8_t channel,  DataBuffer dataBuffer) {
   buffer[cursor++] = highByte(voltage);
   buffer[cursor++] = lowByte(voltage);
 
-
-
 }
 
 

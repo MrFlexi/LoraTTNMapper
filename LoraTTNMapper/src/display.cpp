@@ -4,6 +4,7 @@
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
+int PageNumber = 1;
 
 void log_display(String s)
 {
@@ -100,6 +101,8 @@ void showPage(int page)
       u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(64, 50);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
+      u8g2.setCursor(1, 60);
+      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
       break;
 
     case PAGE_SOLAR:
