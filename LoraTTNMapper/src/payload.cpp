@@ -40,7 +40,7 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 void PayloadConvert::addTemperature(uint8_t channel, float value)
   {
-    uint16_t val = value * 100;
+    uint16_t val = value * 10;
     buffer[cursor++] = channel;
     buffer[cursor++] = LPP_TEMPERATURE;
     buffer[cursor++] = highByte(val);
