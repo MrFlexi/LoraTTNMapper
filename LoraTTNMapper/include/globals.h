@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <FreeRTOS.h>
 
-#define USE_WIFI 1
+#define USE_WIFI 0
 #define USE_BME280 0
 #define USE_CAYENNE 0
 #define HAS_LORA 1

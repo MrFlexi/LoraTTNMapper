@@ -1,7 +1,6 @@
 #include "globals.h"
 #include "button.h"
 
-
 Button *b = NULL;
 
 // Local logging tag
@@ -17,12 +16,12 @@ void button_init(int pin)
 
   // attach events to the button
 
-  b->setOnDoubleClicked([]() { });
+  b->setOnDoubleClicked([]() {});
 
   b->setOnClicked([]() {
     ESP_LOGI(TAG, "Button pressed");
 
-    if ( PageNumber < PAGE_COUNT)
+    if (PageNumber < PAGE_COUNT)
     {
       PageNumber++;
     }
@@ -31,21 +30,18 @@ void button_init(int pin)
       PageNumber = 1;
     }
 
-
-
+    showPage(PageNumber);
   });
 
   b->setOnHolding([]() {
-
     ESP_LOGI(TAG, "Button Holding");
-
   });
 
   // attach interrupt to the button
   // attachInterrupt(digitalPinToInterrupt(pin), ButtonIRQ, CHANGE);
 }
 
-void readButton() 
-  { 
-  b->update(); 
-  }
+void readButton()
+{
+  b->update();
+}

@@ -25,11 +25,26 @@
 // Initialize globals
 //--------------------------------------------------------------------------
 PayloadConvert payload(PAYLOAD_BUFFER_SIZE);
-QueueHandle_t LoraSendQueue;
+
 SemaphoreHandle_t I2Caccess;
 int runmode = 0;
 
 uint8_t msgWaiting = 0;
+
+//--------------------------------------------------------------------------
+// Tasks/Ticker
+//--------------------------------------------------------------------------
+
+Ticker sleepTicker;
+Ticker displayTicker;
+Ticker sendMessageTicker;
+Ticker LORAsendMessageTicker;
+
+//--------------------------------------------------------------------------
+// Sensors
+//--------------------------------------------------------------------------
+Adafruit_BME280 bme; // I2C   PIN 21 + 22
+
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -117,10 +132,6 @@ unsigned long uptime_seconds_actual;
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
-char s[32]; // used to sprintf for Serial output
-
-
-
 
 #if (HAS_INA)
 void print_ina()
@@ -153,51 +164,6 @@ void print_ina()
   Serial.println("h");
 }
 #endif
-
-//--------------------------------------------------------------------------
-// MQTT
-//--------------------------------------------------------------------------
-
-
-
-
-//--------------------------------------------------------------------------
-// Tasks/Ticker
-//--------------------------------------------------------------------------
-
-Ticker sleepTicker;
-Ticker displayTicker;
-Ticker sendMessageTicker;
-Ticker LORAsendMessageTicker;
-
-//--------------------------------------------------------------------------
-// Sensors
-//--------------------------------------------------------------------------
-Adafruit_BME280 bme; // I2C   PIN 21 + 22
-
-//--------------------------------------------------------------------------
-// LORA Settings
-//--------------------------------------------------------------------------
-// LoRaWAN NwkSKey, network session key // msb
-static PROGMEM u1_t NWKSKEY[16] = {0x88, 0x06, 0xDA, 0xCF, 0x30, 0xFB, 0x44, 0xDC, 0x69, 0x0E, 0x15, 0xF8, 0xAD, 0xCB, 0x40, 0x6C};
-
-// LoRaWAN AppSKey, application session key // msb
-static u1_t PROGMEM APPSKEY[16] = {0xB3, 0xB1, 0x59, 0x5D, 0x24, 0xBD, 0xD2, 0xF5, 0x6A, 0x17, 0x0A, 0x94, 0xF2, 0xED, 0xDB, 0xC2};
-static u4_t DEVADDR = 0x260118B7; // <-- Change this address for every node!
-
-void os_getArtEui(u1_t *buf) {}
-void os_getDevEui(u1_t *buf) {}
-void os_getDevKey(u1_t *buf) {}
-
-
-
-// Pin mapping
-const lmic_pinmap lmic_pins = {
-    .nss = 18,
-    .rxtx = LMIC_UNUSED_PIN,
-    .rst = LMIC_UNUSED_PIN, // was "14,"
-    .dio = {26, 33, 32},
-};
 
 
 
@@ -302,7 +268,7 @@ void t_cyclic()
   gps.checkGpsFix();
 
   // Refresh Display
-  showPage(PAGE_VALUES);
+  showPage(PageNumber);
 }
 
 
@@ -359,124 +325,9 @@ void setup_wifi()
 #endif
 }
 
-void onEvent(ev_t ev)
-{
-  switch (ev)
-  {
-  case EV_SCAN_TIMEOUT:
-    Serial.println(F("EV_SCAN_TIMEOUT"));
-    break;
-  case EV_BEACON_FOUND:
-    Serial.println(F("EV_BEACON_FOUND"));
-    break;
-  case EV_BEACON_MISSED:
-    Serial.println(F("EV_BEACON_MISSED"));
-    break;
-  case EV_BEACON_TRACKED:
-    Serial.println(F("EV_BEACON_TRACKED"));
-    break;
-  case EV_JOINING:
-    Serial.println(F("EV_JOINING"));
-    break;
-  case EV_JOINED:
-    Serial.println(F("EV_JOINED"));
-    // Disable link check validation (automatically enabled
-    // during join, but not supported by TTN at this time).
-    LMIC_setLinkCheckMode(0);
-    break;
-  case EV_RFU1:
-    Serial.println(F("EV_RFU1"));
-    break;
-  case EV_JOIN_FAILED:
-    Serial.println(F("EV_JOIN_FAILED"));
-    break;
-  case EV_REJOIN_FAILED:
-    Serial.println(F("EV_REJOIN_FAILED"));
-    break;
-  case EV_TXCOMPLETE:
-    log_display("EV_TXCOMPLETE");
-    dataBuffer.data.txCounter++;
-    Serial.println(F("EV_TXCOMPLETE (waiting for RX windows)"));
-    digitalWrite(BUILTIN_LED, LOW);
-    if (LMIC.txrxFlags & TXRX_ACK)
-    {
-      Serial.println(F("Received Ack"));
-    }
-    if (LMIC.dataLen)
-    {
-      sprintf(s, "Received %i bytes payload", LMIC.dataLen);
-      Serial.println(s);
-      dataBuffer.data.lmic = LMIC;
-      sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
-      Serial.println(s);
-      Serial.println("");
-      Serial.println("Payload");
-      for (int i = 0; i < LMIC.dataLen; i++)
-      {
-        if (LMIC.frame[LMIC.dataBeg + i] < 0x10)
-        {
-          Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
-        }
-      }
-    }
-    // Schedule next transmission
-    //esp_sleep_enable_timer_wakeup(TX_INTERVAL*1000000);
-    //esp_deep_sleep_start();
-    log_display("Next TX started");
-    // Next TX is scheduled after TX_COMPLETE event.
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
-    break;
-  case EV_LOST_TSYNC:
-    Serial.println(F("EV_LOST_TSYNC"));
-    break;
-  case EV_RESET:
-    Serial.println(F("EV_RESET"));
-    break;
-  case EV_RXCOMPLETE:
-    // data received in ping slot
-    Serial.println(F("EV_RXCOMPLETE"));
-    break;
-  case EV_LINK_DEAD:
-    Serial.println(F("EV_LINK_DEAD"));
-    break;
-  case EV_LINK_ALIVE:
-    Serial.println(F("EV_LINK_sleep"));
-    break;
-  default:
-    Serial.println(F("Unknown event"));
-    break;
-  }
-}
 
-void setup_lora()
-{
-  log_display("Setup LORA");
-  // LMIC init
-  os_init();
-  // Reset the MAC state. Session and pending data transfers will be discarded.
-  LMIC_reset();
-  LMIC_setSession(0x1, DEVADDR, NWKSKEY, APPSKEY);
-  LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI); // g-band
-  LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);  // g-band
-  LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK, DR_FSK), BAND_MILLI);   // g2-band
 
-  // Disable link check validation
-  LMIC_setLinkCheckMode(0);
 
-  // TTN uses SF9 for its RX2 window.
-  LMIC.dn2Dr = DR_SF9;
-
-  // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
-  LMIC_setDrTxpow(DR_SF7, 14);
-
-  t_LORA_send_from_queue(&sendjob);
-}
 
 void setup()
 {
