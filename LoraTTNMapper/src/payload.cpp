@@ -74,12 +74,10 @@ void PayloadConvert::addBatVoltage(uint8_t channel,  DataBuffer dataBuffer) {
   buffer[cursor++] = highByte(voltage);
   buffer[cursor++] = lowByte(voltage);
 
-
-
 }
 
 
-void PayloadConvert::addGPS(TinyGPSPlus tGps)
+void PayloadConvert::addGPS_TTN(TinyGPSPlus tGps)
 {
 
 #if (USE_GPS)
@@ -89,6 +87,8 @@ void PayloadConvert::addGPS(TinyGPSPlus tGps)
 
   LatitudeBinary = ((tGps.location.lat() + 90) / 180.0) * 16777215;
   LongitudeBinary = ((tGps.location.lng() + 180) / 360.0) * 16777215;
+
+
 
   buffer[cursor++] = (LatitudeBinary >> 16) & 0xFF;
   buffer[cursor++] = (LatitudeBinary >> 8) & 0xFF;
@@ -107,6 +107,33 @@ void PayloadConvert::addGPS(TinyGPSPlus tGps)
  #endif 
 }
 
+
+void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
+{
+
+#if (USE_GPS)
+  uint32_t lat, lon; 
+  uint16_t altitudeGps;
+  uint8_t hdopGps;
+
+  lat = tGps.location.lat() / 100 ;
+  lon = tGps.location.lng() / 100 ;
+  int32_t alt = tGps.altitude.meters();
+
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_GPS;
+
+  buffer[cursor++] = (byte)((lat & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((lat & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)((lat & 0x0000FF));
+  buffer[cursor++] = (byte)((lon & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((lon & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)(lon & 0x0000FF);
+  buffer[cursor++] = (byte)((alt & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((alt & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)(alt & 0x0000FF);
+ #endif 
+}
 
   void PayloadConvert::enqueue_port(uint8_t port)
   {

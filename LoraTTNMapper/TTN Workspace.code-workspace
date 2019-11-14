@@ -3,6 +3,10 @@
 		{
 			"name": "LoraTTNMapper",
 			"path": "."
+		},
+		{
+			"name": "GPS_USART",
+			"path": "C:\\Users\\TTv060\\Desktop\\Projects\\LoraTTNMapper\\GPS_USART"
 		}
 	],
 	"settings": {
@@ -11,7 +15,8 @@
 			"PLATFORMIO_CALLER": "vscode"
 		},
 		"files.associations": {
-			"system_error": "cpp"
+			"system_error": "cpp",
+			"functional": "cpp"
 		}
 	}
 }

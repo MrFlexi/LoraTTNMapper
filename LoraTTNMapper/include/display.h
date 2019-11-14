@@ -15,7 +15,7 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-
+#define PAGE_COUNT 2
 #define PAGE_VALUES 1
 #define PAGE_SLEEP 2
 #define PAGE_SOLAR 3
@@ -28,6 +28,7 @@
 
 extern HAS_DISPLAY u8g2;             // 
 extern U8G2LOG u8g2log;             // Create a U8g2log object
+extern int PageNumber; 
 
 // allocate memory
 extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
