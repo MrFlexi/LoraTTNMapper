@@ -17,8 +17,8 @@
 
 #define PAGE_COUNT 2
 #define PAGE_VALUES 1
-#define PAGE_SLEEP 2
-#define PAGE_SOLAR 3
+#define PAGE_SOLAR 2
+#define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32

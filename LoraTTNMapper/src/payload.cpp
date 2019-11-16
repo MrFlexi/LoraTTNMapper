@@ -113,12 +113,11 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 
 #if (USE_GPS)
   uint32_t lat, lon; 
-  uint16_t altitudeGps;
   uint8_t hdopGps;
 
-  lat = tGps.location.lat() / 100 ;
-  lon = tGps.location.lng() / 100 ;
-  int32_t alt = tGps.altitude.meters();
+  lat = tGps.location.lat() * 1e6 / 100 ;
+  lon = tGps.location.lng() * 1e6 / 100 ;
+  int32_t alt = tGps.altitude.meters() * 100;
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_GPS;
@@ -126,9 +125,11 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
   buffer[cursor++] = (byte)((lat & 0xFF0000) >> 16);
   buffer[cursor++] = (byte)((lat & 0x00FF00) >> 8);
   buffer[cursor++] = (byte)((lat & 0x0000FF));
+
   buffer[cursor++] = (byte)((lon & 0xFF0000) >> 16);
   buffer[cursor++] = (byte)((lon & 0x00FF00) >> 8);
   buffer[cursor++] = (byte)(lon & 0x0000FF);
+
   buffer[cursor++] = (byte)((alt & 0xFF0000) >> 16);
   buffer[cursor++] = (byte)((alt & 0x00FF00) >> 8);
   buffer[cursor++] = (byte)(alt & 0x0000FF);

@@ -6,11 +6,7 @@
 #include <FreeRTOS.h>
 
 #define USE_WIFI 0
-<<<<<<< HEAD
 #define USE_BME280  0
-=======
-#define USE_BME280 0
->>>>>>> 434fe729d702872eed9912512d386ac3e5ab26b0
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0

@@ -264,35 +264,6 @@ void t_cyclic()
   }    
 #endif
 
-<<<<<<< HEAD
-#if (USE_BME280)
-    payload.reset();
-    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
-    payload.enqueue_port(2);
-#endif
-
-    //payload.reset();
-    //payload.addTemperature(1, 5.11);
-    //payload.enqueue_port(2);
-
-#if (HAS_PMU)
-    //payload.reset();
-    //payload.addVoltage(20, 2.45);
-    //payload.enqueue_port(2);
-
-    payload.reset();
-    payload.addVoltage(30, dataBuffer.data.bat_voltage);
-    //payload.enqueue_port(2);
-
-    //payload.reset();
-    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-    //payload.enqueue_port(2);
-
-    //payload.reset();
-    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-    payload.enqueue_port(2);
-#endif
-=======
   gps.encode();
   gps.checkGpsFix();
 
@@ -300,7 +271,6 @@ void t_cyclic()
   showPage(PageNumber);
 }
 
->>>>>>> 434fe729d702872eed9912512d386ac3e5ab26b0
 
 
 void t_sleep()

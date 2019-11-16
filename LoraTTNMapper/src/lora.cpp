@@ -38,7 +38,7 @@ void t_enqueue_LORA_messages()
       payload.enqueue_port(1);
 
       payload.reset();
-      payload.addGPS_LPP(LPP_GPS_CHANNEL, gps.tGps); // Format for Cayenne LPP Message
+      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
       payload.enqueue_port(2);
     }
     else
@@ -53,24 +53,13 @@ void t_enqueue_LORA_messages()
     payload.enqueue_port(2);
 #endif
 
-    payload.reset();
-    payload.addTemperature(1, 5.11);
-    payload.enqueue_port(2);
+    
 
 #if (HAS_PMU)
     payload.reset();
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
-    payload.enqueue_port(2);
-
-    payload.reset();
     payload.addVoltage(30, dataBuffer.data.bat_voltage);
-    payload.enqueue_port(2);
-
-    payload.reset();
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-    payload.enqueue_port(2);
-
-    payload.reset();
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.enqueue_port(2);
 #endif
