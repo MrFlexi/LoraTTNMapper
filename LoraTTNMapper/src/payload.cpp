@@ -121,8 +121,7 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 void PayloadConvert::enqueue_port(uint8_t port)
 {
   int ret;
-  MessageBuffer_t
-      SendBuffer; // contains MessageSize, MessagePort, MessagePrio, Message[]
+  MessageBuffer_t SendBuffer; 
 
   SendBuffer.MessageSize = payload.getSize();
 
@@ -131,7 +130,6 @@ void PayloadConvert::enqueue_port(uint8_t port)
   ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
-
   if (ret != 1)
   {
     ESP_LOGI(TAG, "LORA sendqueue is full");

@@ -69,8 +69,6 @@ void t_enqueue_LORA_messages()
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.enqueue_port(2);
 #endif
-
-    //dump_queue();
   }
 }
 

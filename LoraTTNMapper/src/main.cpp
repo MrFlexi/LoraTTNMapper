@@ -245,7 +245,7 @@ void t_cyclic()
 #endif
 
 #if (HAS_INA)
-  print_ina();
+  //print_ina();
   dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
   dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
