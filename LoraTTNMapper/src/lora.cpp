@@ -53,17 +53,24 @@ void t_enqueue_LORA_messages()
     payload.enqueue_port(2);
 #endif
 
-    
+#if (HAS_INA)
+    payload.reset();
+    payload.addVoltage(10, dataBuffer.data.panel_voltage);
+    payload.addVoltage(12, dataBuffer.data.panel_current);
+    payload.enqueue_port(2);
+#endif
 
 #if (HAS_PMU)
     payload.reset();
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
+    payload.addVoltage(21, dataBuffer.data.bus_current);
     payload.addVoltage(30, dataBuffer.data.bat_voltage);
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.enqueue_port(2);
 #endif
-    ESP_LOGI(TAG, "Lora Message Queue: %d", uxQueueMessagesWaiting(LoraSendQueue));
+
+    //dump_queue();
   }
 }
 
@@ -103,27 +110,67 @@ void t_LORA_send_from_queue(osjob_t *j)
   else
   {
 
-    if (LoraSendQueue == 0)
+    if (LoraSendQueue != 0)
     {
-      ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
-    }
-    else
-    {
-      if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) != pdTRUE)
+
+      int n = uxQueueMessagesWaiting(LoraSendQueue);
+      ESP_LOGI(TAG, "Messages waiting: %d", n);
+
+      if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
-        ESP_LOGE(TAG, "Queue is empty...");
+        dump_single_message( SendBuffer );
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
       else
       {
-        ESP_LOGI(TAG, "LORA package queued: Port %d, Size %d", SendBuffer.MessagePort, SendBuffer.MessageSize);
-        ESP_LOGI(TAG, "SendBuffer[0..8]: %d %d %d %d %d %d %d %d ", SendBuffer.Message[0], SendBuffer.Message[1], SendBuffer.Message[2], SendBuffer.Message[3], SendBuffer.Message[4], SendBuffer.Message[5], SendBuffer.Message[6], SendBuffer.Message[7]);
-        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
-        ESP_LOGI(TAG, "done...");
+        ESP_LOGV(TAG, "Queue is empty...");
       }
     }
-    ESP_LOGE(TAG, "New callback scheduled...");
+    else
+    {
+      ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
+    }
+    ESP_LOGV(TAG, "New callback scheduled...");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
   }
+}
+
+void dump_queue()
+{
+  MessageBuffer_t SendBuffer;
+  ESP_LOGI(TAG, "--- Queue Dump ---");
+
+  if (LoraSendQueue != 0)
+  {
+    int n = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Messages waiting: %d", n);
+
+    for (int i = 0; i < n; i++)
+    {
+      if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
+      {
+        dump_single_message( SendBuffer );
+      }
+    }
+    Serial.println();
+  }
+}
+
+void dump_single_message(MessageBuffer_t SendBuffer)
+{
+  ESP_LOGV(TAG, "Message Dump");
+  Serial.println(" ");
+  Serial.print(" P:");
+  Serial.print(SendBuffer.MessagePort);
+  Serial.print(" S:");
+  Serial.print(SendBuffer.MessageSize);
+  Serial.print(" ** ");
+  for (int p = 0; p < SendBuffer.MessageSize; p++)
+  {
+    Serial.print(SendBuffer.Message[p]);
+    Serial.print(" ");
+  }
+  Serial.println();
 }
 
 void setup_lora()

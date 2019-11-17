@@ -3,13 +3,12 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 5    // every second
-#define sendMessagesIntervall 60     // every minute
-#define LORAsendMessagesIntervall 20 // every 20 seconds
+#define displayRefreshIntervall     5   // every x second
+#define sendMessagesIntervall       90  // every x seconds
+#define LORAsendMessagesIntervall   30  // every x seconds
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
-
 
 #include "globals.h"
 
@@ -160,8 +159,6 @@ void print_ina()
   Serial.print(current_mA1);
   Serial.println(" mA");
   Serial.println("");
-
-  Serial.println("h");
 }
 #endif
 
@@ -244,7 +241,7 @@ void t_cyclic()
   dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
   dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
   dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-  AXP192_showstatus();
+  // AXP192_showstatus();
 #endif
 
 #if (HAS_INA)
@@ -424,7 +421,7 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  //LORAsendMessageTicker.attach(LORAsendMessagesIntervall, t_LORA_send_from_queue);
+  //LORAsendMessageTicker.attach(LORAsendMessagesIntervall, dump_queue);
 
   ESP_LOGV(TAG, "-- Setup done --");
 

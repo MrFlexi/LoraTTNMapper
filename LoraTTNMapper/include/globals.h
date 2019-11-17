@@ -10,7 +10,7 @@
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA 0
+#define HAS_INA 1
 #define USE_DASH 0
 #define USE_GPS 1
 

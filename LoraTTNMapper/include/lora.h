@@ -3,7 +3,7 @@
 
 // #include "globals.h"
 
-const unsigned TX_INTERVAL = 60;
+const unsigned TX_INTERVAL = 30;
 extern uint8_t txBuffer[9];
 extern QueueHandle_t LoraSendQueue;
 
@@ -31,6 +31,7 @@ static osjob_t sendjob;
 void t_enqueue_LORA_messages();
 void do_send(osjob_t *j);
 void t_LORA_send_from_queue(osjob_t *j);
+void dump_queue();
+void dump_single_message(MessageBuffer_t SendBuffer);
 void setup_lora();
-
 #endif
