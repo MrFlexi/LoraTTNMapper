@@ -116,7 +116,7 @@ void t_LORA_send_from_queue(osjob_t *j)
 
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
-        dump_single_message( SendBuffer );
+        dump_single_message(SendBuffer);
         LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
       else
@@ -130,6 +130,26 @@ void t_LORA_send_from_queue(osjob_t *j)
     }
     ESP_LOGV(TAG, "New callback scheduled...");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
+  }
+}
+
+void queue_aging()
+{
+  MessageBuffer_t SendBuffer;
+
+  int n = uxQueueMessagesWaiting(LoraSendQueue);
+  if (n >= SEND_QUEUE_SIZE)
+  {
+    ESP_LOGI(TAG, "Queue Cleansing");
+    ESP_LOGI(TAG, "Messages waiting before: %d", n);
+    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
+    {
+      ESP_LOGI(TAG, "deleted element:");
+      dump_single_message(SendBuffer);
+
+    }
+    int n = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Messages waiting after: %d", n);
   }
 }
 
@@ -147,7 +167,7 @@ void dump_queue()
     {
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
-        dump_single_message( SendBuffer );
+        dump_single_message(SendBuffer);
       }
     }
     Serial.println();

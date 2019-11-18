@@ -123,10 +123,12 @@ void PayloadConvert::enqueue_port(uint8_t port)
   int ret;
   MessageBuffer_t SendBuffer; 
 
+  queue_aging();    // check queue size and delete oldest entries if necessary
+  
   SendBuffer.MessageSize = payload.getSize();
-
   SendBuffer.MessagePrio = 1;
   SendBuffer.MessagePort = port;
+
   ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
