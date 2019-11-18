@@ -140,8 +140,8 @@ void queue_aging()
   int n = uxQueueMessagesWaiting(LoraSendQueue);
   if (n >= SEND_QUEUE_SIZE)
   {
-    ESP_LOGI(TAG, "Queue Cleansing");
-    ESP_LOGI(TAG, "Messages waiting before: %d", n);
+    ESP_LOGI(TAG, "Queue Aging");
+    ESP_LOGI(TAG, "Messages waiting before aging: %d", n);
     if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
     {
       ESP_LOGI(TAG, "deleted element:");
@@ -149,7 +149,7 @@ void queue_aging()
 
     }
     int n = uxQueueMessagesWaiting(LoraSendQueue);
-    ESP_LOGI(TAG, "Messages waiting after: %d", n);
+    ESP_LOGI(TAG, "Messages waiting after aging: %d", n);
   }
 }
 
