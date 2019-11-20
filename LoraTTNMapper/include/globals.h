@@ -5,12 +5,13 @@
 #include <Arduino.h>
 #include <FreeRTOS.h>
 
-#define USE_WIFI 0
+#define USE_WIFI 1
+#define USE_OTA 1
 #define USE_BME280  0
 #define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA 1
+#define HAS_INA  0
 #define USE_DASH 0
 #define USE_GPS 1
 
@@ -102,9 +103,16 @@ extern QueueHandle_t LoraSendQueue;
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
+
+#if (HAS_INA)
 #include "INA3221.h"
+#endif
+
 #include "payload.h"
+
+#if (USE_MQTT)
 #include "mqtt.h"
+#endif
 
 #ifdef HAS_BUTTON
 #include "button.h"
