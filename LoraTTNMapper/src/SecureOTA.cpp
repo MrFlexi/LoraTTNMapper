@@ -36,18 +36,22 @@ void checkFirmwareUpdates()
 {
   // Fetch the latest firmware version
   const String latest = bintray.getLatestVersion();
+  Serial.println("");
+  Serial.print("Bintray V:");Serial.print(latest); Serial.print(" ");
+  Serial.print("ESP V :");Serial.print(VERSION);
+
   if (latest.length() == 0)
   {
-    Serial.println("Could not load info about the latest firmware, so nothing to update. Continue ...");
+    Serial.println("Could not load info about firmware, ");
     return;
   }
-  else if (atoi(latest.c_str()) <= VERSION )
+  else if (atof(latest.c_str()) <= VERSION )
   {
-    Serial.println("The current firmware is up to date. Continue ...");
+    Serial.println("The firmware is up to date");
     return;
   }
 
-  Serial.println("There is a new version of firmware available: v." + latest);
+  Serial.println("New firmware available: v." + latest);
   processOTAUpdate(latest);
 }
 

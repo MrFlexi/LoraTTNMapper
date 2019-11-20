@@ -328,7 +328,6 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
-  Serial.print("Hallo: ");
   print_wakeup_reason();
 
   // create some semaphores for syncing / mutexing tasks
@@ -347,8 +346,6 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
-
-
 
 #if (HAS_PMU)
   AXP192_init();
