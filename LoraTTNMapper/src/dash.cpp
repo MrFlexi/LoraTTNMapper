@@ -1,3 +1,5 @@
+
+#if (USE_DASH)
 #include "globals.h"
 #include "dash.h"
 
@@ -39,9 +41,11 @@ void create_web_dash(void)
 void update_web_dash(void)
 {
 
+  #if (HAS_INA)
   ESPDash.updateNumberCard("PANEL_VOLTAGE", ina3221.getBusVoltage_V(1)*1000);
   ESPDash.updateNumberCard("PANEL_CURRENT", ina3221.getCurrent_mA(1));
   //ESPDash.updateNumberCard("PANEL_WATT", ina3221.getCurrent_mA(1)*ina3221.getBusVoltage_V(1));
+  #endif
   
   ESPDash.updateNumberCard("BAT_BUS_VOLTAGE", pmu.getVbusVoltage());
   ESPDash.updateNumberCard("BAT_BUS_CURRENT", pmu.getVbusCurrent());
@@ -52,8 +56,8 @@ void update_web_dash(void)
   //ESPDash.updateNumberCard("BAT_CHR_WATT", pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000);
   ESPDash.updateNumberCard("BAT_DIS_CURRENT", pmu.getBattDischargeCurrent());
 
-
-
 }
+
+#endif
 
 

@@ -13,6 +13,13 @@
 #include "globals.h"
 
 //--------------------------------------------------------------------------
+// OTA Settings
+//--------------------------------------------------------------------------
+#include "SecureOTA.h"
+const uint16_t OTA_CHECK_INTERVAL = 3000; // ms
+uint32_t _lastOTACheck = 0;
+
+//--------------------------------------------------------------------------
 // Wifi Settings
 //--------------------------------------------------------------------------
 
@@ -319,6 +326,7 @@ void setup_wifi()
   ESP_LOGV(TAG, String(WiFi.localIP()));
   log_display(String(WiFi.localIP()));
   delay(2000);
+  _lastOTACheck = millis();
 #endif
 }
 
@@ -454,4 +462,12 @@ void loop()
 #ifdef HAS_BUTTON
   readButton();
 #endif
+
+#if (USE_OTA)
+if ((millis() - OTA_CHECK_INTERVAL) > _lastOTACheck) {
+    _lastOTACheck = millis();
+    checkFirmwareUpdates();
+  }
+#endif
+
 }
