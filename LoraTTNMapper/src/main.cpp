@@ -328,6 +328,7 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
+  Serial.print("Hallo: ");
   print_wakeup_reason();
 
   // create some semaphores for syncing / mutexing tasks
@@ -391,6 +392,8 @@ void setup()
   checkFirmwareUpdates();
 #endif
 
+Serial.print("Firmware: "); Serial.println(VERSION);
+
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
@@ -432,6 +435,8 @@ void setup()
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
+
+  
 
 }
 
