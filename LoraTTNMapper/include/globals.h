@@ -126,4 +126,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "lora.h"
 #endif
 
+#if (USE_OTA)
+#include "SecureOTA.h"
+#endif
+
 #endif

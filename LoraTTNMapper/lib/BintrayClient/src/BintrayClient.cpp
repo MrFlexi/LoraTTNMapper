@@ -22,6 +22,8 @@
 #include "BintrayClient.h"
 #include "BintrayCertificates.h"
 
+static const char TAG[] = __FILE__;
+
 BintrayClient::BintrayClient(const String &user, const String &repository, const String &package)
     : m_user(user), m_repo(repository), m_package(package),
       m_storage_host("dl.bintray.com"),
@@ -104,6 +106,7 @@ String BintrayClient::requestHTTPContent(const String &url) const
 
 String BintrayClient::getLatestVersion() const
 {
+    ESP_LOGV(TAG, "BINTRAY: Get latest firmware.");
     String version;
     const String url = getLatestVersionRequestUrl();
     String jsonResult = requestHTTPContent(url);
@@ -138,26 +141,26 @@ String BintrayClient::getBinaryPath(const String &version) const
     String jsonResult = requestHTTPContent(url);
 
     const size_t bufferSize = 1024;
+
     if (jsonResult.length() > bufferSize)
     {
-        ESP_LOGE(TAG, "Error: Firmware download path data invalid.");
+        ESP_LOGE(TAG, "Error: Firmware download path data invalid. ");
+        Serial.println(url);
         return path;
     }
+
     StaticJsonDocument<bufferSize> doc;
-    
     DeserializationError error = deserializeJson(doc, jsonResult.c_str());
-    serializeJsonPretty(doc, Serial);
-
-    //JsonObject &firstItem = root[0];
-
+    path = doc[0]["path"].as<char*>(); 
+    
     if (error)
     {
         ESP_LOGE(TAG, "Error: Firmware download path not found.");
         Serial.println(error.c_str());
-
         return path;
     }    
    
-    // return "/" + getUser() + "/" + getRepository() + "/" + doc[0]["path"];
-    return "/" + getUser() + "/" + getRepository() + "/";
+    path = "/" + getUser() + "/" + getRepository() + "/" + path;
+    Serial.println(path);
+    return path;
 }

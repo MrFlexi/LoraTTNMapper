@@ -3,9 +3,9 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall     5   // every x second
-#define sendMessagesIntervall       90  // every x seconds
-#define LORAsendMessagesIntervall   30  // every x seconds
+#define displayRefreshIntervall 5    // every x second
+#define sendMessagesIntervall 90     // every x seconds
+#define LORAsendMessagesIntervall 30 // every x seconds
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -50,7 +50,6 @@ Ticker LORAsendMessageTicker;
 // Sensors
 //--------------------------------------------------------------------------
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
-
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -169,8 +168,6 @@ void print_ina()
 }
 #endif
 
-
-
 void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -260,12 +257,12 @@ void t_cyclic()
 #if (HAS_LORA)
   if (LoraSendQueue != 0)
   {
-    dataBuffer.data.LoraQueueCounter=  uxQueueMessagesWaiting(LoraSendQueue);
-  } 
+    dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
+  }
   else
   {
-  dataBuffer.data.LoraQueueCounter= 0;
-  }    
+    dataBuffer.data.LoraQueueCounter = 0;
+  }
 #endif
 
   gps.encode();
@@ -274,8 +271,6 @@ void t_cyclic()
   // Refresh Display
   showPage(PageNumber);
 }
-
-
 
 void t_sleep()
 {
@@ -330,10 +325,6 @@ void setup_wifi()
 #endif
 }
 
-
-
-
-
 void setup()
 {
   Serial.begin(115200);
@@ -355,6 +346,8 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
+
+
 
 #if (HAS_PMU)
   AXP192_init();
@@ -392,6 +385,10 @@ void setup()
   Cayenne.begin(username, password, clientID, ssid, wifiPassword);
   u8g2log.print("Cayenne connected...");
   u8g2log.print("\n");
+#endif
+
+#if (USE_OTA)
+  checkFirmwareUpdates();
 #endif
 
 //---------------------------------------------------------------
@@ -435,6 +432,7 @@ void setup()
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
+
 }
 
 void loop()
@@ -462,12 +460,4 @@ void loop()
 #ifdef HAS_BUTTON
   readButton();
 #endif
-
-#if (USE_OTA)
-if ((millis() - OTA_CHECK_INTERVAL) > _lastOTACheck) {
-    _lastOTACheck = millis();
-    checkFirmwareUpdates();
-  }
-#endif
-
 }
