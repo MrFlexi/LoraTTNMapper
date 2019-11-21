@@ -79,11 +79,13 @@ void AXP192_power_lora(bool on)
   if (on)
   {
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
     ESP_LOGI(TAG, "Lora power ON");
   }
   else
   {
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
     ESP_LOGI(TAG, "Lora power OFF");
   }
 }

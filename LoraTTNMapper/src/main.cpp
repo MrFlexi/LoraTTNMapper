@@ -5,7 +5,7 @@
 
 #define displayRefreshIntervall 5    // every x second
 #define sendMessagesIntervall 90     // every x seconds
-#define LORAsendMessagesIntervall 30 // every x seconds
+#define LORAsendMessagesIntervall 60 // every x seconds
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -18,6 +18,7 @@
 #include "SecureOTA.h"
 const uint16_t OTA_CHECK_INTERVAL = 3000; // ms
 uint32_t _lastOTACheck = 0;
+bool wifi_connected = false;
 
 //--------------------------------------------------------------------------
 // Wifi Settings
@@ -313,15 +314,24 @@ void setup_wifi()
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
 
-  while (WiFi.status() != WL_CONNECTED)
+  ESP_LOGI(TAG, "Connecting to WiFi..");
+  int i = 0;
+  wifi_connected = false;
+  while ((WiFi.status() != WL_CONNECTED) && (i < 10))
   {
     delay(1000);
-    ESP_LOGI(TAG, "Connecting to WiFi..");
+    i++;
+    Serial.print('.');
   }
-  ESP_LOGV(TAG, String(WiFi.localIP()));
-  log_display(String(WiFi.localIP()));
-  delay(2000);
-  _lastOTACheck = millis();
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    wifi_connected = true;
+    ESP_LOGV(TAG, String(WiFi.localIP()));
+    log_display(String(WiFi.localIP()));
+    delay(2000);
+  }
+
 #endif
 }
 
@@ -367,7 +377,7 @@ void setup()
 
   setup_display();
   setup_display_new();
-  oledWriteString(0,0,3,(char *)"**Demo**", FONT_LARGE, 0, 1);
+  oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
@@ -387,11 +397,17 @@ void setup()
   u8g2log.print("\n");
 #endif
 
-#if (USE_OTA)
-  checkFirmwareUpdates();
-#endif
+  //---------------------------------------------------------------
+  // OTA Update
+  //---------------------------------------------------------------
 
-Serial.print("Firmware: "); Serial.println(VERSION);
+#if (USE_OTA)
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    _lastOTACheck = millis();
+    checkFirmwareUpdates();
+  }
+#endif
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -434,9 +450,6 @@ Serial.print("Firmware: "); Serial.println(VERSION);
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
-
-  
-
 }
 
 void loop()
