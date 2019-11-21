@@ -25,6 +25,7 @@
 #define U8LOG_HEIGHT 6
 
 #include <U8g2lib.h>
+#include <ss_oled.h>
 
 extern HAS_DISPLAY u8g2;             // 
 extern U8G2LOG u8g2log;             // Create a U8g2log object
@@ -35,6 +36,11 @@ extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
 void log_display(String s);
 void setup_display(void);
+
+void setup_display_new();
+void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
+               const char *format, ...);
+
 void showPage(int page);
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol);
 

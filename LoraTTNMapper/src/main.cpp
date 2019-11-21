@@ -172,23 +172,23 @@ void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-  Serial.print("WakeUp caused by: ");
+  Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
   {
   case ESP_SLEEP_WAKEUP_EXT0:
-    Serial.println("external signal using RTC_IO");
+    Serial.println(F("external signal using RTC_IO"));
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
-    Serial.println("external signal using RTC_CNTL");
+    Serial.println(F("external signal using RTC_CNTL"));
     break;
   case ESP_SLEEP_WAKEUP_TIMER:
     Serial.println("by timer");
     break;
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
-    Serial.println("touchpad");
+    Serial.println(F("touchpad"));
     break;
   case ESP_SLEEP_WAKEUP_ULP:
-    Serial.println("ULP program");
+    Serial.println(F("ULP program"));
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
@@ -366,6 +366,8 @@ void setup()
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
 
   setup_display();
+  setup_display_new();
+  oledWriteString(0,0,3,(char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
