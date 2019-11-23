@@ -461,7 +461,7 @@ void setup()
 #endif
 
 #if (HAS_LORA)
-  t_enqueue_LORA_messages()
+  t_enqueue_LORA_messages();
 #endif
 }
 

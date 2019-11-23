@@ -95,9 +95,6 @@ extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
 extern QueueHandle_t LoraSendQueue;
 
-//#if (USE_CAYENNE)
-//#include "cayenne.h"
-//#endif
 
 #include "../src/hal/ttgobeam10.h"
 #include "power.h"

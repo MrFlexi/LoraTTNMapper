@@ -37,8 +37,8 @@ void checkFirmwareUpdates()
 {
   // Fetch the latest firmware version
   const String latest = bintray.getLatestVersion();
-  log_display("My firmware: v." + String(VERSION));
-  log_display("Server: v." + latest);
+  log_display("Firmware: " + String(VERSION) + " " + latest);
+  delay(500);
  
   if (latest.length() == 0)
   {
@@ -47,7 +47,7 @@ void checkFirmwareUpdates()
   }
   else if (atof(latest.c_str()) <= VERSION )
   {
-    Serial.println("The firmware is up to date");
+    log_display("The firmware is up to date");
     return;
   }
 
