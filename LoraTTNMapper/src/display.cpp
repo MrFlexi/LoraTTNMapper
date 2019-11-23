@@ -40,7 +40,7 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
     len = vsnprintf(temp, len + 1, format, arg);
   }
   va_end(arg);
-  oledWriteString(0, x, y, temp, font, inv, false);
+  //oledWriteString(0, x, y, temp, font, inv, false);
   if (temp != loc_buf) {
     free(temp);
   }
@@ -63,15 +63,15 @@ void setup_display(void)
 void setup_display_new() {
 int rc;
   // put your setup code here, to run once:
-rc = oledInit(OLED_128x64, 0, 0, -1, -1,400000L); // use standard I2C bus at 400Khz
-//rc = oledInit(OLED_128x64, 0, 0, 0xb0, 0xb2, 400000L); // for ATtiny85, use P0 as SDA and P2 as SCL
-  if (rc != OLED_NOT_FOUND)
-  {
-    char *msgs[] = {"SSD1306 @ 0x3C", "SSD1306 @ 0x3D","SH1106 @ 0x3C","SH1106 @ 0x3D"};
-    oledFill(0, 1);
-    oledWriteString(0,0,0,msgs[rc], FONT_NORMAL, 0, 1);
-    delay(2000);
-  }
+//rc = oledInit(OLED_128x64, 0, 0, -1, -1,400000L); // use standard I2C bus at 400Khz
+
+//  if (rc != OLED_NOT_FOUND)
+//  {
+//    char *msgs[] = {"SSD1306 @ 0x3C", "SSD1306 @ 0x3D","SH1106 @ 0x3C","SH1106 @ 0x3D"};
+//    oledFill(0, 1);
+//    oledWriteString(0,0,0,msgs[rc], FONT_NORMAL, 0, 1);
+//    delay(2000);
+//  }
 }
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
@@ -123,7 +123,7 @@ void showPage(int page)
   {
 
     u8g2.clearBuffer();
-    oledFill(0, 1);
+    //oledFill(0, 1);
 
     uint8_t icon = 0;
 

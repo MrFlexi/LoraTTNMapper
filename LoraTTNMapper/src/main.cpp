@@ -377,7 +377,7 @@ void setup()
 
   setup_display();
   setup_display_new();
-  oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
+  //oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();
   calibrate_voltage();

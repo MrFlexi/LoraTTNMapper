@@ -25,7 +25,7 @@
 #define U8LOG_HEIGHT 6
 
 #include <U8g2lib.h>
-#include <ss_oled.h>
+//#include <ss_oled.h>
 
 extern HAS_DISPLAY u8g2;             // 
 extern U8G2LOG u8g2log;             // Create a U8g2log object
