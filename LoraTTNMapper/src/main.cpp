@@ -414,14 +414,14 @@ void setup()
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  Serial.println("Setup ESP32 to wake-up via timer after " + String(TIME_TO_SLEEP) +
+  Serial.println("ESP32 wake-up via timer after " + String(TIME_TO_SLEEP) +
                  " Minutes");
 #endif
 
   gps.init();
   //gps.softwareReset();
   gps.wakeup();
-  //gps.ecoMode();
+  gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
 
@@ -450,6 +450,19 @@ void setup()
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
+
+  //-------------------------------------------------------------
+  // Call all tasks once after startup, next call via Timer
+  //-------------------------------------------------------------
+  t_cyclic();
+
+#if (USE_CAYENNE)
+  Cayenne_send();
+#endif
+
+#if (HAS_LORA)
+  t_enqueue_LORA_messages()
+#endif
 }
 
 void loop()

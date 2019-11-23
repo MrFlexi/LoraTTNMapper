@@ -19,6 +19,7 @@
 #include <Update.h>
 #include <BintrayClient.h>
 #include "SecureOTA.h"
+#include "globals.h"
 
 const BintrayClient bintray(BINTRAY_USER, BINTRAY_REPO, BINTRAY_PACKAGE);
 
@@ -36,13 +37,12 @@ void checkFirmwareUpdates()
 {
   // Fetch the latest firmware version
   const String latest = bintray.getLatestVersion();
-  Serial.println("");
-  Serial.print("Bintray V:");Serial.print(latest); Serial.print(" ");
-  Serial.print("ESP V :");Serial.print(VERSION);
-
+  log_display("My firmware: v." + String(VERSION));
+  log_display("Server: v." + latest);
+ 
   if (latest.length() == 0)
   {
-    Serial.println("Could not load info about firmware, ");
+    Serial.println("Could not load firmware info, ");
     return;
   }
   else if (atof(latest.c_str()) <= VERSION )
@@ -51,7 +51,7 @@ void checkFirmwareUpdates()
     return;
   }
 
-  Serial.println("New firmware available: v." + latest);
+  log_display("New firmware: v." + latest);
   processOTAUpdate(latest);
 }
 
@@ -69,7 +69,7 @@ void processOTAUpdate(const String &version)
   String firmwarePath = bintray.getBinaryPath(version);
   if (!firmwarePath.endsWith(".bin"))
   {
-    Serial.println("Unsupported binary format. OTA update cannot be performed!");
+    Serial.println("Unsupported format.");
     return;
   }
 
@@ -94,7 +94,7 @@ void processOTAUpdate(const String &version)
       client.setCACert(bintray.getCertificate(currentHost));
       if (!client.connect(currentHost.c_str(), port))
       {
-        Serial.println("Redirect detected! Cannot connect to " + currentHost + " for some reason!");
+        Serial.println("Redirect detected! Cannot connect to " + currentHost );
         return;
       }
     }
@@ -203,12 +203,12 @@ void processOTAUpdate(const String &version)
       {
         if (Update.isFinished())
         {
-          Serial.println("OTA update has successfully completed. Rebooting ...");
+          Serial.println("OTA completed. Rebooting ...");
           ESP.restart();
         }
         else
         {
-          Serial.println("Something went wrong! OTA update hasn't been finished properly.");
+          Serial.println("OTA update hasn't been finished properly.");
         }
       }
       else
@@ -218,13 +218,13 @@ void processOTAUpdate(const String &version)
     }
     else
     {
-      Serial.println("There isn't enough space to start OTA update");
+      Serial.println("Not enough space for OTA update");
       client.flush();
     }
   }
   else
   {
-    Serial.println("There was no valid content in the response from the OTA server!");
+    Serial.println("No valid response from server!");
     client.flush();
   }
 }

@@ -1,7 +1,5 @@
 
 
-#if (HAS_INA)
-
 #if ARDUINO >= 100
  #include "Arduino.h"
 #else
@@ -9,7 +7,6 @@
 #endif
 
 #include <Wire.h>
-
 #include "INA3221.h"
 
 /**************************************************************************/
@@ -185,4 +182,4 @@ int SDL_Arduino_INA3221::getManufID()
 
 SDL_Arduino_INA3221 ina3221;
 
-#endif
+
