@@ -331,6 +331,13 @@ void setup_wifi()
     log_display(String(WiFi.localIP()));
     delay(2000);
   }
+  else
+  {
+
+    //Turn off WiFi if no connection was made
+    log_display("WIFI OFF");
+    WiFi.mode(WIFI_OFF);
+  }
 
 #endif
 }
@@ -382,9 +389,8 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-  //Turn off WiFi and Bluetooth
-  //log_display("Stop Bluethooth");
-  //WiFi.mode(WIFI_OFF);
+  //Turn off Bluetooth
+  log_display("Stop Bluethooth");
   btStop();
 
 #if (USE_MQTT)
@@ -457,7 +463,8 @@ void setup()
   t_cyclic();
 
 #if (USE_CAYENNE)
-  Cayenne_send();
+  if (WiFi.status() == WL_CONNECTED)
+    Cayenne_send();
 #endif
 
 #if (HAS_LORA)
