@@ -271,6 +271,11 @@ void t_cyclic()
 
   // Refresh Display
   showPage(PageNumber);
+
+#if (USE_DASH)
+  if (WiFi.status() == WL_CONNECTED
+   update_web_dash();
+#endif
 }
 
 void t_sleep()
@@ -398,9 +403,11 @@ void setup()
 #endif
 
 #if (USE_CAYENNE)
-  Cayenne.begin(username, password, clientID, ssid, wifiPassword);
-  u8g2log.print("Cayenne connected...");
-  u8g2log.print("\n");
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Cayenne.begin(username, password, clientID, ssid, wifiPassword);
+    log_display("Cayenne connected...");
+  }
 #endif
 
   //---------------------------------------------------------------
@@ -437,7 +444,10 @@ void setup()
 #endif
 
 #if (USE_DASH)
-  create_web_dash();
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    create_web_dash();
+  }
 #endif
 
 #ifdef HAS_BUTTON
@@ -487,11 +497,14 @@ void loop()
 
 #if (USE_MQTT)
   // MQTT Connection
-  if (!client.connected())
+  if (WiFi.status() == WL_CONNECTED)
   {
-    reconnect();
+    if (!client.connected())
+    {
+      reconnect();
+    }
+    client.loop();
   }
-  client.loop();
 #endif
 
 #ifdef HAS_BUTTON
