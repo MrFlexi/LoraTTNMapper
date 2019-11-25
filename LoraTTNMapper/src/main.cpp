@@ -421,7 +421,7 @@ void setup()
   gps.init();
   //gps.softwareReset();
   gps.wakeup();
-  gps.ecoMode();
+  //gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
 
