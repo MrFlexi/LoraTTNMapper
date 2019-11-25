@@ -5,6 +5,7 @@ HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SD
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 int PageNumber = 1;
+char sbuf[32];
 
 void log_display(String s)
 {
@@ -132,7 +133,8 @@ void showPage(int page)
     case PAGE_VALUES:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "   SAP GTT  ");
+      sprintf(sbuf, "  SAP GTT   V:", VERSION);
+      u8g2.drawStr(1, 15, sbuf );
 
       u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
