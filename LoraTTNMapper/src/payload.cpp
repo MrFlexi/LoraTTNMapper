@@ -25,6 +25,7 @@ void PayloadConvert::addFloat(uint8_t channel, float value)
 { 
   uint16_t volt = value * 100;
   buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_ANALOG_INPUT;
   buffer[cursor++] = highByte(volt);
   buffer[cursor++] = lowByte(volt);
 }

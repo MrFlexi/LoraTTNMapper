@@ -71,7 +71,7 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
-  uint8_t firmware_version; 
+  float firmware_version; 
   uint8_t bytesReceived;
   lmic_t lmic;
   float panel_voltage = 0;
