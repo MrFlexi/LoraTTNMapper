@@ -17,6 +17,17 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 #if (PAYLOAD_ENCODER == 3)
 
+
+#define LPP_DIGITAL_INPUT 0  // 1 byte
+
+
+void PayloadConvert::addByte(uint8_t channel, uint8_t value)
+{ 
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_DIGITAL_INPUT;
+  buffer[cursor++] = value; 
+}
+
 void PayloadConvert::addVoltage(uint8_t channel, float value)
 {
   uint16_t volt = value * 100;

@@ -385,10 +385,11 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
+  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;  
+  dataBuffer.data.firmware_version = VERSION*10;
 
   setup_display();
-  setup_display_new();
+  //setup_display_new();
   //oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();

@@ -24,6 +24,7 @@ extern void lora_queue_init(void);
 #define LPP_HUMIDITY_CHANNEL 29
 #define LPP_BAROMETER_CHANNEL 30
 #define LPP_AIR_CHANNEL 31
+#define LPP_FIRMWARE_CHANNEL 99
 
 // MyDevices CayenneLPP 2.0 types for Packed Sensor Payload, not using channels,
 // but different FPorts
@@ -48,8 +49,8 @@ public:
   void enqueue_port(uint8_t port);
   void reset(void);
   uint8_t getSize(void);
-  uint8_t *getBuffer(void);
-  void addByte(uint8_t value);
+  uint8_t *getBuffer(void);  
+  void addByte(uint8_t channel, uint8_t value);
   void addCount(uint16_t value, uint8_t sniffytpe);  
   void addStatus(uint16_t voltage, uint64_t uptime, float cputemp, uint32_t mem,
                  uint8_t reset1, uint8_t reset2);
