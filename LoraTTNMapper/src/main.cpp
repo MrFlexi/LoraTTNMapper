@@ -386,7 +386,7 @@ void setup()
 
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;  
-  dataBuffer.data.firmware_version = VERSION*10;
+  dataBuffer.data.firmware_version = VERSION;
 
   setup_display();
   //setup_display_new();
