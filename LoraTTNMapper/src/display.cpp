@@ -1,5 +1,24 @@
+
+
+
 #include "globals.h"
 #include "display.h"
+
+void log_display(String s)
+{
+  Serial.println(s);
+  if (runmode < 1)
+  {
+    #if (USE_DISPLAY)
+    u8g2log.print(s);
+    u8g2log.print("\n");
+    #endif
+  }
+}
+
+
+#if (USE_DISPLAY)
+
 
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
@@ -51,7 +70,7 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
 void setup_display(void)
 {
   u8g2.begin();
-  u8g2.setFont(u8g2_font_profont11_mf);                         // set the font for the terminal window
+  u8g2.setFont(u8g2_font_profont11_mr);                         // set the font for the terminal window
   u8g2log.begin(u8g2, U8LOG_WIDTH, U8LOG_HEIGHT, u8log_buffer); // connect to u8g2, assign buffer
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
@@ -206,6 +225,8 @@ void showPage(int page)
   }
 }
 
+#endif
+
 DataBuffer::DataBuffer()
 {
 }
@@ -221,3 +242,4 @@ void DataBuffer::get()
 
 DataBuffer dataBuffer;
 deviceStatus_t sensorValues;
+

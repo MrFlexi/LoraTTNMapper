@@ -14,7 +14,8 @@
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
-#define USE_BLE 0
+#define USE_BLE 1
+#define USE_DISPLAY 0
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -46,7 +47,7 @@
 #include <Wire.h>
 #include "WiFi.h"
 
-#if (HAS_BME)
+#if (USE_BME280)
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #endif

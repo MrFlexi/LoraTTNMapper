@@ -272,7 +272,9 @@ void t_cyclic()
   gps.checkGpsFix();
 
   // Refresh Display
+  #if (USE_DISPLAY)
   showPage(PageNumber);
+  #endif
 
 #if (USE_DASH)
   if (WiFi.status() == WL_CONNECTED
@@ -420,7 +422,10 @@ void setup()
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;  
   dataBuffer.data.firmware_version = VERSION;
 
+ #if (USE_DISPLAY)
   setup_display();
+ #endif
+
   //setup_display_new();
   //oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
@@ -504,7 +509,9 @@ setup_BLE();
   ESP_LOGV(TAG, "-- Setup done --");
 
   runmode = 1; // Switch from Terminal Mode to page Display
+   #if (USE_DISPLAY)
   showPage(1);
+  #endif
 
   //-------------------------------------------------------------
   // Call all tasks once after startup, next call via Timer
