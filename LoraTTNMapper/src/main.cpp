@@ -347,6 +347,35 @@ void setup_wifi()
 #endif
 }
 
+
+
+
+void setup_BLE() {  
+  Serial.println("Setup BLE");
+
+  BLEDevice::init("Long name works now");
+  BLEServer *pServer = BLEDevice::createServer();
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+                                         CHARACTERISTIC_UUID,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+
+  pCharacteristic->setValue("SAP GTT");
+  pService->start();
+  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+  Serial.println("SAP GTT Monitor");
+}
+
+
+
 void setup()
 {
   Serial.begin(115200);
@@ -438,6 +467,12 @@ void setup()
   //gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
+
+
+#if (USE_BLE)
+setup_BLE();
+#endif
+
 
 #if (HAS_LORA)
   setup_lora();

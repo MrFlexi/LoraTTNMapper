@@ -7,13 +7,14 @@
 
 #define USE_WIFI 1
 #define USE_OTA 1
-#define USE_BME280  0
+#define USE_BME280 0
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA  0
+#define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
+#define USE_BLE 1
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -33,7 +34,7 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 2         // sleep for n minute
+#define TIME_TO_SLEEP 2          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 10    // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
@@ -71,7 +72,7 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
-  float firmware_version; 
+  float firmware_version;
   uint8_t bytesReceived;
   lmic_t lmic;
   float panel_voltage = 0;
@@ -95,7 +96,6 @@ typedef struct
 extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
 extern QueueHandle_t LoraSendQueue;
-
 
 #include "../src/hal/ttgobeam10.h"
 #include "power.h"
@@ -127,6 +127,14 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_OTA)
 #include "SecureOTA.h"
+#endif
+
+#if (USE_BLE)
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #endif
 
 #endif
