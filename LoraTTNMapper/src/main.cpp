@@ -50,7 +50,9 @@ Ticker LORAsendMessageTicker;
 //--------------------------------------------------------------------------
 // Sensors
 //--------------------------------------------------------------------------
+#if (USE_BME)
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
+#endif
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -349,7 +351,7 @@ void setup_wifi()
 
 
 
-
+#if (USE_BLE)
 void setup_BLE() {  
   Serial.println("Setup BLE");
 
@@ -373,6 +375,7 @@ void setup_BLE() {
   BLEDevice::startAdvertising();
   Serial.println("SAP GTT Monitor");
 }
+#endif
 
 
 
@@ -425,8 +428,8 @@ void setup()
   calibrate_voltage();
 
   //Turn off Bluetooth
-  log_display("Stop Bluethooth");
-  btStop();
+  //log_display("Stop Bluethooth");
+  //btStop();
 
 #if (USE_MQTT)
   setup_mqtt();

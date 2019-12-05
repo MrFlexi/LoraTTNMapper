@@ -8,7 +8,7 @@
 #define USE_WIFI 1
 #define USE_OTA 1
 #define USE_BME280 0
-#define USE_CAYENNE 1
+#define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
@@ -45,8 +45,12 @@
 #include "esp_sleep.h"
 #include <Wire.h>
 #include "WiFi.h"
+
+#if (HAS_BME)
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#endif
+
 #include "esp_log.h"
 //#include <Preferences.h>
 
