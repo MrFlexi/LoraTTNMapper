@@ -1,24 +1,6 @@
 
-
-
 #include "globals.h"
 #include "display.h"
-
-void log_display(String s)
-{
-  Serial.println(s);
-  if (runmode < 1)
-  {
-    #if (USE_DISPLAY)
-    u8g2log.print(s);
-    u8g2log.print("\n");
-    #endif
-  }
-}
-
-
-#if (USE_DISPLAY)
-
 
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
@@ -196,7 +178,7 @@ void showPage(int page)
 
       break;
 
-      case PAGE_VALUES:
+      case PAGE_SETTINGS:
       u8g2.setFont(u8g2_font_profont11_mf);
       sprintf(sbuf, "Firmware:", VERSION);
       u8g2.drawStr(1, 15, sbuf );
@@ -228,7 +210,6 @@ void showPage(int page)
   }
 }
 
-#endif
 
 DataBuffer::DataBuffer()
 {

@@ -50,9 +50,11 @@ Ticker LORAsendMessageTicker;
 //--------------------------------------------------------------------------
 // Sensors
 //--------------------------------------------------------------------------
-#if (USE_BME)
+
+#if (USE_BME280)
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 #endif
+
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -277,7 +279,7 @@ void t_cyclic()
   #endif
 
 #if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED
+  if (WiFi.status() == WL_CONNECTED)
    update_web_dash();
 #endif
 }
@@ -357,7 +359,7 @@ void setup_wifi()
 void setup_BLE() {  
   Serial.println("Setup BLE");
 
-  BLEDevice::init("Long name works now");
+  BLEDevice::init("SolarServer");
   BLEServer *pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(

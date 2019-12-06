@@ -12,11 +12,7 @@ extern int PageNumber;
 #define PAGE_SETTINGS 3
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
-void log_display(String s);
 
-
-
-#if (USE_DISPLAY)
 
 #include "globals.h"
 
@@ -46,15 +42,13 @@ extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
 
 void setup_display(void);
-
+void log_display(String s);
 void setup_display_new();
 void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
                const char *format, ...);
 
 void showPage(int page);
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol);
-
-#endif
 
 class DataBuffer
 {
