@@ -15,7 +15,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_BLE 1
-#define USE_DISPLAY 0
+#define USE_DISPLAY 1
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51

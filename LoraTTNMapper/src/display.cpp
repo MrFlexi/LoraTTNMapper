@@ -143,8 +143,7 @@ void showPage(int page)
   {
 
     u8g2.clearBuffer();
-    //oledFill(0, 1);
-
+  
     uint8_t icon = 0;
 
     switch (page)
@@ -152,7 +151,7 @@ void showPage(int page)
     case PAGE_VALUES:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      sprintf(sbuf, "  SAP GTT   V:", VERSION);
+      sprintf(sbuf, "  SAP GTT   ");
       u8g2.drawStr(1, 15, sbuf );
 
       u8g2.setFont(u8g2_font_profont11_mf);
@@ -197,11 +196,15 @@ void showPage(int page)
 
       break;
 
+      case PAGE_VALUES:
+      u8g2.setFont(u8g2_font_profont11_mf);
+      sprintf(sbuf, "Firmware:", VERSION);
+      u8g2.drawStr(1, 15, sbuf );
+      break;
+
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_profont11_mf);
-      //u8g2.setCursor(1, 30);
-      //u8g2.printf("Sleeping until:%.2d", gps.tGps.satellites.value());
-
+      
       if (dataBuffer.data.sleepCounter <= 0)
       {
         drawSymbol(48, 50, RAIN);

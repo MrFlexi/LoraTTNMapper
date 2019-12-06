@@ -6,9 +6,10 @@
 #define _DISPLAY_H
 
 extern int PageNumber; 
-#define PAGE_COUNT 2
+#define PAGE_COUNT 3
 #define PAGE_VALUES 1
 #define PAGE_SOLAR 2
+#define PAGE_SETTINGS 3
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
 void log_display(String s);
