@@ -47,6 +47,7 @@ void update_web_dash(void)
   //ESPDash.updateNumberCard("PANEL_WATT", ina3221.getCurrent_mA(1)*ina3221.getBusVoltage_V(1));
   #endif
   
+  #if (HAS_PMU)
   ESPDash.updateNumberCard("BAT_BUS_VOLTAGE", pmu.getVbusVoltage());
   ESPDash.updateNumberCard("BAT_BUS_CURRENT", pmu.getVbusCurrent());
    //ESPDash.updateNumberCard("BAT_BUS_WATT", pmu.getVbusCurrent()/1000*pmu.getVbusVoltage());
@@ -55,6 +56,7 @@ void update_web_dash(void)
   ESPDash.updateNumberCard("BAT_CHR_CURRENT", pmu.getBattChargeCurrent());
   //ESPDash.updateNumberCard("BAT_CHR_WATT", pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000);
   ESPDash.updateNumberCard("BAT_DIS_CURRENT", pmu.getBattDischargeCurrent());
+  #endif
 
 }
 

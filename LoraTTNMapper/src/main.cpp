@@ -106,15 +106,13 @@ void Cayenne_send(void)
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
-
   Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(22, pmu.getVbusCurrent()/1000*pmu.getVbusVoltage(), "pow", "Watts");
+  
 
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
+  
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
 }
 
@@ -286,7 +284,7 @@ void t_cyclic()
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
-#ifdef HAS_PMU
+#if (HAS_PMU)
   dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
   dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
@@ -337,8 +335,10 @@ void t_sleep()
   dataBuffer.data.sleepCounter--;
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
   {
+    #if (HAS_PMU)
     AXP192_power_gps(OFF);
     AXP192_power_lora(OFF);
+    #endif
     delay(1000);
     t_cyclic(); // Aktuelle Messwerte anzeigen
     delay(5000);

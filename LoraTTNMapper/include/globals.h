@@ -14,7 +14,7 @@
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 1
-#define USE_DASH 1
+#define USE_DASH 0
 #define USE_GPS 1
 #define USE_BLE 0
 #define USE_DISPLAY 1
