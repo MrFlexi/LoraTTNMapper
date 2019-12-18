@@ -8,26 +8,22 @@
 #include <stdint.h>
 
 // Hardware related definitions for TTGO T-Beam board
-// (only) for older T-Beam version T22_V05 eternal wiring LORA_IO1 to GPIO33 is needed!
-//
-// pinouts taken from http://tinymicros.com/wiki/TTGO_T-Beam
+// (only) for newer T-Beam version T22_V10
+// pinouts taken from https://github.com/lewisxhe/TTGO-T-Beam
 
-#define HAS_LED GPIO_NUM_14 // on board green LED, only new version TTGO-BEAM V07
-//#define HAS_LED GPIO_NUM_21 // on board green LED, only old verison TTGO-BEAM V05
+#define HAS_LORA                1               // comment out if device shall not send data via LoRa
+#define CFG_sx1276_radio        1               // HPD13A LoRa SoC
+#define BOARD_HAS_PSRAM                         // use extra 4MB external RAM
+#define HAS_BUTTON              GPIO_NUM_38     // middle on board button
+#define HAS_PMU                 0               // AXP192 power management chip
+#define PMU_INT                 GPIO_NUM_35     // AXP192 interrupt
 
-#define HAS_LORA 1       // comment out if device shall not send data via LoRa
-#define CFG_sx1276_radio 1 // HPD13A LoRa SoC
-#define BOARD_HAS_PSRAM // use extra 4MB external RAM
-#define HAS_BUTTON GPIO_NUM_39 // on board button (next to reset)
-#define BAT_MEASURE_ADC ADC1_GPIO35_CHANNEL // battery probe GPIO pin -> ADC1_CHANNEL_7
-#define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
+#define HAS_LED NOT_A_PIN
 
 // GPS settings
 #define HAS_GPS 1 // use on board GPS
-#define GPS_TX          12
-#define GPS_RX          15
-
-//#define GPS_INT GPIO_NUM_34 // 30ns accurary timepulse, to be external wired on pcb: NEO 6M Pin#3 -> GPIO34
+#define GPS_TX          34
+#define GPS_RX          12
 
 // enable only if device has these sensors, otherwise comment these lines
 // BME680 sensor on I2C bus
@@ -36,11 +32,9 @@
 //#define BME680_ADDR BME680_I2C_ADDR_PRIMARY // !! connect SDIO of BME680 to GND !!
 
 // display (if connected)
-
-
-#define MY_OLED_SDA SDA
-#define MY_OLED_SCL SCL
-#define MY_OLED_RST U8X8_PIN_NONE
+//#define MY_OLED_SDA SDA
+//#define MY_OLED_SCL SCL
+//#define MY_OLED_RST U8X8_PIN_NONE
 //#define DISPLAY_FLIP  1 // use if display is rotated
 
 // user defined sensors (if connected)
