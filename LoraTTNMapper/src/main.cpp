@@ -511,8 +511,8 @@ void setup()
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  Serial.println("ESP32 wake-up via timer after " + String(TIME_TO_SLEEP) +
-                 " Minutes");
+  log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
+                 " min");
 #endif
 
   gps.init();
@@ -545,14 +545,13 @@ setup_BLE();
 #endif
 
   // Tasks
-  ESP_LOGV(TAG, "-- Starting Tasks --");
+  log_display("-- Starting Tasks --");
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
-  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  //LORAsendMessageTicker.attach(LORAsendMessagesIntervall, dump_queue);
+  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);  
 
-  ESP_LOGV(TAG, "-- Setup done --");
+  log_display("-- Setup done --");
 
   runmode = 1; // Switch from Terminal Mode to page Display
    #if (USE_DISPLAY)

@@ -13,7 +13,6 @@ extern int PageNumber;
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
 
-
 #include "globals.h"
 
 #define SUN	0
@@ -24,8 +23,6 @@ extern int PageNumber;
 #define SLEEP 10
 #define ICON_NOTES 11
 
-
-
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32
 #define U8LOG_HEIGHT 6
@@ -35,7 +32,6 @@ extern int PageNumber;
 
 extern HAS_DISPLAY u8g2;             // 
 extern U8G2LOG u8g2log;             // Create a U8g2log object
-
 
 // allocate memory
 extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
