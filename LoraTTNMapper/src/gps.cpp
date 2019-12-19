@@ -19,10 +19,8 @@ void Neo6m::encode()
     {
       char data = GPSSerial.read();
       tGps.encode(data);
-      //Serial.print(data);
     }
   }
-  Serial.println("");
 }
 
 void Neo6m::buildPacket(uint8_t txBuffer[9])
@@ -63,7 +61,6 @@ bool Neo6m::checkGpsFix()
       tGps.altitude.isValid() &&
       tGps.altitude.age() < 2000)
   {
-    Serial.println("Valid gps Fix.");
     return true;
   }
   else
@@ -90,7 +87,7 @@ bool Neo6m::checkGpsFix()
 }
 
   void Neo6m::wakeup() {
-    Serial.println("GPS wake up");
+    log_display("GPS wake up");
     int data = -1;
     do
     {
@@ -100,7 +97,7 @@ bool Neo6m::checkGpsFix()
       }
       data = GPSSerial.read();
     } while (data == -1);
-    Serial.println("not sleeping");
+    log_display("not sleeping");
   }
 
 
@@ -109,7 +106,7 @@ bool Neo6m::checkGpsFix()
     do
     {
       //We cannot read UBX ack therefore try to sleep gps until it does not send data anymore
-      Serial.println("try to sleep gps!");
+      log_display("try to sleep gps!");
       Neo6m::softwareReset(); //sleep_mode can only be activated at start up
       delay(600);                //give some time to restart //TODO wait for ack
       GPSSerial.write(RXM_PMREQ, sizeof(RXM_PMREQ));
@@ -130,7 +127,7 @@ bool Neo6m::checkGpsFix()
         }
         if (offTime != 1 && millis() - offTime > 100)
         { //if gps chip does not send any commands for .. seconds it is sleeping
-          Serial.println("sleeping gps!");
+          log_display("sleeping gps!");
           return;
         }
       }

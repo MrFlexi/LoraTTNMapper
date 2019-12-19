@@ -9,7 +9,7 @@
 
 #define USE_WIFI 1
 #define USE_OTA 1
-#define USE_BME280 0
+#define USE_BME280 1
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
@@ -109,7 +109,7 @@ extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
 extern QueueHandle_t LoraSendQueue;
 
-// #include "../src/hal/ttgobeam.h"
+#include "../src/hal/ttgobeam.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"

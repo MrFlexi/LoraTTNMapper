@@ -69,6 +69,11 @@ void t_enqueue_LORA_messages()
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     payload.enqueue_port(2);
+
+#else
+    payload.reset();
+    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+    payload.enqueue_port(2);
 #endif
   }
 }
@@ -99,12 +104,12 @@ void do_send(osjob_t *j)
 void t_LORA_send_from_queue(osjob_t *j)
 {
   MessageBuffer_t SendBuffer;
-  ESP_LOGI(TAG, "Send Lora MSG from Queue");
+  log_display("Send Lora MSG from Queue");
 
   // Check if there is not a current TX/RX job running
   if (LMIC.opmode & OP_TXRXPEND)
   {
-    Serial.println(F("OP_TXRXPEND, not sending"));
+    log_display("TXRXPEND, not sending");
   }
   else
   {
@@ -113,7 +118,7 @@ void t_LORA_send_from_queue(osjob_t *j)
     {
 
       int n = uxQueueMessagesWaiting(LoraSendQueue);
-      ESP_LOGI(TAG, "Messages waiting: %d", n);
+      ESP_LOGV(TAG "Messages waiting: %d", n);
 
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
@@ -122,7 +127,7 @@ void t_LORA_send_from_queue(osjob_t *j)
       }
       else
       {
-        ESP_LOGV(TAG, "Queue empty...");
+        log_display("Queue empty...");
       }
     }
     else
@@ -141,13 +146,12 @@ void queue_aging()
   int n = uxQueueMessagesWaiting(LoraSendQueue);
   if (n >= SEND_QUEUE_SIZE)
   {
-    ESP_LOGI(TAG, "Queue Aging");
+    log_display("Queue Aging");
     ESP_LOGI(TAG, "Messages before aging: %d", n);
     if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
     {
       ESP_LOGI(TAG, "deleted element:");
       dump_single_message(SendBuffer);
-
     }
     int n = uxQueueMessagesWaiting(LoraSendQueue);
     ESP_LOGI(TAG, "Messages after aging: %d", n);
@@ -177,9 +181,9 @@ void dump_queue()
 
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
-  ESP_LOGV(TAG, "Message Dump");  
-  Serial.print(SendBuffer.MessagePort);  
-  Serial.print(SendBuffer.MessageSize);  
+  ESP_LOGV(TAG, "Message Dump");
+  Serial.print(SendBuffer.MessagePort);
+  Serial.print(SendBuffer.MessageSize);
   for (int p = 0; p < SendBuffer.MessageSize; p++)
   {
     Serial.print(SendBuffer.Message[p]);
@@ -264,7 +268,7 @@ void onEvent(ev_t ev)
     if (LMIC.dataLen)
     {
       sprintf(s, "Received %i payload", LMIC.dataLen);
-      Serial.println(s);
+      log_display(s);
       dataBuffer.data.lmic = LMIC;
       sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
       Serial.println(s);

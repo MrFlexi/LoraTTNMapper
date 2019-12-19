@@ -355,9 +355,6 @@ void t_cyclic()
 #if (USE_SERIAL_BT)
   sprintf(buf, "Lora Queue:", dataBuffer.data.LoraQueueCounter);
   log_display(buf);
-
-  sprintf(buf, "Firmware:", VERSION);
-  log_display(buf);
 #endif
 }
 
@@ -579,13 +576,13 @@ void setup()
 #endif
 
   // Tasks
-  log_display("-- Starting Tasks --");
+  log_display("Starting Tasks...");
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
 
-  log_display("-- Setup done --");
+  log_display("Runmode=1");
 
   runmode = 1; // Switch from Terminal Mode to page Display
 #if (USE_DISPLAY)
