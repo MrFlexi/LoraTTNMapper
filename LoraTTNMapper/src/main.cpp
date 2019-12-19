@@ -159,10 +159,12 @@ void display_chip_info()
                                                          : "external");
   ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
            ESP.getHeapSize(), ESP.getFreeHeap());
-#ifdef BOARD_HAS_PSRAM
+#if (BOARD_HAS_PSRAM)
   ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
            ESP.getPsramSize(), ESP.getFreePsram());
+           
 #endif
+
   ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
            ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
   ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),

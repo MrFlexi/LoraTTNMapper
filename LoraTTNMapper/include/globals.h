@@ -17,7 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_BLE 0
-#define USE_SERIAL_BT 0
+#define USE_SERIAL_BT 1
 #define USE_DISPLAY 1
 
 #define PAYLOAD_ENCODER 3
@@ -109,7 +109,7 @@ extern int runmode;
 extern SemaphoreHandle_t I2Caccess;
 extern QueueHandle_t LoraSendQueue;
 
-#include "../src/hal/ttgobeam.h"
+// #include "../src/hal/ttgobeam.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"
