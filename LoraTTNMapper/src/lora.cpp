@@ -122,14 +122,14 @@ void t_LORA_send_from_queue(osjob_t *j)
       }
       else
       {
-        ESP_LOGV(TAG, "Queue is empty...");
+        ESP_LOGV(TAG, "Queue empty...");
       }
     }
     else
     {
-      ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
+      ESP_LOGV(TAG, "LORA not initalized.");
     }
-    ESP_LOGV(TAG, "New callback scheduled...");
+    ESP_LOGV(TAG, "New callback scheduled");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
@@ -142,7 +142,7 @@ void queue_aging()
   if (n >= SEND_QUEUE_SIZE)
   {
     ESP_LOGI(TAG, "Queue Aging");
-    ESP_LOGI(TAG, "Messages waiting before aging: %d", n);
+    ESP_LOGI(TAG, "Messages before aging: %d", n);
     if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
     {
       ESP_LOGI(TAG, "deleted element:");
@@ -150,7 +150,7 @@ void queue_aging()
 
     }
     int n = uxQueueMessagesWaiting(LoraSendQueue);
-    ESP_LOGI(TAG, "Messages waiting after aging: %d", n);
+    ESP_LOGI(TAG, "Messages after aging: %d", n);
   }
 }
 
@@ -177,13 +177,9 @@ void dump_queue()
 
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
-  ESP_LOGV(TAG, "Message Dump");
-  Serial.println(" ");
-  Serial.print(" P:");
-  Serial.print(SendBuffer.MessagePort);
-  Serial.print(" S:");
-  Serial.print(SendBuffer.MessageSize);
-  Serial.print(" ** ");
+  ESP_LOGV(TAG, "Message Dump");  
+  Serial.print(SendBuffer.MessagePort);  
+  Serial.print(SendBuffer.MessageSize);  
   for (int p = 0; p < SendBuffer.MessageSize; p++)
   {
     Serial.print(SendBuffer.Message[p]);
@@ -267,7 +263,7 @@ void onEvent(ev_t ev)
     }
     if (LMIC.dataLen)
     {
-      sprintf(s, "Received %i bytes payload", LMIC.dataLen);
+      sprintf(s, "Received %i payload", LMIC.dataLen);
       Serial.println(s);
       dataBuffer.data.lmic = LMIC;
       sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);

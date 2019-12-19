@@ -36,7 +36,11 @@ extern U8G2LOG u8g2log;             // Create a U8g2log object
 // allocate memory
 extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
+//--------------------------------------------------------------------------
+// Serial BT
+//--------------------------------------------------------------------------
 
+void setup_serial_bt(void);
 void setup_display(void);
 void log_display(String s);
 void setup_display_new();

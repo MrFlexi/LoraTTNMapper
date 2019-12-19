@@ -6,7 +6,7 @@
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
-  Serial.print("Message arrived [");
+  Serial.print(F("Message arrived ["));
 
   u8g2log.print(topic);
   u8g2log.print("\n");

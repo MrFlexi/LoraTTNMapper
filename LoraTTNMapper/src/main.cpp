@@ -10,6 +10,8 @@
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+char buf[32];
+
 #include "globals.h"
 
 //--------------------------------------------------------------------------
@@ -54,7 +56,6 @@ Ticker LORAsendMessageTicker;
 #if (USE_BME280)
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 #endif
-
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -108,12 +109,12 @@ void Cayenne_send(void)
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
   Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
-  
 
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-  
+
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+  Cayenne.virtualWrite(40, dataBuffer.data.LoraQueueCounter, "counter", "Counter");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -141,47 +142,45 @@ String stringOne = "";
 
 static const char TAG[] = __FILE__;
 
-
-
-void display_chip_info() {
+void display_chip_info()
+{
   // print chip information on startup if in verbose mode after coldstart
 
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    ESP_LOGI(TAG,
-             "This is ESP32 chip with %d CPU cores, WiFi%s%s, silicon revision "
-             "%d, %dMB %s Flash",
-             chip_info.cores,
-             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-             (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "",
-             chip_info.revision, spi_flash_get_chip_size() / (1024 * 1024),
-             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
-                                                           : "external");
-    ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
-             ESP.getHeapSize(), ESP.getFreeHeap());
+  esp_chip_info_t chip_info;
+  esp_chip_info(&chip_info);
+  ESP_LOGI(TAG,
+           "This is ESP32 chip with %d CPU cores, WiFi%s%s, silicon revision "
+           "%d, %dMB %s Flash",
+           chip_info.cores,
+           (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+           (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "",
+           chip_info.revision, spi_flash_get_chip_size() / (1024 * 1024),
+           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
+                                                         : "external");
+  ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
+           ESP.getHeapSize(), ESP.getFreeHeap());
 #ifdef BOARD_HAS_PSRAM
-    ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
-             ESP.getPsramSize(), ESP.getFreePsram());
+  ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
+           ESP.getPsramSize(), ESP.getFreePsram());
 #endif
-    ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
-             ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
-    ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),
-             ESP.getFlashChipSpeed());
+  ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
+           ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
+  ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),
+           ESP.getFlashChipSpeed());
 
 #if (HAS_LORA)
-    ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
-             LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
-    ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
-             ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
-             ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
-             ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
-             ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
 #endif // HAS_LORA
 
 #if (HAS_GPS)
-    ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
-
 }
 
 #if (HAS_INA)
@@ -314,15 +313,24 @@ void t_cyclic()
   gps.encode();
   gps.checkGpsFix();
 
-  // Refresh Display
-  #if (USE_DISPLAY)
+// Refresh Display
+#if (USE_DISPLAY)
   showPage(PageNumber);
-  #endif
+#endif
 
 #if (USE_DASH)
   if (WiFi.status() == WL_CONNECTED)
-   update_web_dash();
+    update_web_dash();
 #endif
+
+#if ( USE_SERIAL_BT)
+  sprintf(buf, "Lora Queue:", dataBuffer.data.LoraQueueCounter);
+  log_display(buf);
+
+  sprintf(buf, "Firmware:", VERSION);
+  log_display(buf);
+#endif
+
 }
 
 void t_sleep()
@@ -335,10 +343,10 @@ void t_sleep()
   dataBuffer.data.sleepCounter--;
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
   {
-    #if (HAS_PMU)
+#if (HAS_PMU)
     AXP192_power_gps(OFF);
     AXP192_power_lora(OFF);
-    #endif
+#endif
     delay(1000);
     t_cyclic(); // Aktuelle Messwerte anzeigen
     delay(5000);
@@ -354,7 +362,7 @@ void t_sleep()
     //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
     //pinMode(SCL, INPUT);
 
-    ESP_LOGI(TAG, "ESP32 Deep Sleep started");
+    log_display("ESP32 Deep Sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
@@ -396,20 +404,18 @@ void setup_wifi()
 #endif
 }
 
-
-
 #if (USE_BLE)
-void setup_BLE() {  
+void setup_BLE()
+{
   Serial.println("Setup BLE");
 
   BLEDevice::init("SolarServer");
   BLEServer *pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE
-                                       );
+      CHARACTERISTIC_UUID,
+      BLECharacteristic::PROPERTY_READ |
+          BLECharacteristic::PROPERTY_WRITE);
 
   pCharacteristic->setValue("SAP GTT");
   pService->start();
@@ -417,18 +423,21 @@ void setup_BLE() {
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x06); // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
   Serial.println("SAP GTT Monitor");
 }
 #endif
 
-
-
 void setup()
 {
   Serial.begin(115200);
+
+#if (USE_SERIAL_BT)
+  setup_serial_bt();
+#endif
+
   display_chip_info();
   print_wakeup_reason();
 
@@ -465,15 +474,13 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;  
+  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.firmware_version = VERSION;
 
- #if (USE_DISPLAY)
+#if (USE_DISPLAY)
   setup_display();
- #endif
+#endif
 
-  //setup_display_new();
-  //oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
@@ -503,6 +510,7 @@ void setup()
   {
     _lastOTACheck = millis();
     checkFirmwareUpdates();
+    delay(1000);
   }
 #endif
 
@@ -512,7 +520,7 @@ void setup()
 #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
-                 " min");
+              " min");
 #endif
 
   gps.init();
@@ -522,11 +530,9 @@ void setup()
 
   delay(2000); // Wait for GPS beeing stable
 
-
 #if (USE_BLE)
-setup_BLE();
+  setup_BLE();
 #endif
-
 
 #if (HAS_LORA)
   setup_lora();
@@ -549,14 +555,14 @@ setup_BLE();
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
-  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);  
+  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
 
   log_display("-- Setup done --");
 
   runmode = 1; // Switch from Terminal Mode to page Display
-   #if (USE_DISPLAY)
+#if (USE_DISPLAY)
   showPage(1);
-  #endif
+#endif
 
   //-------------------------------------------------------------
   // Call all tasks once after startup, next call via Timer

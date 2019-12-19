@@ -142,12 +142,12 @@ void PayloadConvert::enqueue_port(uint8_t port)
   SendBuffer.MessagePrio = 1;
   SendBuffer.MessagePort = port;
 
-  ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
+  ESP_LOGI(TAG, "Enqueue message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
   if (ret != 1)
   {
-    ESP_LOGI(TAG, "LORA sendqueue is full");
+    ESP_LOGI(TAG, "LORA queue full");
   }
 }
 

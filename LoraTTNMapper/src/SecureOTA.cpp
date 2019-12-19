@@ -42,7 +42,7 @@ void checkFirmwareUpdates()
  
   if (latest.length() == 0)
   {
-    log_display("Could not load firmware info");
+    log_display("Could not load");
     return;
   }
   else if (atof(latest.c_str()) <= VERSION )
@@ -94,7 +94,7 @@ void processOTAUpdate(const String &version)
       client.setCACert(bintray.getCertificate(currentHost));
       if (!client.connect(currentHost.c_str(), port))
       {
-        log_display("Redirect detected! Cannot connect to " + currentHost );
+        log_display("Cannot connect to " + currentHost );
         return;
       }
     }
@@ -166,7 +166,7 @@ void processOTAUpdate(const String &version)
       if (line.startsWith("Content-Length: "))
       {
         contentLength = atoi((getHeaderValue(line, "Content-Length: ")).c_str());
-        log_display("Size: " + String(contentLength) + " bytes");
+        log_display("Size: " + String(contentLength/1024) + " kbytes");
       }
 
       if (line.startsWith("Content-Type: "))
@@ -203,7 +203,7 @@ void processOTAUpdate(const String &version)
       {
         if (Update.isFinished())
         {
-          log_display("OTA completed. Rebooting ...");
+          log_display("Rebooting ...");
           delay(1000);
           ESP.restart();
         }

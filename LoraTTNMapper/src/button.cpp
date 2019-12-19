@@ -19,7 +19,7 @@ void button_init(int pin)
   b->setOnDoubleClicked([]() {});
 
   b->setOnClicked([]() {
-    ESP_LOGI(TAG, "Button pressed");
+    ESP_LOGI(TAG, "pressed");
 
      #if (USE_DISPLAY)
     if (PageNumber < PAGE_COUNT)
@@ -35,7 +35,7 @@ void button_init(int pin)
   });
 
   b->setOnHolding([]() {
-    ESP_LOGI(TAG, "Button Holding");
+    ESP_LOGI(TAG, "holding");
   });
 
   // attach interrupt to the button

@@ -17,6 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_BLE 0
+#define USE_SERIAL_BT 0
 #define USE_DISPLAY 1
 
 #define PAYLOAD_ENCODER 3
@@ -35,7 +36,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
+#define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 5          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 10    // sleep after n minutes or
@@ -56,6 +57,10 @@
 
 #include "esp_log.h"
 //#include <Preferences.h>
+
+#if (USE_SERIAL_BT)
+#include "BluetoothSerial.h" 
+#endif
 
 //--------------------------------------------------------------------------
 // Wifi Settings
