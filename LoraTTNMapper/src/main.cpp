@@ -31,6 +31,25 @@ bool wifi_connected = false;
 //WiFiClient wifiClient;
 
 //--------------------------------------------------------------------------
+// Lora Helper
+//--------------------------------------------------------------------------
+const char *getSfName(rps_t rps) {
+  const char *const t[] = {"FSK",  "SF7",  "SF8",  "SF9",
+                           "SF10", "SF11", "SF12", "SF?"};
+  return t[getSf(rps)];
+}
+
+const char *getBwName(rps_t rps) {
+  const char *const t[] = {"BW125", "BW250", "BW500", "BW?"};
+  return t[getBw(rps)];
+}
+
+const char *getCrName(rps_t rps) {
+  const char *const t[] = {"CR 4/5", "CR 4/6", "CR 4/7", "CR 4/8"};
+  return t[getCr(rps)];
+}
+
+//--------------------------------------------------------------------------
 // Initialize globals
 //--------------------------------------------------------------------------
 PayloadConvert payload(PAYLOAD_BUFFER_SIZE);
@@ -162,7 +181,7 @@ void display_chip_info()
 #if (BOARD_HAS_PSRAM)
   ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
            ESP.getPsramSize(), ESP.getFreePsram());
-           
+
 #endif
 
   ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
@@ -302,6 +321,14 @@ void t_cyclic()
 #endif
 
 #if (HAS_LORA)
+
+
+
+  ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
+           getSfName(updr2rps(LMIC.datarate)),
+           getBwName(updr2rps(LMIC.datarate)),
+           getCrName(updr2rps(LMIC.datarate)));
+
   if (LoraSendQueue != 0)
   {
     dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
@@ -325,14 +352,13 @@ void t_cyclic()
     update_web_dash();
 #endif
 
-#if ( USE_SERIAL_BT)
+#if (USE_SERIAL_BT)
   sprintf(buf, "Lora Queue:", dataBuffer.data.LoraQueueCounter);
   log_display(buf);
 
   sprintf(buf, "Firmware:", VERSION);
   log_display(buf);
 #endif
-
 }
 
 void t_sleep()
