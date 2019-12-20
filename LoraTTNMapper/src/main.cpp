@@ -3,7 +3,7 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 2    // every x second
+#define displayRefreshIntervall 1    // every x second
 #define displayMoveIntervall 8   // every x second
 #define sendMessagesIntervall 90     // every x seconds
 #define LORAsendMessagesIntervall 60 // every x seconds
@@ -336,7 +336,7 @@ void setup_sensors()
 
 void t_moveDisplay()
 {
-   #if (USE_DISPLAY)
+   #if (USE_DISPLAYS)
     if (PageNumber < PAGE_COUNT)
     {
       PageNumber++;
@@ -351,15 +351,15 @@ void t_moveDisplay()
 
 void t_cyclic()
 {
-  String stringOne;
+  //String stringOne;
 
-  String taskMessage = "Cyclic running on core ";
-  taskMessage = taskMessage + xPortGetCoreID();
-  Serial.println(taskMessage);
+  //String taskMessage = "Cyclic running on core ";
+  //taskMessage = taskMessage + xPortGetCoreID();
+  //Serial.println(taskMessage);
 
-  Serial.print((temprature_sens_read() - 32) / 1.8);
-  Serial.println(" C");
-  dataBuffer.data.cpu_temperature = ((temprature_sens_read() - 32) / 1.8);
+  //Serial.print((temprature_sens_read() - 32) / 1.8);
+  //Serial.println(" C");
+  //dataBuffer.data.cpu_temperature = ((temprature_sens_read() - 32) / 1.8);
 
 // Temperatur
 #if (USE_BME280)
@@ -648,14 +648,14 @@ void setup()
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
 
-  xTaskCreatePinnedToCore(
-      coreTask,   /* Function to implement the task */
-      "coreTask", /* Name of the task */
-      10000,      /* Stack size in words */
-      NULL,       /* Task input parameter */
-      0,          /* Priority of the task */
-      NULL,       /* Task handle. */
-      taskCore);  /* Core where the task should run */
+  //xTaskCreatePinnedToCore(
+  //    coreTask,   /* Function to implement the task */
+  //    "coreTask", /* Name of the task */
+  //    10000,      /* Stack size in words */
+  //    NULL,       /* Task input parameter */
+  //    0,          /* Priority of the task */
+  //    NULL,       /* Task handle. */
+  //    taskCore);  /* Core where the task should run */
 
   log_display("Runmode=1");
 

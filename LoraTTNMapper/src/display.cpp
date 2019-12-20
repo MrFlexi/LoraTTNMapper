@@ -45,7 +45,7 @@ void log_display(String s)
 void setup_display(void)
 {
   u8g2.begin();
-  u8g2.setFont(u8g2_font_profont12_mr);                         // set the font for the terminal window
+  u8g2.setFont(u8g2_font_profont11_mr);                         // set the font for the terminal window
   u8g2log.begin(u8g2, U8LOG_WIDTH, U8LOG_HEIGHT, u8log_buffer); // connect to u8g2, assign buffer
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
@@ -111,7 +111,7 @@ void showPage(int page)
     case PAGE_VALUES:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "   SAP GTT  ");
+      u8g2.drawStr(1, 15, "SAP GTT");
 
       u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
