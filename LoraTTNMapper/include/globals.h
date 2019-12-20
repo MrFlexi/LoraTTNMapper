@@ -8,8 +8,8 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 1
-#define USE_BME280 1
+#define USE_OTA 0
+#define USE_BME280 0
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
@@ -17,7 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_BLE 0
-#define USE_SERIAL_BT 1
+#define USE_SERIAL_BT 0
 #define USE_DISPLAY 1
 
 #define PAYLOAD_ENCODER 3
@@ -36,10 +36,10 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0              // Main switch
+#define ESP_SLEEP 1             // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5          // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 10    // sleep after n minutes or
+#define TIME_TO_SLEEP 10          // sleep for n minute
+#define TIME_TO_NEXT_SLEEP 5    // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
@@ -78,6 +78,7 @@ typedef struct
   float humidity;           // humidity signal
   float pressure;           // pressure signal
   float raw_temperature;    // raw temperature signal
+  float cpu_temperature;    // raw temperature signal
   float raw_humidity;       // raw humidity signal
   float gas;                // raw gas sensor signal
   uint8_t aliveCounter;     // aliveCounter

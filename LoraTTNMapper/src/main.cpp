@@ -3,7 +3,8 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 5    // every x second
+#define displayRefreshIntervall 2    // every x second
+#define displayMoveIntervall 8   // every x second
 #define sendMessagesIntervall 90     // every x seconds
 #define LORAsendMessagesIntervall 60 // every x seconds
 
@@ -33,18 +34,21 @@ bool wifi_connected = false;
 //--------------------------------------------------------------------------
 // Lora Helper
 //--------------------------------------------------------------------------
-const char *getSfName(rps_t rps) {
-  const char *const t[] = {"FSK",  "SF7",  "SF8",  "SF9",
+const char *getSfName(rps_t rps)
+{
+  const char *const t[] = {"FSK", "SF7", "SF8", "SF9",
                            "SF10", "SF11", "SF12", "SF?"};
   return t[getSf(rps)];
 }
 
-const char *getBwName(rps_t rps) {
+const char *getBwName(rps_t rps)
+{
   const char *const t[] = {"BW125", "BW250", "BW500", "BW?"};
   return t[getBw(rps)];
 }
 
-const char *getCrName(rps_t rps) {
+const char *getCrName(rps_t rps)
+{
   const char *const t[] = {"CR 4/5", "CR 4/6", "CR 4/7", "CR 4/8"};
   return t[getCr(rps)];
 }
@@ -65,8 +69,31 @@ uint8_t msgWaiting = 0;
 
 Ticker sleepTicker;
 Ticker displayTicker;
+Ticker displayMoveTicker;
 Ticker sendMessageTicker;
 Ticker LORAsendMessageTicker;
+
+//--------------------------------------------------------------------------
+// RTOS Tasks
+//--------------------------------------------------------------------------
+static int taskCore = 1;
+
+void coreTask(void *pvParameters)
+{
+
+  String taskMessage = "RTOS running on core ";
+  taskMessage = taskMessage + xPortGetCoreID();
+
+#ifdef HAS_BUTTON
+  readButton();
+#endif
+
+  while (true)
+  {
+    Serial.println(taskMessage);
+    delay(1000);
+  }
+}
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -75,6 +102,19 @@ Ticker LORAsendMessageTicker;
 #if (USE_BME280)
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 #endif
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+  uint8_t temprature_sens_read();
+
+#ifdef __cplusplus
+}
+#endif
+
+uint8_t temprature_sens_read();
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -131,9 +171,10 @@ void Cayenne_send(void)
 
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
-  Cayenne.virtualWrite(40, dataBuffer.data.LoraQueueCounter, "counter", "Counter");
+
+  Cayenne.virtualWrite(LPP_LORA_QUEUE_COUNT_CHANNEL, dataBuffer.data.LoraQueueCounter, "counter", "Counter");
+  Cayenne.celsiusWrite(LPP_CPU_TEMP_CHANNEL, dataBuffer.data.temperature);
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -293,9 +334,32 @@ void setup_sensors()
 #endif
 }
 
+void t_moveDisplay()
+{
+   #if (USE_DISPLAY)
+    if (PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }  
+    showPage(PageNumber);
+  #endif  
+}
+
 void t_cyclic()
 {
   String stringOne;
+
+  String taskMessage = "Cyclic running on core ";
+  taskMessage = taskMessage + xPortGetCoreID();
+  Serial.println(taskMessage);
+
+  Serial.print((temprature_sens_read() - 32) / 1.8);
+  Serial.println(" C");
+  dataBuffer.data.cpu_temperature = ((temprature_sens_read() - 32) / 1.8);
 
 // Temperatur
 #if (USE_BME280)
@@ -321,9 +385,6 @@ void t_cyclic()
 #endif
 
 #if (HAS_LORA)
-
-
-
   ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
            getSfName(updr2rps(LMIC.datarate)),
            getBwName(updr2rps(LMIC.datarate)),
@@ -353,8 +414,11 @@ void t_cyclic()
 #endif
 
 #if (USE_SERIAL_BT)
-  sprintf(buf, "Lora Queue:", dataBuffer.data.LoraQueueCounter);
+  sprintf(buf, "Lora Queue %d:", dataBuffer.data.LoraQueueCounter);
   log_display(buf);
+  sprintf(buf, "Temp CPU%.2f Outdoor %.2f:", dataBuffer.data.cpu_temperature, dataBuffer.data.temperature);
+  log_display(buf);
+
 #endif
 }
 
@@ -372,11 +436,10 @@ void t_sleep()
     AXP192_power_gps(OFF);
     AXP192_power_lora(OFF);
 #endif
-    delay(1000);
     t_cyclic(); // Aktuelle Messwerte anzeigen
-    delay(5000);
-    runmode = 0;
-    // gps.enable_sleep();
+    delay(2000);
+    //runmode = 0;
+    gps.enable_sleep();
     Serial.flush();
     showPage(PAGE_SLEEP);
 
@@ -387,7 +450,7 @@ void t_sleep()
     //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
     //pinMode(SCL, INPUT);
 
-    log_display("ESP32 Deep Sleep started");
+    log_display("Deep sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
@@ -461,6 +524,10 @@ void setup()
 
 #if (USE_SERIAL_BT)
   setup_serial_bt();
+#else
+  //Turn off Bluetooth
+  //log_display("Stop Bluethooth");
+  //btStop();
 #endif
 
   display_chip_info();
@@ -510,9 +577,7 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-  //Turn off Bluetooth
-  //log_display("Stop Bluethooth");
-  //btStop();
+
 
 #if (USE_MQTT)
   setup_mqtt();
@@ -580,7 +645,17 @@ void setup()
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
+  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
+
+  xTaskCreatePinnedToCore(
+      coreTask,   /* Function to implement the task */
+      "coreTask", /* Name of the task */
+      10000,      /* Stack size in words */
+      NULL,       /* Task input parameter */
+      0,          /* Priority of the task */
+      NULL,       /* Task handle. */
+      taskCore);  /* Core where the task should run */
 
   log_display("Runmode=1");
 
@@ -627,9 +702,5 @@ void loop()
     }
     client.loop();
   }
-#endif
-
-#ifdef HAS_BUTTON
-  readButton();
 #endif
 }
