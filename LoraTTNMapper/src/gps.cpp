@@ -127,7 +127,7 @@ bool Neo6m::checkGpsFix()
         }
         if (offTime != 1 && millis() - offTime > 100)
         { //if gps chip does not send any commands for .. seconds it is sleeping
-          log_display("sleeping gps!");
+          log_display("GPS is sleeping");
           return;
         }
       }

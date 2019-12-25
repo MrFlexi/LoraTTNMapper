@@ -42,12 +42,12 @@ void checkFirmwareUpdates()
  
   if (latest.length() == 0)
   {
-    log_display("Could not load");
+    Serial.println("Could not load firmware info, ");
     return;
   }
   else if (atof(latest.c_str()) <= VERSION )
   {
-    log_display("Firmware up to date");
+    log_display("The firmware is up to date");
     return;
   }
 
@@ -69,7 +69,7 @@ void processOTAUpdate(const String &version)
   String firmwarePath = bintray.getBinaryPath(version);
   if (!firmwarePath.endsWith(".bin"))
   {
-    log_display("Unsupported format.");
+    Serial.println("Unsupported format.");
     return;
   }
 
@@ -81,7 +81,7 @@ void processOTAUpdate(const String &version)
 
   if (!client.connect(currentHost.c_str(), port))
   {
-    log_display("Cannot connect to " + currentHost);
+    Serial.println("Cannot connect to " + currentHost);
     return;
   }
 
@@ -94,7 +94,7 @@ void processOTAUpdate(const String &version)
       client.setCACert(bintray.getCertificate(currentHost));
       if (!client.connect(currentHost.c_str(), port))
       {
-        log_display("Cannot connect to " + currentHost );
+        Serial.println("Redirect detected! Cannot connect to " + currentHost );
         return;
       }
     }
@@ -111,7 +111,7 @@ void processOTAUpdate(const String &version)
     {
       if (millis() - timeout > RESPONSE_TIMEOUT_MS)
       {
-        log_display("Client Timeout !");
+        Serial.println("Client Timeout !");
         client.stop();
         return;
       }
@@ -166,7 +166,7 @@ void processOTAUpdate(const String &version)
       if (line.startsWith("Content-Length: "))
       {
         contentLength = atoi((getHeaderValue(line, "Content-Length: ")).c_str());
-        log_display("Size: " + String(contentLength/1024) + " kbytes");
+        Serial.println("Got " + String(contentLength) + " bytes from server");
       }
 
       if (line.startsWith("Content-Type: "))
@@ -186,12 +186,12 @@ void processOTAUpdate(const String &version)
   {
     if (Update.begin(contentLength))
     {
-      log_display("Start OTA update.");
+      Serial.println("Starting Over-The-Air update. This may take some time to complete ...");
       size_t written = Update.writeStream(client);
 
       if (written == contentLength)
       {
-        log_display("Written: " + String(written));
+        Serial.println("Written : " + String(written) + " successfully");
       }
       else
       {
@@ -203,29 +203,28 @@ void processOTAUpdate(const String &version)
       {
         if (Update.isFinished())
         {
-          log_display("Rebooting ...");
-          delay(1000);
+          Serial.println("OTA completed. Rebooting ...");
           ESP.restart();
         }
         else
         {
-          log_display("OTA error.");
+          Serial.println("OTA update hasn't been finished properly.");
         }
       }
       else
       {
-        log_display("OTA error #: " + String(Update.getError()));
+        Serial.println("An error Occurred. Error #: " + String(Update.getError()));
       }
     }
     else
     {
-      log_display("No space for OTA");
+      Serial.println("Not enough space for OTA update");
       client.flush();
     }
   }
   else
   {
-    log_display("Invalid response from server!");
+    Serial.println("No valid response from server!");
     client.flush();
   }
 }

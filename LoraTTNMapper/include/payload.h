@@ -24,6 +24,8 @@ extern void lora_queue_init(void);
 #define LPP_HUMIDITY_CHANNEL 29
 #define LPP_BAROMETER_CHANNEL 30
 #define LPP_AIR_CHANNEL 31
+#define LPP_LORA_QUEUE_COUNT_CHANNEL 40
+#define LPP_CPU_TEMP_CHANNEL 41
 #define LPP_FIRMWARE_CHANNEL 99
 
 // MyDevices CayenneLPP 2.0 types for Packed Sensor Payload, not using channels,
