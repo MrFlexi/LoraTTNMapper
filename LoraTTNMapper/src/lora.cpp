@@ -218,7 +218,7 @@ void setup_lora()
   LMIC.dn2Dr = DR_SF9;
 
   // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
-  LMIC_setDrTxpow(DR_SF10, 14);
+  LMIC_setDrTxpow(DR_SF12, 14);
 
   t_LORA_send_from_queue(&sendjob);
 }

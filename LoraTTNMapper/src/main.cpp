@@ -659,7 +659,7 @@ void setup()
 
   log_display("Runmode=1");
 
-  runmode = 1; // Switch from Terminal Mode to page Display
+  //runmode = 1; // Switch from Terminal Mode to page Display
 #if (USE_DISPLAY)
   showPage(1);
 #endif
