@@ -15,9 +15,10 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-#define PAGE_COUNT 2
+#define PAGE_COUNT 3
 #define PAGE_VALUES 1
 #define PAGE_SOLAR 2
+#define PAGE_SETTINGS 3
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
 // assume 4x6 font, define width and height
@@ -36,6 +37,7 @@ extern uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 
 void log_display(String s);
 void setup_display(void);
+void t_moveDisplay(void);
 
 void setup_display_new();
 void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,

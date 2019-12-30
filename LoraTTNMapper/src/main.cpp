@@ -6,6 +6,7 @@
 #define displayRefreshIntervall 5    // every x second
 #define sendMessagesIntervall 90     // every x seconds
 #define LORAsendMessagesIntervall 60 // every x seconds
+#define displayMoveIntervall 8   // every x second
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -44,6 +45,7 @@ uint8_t msgWaiting = 0;
 
 Ticker sleepTicker;
 Ticker displayTicker;
+Ticker displayMoveTicker;
 Ticker sendMessageTicker;
 Ticker LORAsendMessageTicker;
 
@@ -456,14 +458,15 @@ void setup()
 #endif
 
   // Tasks
-  ESP_LOGV(TAG, "-- Starting Tasks --");
+  ESP_LOGV(TAG, "Starting Tasks");
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
+  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  //LORAsendMessageTicker.attach(LORAsendMessagesIntervall, dump_queue);
+  
 
-  ESP_LOGV(TAG, "-- Setup done --");
+  ESP_LOGV(TAG, "Setup done");
 
   runmode = 1; // Switch from Terminal Mode to page Display
   showPage(1);
