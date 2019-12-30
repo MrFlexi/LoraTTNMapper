@@ -239,7 +239,7 @@ void t_cyclic()
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
-#ifdef HAS_PMU
+#if (HAS_PMU)
   dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
   dataBuffer.data.bus_current = pmu.getVbusCurrent();
 

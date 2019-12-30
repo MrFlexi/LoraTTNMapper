@@ -318,24 +318,3 @@ uint16_t read_voltage()
 
   return voltage;
 }
-
-float read_current()
-{
-  float current = 0;
-
-
-//if (pmu.isBatteryConnect())
-    
-  //if (pmu.isVBUSPlug())
-  //  current = pmu.getVbusCurrent();
-  //else
-  //  if (pmu.isChargeing())
-  //    current = pmu.getBattChargeCurrent();
-
-
-
-  current = pmu.isVBUSPlug() ? pmu.getVbusCurrent() : pmu.getBattDischargeCurrent();
-
-
-  return current;
-}
