@@ -6,7 +6,7 @@
 #define displayRefreshIntervall 5    // every x second
 #define sendMessagesIntervall 90     // every x seconds
 #define LORAsendMessagesIntervall 60 // every x seconds
-#define displayMoveIntervall 8   // every x second
+#define displayMoveIntervall 8       // every x second
 
 //const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -28,6 +28,28 @@ bool wifi_connected = false;
 //const char ssid[] = "MrFlexi";
 //const char wifiPassword[] = "Linde-123";
 //WiFiClient wifiClient;
+
+//--------------------------------------------------------------------------
+// Lora Helper
+//--------------------------------------------------------------------------
+const char *getSfName(rps_t rps)
+{
+  const char *const t[] = {"FSK", "SF7", "SF8", "SF9",
+                           "SF10", "SF11", "SF12", "SF?"};
+  return t[getSf(rps)];
+}
+
+const char *getBwName(rps_t rps)
+{
+  const char *const t[] = {"BW125", "BW250", "BW500", "BW?"};
+  return t[getBw(rps)];
+}
+
+const char *getCrName(rps_t rps)
+{
+  const char *const t[] = {"CR 4/5", "CR 4/6", "CR 4/7", "CR 4/8"};
+  return t[getCr(rps)];
+}
 
 //--------------------------------------------------------------------------
 // Initialize globals
@@ -171,6 +193,50 @@ void print_ina()
 }
 #endif
 
+void display_chip_info()
+{
+  // print chip information on startup if in verbose mode after coldstart
+
+  esp_chip_info_t chip_info;
+  esp_chip_info(&chip_info);
+  ESP_LOGI(TAG,
+           "This is ESP32 chip with %d CPU cores, WiFi%s%s, silicon revision "
+           "%d, %dMB %s Flash",
+           chip_info.cores,
+           (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+           (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "",
+           chip_info.revision, spi_flash_get_chip_size() / (1024 * 1024),
+           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
+                                                         : "external");
+  ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
+           ESP.getHeapSize(), ESP.getFreeHeap());
+           
+#if (BOARD_HAS_PSRAM)
+  ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
+           ESP.getPsramSize(), ESP.getFreePsram());
+
+#endif
+
+  ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
+           ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
+  ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),
+           ESP.getFlashChipSpeed());
+
+#if (HAS_LORA)
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+#endif // HAS_LORA
+
+#if (HAS_GPS)
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
+#endif
+}
+
 void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -258,6 +324,12 @@ void t_cyclic()
 #endif
 
 #if (HAS_LORA)
+
+  ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
+           getSfName(updr2rps(LMIC.datarate)),
+           getBwName(updr2rps(LMIC.datarate)),
+           getCrName(updr2rps(LMIC.datarate)));
+
   if (LoraSendQueue != 0)
   {
     dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
@@ -271,8 +343,10 @@ void t_cyclic()
   gps.encode();
   gps.checkGpsFix();
 
-  // Refresh Display
+// Refresh Display
+#if (USE_DISPLAY)
   showPage(PageNumber);
+#endif
 
 #if (USE_DASH)
   if (WiFi.status() == WL_CONNECTED
@@ -290,8 +364,12 @@ void t_sleep()
   dataBuffer.data.sleepCounter--;
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
   {
+
+#if (HAS_PMU)
     AXP192_power_gps(OFF);
     AXP192_power_lora(OFF);
+#endif
+
     delay(1000);
     t_cyclic(); // Aktuelle Messwerte anzeigen
     delay(5000);
@@ -307,7 +385,7 @@ void t_sleep()
     //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
     //pinMode(SCL, INPUT);
 
-    ESP_LOGI(TAG, "ESP32 Deep Sleep started");
+    ESP_LOGI(TAG, "Deep Sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
@@ -353,6 +431,7 @@ void setup()
 {
   Serial.begin(115200);
   print_wakeup_reason();
+  display_chip_info();
 
   // create some semaphores for syncing / mutexing tasks
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
@@ -387,7 +466,7 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;  
+  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.firmware_version = VERSION;
 
   setup_display();
@@ -422,16 +501,17 @@ void setup()
   {
     _lastOTACheck = millis();
     checkFirmwareUpdates();
+    delay(2000);
   }
 #endif
 
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
-#if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  Serial.println("ESP32 wake-up via timer after " + String(TIME_TO_SLEEP) +
-                 " Minutes");
+#if (ESP_SLEEP)  
+   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
+  log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
+              " min");
 #endif
 
   gps.init();
@@ -458,18 +538,17 @@ void setup()
 #endif
 
   // Tasks
-  ESP_LOGV(TAG, "Starting Tasks");
+  log_display("Starting Tasks");
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  
 
-  ESP_LOGV(TAG, "Setup done");
+  log_display("Setup done");
 
   runmode = 1; // Switch from Terminal Mode to page Display
-  showPage(1);
+  showPage(PAGE_VALUES);
 
   //-------------------------------------------------------------
   // Call all tasks once after startup, next call via Timer
@@ -511,7 +590,7 @@ void loop()
   }
 #endif
 
-#ifdef HAS_BUTTON
+#if (HAS_BUTTON)
   readButton();
 #endif
 }

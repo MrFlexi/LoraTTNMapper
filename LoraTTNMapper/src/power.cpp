@@ -5,7 +5,7 @@
 // Local logging tag
 static const char TAG[] = __FILE__;
 
-#ifdef HAS_PMU
+#if (HAS_PMU)
 
 AXP20X_Class pmu;
 

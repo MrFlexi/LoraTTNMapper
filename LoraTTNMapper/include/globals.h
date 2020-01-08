@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 #include <FreeRTOS.h>
+#include "esp_system.h"
+#include "esp_spi_flash.h"
 
 #define USE_WIFI 1
 #define USE_OTA 0
