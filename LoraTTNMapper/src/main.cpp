@@ -4,9 +4,9 @@
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
 #define displayRefreshIntervall 5    // every x second
-#define sendMessagesIntervall 120     // every x seconds
+#define sendMessagesIntervall 60     // every x seconds
 #define sendCayenneIntervall 30    // every x seconds
-#define LORAsendMessagesIntervall 60 // every x seconds
+#define LORAsendMessagesIntervall 40 // every x seconds
 #define displayMoveIntervall 8       // every x second
 
 #define SEALEVELPRESSURE_HPA (1013.25)
