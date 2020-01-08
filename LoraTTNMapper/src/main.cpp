@@ -5,10 +5,10 @@
 
 #define displayRefreshIntervall 5    // every x second
 #define sendMessagesIntervall 90     // every x seconds
+#define sendCayenneIntervall 30    // every x seconds
 #define LORAsendMessagesIntervall 60 // every x seconds
 #define displayMoveIntervall 8       // every x second
 
-//const float sleepPeriod = 2; //seconds
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 #include "globals.h"
@@ -69,6 +69,7 @@ Ticker sleepTicker;
 Ticker displayTicker;
 Ticker displayMoveTicker;
 Ticker sendMessageTicker;
+Ticker sendCayenneTicker;
 Ticker LORAsendMessageTicker;
 
 //--------------------------------------------------------------------------
@@ -293,6 +294,15 @@ void setup_sensors()
 #endif
 }
 
+void t_send_cayenne()
+{
+
+#if (USE_CAYENNE)
+  Cayenne_send();
+#endif
+
+}
+
 void t_cyclic()
 {
   String stringOne;
@@ -350,9 +360,6 @@ void t_cyclic()
    update_web_dash();
 #endif
 
-#if (USE_CAYENNE)
-  Cayenne_send();
-#endif
 }
 
 void t_sleep()
@@ -462,8 +469,6 @@ void setup()
   dataBuffer.data.firmware_version = VERSION;
 
   setup_display();
-  //setup_display_new();
-  //oledWriteString(0, 0, 3, (char *)"**Demo**", FONT_LARGE, 0, 1);
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
@@ -536,7 +541,7 @@ void setup()
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-
+  sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
   log_display("Setup done");
 
   runmode = 1; // Switch from Terminal Mode to page Display
