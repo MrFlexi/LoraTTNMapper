@@ -90,23 +90,23 @@ char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2"; // DE001-Balkon
 
 CAYENNE_CONNECTED()
 {
-  Serial.println("Cayenne connected...");
+  log_display("Cayenne connected...");
 }
 
 CAYENNE_DISCONNECTED()
 {
-  Serial.println("Cayenne connection lost...");
+  log_display("Cayenne connection lost...");
   bool disconnected = true;
   while (disconnected)
   {
     if (WiFi.status() == WL_CONNECTED)
     {
-      Serial.println("Wifi is back...");
+      log_display("Wifi is back...");
       disconnected = false;
     }
     else
     {
-      Serial.println("No wifi...");
+      log_display("No wifi...");
     }
     delay(2000);
   }
@@ -119,22 +119,19 @@ CAYENNE_OUT_DEFAULT()
 void Cayenne_send(void)
 {
 
-  ESP_LOGI(TAG, "Cayenne send data");
+  log_display("Cayenne send data");
 
   Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
   Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(12, ina3221.getBusVoltage_V(1)*ina3221.getCurrent_mA(1), "pow", "Watts");
-
+  
   Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(22, pmu.getVbusCurrent()/1000*pmu.getVbusVoltage(), "pow", "Watts");
-
+  
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
-  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-  //Cayenne.virtualWrite(32, pmu.getBattChargeCurrent()*pmu.getBattVoltage()/1000, "pow", "Watts");
+  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");  
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
 }
 
@@ -142,7 +139,7 @@ void Cayenne_send(void)
 // You can also use functions for specific channels, e.g CAYENNE_IN(1) for channel 1 commands.
 CAYENNE_IN_DEFAULT()
 {
-  ESP_LOGI(TAG, "Cayenne data received");
+  log_display("Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
   //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
 }
@@ -352,6 +349,11 @@ void t_cyclic()
   if (WiFi.status() == WL_CONNECTED
    update_web_dash();
 #endif
+
+#if (USE_CAYENNE)
+  Cayenne_send();
+#endif
+
 }
 
 void t_sleep()
