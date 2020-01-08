@@ -126,12 +126,12 @@ void Cayenne_send(void)
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
-  
+
   Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
-  
+
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
-  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");  
+  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
 }
 
@@ -207,7 +207,7 @@ void display_chip_info()
                                                          : "external");
   ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
            ESP.getHeapSize(), ESP.getFreeHeap());
-           
+
 #if (BOARD_HAS_PSRAM)
   ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
            ESP.getPsramSize(), ESP.getFreePsram());
@@ -353,7 +353,6 @@ void t_cyclic()
 #if (USE_CAYENNE)
   Cayenne_send();
 #endif
-
 }
 
 void t_sleep()
@@ -368,8 +367,7 @@ void t_sleep()
   {
 
 #if (HAS_PMU)
-    AXP192_power_gps(OFF);
-    AXP192_power_lora(OFF);
+    AXP192_power(pmu_power_sleep);
 #endif
 
     delay(1000);
@@ -379,14 +377,6 @@ void t_sleep()
     // gps.enable_sleep();
     Serial.flush();
     showPage(PAGE_SLEEP);
-
-    //AXP192_power(OFF);   // funktioniert nicht, I2C Bus wird nicht freigegeben
-    //delay(100);
-    //Wire.flush();
-    //Wire.~TwoWire();
-    //pinMode(SDA, INPUT); // needed because Wire.end() enables pullups, power Saving
-    //pinMode(SCL, INPUT);
-
     ESP_LOGI(TAG, "Deep Sleep started");
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
@@ -510,8 +500,8 @@ void setup()
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
-#if (ESP_SLEEP)  
-   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
+#if (ESP_SLEEP)
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
               " min");
 #endif

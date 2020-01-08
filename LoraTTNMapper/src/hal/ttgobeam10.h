@@ -21,7 +21,7 @@
 #define HAS_LED NOT_A_PIN
 
 // GPS settings
-#define HAS_GPS 1 // use on board GPS
+#define HAS_GPS         1                       // use on board GPS
 #define GPS_TX          34
 #define GPS_RX          12
 

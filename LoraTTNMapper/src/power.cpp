@@ -53,24 +53,36 @@ void power_event_IRQ(void)
   read_voltage();
 }
 
-void AXP192_power(bool on)
+void AXP192_power(pmu_power_t powerlevel)
 {
-  if (on)
-  {
+
+  switch (powerlevel) {
+
+  default:  
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
-    // pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
-    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);  
     ESP_LOGI(TAG, "AXP power ON");
-  }
-  else
-  {
+    break;
+
+
+  case pmu_power_sleep:
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    // we don't cut off DCDC1, because then display blocks i2c bus
+    pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
+    ESP_LOGI(TAG, "AXP power SLEEP");
+    break;  
+  
+  case pmu_power_off:  
     pmu.setChgLEDMode(AXP20X_LED_OFF);
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_OFF);
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF);
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
     ESP_LOGI(TAG, "AXP power OFF");
+    break;
   }
 }
 
@@ -124,6 +136,52 @@ void AXP192_showstatus(void)
     ESP_LOGI(TAG, "USB not present");
 }
 
+void AXP192_powerevent_IRQ(void) {
+
+  pmu.readIRQ();
+
+  if (pmu.isVbusOverVoltageIRQ())
+    ESP_LOGI(TAG, "USB voltage %.2fV too high.", pmu.getVbusVoltage() / 1000);
+  if (pmu.isVbusPlugInIRQ())
+    ESP_LOGI(TAG, "USB plugged, %.2fV @ %.0mA", pmu.getVbusVoltage() / 1000,
+             pmu.getVbusCurrent());
+  if (pmu.isVbusRemoveIRQ())
+    ESP_LOGI(TAG, "USB unplugged.");
+
+  if (pmu.isBattPlugInIRQ())
+    ESP_LOGI(TAG, "Battery is connected.");
+  if (pmu.isBattRemoveIRQ())
+    ESP_LOGI(TAG, "Battery was removed.");
+  if (pmu.isChargingIRQ())
+    ESP_LOGI(TAG, "Battery charging.");
+  if (pmu.isChargingDoneIRQ())
+    ESP_LOGI(TAG, "Battery charging done.");
+  if (pmu.isBattTempLowIRQ())
+    ESP_LOGI(TAG, "Battery high temperature.");
+  if (pmu.isBattTempHighIRQ())
+    ESP_LOGI(TAG, "Battery low temperature.");
+
+// short press -> esp32 deep sleep mode, can be exited by pressing user button
+#ifdef HAS_BUTTON
+  if (pmu.isPEKShortPressIRQ()) {
+    ESP_LOGI(TAG, "Power Button --> Short Pressed");
+    // enter_deepsleep(0, HAS_BUTTON);
+  }
+#endif
+
+  // long press -> shutdown power, can be exited by another longpress
+  if (pmu.isPEKLongtPressIRQ()) {
+    ESP_LOGI(TAG, "Power Button --> LONG Press");
+    //AXP192_power(pmu_power_off); // switch off Lora, GPS, display
+    //pmu.shutdown();              // switch off device
+  }
+
+  pmu.clearIRQ();
+
+  // refresh stored voltage value
+  read_voltage();
+}
+
 void AXP192_init(void)
 {
   
@@ -145,11 +203,11 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
 
     // switch power rails on
-    AXP192_power(true);
+    AXP192_power(pmu_power_on);
 
 #ifdef PMU_INT
     pinMode(PMU_INT, INPUT_PULLUP);
-    //attachInterrupt(digitalPinToInterrupt(PMU_INT), PMUIRQ, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT), AXP192_powerevent_IRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
                       AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
                       AXP202_CHARGING_FINISHED_IRQ,

@@ -60,6 +60,9 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
+
+enum pmu_power_t { pmu_power_on, pmu_power_off, pmu_power_sleep };
+
 typedef struct
 {
   float iaq;                // IAQ signal

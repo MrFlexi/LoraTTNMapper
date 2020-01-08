@@ -21,7 +21,7 @@ bool batt_sufficient(void);
 #if (HAS_PMU)
 #include <axp20x.h>
 void power_event_IRQ(void);
-void AXP192_power(bool on);
+void AXP192_power(pmu_power_t powerlevel);
 void AXP192_power_gps(bool on);
 void AXP192_power_lora(bool on);
 void AXP192_init(void);
