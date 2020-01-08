@@ -100,7 +100,7 @@ extern SemaphoreHandle_t I2Caccess;
 extern QueueHandle_t LoraSendQueue;
 
 
-#include "../src/hal/ttgobeam.h"
+#include "../src/hal/ttgobeam10.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"
