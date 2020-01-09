@@ -14,7 +14,7 @@
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA  0
-#define USE_DASH 0
+#define USE_DASH 1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -36,8 +36,8 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5         // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 4    // sleep after n minutes or
+#define TIME_TO_SLEEP 20         // sleep for n minute
+#define TIME_TO_NEXT_SLEEP 5    // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 2 // after n Lora TX events
 
 #include <lmic.h>

@@ -1,5 +1,5 @@
 
-#if (USE_DASH)
+
 #include "globals.h"
 #include "dash.h"
 
@@ -60,6 +60,5 @@ void update_web_dash(void)
 
 }
 
-#endif
 
 

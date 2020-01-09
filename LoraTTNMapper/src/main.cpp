@@ -356,7 +356,7 @@ void t_cyclic()
 #endif
 
 #if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED
+  if (WiFi.status() == WL_CONNECTED)
    update_web_dash();
 #endif
 
