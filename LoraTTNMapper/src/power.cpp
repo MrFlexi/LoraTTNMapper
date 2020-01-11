@@ -90,7 +90,7 @@ void AXP192_showstatus(void)
     ESP_LOGI(TAG, "USB not present");
 }
 
-void IRAM_ATTR AXP192_powerevent_IRQ(void)
+void AXP192_event_handler(void)
 {
   ESP_LOGI(TAG, "PMU Event");
   pmu.readIRQ();
@@ -126,8 +126,8 @@ void IRAM_ATTR AXP192_powerevent_IRQ(void)
   if (pmu.isPEKLongtPressIRQ())
   {
     ESP_LOGI(TAG, "Power Button --> LONG Press");
-    //AXP192_power(pmu_power_off); // switch off Lora, GPS, display
-    //pmu.shutdown();              // switch off device
+    AXP192_power(pmu_power_off); // switch off Lora, GPS, display
+    pmu.shutdown();              // switch off device
   }
 
   pmu.clearIRQ();
@@ -161,7 +161,7 @@ void AXP192_init(void)
 
 #ifdef PMU_INT
     pinMode(PMU_INT, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PMU_INT), AXP192_powerevent_IRQ, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT), PMUIRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
                       AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
                       AXP202_CHARGING_FINISHED_IRQ| AXP202_PEK_LONGPRESS_IRQ| AXP202_PEK_SHORTPRESS_IRQ,

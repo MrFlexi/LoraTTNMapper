@@ -61,9 +61,14 @@ int runmode = 0;
 
 uint8_t msgWaiting = 0;
 
+RTC_DATA_ATTR int bootCount = 0;
+touch_pad_t touchPin;
+
 //--------------------------------------------------------------------------
 // Tasks/Ticker
 //--------------------------------------------------------------------------
+
+TaskHandle_t irqHandlerTask = NULL;
 
 Ticker sleepTicker;
 Ticker displayTicker;
@@ -191,6 +196,10 @@ void print_ina()
 }
 #endif
 
+void touch_callback(){
+  //placeholder callback function
+}
+
 void display_chip_info()
 {
   // print chip information on startup if in verbose mode after coldstart
@@ -260,6 +269,25 @@ void print_wakeup_reason()
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
     break;
+  }
+}
+
+void print_wakeup_touchpad(){
+  touch_pad_t pin;
+  touchPin = esp_sleep_get_touchpad_wakeup_status();
+  switch(touchPin)
+  {
+    case 0  : Serial.println("Touch detected on GPIO 4"); break;
+    case 1  : Serial.println("Touch detected on GPIO 0"); break;
+    case 2  : Serial.println("Touch detected on GPIO 2"); break;
+    case 3  : Serial.println("Touch detected on GPIO 15"); break;
+    case 4  : Serial.println("Touch detected on GPIO 13"); break;
+    case 5  : Serial.println("Touch detected on GPIO 12"); break;
+    case 6  : Serial.println("Touch detected on GPIO 14"); break;
+    case 7  : Serial.println("Touch detected on GPIO 27"); break;
+    case 8  : Serial.println("Touch detected on GPIO 33"); break;
+    case 9  : Serial.println("Touch detected on GPIO 32"); break;
+    default : Serial.println("Wakeup not by touchpad"); break;
   }
 }
 
@@ -429,7 +457,13 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
+
+ //Increment boot number and print it every reboot
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
   print_wakeup_reason();
+  print_wakeup_touchpad();
   display_chip_info();
 
   // create some semaphores for syncing / mutexing tasks
@@ -509,6 +543,14 @@ void setup()
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
   log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
               " min");
+
+#ifdef HAS_BUTTON
+  esp_sleep_enable_ext0_wakeup(HAS_BUTTON,0); //1 = High, 0 = Low
+#endif
+
+  //Setup interrupt on Touch Pad 3 (GPIO15)
+  touchAttachInterrupt(GPIO_NUM_0, touch_callback, PAD_TRESHOLD);
+  esp_sleep_enable_touchpad_wakeup();
 #endif
 
   gps.init();
@@ -531,10 +573,13 @@ void setup()
 #endif
 
 #ifdef HAS_BUTTON
+  pinMode(HAS_BUTTON, INPUT_PULLUP);
   button_init(HAS_BUTTON);
 #endif
 
+  //-------------------------------------------------------------------------------
   // Tasks
+  //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
 
   sleepTicker.attach(60, t_sleep);
@@ -542,6 +587,20 @@ void setup()
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
+
+
+
+// Interrupt ISR Handler
+  ESP_LOGI(TAG, "Starting Interrupt Handler...");
+  xTaskCreatePinnedToCore(irqHandler,      // task function
+                          "irqhandler",    // name of task
+                          4096,            // stack size of task
+                          (void *)1,       // parameter of the task
+                          2,               // priority of the task
+                          &irqHandlerTask, // task handle
+                          1);              // CPU core
+
+
   log_display("Setup done");
 
   runmode = 1; // Switch from Terminal Mode to page Display
