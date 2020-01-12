@@ -17,6 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
+#define USE_ADXL345 0
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -38,8 +39,8 @@
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 5         // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 1    // sleep after n minutes or
-#define SLEEP_AFTER_N_TX_COUNT 2 // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP 6    // sleep after n minutes or
+#define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
 #include <hal/hal.h>
@@ -136,6 +137,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_OTA)
 #include "SecureOTA.h"
+#endif
+
+#if (USE_ADXL345)
+#include "adxl.h"
 #endif
 
 #endif

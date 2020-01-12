@@ -5,7 +5,7 @@
 
 #define displayRefreshIntervall 5    // every x second
 #define sendMessagesIntervall 60     // every x seconds
-#define sendCayenneIntervall 30    // every x seconds
+#define sendCayenneIntervall 30      // every x seconds
 #define LORAsendMessagesIntervall 40 // every x seconds
 #define displayMoveIntervall 8       // every x second
 
@@ -196,7 +196,8 @@ void print_ina()
 }
 #endif
 
-void touch_callback(){
+void touch_callback()
+{
   //placeholder callback function
 }
 
@@ -272,22 +273,45 @@ void print_wakeup_reason()
   }
 }
 
-void print_wakeup_touchpad(){
+void print_wakeup_touchpad()
+{
   touch_pad_t pin;
   touchPin = esp_sleep_get_touchpad_wakeup_status();
-  switch(touchPin)
+  switch (touchPin)
   {
-    case 0  : Serial.println("Touch detected on GPIO 4"); break;
-    case 1  : Serial.println("Touch detected on GPIO 0"); break;
-    case 2  : Serial.println("Touch detected on GPIO 2"); break;
-    case 3  : Serial.println("Touch detected on GPIO 15"); break;
-    case 4  : Serial.println("Touch detected on GPIO 13"); break;
-    case 5  : Serial.println("Touch detected on GPIO 12"); break;
-    case 6  : Serial.println("Touch detected on GPIO 14"); break;
-    case 7  : Serial.println("Touch detected on GPIO 27"); break;
-    case 8  : Serial.println("Touch detected on GPIO 33"); break;
-    case 9  : Serial.println("Touch detected on GPIO 32"); break;
-    default : Serial.println("Wakeup not by touchpad"); break;
+  case 0:
+    Serial.println("Touch detected on GPIO 4");
+    break;
+  case 1:
+    Serial.println("Touch detected on GPIO 0");
+    break;
+  case 2:
+    Serial.println("Touch detected on GPIO 2");
+    break;
+  case 3:
+    Serial.println("Touch detected on GPIO 15");
+    break;
+  case 4:
+    Serial.println("Touch detected on GPIO 13");
+    break;
+  case 5:
+    Serial.println("Touch detected on GPIO 12");
+    break;
+  case 6:
+    Serial.println("Touch detected on GPIO 14");
+    break;
+  case 7:
+    Serial.println("Touch detected on GPIO 27");
+    break;
+  case 8:
+    Serial.println("Touch detected on GPIO 33");
+    break;
+  case 9:
+    Serial.println("Touch detected on GPIO 32");
+    break;
+  default:
+    Serial.println("Wakeup not by touchpad");
+    break;
   }
 }
 
@@ -328,7 +352,6 @@ void t_send_cayenne()
 #if (USE_CAYENNE)
   Cayenne_send();
 #endif
-
 }
 
 void t_cyclic()
@@ -358,6 +381,10 @@ void t_cyclic()
   dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
+#if (USE_ADXL345)
+  adxl_dumpValues();
+#endif
+
 #if (HAS_LORA)
 
   ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
@@ -385,9 +412,8 @@ void t_cyclic()
 
 #if (USE_DASH)
   if (WiFi.status() == WL_CONNECTED)
-   update_web_dash();
+    update_web_dash();
 #endif
-
 }
 
 void t_sleep()
@@ -458,7 +484,7 @@ void setup()
 {
   Serial.begin(115200);
 
- //Increment boot number and print it every reboot
+  //Increment boot number and print it every reboot
   ++bootCount;
   Serial.println("Boot number: " + String(bootCount));
 
@@ -536,6 +562,10 @@ void setup()
   }
 #endif
 
+#if (USE_ADXL345)
+  setup_adxl345();
+#endif
+
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
@@ -545,7 +575,7 @@ void setup()
               " min");
 
 #ifdef HAS_BUTTON
-  esp_sleep_enable_ext0_wakeup(HAS_BUTTON,0); //1 = High, 0 = Low
+  esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
   //Setup interrupt on Touch Pad 3 (GPIO15)
@@ -588,9 +618,7 @@ void setup()
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 
-
-
-// Interrupt ISR Handler
+  // Interrupt ISR Handler
   ESP_LOGI(TAG, "Starting Interrupt Handler...");
   xTaskCreatePinnedToCore(irqHandler,      // task function
                           "irqhandler",    // name of task
@@ -599,7 +627,6 @@ void setup()
                           2,               // priority of the task
                           &irqHandlerTask, // task handle
                           1);              // CPU core
-
 
   log_display("Setup done");
 
