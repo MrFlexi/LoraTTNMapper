@@ -38,45 +38,71 @@ void setup_adxl345(){
  
   //setting all interrupts to take place on int pin 1
   //I had issues with int pin 2, was unable to reset it
+  adxl.setInterruptMapping( ADXL345_INT_DATA_READY_BIT,   ADXL345_INT1_PIN );
   adxl.setInterruptMapping( ADXL345_INT_SINGLE_TAP_BIT,   ADXL345_INT1_PIN );
   adxl.setInterruptMapping( ADXL345_INT_DOUBLE_TAP_BIT,   ADXL345_INT1_PIN );
   adxl.setInterruptMapping( ADXL345_INT_FREE_FALL_BIT,    ADXL345_INT1_PIN );
   adxl.setInterruptMapping( ADXL345_INT_ACTIVITY_BIT,     ADXL345_INT1_PIN );
   adxl.setInterruptMapping( ADXL345_INT_INACTIVITY_BIT,   ADXL345_INT1_PIN );
+  adxl.setInterruptMapping(ADXL345_INT_WATERMARK_BIT,     ADXL345_INT1_PIN);
  
   //register interrupt actions - 1 == on; 0 == off  
-  adxl.setInterrupt( ADXL345_INT_SINGLE_TAP_BIT, 1);
-  adxl.setInterrupt( ADXL345_INT_DOUBLE_TAP_BIT, 1);
-  adxl.setInterrupt( ADXL345_INT_FREE_FALL_BIT,  1);
-  adxl.setInterrupt( ADXL345_INT_ACTIVITY_BIT,   1);
-  adxl.setInterrupt( ADXL345_INT_INACTIVITY_BIT, 1);
+  adxl.setInterrupt( ADXL345_INT_DATA_READY_BIT, 1 );
+  adxl.setInterrupt( ADXL345_INT_SINGLE_TAP_BIT, 0);
+  adxl.setInterrupt( ADXL345_INT_DOUBLE_TAP_BIT, 0);
+  adxl.setInterrupt( ADXL345_INT_FREE_FALL_BIT,  0);
+  adxl.setInterrupt( ADXL345_INT_ACTIVITY_BIT,   0);
+  adxl.setInterrupt( ADXL345_INT_INACTIVITY_BIT, 0);
+  adxl.setInterrupt( ADXL345_INT_WATERMARK_BIT, 1);
+
+  //setting lowest sampling rate
+  adxl.setRate(6.25);
+  //setting device into FIFO mode
+  adxl.setMode(ADXL345_MODE_FIFO);
+  //set watermark for Watermark interrupt 
+  Serial.println("Current operation mode: ");
+  Serial.println(adxl.getMode());
+  adxl.setWatermark(30); 
+  delay(100);
+
 }
 
 void adxl_dumpValues()
 {
-int x,y,z;  
-	adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
-	// Output x,y,z values 
-	Serial.print("values of X , Y , Z: ");
-	Serial.print(x);
-	Serial.print(" , ");
-	Serial.print(y);
-	Serial.print(" , ");
-	Serial.println(z);
-	
-	double xyz[3];
-	double ax,ay,az;
-	adxl.getAcceleration(xyz);
-	ax = xyz[0];
-	ay = xyz[1];
-	az = xyz[2];
-	Serial.print("X=");
-	Serial.print(ax);
-    Serial.println(" g");
-	Serial.print("Y=");
-	Serial.print(ay);
-    Serial.println(" g");
-	Serial.print("Z=");
-	Serial.print(az);
-    Serial.println(" g");
+//Boring accelerometer stuff   
+  int x[32],y[32],z[32];
+  byte fifoentries,intEvent;
+
+
+  fifoentries = adxl.getFifoEntries();
+  if ((fifoentries%5)==0)             //Printing only every 5th sample to prevent spam on console
+  {
+    Serial.print("Current FIFO entries: ");
+    Serial.println(fifoentries);
+  }
+
+  
+  intEvent = adxl.getInterruptSource();  // reading interrupt status flags
+  if (adxl.triggered(intEvent,ADXL345_WATERMARK) )   // if watermark interrupt occured
+  {
+      Serial.println("Watermark interrupt triggered. Fetching data now." );
+  
+  if (fifoentries != 0){
+    adxl.burstReadXYZ(&x[0],&y[0],&z[0],fifoentries);   // reading all samples of FIFO
+    for (int i=0;i<fifoentries;i=i+5)       //Printing only every 5th sample to prevent spam on console
+    {
+      Serial.print("FIFO data sample: ");
+      Serial.print(i);      
+      Serial.print(", x: ");
+      Serial.print(x[i]);
+      Serial.print(", y: ");
+      Serial.print(y[i]);
+      Serial.print(", z: ");
+      Serial.println(z[i]);
+    }
+    
+    }
+  }
+  delay(200);
+
 	}
