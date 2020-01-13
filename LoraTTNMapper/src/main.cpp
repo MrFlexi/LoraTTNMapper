@@ -564,6 +564,7 @@ void setup()
 
 #if (USE_ADXL345)
   setup_adxl345();
+  attachInterrupt(digitalPinToInterrupt(ADXL_INT), PMUIRQ, FALLING);
 #endif
 
 //---------------------------------------------------------------
@@ -575,12 +576,13 @@ void setup()
               " min");
 
 #ifdef HAS_BUTTON
-  esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
+//esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
-  //Setup interrupt on Touch Pad 3 (GPIO15)
-  touchAttachInterrupt(GPIO_NUM_0, touch_callback, PAD_TRESHOLD);
-  esp_sleep_enable_touchpad_wakeup();
+#ifdef ADXL_INT
+  esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
+#endif
+
 #endif
 
   gps.init();

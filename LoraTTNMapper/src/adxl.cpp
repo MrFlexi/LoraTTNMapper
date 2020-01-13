@@ -51,8 +51,8 @@ void setup_adxl345(){
   adxl.setInterrupt( ADXL345_INT_SINGLE_TAP_BIT, 0);
   adxl.setInterrupt( ADXL345_INT_DOUBLE_TAP_BIT, 0);
   adxl.setInterrupt( ADXL345_INT_FREE_FALL_BIT,  0);
-  adxl.setInterrupt( ADXL345_INT_ACTIVITY_BIT,   0);
-  adxl.setInterrupt( ADXL345_INT_INACTIVITY_BIT, 0);
+  adxl.setInterrupt( ADXL345_INT_ACTIVITY_BIT,   1);
+  adxl.setInterrupt( ADXL345_INT_INACTIVITY_BIT, 1);
   adxl.setInterrupt( ADXL345_INT_WATERMARK_BIT, 1);
 
   //setting lowest sampling rate

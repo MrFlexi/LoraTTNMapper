@@ -60,6 +60,21 @@ void IRAM_ATTR PMUIRQ()
 }
 #endif
 
+
+#if  (USE_ADXL345)
+void IRAM_ATTR ADXLIRQ()
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  xTaskNotifyFromISR(irqHandlerTask, ADXL_IRQ, eSetBits,
+                     &xHigherPriorityTaskWoken);
+
+  if (xHigherPriorityTaskWoken)
+    portYIELD_FROM_ISR();
+}
+#endif
+
+
 void mask_user_IRQ()
 {
   xTaskNotify(irqHandlerTask, MASK_IRQ, eSetBits);

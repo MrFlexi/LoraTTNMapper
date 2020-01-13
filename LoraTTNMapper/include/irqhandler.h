@@ -11,6 +11,7 @@
 #define BME_IRQ 0x080
 #define MATRIX_DISPLAY_IRQ 0x100
 #define PMU_IRQ 0x200
+#define ADXL_IRQ 0x400
 
 #include "globals.h"
 
@@ -32,6 +33,10 @@ void IRAM_ATTR ButtonIRQ();
 
 #ifdef HAS_PMU
 void IRAM_ATTR PMUIRQ();
+#endif
+
+#if (USE_ADXL345)
+void IRAM_ATTR ADXLIRQ();
 #endif
 
 
