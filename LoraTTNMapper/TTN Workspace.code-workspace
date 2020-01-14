@@ -7,6 +7,10 @@
 		{
 			"name": "GPS_USART",
 			"path": "C:\\Users\\TTv060\\Desktop\\Projects\\LoraTTNMapper\\GPS_USART"
+		},
+		{
+			"name": "Test ADXL",
+			"path": "D:\\Jochen\\Projekte\\Arduino\\Sketches\\Test ADXL"
 		}
 	],
 	"settings": {

@@ -70,6 +70,13 @@ void setup_adxl345(){
 void adxl_dumpValues()
 {
 //Boring accelerometer stuff   
+
+// block i2c bus access
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
+
   int x[32],y[32],z[32];
   byte fifoentries,intEvent;
 
@@ -106,3 +113,5 @@ void adxl_dumpValues()
   delay(200);
 
 	}
+  I2C_MUTEX_UNLOCK(); // release i2c bus access
+}
