@@ -489,7 +489,7 @@ void setup()
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
-  print_wakeup_touchpad();
+  // print_wakeup_touchpad();
   display_chip_info();
 
   // create some semaphores for syncing / mutexing tasks
@@ -564,7 +564,9 @@ void setup()
 
 #if (USE_ADXL345)
   setup_adxl345();
+#ifdef ADXL_INT
   attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, CHANGE);
+#endif
 #endif
 
 //---------------------------------------------------------------
@@ -579,8 +581,10 @@ void setup()
 //esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
+#if (USE_ADXL345)
 #ifdef ADXL_INT
   esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
+#endif
 #endif
 
 #endif

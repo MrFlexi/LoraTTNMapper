@@ -118,16 +118,45 @@ void adxl_event_handler()
   Serial.println("****************************"); 
   Serial.println("***   ADXL Event Handler *** "); 
   Serial.println("****************************"); 
-  byte source = adxl.getInterruptSource();
   
+  int x[32], y[32], z[32];
+  byte fifoentries, intEvent;
+
+  byte source = adxl.getInterruptSource();  
   print_byte(source);
 
    // Inactivity 
 
-   if ( adxl.getInterruptSource( ADXL345_INT_INACTIVITY_BIT) )
-   {
+   if (adxl.triggered(source, ADXL345_INACTIVITY))
+   { // if watermark interrupt occured   
     Serial.println("*** INACTIVITY ***"); 
    }; 
+
+
+  if (adxl.triggered(source, ADXL345_WATERMARK)) // if watermark interrupt occured
+    {
+
+
+      fifoentries = adxl.getFifoEntries();
+      Serial.println("Watermark reached ");      
+
+      if (fifoentries != 0)
+      {
+        adxl.burstReadXYZ(&x[0], &y[0], &z[0], fifoentries); // reading all samples of FIFO
+        for (int i = 0; i < fifoentries; i = i + 5)          //Printing only every 5th sample to prevent spam on console
+        {
+          Serial.print("FIFO data sample: ");
+          Serial.print(i);
+          Serial.print(", x: ");
+          Serial.print(x[i]);
+          Serial.print(", y: ");
+          Serial.print(y[i]);
+          Serial.print(", z: ");
+          Serial.println(z[i]);
+        }
+      }
+    }
+    delay(200);
 
             
  } 
