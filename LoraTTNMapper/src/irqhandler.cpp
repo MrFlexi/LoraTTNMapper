@@ -28,8 +28,13 @@ void irqHandler(void *pvParameters)
 
 // do we have a power event?
 #if (HAS_PMU)
-    if (InterruptStatus & PMU_IRQ)
+    if (InterruptStatus & PMU_IRQ_BIT)
       AXP192_event_handler();
+#endif
+
+#if (USE_ADXL345)
+    if (InterruptStatus & ADXL_IRQ_BIT)
+      adxl_event_handler();
 #endif
   }
 }
@@ -47,12 +52,12 @@ void IRAM_ATTR ButtonIRQ()
 }
 #endif
 
-#ifdef HAS_PMU
-void IRAM_ATTR PMUIRQ()
+#if (HAS_PMU)
+void IRAM_ATTR PMU_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ, eSetBits,
+  xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
                      &xHigherPriorityTaskWoken);
 
   if (xHigherPriorityTaskWoken)
@@ -60,20 +65,18 @@ void IRAM_ATTR PMUIRQ()
 }
 #endif
 
-
-#if  (USE_ADXL345)
-void IRAM_ATTR ADXLIRQ()
+#if (USE_ADXL345)
+void IRAM_ATTR ADXL_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  xTaskNotifyFromISR(irqHandlerTask, ADXL_IRQ, eSetBits,
+  xTaskNotifyFromISR(irqHandlerTask, ADXL_IRQ_BIT, eSetBits,
                      &xHigherPriorityTaskWoken);
 
   if (xHigherPriorityTaskWoken)
     portYIELD_FROM_ISR();
 }
 #endif
-
 
 void mask_user_IRQ()
 {

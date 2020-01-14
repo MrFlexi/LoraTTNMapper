@@ -161,7 +161,7 @@ void AXP192_init(void)
 
 #ifdef PMU_INT
     pinMode(PMU_INT, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PMU_INT), PMUIRQ, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT), PMU_IRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
                       AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
                       AXP202_CHARGING_FINISHED_IRQ| AXP202_PEK_LONGPRESS_IRQ| AXP202_PEK_SHORTPRESS_IRQ,

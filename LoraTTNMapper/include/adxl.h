@@ -13,5 +13,6 @@
 
 void setup_adxl345( void );
 void adxl_dumpValues(void);
+void adxl_event_handler(void);
 
 #endif

@@ -564,7 +564,7 @@ void setup()
 
 #if (USE_ADXL345)
   setup_adxl345();
-  attachInterrupt(digitalPinToInterrupt(ADXL_INT), PMUIRQ, FALLING);
+  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, CHANGE);
 #endif
 
 //---------------------------------------------------------------
