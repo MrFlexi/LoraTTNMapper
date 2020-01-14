@@ -11,6 +11,10 @@
 		{
 			"name": "Test ADXL",
 			"path": "D:\\Jochen\\Projekte\\Arduino\\Sketches\\Test ADXL"
+		},
+		{
+			"name": "ADXL Test 2",
+			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\ADXL Test 2"
 		}
 	],
 	"settings": {

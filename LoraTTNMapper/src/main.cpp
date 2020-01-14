@@ -621,7 +621,9 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+  #if (HAS_LORA)
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
+  #endif
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 
   // Interrupt ISR Handler
