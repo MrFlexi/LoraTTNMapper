@@ -8,7 +8,7 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280  0
 #define USE_CAYENNE 1
 #define HAS_LORA 1
@@ -17,7 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 1
+#define USE_ADXL345 0
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -106,7 +106,7 @@ extern TaskHandle_t irqHandlerTask;
 extern QueueHandle_t LoraSendQueue;
 
 
-#include "../src/hal/ttgobeam10.h"
+#include "../src/hal/ttgobeam.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"

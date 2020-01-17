@@ -624,9 +624,13 @@ void setup()
   #if (HAS_LORA)
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
   #endif
+
+  #if (USE_CAYENNE)
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
+  #endif
 
   // Interrupt ISR Handler
+  #if (USE_INTERRUPTS)
   ESP_LOGI(TAG, "Starting Interrupt Handler...");
   xTaskCreatePinnedToCore(irqHandler,      // task function
                           "irqhandler",    // name of task
@@ -635,6 +639,7 @@ void setup()
                           2,               // priority of the task
                           &irqHandlerTask, // task handle
                           1);              // CPU core
+  #endif
 
   log_display("Setup done");
 
