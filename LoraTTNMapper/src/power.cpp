@@ -297,7 +297,7 @@ uint16_t read_voltage()
 {
   uint16_t voltage = 0;
 
-#ifdef HAS_PMU
+#if (HAS_PMU)
   voltage = pmu.isVBUSPlug() ? pmu.getVbusVoltage() : pmu.getBattVoltage();
 #else
 

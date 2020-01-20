@@ -3,11 +3,10 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 5    // every x second
+#define displayRefreshIntervall 1    // every x second
 #define sendMessagesIntervall 60     // every x seconds
 #define sendCayenneIntervall 30      // every x seconds
 #define LORAsendMessagesIntervall 40 // every x seconds
-#define displayMoveIntervall 8       // every x second
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -57,7 +56,6 @@ const char *getCrName(rps_t rps)
 PayloadConvert payload(PAYLOAD_BUFFER_SIZE);
 
 SemaphoreHandle_t I2Caccess;
-int runmode = 0;
 
 uint8_t msgWaiting = 0;
 
@@ -69,6 +67,9 @@ touch_pad_t touchPin;
 //--------------------------------------------------------------------------
 
 TaskHandle_t irqHandlerTask = NULL;
+TaskHandle_t moveDisplayHandlerTask = NULL;
+TaskHandle_t t_cyclic_HandlerTask = NULL;
+
 
 Ticker sleepTicker;
 Ticker displayTicker;
@@ -125,7 +126,7 @@ CAYENNE_OUT_DEFAULT()
 void Cayenne_send(void)
 {
 
-  log_display("Cayenne send data");
+  log_display("Cayenne send");
 
   Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
   Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
@@ -354,65 +355,75 @@ void t_send_cayenne()
 #endif
 }
 
+
+
+void t_cyclicRTOS(void *pvParameters)
+{
+  
+}
+
 void t_cyclic()
 {
   String stringOne;
-
+    Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+    dataBuffer.data.freeheap =  ESP.getFreeHeap();
 // Temperatur
 #if (USE_BME280)
-  dataBuffer.data.temperature = bme.readTemperature();
-  dataBuffer.data.humidity = bme.readHumidity();
-  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+    dataBuffer.data.temperature = bme.readTemperature();
+    dataBuffer.data.humidity = bme.readHumidity();
+    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #if (HAS_PMU)
-  dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
-  dataBuffer.data.bus_current = pmu.getVbusCurrent();
+    dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
+    dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
-  dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
-  dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-  dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-  // AXP192_showstatus();
+    dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+    dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
+    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+    // AXP192_showstatus();
+#else
+    dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
 #if (HAS_INA)
-  //print_ina();
-  dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
-  dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
+    //print_ina();
+    dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
+    dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
 #if (USE_ADXL345)
-  adxl_dumpValues();
+    adxl_dumpValues();
 #endif
 
 #if (HAS_LORA)
 
-  ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
-           getSfName(updr2rps(LMIC.datarate)),
-           getBwName(updr2rps(LMIC.datarate)),
-           getCrName(updr2rps(LMIC.datarate)));
+    ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
+             getSfName(updr2rps(LMIC.datarate)),
+             getBwName(updr2rps(LMIC.datarate)),
+             getCrName(updr2rps(LMIC.datarate)));
 
-  if (LoraSendQueue != 0)
-  {
-    dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
-  }
-  else
-  {
-    dataBuffer.data.LoraQueueCounter = 0;
-  }
+    if (LoraSendQueue != 0)
+    {
+      dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
+    }
+    else
+    {
+      dataBuffer.data.LoraQueueCounter = 0;
+    }
 #endif
 
-  gps.encode();
-  gps.checkGpsFix();
+    gps.encode();
+    gps.checkGpsFix();
 
 // Refresh Display
 #if (USE_DISPLAY)
-  showPage(PageNumber);
+    showPage(PageNumber);
 #endif
 
 #if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED)
-    update_web_dash();
+    if (WiFi.status() == WL_CONNECTED)
+      update_web_dash();
 #endif
 }
 
@@ -430,12 +441,7 @@ void t_sleep()
 #if (HAS_PMU)
     AXP192_power(pmu_power_sleep);
 #endif
-
-    delay(1000);
-    t_cyclic(); // Aktuelle Messwerte anzeigen
-    delay(5000);
-    runmode = 0;
-    // gps.enable_sleep();
+    gps.enable_sleep();
     Serial.flush();
     showPage(PAGE_SLEEP);
     ESP_LOGI(TAG, "Deep Sleep started");
@@ -480,9 +486,32 @@ void setup_wifi()
 #endif
 }
 
+  void createRTOStasks()
+  {
+
+  xTaskCreatePinnedToCore(t_cyclicRTOS,              // task function
+                          "t_cyclic",            // name of task
+                          4096,                  // stack size of task
+                          (void *)1,             // parameter of the task
+                          2,                     // priority of the task
+                          &t_cyclic_HandlerTask, // task handle
+                          1);                    // CPU core
+
+  xTaskCreatePinnedToCore(t_moveDisplayRTOS,           // task function
+                          "moveDisplay",           // name of task
+                          4096,                    // stack size of task
+                          (void *)1,               // parameter of the task
+                          2,                       // priority of the task
+                          &moveDisplayHandlerTask, // task handle
+                          1);                      // CPU core
+
+  }
+
 void setup()
 {
   Serial.begin(115200);
+  dataBuffer.data.runmode = 0;
+  Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
   //Increment boot number and print it every reboot
   ++bootCount;
@@ -592,7 +621,7 @@ void setup()
   gps.init();
   //gps.softwareReset();
   gps.wakeup();
-  //gps.ecoMode();
+  gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
 
@@ -621,16 +650,17 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
-  #if (HAS_LORA)
+
+#if (HAS_LORA)
   sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
-  #endif
+#endif
 
-  #if (USE_CAYENNE)
+#if (USE_CAYENNE)
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
-  #endif
+#endif
 
-  // Interrupt ISR Handler
-  #if (USE_INTERRUPTS)
+// Interrupt ISR Handler
+#if (USE_INTERRUPTS)
   ESP_LOGI(TAG, "Starting Interrupt Handler...");
   xTaskCreatePinnedToCore(irqHandler,      // task function
                           "irqhandler",    // name of task
@@ -639,17 +669,9 @@ void setup()
                           2,               // priority of the task
                           &irqHandlerTask, // task handle
                           1);              // CPU core
-  #endif
+#endif
 
-  log_display("Setup done");
 
-  runmode = 1; // Switch from Terminal Mode to page Display
-  showPage(PAGE_VALUES);
-
-  //-------------------------------------------------------------
-  // Call all tasks once after startup, next call via Timer
-  //-------------------------------------------------------------
-  t_cyclic();
 
 #if (USE_CAYENNE)
   if (WiFi.status() == WL_CONNECTED)
@@ -659,6 +681,12 @@ void setup()
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
 #endif
+
+  log_display("Setup done");
+
+  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
+  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+  //showPage(PAGE_VALUES);
 }
 
 void loop()
@@ -689,4 +717,5 @@ void loop()
 #if (HAS_BUTTON)
   readButton();
 #endif
+  delay(1);
 }

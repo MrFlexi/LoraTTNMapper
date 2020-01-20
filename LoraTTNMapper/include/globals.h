@@ -8,16 +8,19 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 0
-#define USE_BME280  0
+#define USE_OTA 1
+#define USE_BME280  1
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA  0
-#define USE_DASH 0
+#define HAS_INA  1
+#define USE_DASH 1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 #define USE_ADXL345 0
+#define USE_INTERRUPTS 0
+
+#define displayMoveIntervall 8       // every x second
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -36,7 +39,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
+#define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 5         // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 6    // sleep after n minutes or
@@ -79,6 +82,8 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
+  uint8_t runmode;        // aliveCounter
+  uint32_t freeheap;        // free memory
   float firmware_version; 
   uint8_t bytesReceived;
   lmic_t lmic;
@@ -100,9 +105,13 @@ typedef struct
   uint8_t Message[PAYLOAD_BUFFER_SIZE];
 } MessageBuffer_t;
 
-extern int runmode;
+
 extern SemaphoreHandle_t I2Caccess;
+
 extern TaskHandle_t irqHandlerTask;
+extern TaskHandle_t moveDisplayHandlerTask;
+extern TaskHandle_t t_cyclic_HandlerTask;
+
 extern QueueHandle_t LoraSendQueue;
 
 

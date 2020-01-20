@@ -10,25 +10,50 @@ char sbuf[32];
 void log_display(String s)
 {
   Serial.println(s);
-  if (runmode < 1)
+  Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+
+  if (dataBuffer.data.runmode < 1)
   {
     u8g2log.print(s);
     u8g2log.print("\n");
   }
 }
 
-void t_moveDisplay()
+void t_moveDisplayRTOS(void *pvParameters)
 {
 #if (USE_DISPLAY)
-  if (PageNumber < PAGE_COUNT)
+
+  for (;;)
   {
-    PageNumber++;
+
+    if (PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }
+    //showPage(PageNumber);
+    vTaskDelay(displayMoveIntervall * 1000 / portTICK_PERIOD_MS);
   }
-  else
-  {
-    PageNumber = 1;
-  }
-  showPage(PageNumber);
+#endif
+}
+
+void t_moveDisplay(void)
+{
+#if (USE_DISPLAY)
+
+    if (PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }
+    //showPage(PageNumber);
+    
 #endif
 }
 
@@ -154,6 +179,23 @@ void showPage(int page)
       u8g2.drawStr(1, 15, "SAP GTT");
 
       u8g2.setFont(u8g2_font_profont11_mf);
+
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
+      u8g2.setCursor(64,40);
+      u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
+      u8g2.setCursor(1, 50);
+      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
+      break;
+
+    case PAGE_GPS:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "GPS");
+
+      u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
       u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
       u8g2.setCursor(64, 30);
@@ -162,19 +204,11 @@ void showPage(int page)
       u8g2.setCursor(1, 40);
       u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
       u8g2.setCursor(64, 40);
-
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
-      u8g2.setCursor(1, 50);
-      u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
-      u8g2.setCursor(64, 50);
-      u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
       break;
 
     case PAGE_SOLAR:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Sun Panel");
+      u8g2.drawStr(1, 15, "Solar Panel");
       u8g2.setFont(u8g2_font_profont11_mf);
 
 #if (HAS_INA)
@@ -191,13 +225,16 @@ void showPage(int page)
 
       u8g2.setCursor(1, 60);
       u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+#else
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
 #endif
 
       break;
 
-    case PAGE_SETTINGS:
+    case PAGE_SENSORS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Settings");
+      u8g2.drawStr(1, 15, "Sensors");
 
       u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
