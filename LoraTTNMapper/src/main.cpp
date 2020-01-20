@@ -525,6 +525,7 @@ void setup()
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
+  delay(1000);
 
   //---------------------------------------------------------------
   // Get preferences from Flash
@@ -543,6 +544,8 @@ void setup()
   AXP192_showstatus();
   AXP192_power_gps(ON);
 #endif
+
+delay(1000);
 
 #if (HAS_INA)
   ina3221.begin();
@@ -565,6 +568,7 @@ void setup()
   //Turn off Bluetooth
   log_display("Stop Bluethooth");
   btStop();
+  delay(1000);
 
 #if (USE_MQTT)
   setup_mqtt();
@@ -587,9 +591,10 @@ void setup()
   {
     _lastOTACheck = millis();
     checkFirmwareUpdates();
-    delay(2000);
+    
   }
 #endif
+delay(1000);
 
 #if (USE_ADXL345)
   setup_adxl345();
@@ -612,7 +617,7 @@ void setup()
 
 #if (USE_ADXL345)
 #ifdef ADXL_INT
-  esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
+  //esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
 #endif
 #endif
 
@@ -673,10 +678,10 @@ void setup()
 
 
 
-#if (USE_CAYENNE)
-  if (WiFi.status() == WL_CONNECTED)
-    Cayenne_send();
-#endif
+//#if (USE_CAYENNE)
+//  if (WiFi.status() == WL_CONNECTED)
+//    Cayenne_send();
+//#endif
 
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
