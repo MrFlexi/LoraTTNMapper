@@ -365,7 +365,7 @@ void t_cyclicRTOS(void *pvParameters)
 void t_cyclic()
 {
   String stringOne;
-    Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+    ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
     dataBuffer.data.freeheap =  ESP.getFreeHeap();
 // Temperatur
 #if (USE_BME280)
@@ -418,6 +418,7 @@ void t_cyclic()
 
 // Refresh Display
 #if (USE_DISPLAY)
+if ( dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
 
@@ -538,6 +539,7 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
+  delay(2000);
 
 #if (HAS_PMU)
   AXP192_init();
@@ -633,6 +635,7 @@ delay(1000);
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
+  delay(1000);
 #endif
 
 #if (USE_DASH)
