@@ -94,7 +94,7 @@ void processOTAUpdate(const String &version)
       client.setCACert(bintray.getCertificate(currentHost));
       if (!client.connect(currentHost.c_str(), port))
       {
-        Serial.println("Redirect detected! Cannot connect to " + currentHost );
+        Serial.println("Cannot connect to " + currentHost );
         return;
       }
     }
@@ -166,7 +166,7 @@ void processOTAUpdate(const String &version)
       if (line.startsWith("Content-Length: "))
       {
         contentLength = atoi((getHeaderValue(line, "Content-Length: ")).c_str());
-        log_display("Got " + String(contentLength) );
+        log_display("kB: " + String(contentLength / 1024 ) );
       }
 
       if (line.startsWith("Content-Type: "))

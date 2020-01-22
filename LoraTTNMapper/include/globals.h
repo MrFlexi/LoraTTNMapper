@@ -20,7 +20,7 @@
 #define USE_ADXL345 0
 #define USE_INTERRUPTS 0
 
-#define displayMoveIntervall 8       // every x second
+#define displayMoveIntervall 5       // every x second
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -86,8 +86,9 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
-  uint8_t runmode;        // aliveCounter
+  uint8_t runmode;           // aliveCounter
   uint32_t freeheap;        // free memory
+  uint8_t tx_ack_req;           // request TTN to acknowlede a TX 
   float firmware_version; 
   uint8_t bytesReceived;
   lmic_t lmic;

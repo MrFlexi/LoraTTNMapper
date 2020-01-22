@@ -592,6 +592,7 @@ delay(1000);
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.firmware_version = VERSION;
+  dataBuffer.data.tx_ack_req = 1;                               
 
   setup_display();
   setup_sensors();

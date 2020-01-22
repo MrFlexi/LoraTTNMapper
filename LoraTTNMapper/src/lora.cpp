@@ -118,7 +118,7 @@ void t_LORA_send_from_queue(osjob_t *j)
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
         dump_single_message(SendBuffer);
-        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, dataBuffer.data.tx_ack_req);
       }
       else
       {

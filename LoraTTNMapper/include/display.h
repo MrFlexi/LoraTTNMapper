@@ -15,11 +15,13 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-#define PAGE_COUNT 4
-#define PAGE_VALUES 1
-#define PAGE_SOLAR 2
-#define PAGE_SENSORS 3
-#define PAGE_GPS 4
+#define PAGE_COUNT 5
+#define PAGE_TBEAM 1
+#define PAGE_LORA 2
+#define PAGE_GPS 3
+#define PAGE_SOLAR 4
+#define PAGE_SENSORS 5
+
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
 // assume 4x6 font, define width and height

@@ -120,6 +120,9 @@ void showPage(int page)
   else
   {
 
+
+    // u8g2_font_profont15_tr  W7 H15
+
     u8g2.clearBuffer();
     //oledFill(0, 1);
 
@@ -127,21 +130,28 @@ void showPage(int page)
 
     switch (page)
     {
-    case PAGE_VALUES:
 
+      case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "SAP GTT");
 
-      u8g2.setFont(u8g2_font_profont11_mf);
-
+      u8g2.setFont(u8g2_font_profont15_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
-      u8g2.setCursor(1, 40);
-      u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
-      u8g2.setCursor(64,40);
+      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);      
+      break;
+
+    case PAGE_LORA:
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "LORA TX/RX");
+      u8g2.setFont(u8g2_font_profont15_tr);                 
+      u8g2.setCursor(1,30);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      u8g2.setCursor(1, 50);
-      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
+      u8g2.setCursor(64, 30);
+      u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
+      u8g2.setCursor(1, 45);
+      u8g2.printf("RX Len:%.2d", dataBuffer.data.lmic.dataLen);
+      u8g2.setCursor(1, 60);
+      u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
       break;
 
     case PAGE_GPS:
