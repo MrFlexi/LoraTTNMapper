@@ -57,39 +57,6 @@ void t_moveDisplay(void)
 #endif
 }
 
-void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
-               const char *format, ...)
-{
-  char loc_buf[64];
-  char *temp = loc_buf;
-  va_list arg;
-  va_list copy;
-  va_start(arg, format);
-  va_copy(copy, arg);
-  int len = vsnprintf(temp, sizeof(loc_buf), format, copy);
-  va_end(copy);
-  if (len < 0)
-  {
-    va_end(arg);
-    return;
-  };
-  if (len >= sizeof(loc_buf))
-  {
-    temp = (char *)malloc(len + 1);
-    if (temp == NULL)
-    {
-      va_end(arg);
-      return;
-    }
-    len = vsnprintf(temp, len + 1, format, arg);
-  }
-  va_end(arg);
-  //oledWriteString(0, x, y, temp, font, inv, false);
-  if (temp != loc_buf)
-  {
-    free(temp);
-  }
-}
 
 void setup_display(void)
 {
@@ -103,20 +70,7 @@ void setup_display(void)
   log_display("TTN-ABP-Mapper");
 }
 
-void setup_display_new()
-{
-  int rc;
-  // put your setup code here, to run once:
-  //rc = oledInit(OLED_128x64, 0, 0, -1, -1,400000L); // use standard I2C bus at 400Khz
 
-  //  if (rc != OLED_NOT_FOUND)
-  //  {
-  //    char *msgs[] = {"SSD1306 @ 0x3C", "SSD1306 @ 0x3D","SH1106 @ 0x3C","SH1106 @ 0x3D"};
-  //    oledFill(0, 1);
-  //    oledWriteString(0,0,0,msgs[rc], FONT_NORMAL, 0, 1);
-  //    delay(2000);
-  //  }
-}
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 {
