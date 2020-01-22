@@ -7,10 +7,19 @@ uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 int PageNumber = 1;
 char sbuf[32];
 
+
+#if (USE_SERIAL_BT)
+BluetoothSerial SerialBT;
+#endif
+
 void log_display(String s)
 {
   Serial.println(s);
-  Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+  //Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+
+#if (USE_SERIAL_BT)
+  SerialBT.println(s);
+ #endif 
 
   if (dataBuffer.data.runmode < 1)
   {
@@ -120,11 +129,10 @@ void showPage(int page)
   else
   {
 
-
     // u8g2_font_profont15_tr  W7 H15
+    // u8g2_font_ncenB08_tr W12 H13
 
-    u8g2.clearBuffer();
-    //oledFill(0, 1);
+    u8g2.clearBuffer();  
 
     uint8_t icon = 0;
 
@@ -133,7 +141,8 @@ void showPage(int page)
 
       case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "SAP GTT");
+      sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
+      u8g2.drawStr(1, 15, sbuf);
 
       u8g2.setFont(u8g2_font_profont15_tr);     
       u8g2.setCursor(1, 30);
@@ -143,7 +152,7 @@ void showPage(int page)
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "LORA TX/RX");
-      u8g2.setFont(u8g2_font_profont15_tr);                 
+      u8g2.setFont(u8g2_font_ncenB08_tr);                 
       u8g2.setCursor(1,30);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
       u8g2.setCursor(64, 30);

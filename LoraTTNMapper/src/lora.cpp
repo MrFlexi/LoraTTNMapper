@@ -130,7 +130,7 @@ void t_LORA_send_from_queue(osjob_t *j)
       ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
     }
     ESP_LOGV(TAG, "New callback scheduled...");
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
 
@@ -259,19 +259,19 @@ void onEvent(ev_t ev)
   case EV_TXCOMPLETE:
     log_display("EV_TXCOMPLETE");
     dataBuffer.data.txCounter++;
-    Serial.println(F("EV_TXCOMPLETE (waiting for RX windows)"));
+
     digitalWrite(BUILTIN_LED, LOW);
     if (LMIC.txrxFlags & TXRX_ACK)
     {
-      Serial.println(F("Received Ack"));
+      log_display("Received Ack");
     }
     if (LMIC.dataLen)
     {
       sprintf(s, "Received %i bytes payload", LMIC.dataLen);
-      Serial.println(s);
+      log_display(s);
       dataBuffer.data.lmic = LMIC;
       sprintf(s, "RSSI %d SNR %.1d", LMIC.rssi, LMIC.snr);
-      Serial.println(s);
+      log_display(s);
       Serial.println("");
       Serial.println("Payload");
       for (int i = 0; i < LMIC.dataLen; i++)
@@ -283,11 +283,9 @@ void onEvent(ev_t ev)
       }
     }
     // Schedule next transmission
-    //esp_sleep_enable_timer_wakeup(TX_INTERVAL*1000000);
-    //esp_deep_sleep_start();
     log_display("Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
-    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), t_LORA_send_from_queue);
+    os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
     break;
   case EV_LOST_TSYNC:
     Serial.println(F("EV_LOST_TSYNC"));
@@ -297,7 +295,7 @@ void onEvent(ev_t ev)
     break;
   case EV_RXCOMPLETE:
     // data received in ping slot
-    Serial.println(F("EV_RXCOMPLETE"));
+    log_display("EV_RXCOMPLETE");
     break;
   case EV_LINK_DEAD:
     Serial.println(F("EV_LINK_DEAD"));

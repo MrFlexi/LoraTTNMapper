@@ -3,10 +3,7 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define displayRefreshIntervall 1    // every x second
-#define sendMessagesIntervall 60     // every x seconds
-#define sendCayenneIntervall 30      // every x seconds
-#define LORAsendMessagesIntervall 40 // every x seconds
+
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -559,6 +556,13 @@ void setup()
   I2C_MUTEX_UNLOCK();
   delay(1000);
 
+
+#if (USE_SERIAL_BT)
+  SerialBT.begin("T-BEAM_01"); //Bluetooth device name
+  Serial.println("The device started, now you can pair it with bluetooth!");
+  delay(1000);
+ #endif 
+
   //---------------------------------------------------------------
   // Get preferences from Flash
   //---------------------------------------------------------------
@@ -599,10 +603,13 @@ delay(1000);
   setup_wifi();
   calibrate_voltage();
 
+#if (USE_SERIAL_BT)
+#else
   //Turn off Bluetooth
   log_display("Stop Bluethooth");
   btStop();
-  delay(1000);
+#endif  
+  
 
 #if (USE_MQTT)
   setup_mqtt();
@@ -698,7 +705,7 @@ setup_BLE();
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
 
 #if (HAS_LORA)
-  sendMessageTicker.attach(sendMessagesIntervall, t_enqueue_LORA_messages);
+  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
 
 #if (USE_CAYENNE)

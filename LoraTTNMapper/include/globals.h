@@ -19,6 +19,17 @@
 #define USE_DISPLAY 1
 #define USE_ADXL345 0
 #define USE_INTERRUPTS 0
+#define USE_BLE   0
+#define USE_SERIAL_BT       1
+
+
+#define displayRefreshIntervall       1    // every x second
+#define LORAenqueueMessagesIntervall  60     // every x seconds
+#define LORA_TX_INTERVAL              60
+
+#define sendCayenneIntervall 30      // every x seconds
+// #define LORAsendMessagesIntervall 40 // every x seconds
+
 
 #define displayMoveIntervall 5       // every x second
 
@@ -56,6 +67,10 @@
 #if (HAS_BME)
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#endif
+
+#if (USE_SERIAL_BT)
+  #include "BluetoothSerial.h"
 #endif
 
 #include "esp_log.h"

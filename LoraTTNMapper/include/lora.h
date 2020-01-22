@@ -1,9 +1,9 @@
 #ifndef _LORA_H
 #define _LORA_H
 
-// #include "globals.h"
+#include "globals.h"
 
-const unsigned TX_INTERVAL = 30;
+// const unsigned LORA_TX_INTERVAL = 60;
 extern uint8_t txBuffer[9];
 extern QueueHandle_t LoraSendQueue;
 
