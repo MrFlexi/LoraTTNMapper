@@ -30,7 +30,7 @@ void button_init(int pin)
       PageNumber = 1;
     }
 
-    showPage(PageNumber);
+    //showPage(PageNumber);
   });
 
   b->setOnHolding([]() {

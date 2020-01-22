@@ -10,16 +10,56 @@ char sbuf[32];
 void log_display(String s)
 {
   Serial.println(s);
-  if (runmode < 1)
+  Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+
+  if (dataBuffer.data.runmode < 1)
   {
     u8g2log.print(s);
     u8g2log.print("\n");
   }
 }
 
+void t_moveDisplayRTOS(void *pvParameters)
+{
+#if (USE_DISPLAY)
+
+  for (;;)
+  {
+
+    if (PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }
+    //showPage(PageNumber);
+    vTaskDelay(displayMoveIntervall * 1000 / portTICK_PERIOD_MS);
+  }
+#endif
+}
+
+void t_moveDisplay(void)
+{
+#if (USE_DISPLAY)
+
+    if (PageNumber < PAGE_COUNT)
+    {
+      PageNumber++;
+    }
+    else
+    {
+      PageNumber = 1;
+    }
+    //showPage(PageNumber);
+    
+#endif
+}
 
 void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
-               const char *format, ...) {
+               const char *format, ...)
+{
   char loc_buf[64];
   char *temp = loc_buf;
   va_list arg;
@@ -28,13 +68,16 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
   va_copy(copy, arg);
   int len = vsnprintf(temp, sizeof(loc_buf), format, copy);
   va_end(copy);
-  if (len < 0) {
+  if (len < 0)
+  {
     va_end(arg);
     return;
   };
-  if (len >= sizeof(loc_buf)) {
+  if (len >= sizeof(loc_buf))
+  {
     temp = (char *)malloc(len + 1);
-    if (temp == NULL) {
+    if (temp == NULL)
+    {
       va_end(arg);
       return;
     }
@@ -42,11 +85,11 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
   }
   va_end(arg);
   //oledWriteString(0, x, y, temp, font, inv, false);
-  if (temp != loc_buf) {
+  if (temp != loc_buf)
+  {
     free(temp);
   }
 }
-
 
 void setup_display(void)
 {
@@ -60,19 +103,19 @@ void setup_display(void)
   log_display("TTN-ABP-Mapper");
 }
 
-
-void setup_display_new() {
-int rc;
+void setup_display_new()
+{
+  int rc;
   // put your setup code here, to run once:
-//rc = oledInit(OLED_128x64, 0, 0, -1, -1,400000L); // use standard I2C bus at 400Khz
+  //rc = oledInit(OLED_128x64, 0, 0, -1, -1,400000L); // use standard I2C bus at 400Khz
 
-//  if (rc != OLED_NOT_FOUND)
-//  {
-//    char *msgs[] = {"SSD1306 @ 0x3C", "SSD1306 @ 0x3D","SH1106 @ 0x3C","SH1106 @ 0x3D"};
-//    oledFill(0, 1);
-//    oledWriteString(0,0,0,msgs[rc], FONT_NORMAL, 0, 1);
-//    delay(2000);
-//  }
+  //  if (rc != OLED_NOT_FOUND)
+  //  {
+  //    char *msgs[] = {"SSD1306 @ 0x3C", "SSD1306 @ 0x3D","SH1106 @ 0x3C","SH1106 @ 0x3D"};
+  //    oledFill(0, 1);
+  //    oledWriteString(0,0,0,msgs[rc], FONT_NORMAL, 0, 1);
+  //    delay(2000);
+  //  }
 }
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
@@ -133,8 +176,24 @@ void showPage(int page)
     case PAGE_VALUES:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      sprintf(sbuf, "  SAP GTT   V:", VERSION);
-      u8g2.drawStr(1, 15, sbuf );
+      u8g2.drawStr(1, 15, "SAP GTT");
+
+      u8g2.setFont(u8g2_font_profont11_mf);
+
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
+      u8g2.setCursor(64,40);
+      u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
+      u8g2.setCursor(1, 50);
+      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
+      break;
+
+    case PAGE_GPS:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "GPS");
 
       u8g2.setFont(u8g2_font_profont11_mf);
       u8g2.setCursor(1, 30);
@@ -145,27 +204,19 @@ void showPage(int page)
       u8g2.setCursor(1, 40);
       u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
       u8g2.setCursor(64, 40);
-
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);
-      u8g2.setCursor(1, 50);
-      u8g2.printf("Len:%.2d", dataBuffer.data.lmic.dataLen);
-      u8g2.setCursor(64, 50);
-      u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Que:%.2d", dataBuffer.data.LoraQueueCounter);
       break;
 
     case PAGE_SOLAR:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "   Sun Panel  ");
+      u8g2.drawStr(1, 15, "Solar Panel");
       u8g2.setFont(u8g2_font_profont11_mf);
 
-      #if (HAS_INA)
-        u8g2.setCursor(1, 30);
-        u8g2.printf("Sol: %.2fV %.0fmA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
-      #endif
+#if (HAS_INA)
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Sol: %.2fV %.0fmA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
+#endif
 
-      #if (HAS_PMU)
+#if (HAS_PMU)
       u8g2.setCursor(1, 40);
       u8g2.printf("Bus: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 
@@ -174,8 +225,20 @@ void showPage(int page)
 
       u8g2.setCursor(1, 60);
       u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
-      #endif
+#else
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
 
+      break;
+
+    case PAGE_SENSORS:
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Sensors");
+
+      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       break;
 
     case PAGE_SLEEP:

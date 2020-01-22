@@ -6,6 +6,7 @@
 
 extern void SendPayload(uint8_t port);
 extern void lora_queue_init(void);
+void AXP192_powerevent_IRQ(void);
 
 
 // MyDevices CayenneLPP 1.0 channels for Synamic sensor payload format

@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 #include <FreeRTOS.h>
+#include "esp_system.h"
+#include "esp_spi_flash.h"
 
 #define USE_WIFI 1
 #define USE_OTA 1
@@ -14,11 +16,16 @@
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
-#define USE_BLE 0
+#define USE_DISPLAY 1
+#define USE_ADXL345 0
+#define USE_INTERRUPTS 0
+
+#define displayMoveIntervall 8       // every x second
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
 #define SEND_QUEUE_SIZE 10
+#define PAD_TRESHOLD 40
 
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 #define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
@@ -34,8 +41,8 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 2          // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 10    // sleep after n minutes or
+#define TIME_TO_SLEEP 5         // sleep for n minute
+#define TIME_TO_NEXT_SLEEP 6    // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
@@ -62,6 +69,9 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
+
+enum pmu_power_t { pmu_power_on, pmu_power_off, pmu_power_sleep };
+
 typedef struct
 {
   float iaq;                // IAQ signal
@@ -76,7 +86,9 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
-  float firmware_version;
+  uint8_t runmode;        // aliveCounter
+  uint32_t freeheap;        // free memory
+  float firmware_version; 
   uint8_t bytesReceived;
   lmic_t lmic;
   float panel_voltage = 0;
@@ -97,15 +109,22 @@ typedef struct
   uint8_t Message[PAYLOAD_BUFFER_SIZE];
 } MessageBuffer_t;
 
-extern int runmode;
+
 extern SemaphoreHandle_t I2Caccess;
+
+extern TaskHandle_t irqHandlerTask;
+extern TaskHandle_t moveDisplayHandlerTask;
+extern TaskHandle_t t_cyclic_HandlerTask;
+
 extern QueueHandle_t LoraSendQueue;
 
-#include "../src/hal/ttgobeam10.h"
+
+#include "../src/hal/ttgobeam.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"
 #include "i2cscan.h"
+#include "irqhandler.h"
 
 #if (HAS_INA)
 #include "INA3221.h"
@@ -133,12 +152,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "SecureOTA.h"
 #endif
 
-#if (USE_BLE)
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
-#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+#if (USE_ADXL345)
+#include "adxl.h"
 #endif
 
 #endif
