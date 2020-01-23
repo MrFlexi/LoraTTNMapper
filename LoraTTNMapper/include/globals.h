@@ -19,19 +19,16 @@
 #define USE_DISPLAY 1
 #define USE_ADXL345 0
 #define USE_INTERRUPTS 0
-#define USE_BLE   0
-#define USE_SERIAL_BT       1
+#define USE_BLE 1
+#define USE_SERIAL_BT 0
 
+#define displayRefreshIntervall 1       // every x second
+#define displayMoveIntervall 5 // every x second
 
-#define displayRefreshIntervall       1    // every x second
-#define LORAenqueueMessagesIntervall  60     // every x seconds
-#define LORA_TX_INTERVAL              60
+#define LORAenqueueMessagesIntervall 60 // every x seconds
+#define LORA_TX_INTERVAL 60
 
-#define sendCayenneIntervall 30      // every x seconds
-// #define LORAsendMessagesIntervall 40 // every x seconds
-
-
-#define displayMoveIntervall 5       // every x second
+#define sendCayenneIntervall 30 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -52,8 +49,8 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5         // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 6    // sleep after n minutes or
+#define TIME_TO_SLEEP 5          // sleep for n minute
+#define TIME_TO_NEXT_SLEEP 6     // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
@@ -70,7 +67,7 @@
 #endif
 
 #if (USE_SERIAL_BT)
-  #include "BluetoothSerial.h"
+#include "BluetoothSerial.h"
 #endif
 
 #include "esp_log.h"
@@ -84,8 +81,12 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
-
-enum pmu_power_t { pmu_power_on, pmu_power_off, pmu_power_sleep };
+enum pmu_power_t
+{
+  pmu_power_on,
+  pmu_power_off,
+  pmu_power_sleep
+};
 
 typedef struct
 {
@@ -101,10 +102,10 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
-  uint8_t runmode;           // aliveCounter
+  uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
-  uint8_t tx_ack_req;           // request TTN to acknowlede a TX 
-  float firmware_version; 
+  uint8_t tx_ack_req;       // request TTN to acknowlede a TX
+  float firmware_version;
   uint8_t bytesReceived;
   lmic_t lmic;
   float panel_voltage = 0;
@@ -125,7 +126,6 @@ typedef struct
   uint8_t Message[PAYLOAD_BUFFER_SIZE];
 } MessageBuffer_t;
 
-
 extern SemaphoreHandle_t I2Caccess;
 
 extern TaskHandle_t irqHandlerTask;
@@ -133,7 +133,6 @@ extern TaskHandle_t moveDisplayHandlerTask;
 extern TaskHandle_t t_cyclic_HandlerTask;
 
 extern QueueHandle_t LoraSendQueue;
-
 
 #include "../src/hal/ttgobeam.h"
 #include "power.h"
@@ -170,6 +169,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_ADXL345)
 #include "adxl.h"
+#endif
+
+#if (USE_BLE)
+#include <ble.h>
 #endif
 
 #endif

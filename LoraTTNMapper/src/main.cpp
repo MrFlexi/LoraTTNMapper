@@ -3,8 +3,6 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-
-
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 #include "globals.h"
@@ -66,7 +64,6 @@ touch_pad_t touchPin;
 TaskHandle_t irqHandlerTask = NULL;
 TaskHandle_t moveDisplayHandlerTask = NULL;
 TaskHandle_t t_cyclic_HandlerTask = NULL;
-
 
 Ticker sleepTicker;
 Ticker displayTicker;
@@ -352,79 +349,84 @@ void t_send_cayenne()
 #if (USE_CAYENNE)
   Cayenne_send();
 #endif
+
+#if (USE_BLE)
+  void ble_send();
+#endif
+
+#if (USE_DASH)
+  if (WiFi.status() == WL_CONNECTED)
+    update_web_dash();
+#endif
+
 }
-
-
 
 void t_cyclicRTOS(void *pvParameters)
 {
-  
 }
 
 void t_cyclic()
 {
   String stringOne;
-    ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
-    dataBuffer.data.freeheap =  ESP.getFreeHeap();
+  ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
+  dataBuffer.data.freeheap = ESP.getFreeHeap();
 // Temperatur
 #if (USE_BME280)
-    dataBuffer.data.temperature = bme.readTemperature();
-    dataBuffer.data.humidity = bme.readHumidity();
-    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  dataBuffer.data.temperature = bme.readTemperature();
+  dataBuffer.data.humidity = bme.readHumidity();
+  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #if (HAS_PMU)
-    dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
-    dataBuffer.data.bus_current = pmu.getVbusCurrent();
+  dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
+  dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
-    dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
-    dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-    // AXP192_showstatus();
+  dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+  dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
+  dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+  // AXP192_showstatus();
 #else
-    dataBuffer.data.bat_voltage = read_voltage() / 1000;
+  dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
 #if (HAS_INA)
-    //print_ina();
-    dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
-    dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
+  //print_ina();
+  dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
+  dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
 #if (USE_ADXL345)
-    adxl_dumpValues();
+  adxl_dumpValues();
 #endif
 
 #if (HAS_LORA)
 
-    ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
-             getSfName(updr2rps(LMIC.datarate)),
-             getBwName(updr2rps(LMIC.datarate)),
-             getCrName(updr2rps(LMIC.datarate)));
+  ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
+           getSfName(updr2rps(LMIC.datarate)),
+           getBwName(updr2rps(LMIC.datarate)),
+           getCrName(updr2rps(LMIC.datarate)));
 
-    if (LoraSendQueue != 0)
-    {
-      dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
-    }
-    else
-    {
-      dataBuffer.data.LoraQueueCounter = 0;
-    }
+  if (LoraSendQueue != 0)
+  {
+    dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
+  }
+  else
+  {
+    dataBuffer.data.LoraQueueCounter = 0;
+  }
 #endif
 
-    gps.encode();
-    gps.checkGpsFix();
+  gps.encode();
+  gps.checkGpsFix();
 
 // Refresh Display
+
 #if (USE_DISPLAY)
-if ( dataBuffer.data.runmode > 0)
+  if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
 
-#if (USE_DASH)
-    if (WiFi.status() == WL_CONNECTED)
-      update_web_dash();
-#endif
+
 }
 
 void t_sleep()
@@ -486,39 +488,10 @@ void setup_wifi()
 #endif
 }
 
+void createRTOStasks()
+{
 
-
-#if (USE_BLE)
-void setup_BLE() {  
-  Serial.println("Setup BLE");
-
-  BLEDevice::init("Long name works now");
-  BLEServer *pServer = BLEDevice::createServer();
-  BLEService *pService = pServer->createService(SERVICE_UUID);
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE
-                                       );
-
-  pCharacteristic->setValue("SAP GTT");
-  pService->start();
-  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-  pAdvertising->setMinPreferred(0x12);
-  BLEDevice::startAdvertising();
-  Serial.println("SAP GTT Monitor");
-}
-#endif
-
-
-  void createRTOStasks()
-  {
-
-  xTaskCreatePinnedToCore(t_cyclicRTOS,              // task function
+  xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
                           (void *)1,             // parameter of the task
@@ -526,15 +499,14 @@ void setup_BLE() {
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core
 
-  xTaskCreatePinnedToCore(t_moveDisplayRTOS,           // task function
+  xTaskCreatePinnedToCore(t_moveDisplayRTOS,       // task function
                           "moveDisplay",           // name of task
                           4096,                    // stack size of task
                           (void *)1,               // parameter of the task
                           2,                       // priority of the task
                           &moveDisplayHandlerTask, // task handle
                           1);                      // CPU core
-
-  }
+}
 
 void setup()
 {
@@ -556,16 +528,19 @@ void setup()
   I2C_MUTEX_UNLOCK();
   delay(1000);
 
-
+  // Bluethooth Serial + BLE
 #if (USE_SERIAL_BT)
   SerialBT.begin("T-BEAM_01"); //Bluetooth device name
   Serial.println("The device started, now you can pair it with bluetooth!");
   delay(1000);
- #endif 
+#endif
 
-  //---------------------------------------------------------------
-  // Get preferences from Flash
-  //---------------------------------------------------------------
+#if (USE_BLE)
+  setup_ble();
+#endif
+
+  // Preferences
+
   //preferences.begin("config", false); // NVS Flash RW mode
   //preferences.getULong("uptime", uptime_seconds_old);
   //Serial.println("Uptime old: " + String(uptime_seconds_old));
@@ -582,7 +557,7 @@ void setup()
   AXP192_power_gps(ON);
 #endif
 
-delay(1000);
+  delay(1000);
 
 #if (HAS_INA)
   ina3221.begin();
@@ -596,7 +571,7 @@ delay(1000);
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.firmware_version = VERSION;
-  dataBuffer.data.tx_ack_req = 1;                               
+  dataBuffer.data.tx_ack_req = 1;
 
   setup_display();
   setup_sensors();
@@ -608,8 +583,7 @@ delay(1000);
   //Turn off Bluetooth
   log_display("Stop Bluethooth");
   btStop();
-#endif  
-  
+#endif
 
 #if (USE_MQTT)
   setup_mqtt();
@@ -632,10 +606,9 @@ delay(1000);
   {
     _lastOTACheck = millis();
     checkFirmwareUpdates();
-    
   }
 #endif
-delay(1000);
+  delay(1000);
 
 #if (USE_ADXL345)
   setup_adxl345();
@@ -670,12 +643,6 @@ delay(1000);
   gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
-
-
-#if (USE_BLE)
-setup_BLE();
-#endif
-
 
 #if (HAS_LORA)
   setup_lora();
@@ -724,12 +691,10 @@ setup_BLE();
                           1);              // CPU core
 #endif
 
-
-
-//#if (USE_CAYENNE)
-//  if (WiFi.status() == WL_CONNECTED)
-//    Cayenne_send();
-//#endif
+  //#if (USE_CAYENNE)
+  //  if (WiFi.status() == WL_CONNECTED)
+  //    Cayenne_send();
+  //#endif
 
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
