@@ -5,9 +5,13 @@
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 float txValue = 0;
+uint8_t i;
 const int readPin = 32; // Use GPIO number. See ESP32 board pinouts
 const int LED = 2; // Could be different depending on the dev board. I used the DOIT ESP32 dev board.
 
+
+BLECharacteristic BatteryLevelCharacteristic(BLEUUID((uint16_t)0x2A19), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+BLEDescriptor BatteryLevelDescriptor(BLEUUID((uint16_t)0x2901));
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -49,29 +53,42 @@ void setup_ble() {
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
+
+  //-------------------------------------------------------------------
+  // Service 1
+  //-------------------------------------------------------------------
   // Create the BLE Service
   BLEService *pService = pServer->createService(SERVICE_UUID);
-
-  // Create a BLE Characteristic
-  pCharacteristic = pService->createCharacteristic(
-                      CHARACTERISTIC_UUID_TX,
-                      BLECharacteristic::PROPERTY_NOTIFY
-                    );
-                      
+  
+  pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, BLECharacteristic::PROPERTY_NOTIFY);                      
   pCharacteristic->addDescriptor(new BLE2902());
+  BLECharacteristic *pCharacteristic = pService->createCharacteristic( CHARACTERISTIC_UUID_RX, BLECharacteristic::PROPERTY_WRITE);
 
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID_RX,
-                                         BLECharacteristic::PROPERTY_WRITE
-                                       );
-
-  pCharacteristic->setCallbacks(new MyCallbacks());
-
-  // Start the service
+  pCharacteristic->setCallbacks(new MyCallbacks());  
   pService->start();
+    
+  
+  //-------------------------------------------------------------------
+  // Service 2
+  //-------------------------------------------------------------------  
+  BLEService *pBattery = pServer->createService(BatteryService);
+  pBattery->addCharacteristic(&BatteryLevelCharacteristic);
+  BatteryLevelDescriptor.setValue("Percentage 0 - 100");
+  BatteryLevelCharacteristic.addDescriptor(&BatteryLevelDescriptor);
+  BatteryLevelCharacteristic.addDescriptor(new BLE2902());
 
-  // Start advertising
+  pServer->getAdvertising()->addServiceUUID(BatteryService);
+
+  pBattery->start(); 
+  
+  
+  
+  //-------------------------------------------------------------------
+  // BLE Server starten
+  //-------------------------------------------------------------------  
   pServer->getAdvertising()->start();
+
+
   Serial.println("Waiting for BLE Client...");
 }
 
@@ -85,6 +102,11 @@ if (deviceConnected) {
     
     pCharacteristic->notify(); // Send the value to the app!
     Serial.print("*** BLE Sent Value: ");  
+
+
+    i = 25;
+    BatteryLevelCharacteristic.setValue(&i, 1);
+    BatteryLevelCharacteristic.notify();
 
     
   }
