@@ -578,11 +578,11 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-#if (USE_SERIAL_BT)
+#if (USE_SERIAL_BT) 
 #else
   //Turn off Bluetooth
-  log_display("Stop Bluethooth");
-  btStop();
+  //log_display("Stop Bluethooth");
+  //btStop();
 #endif
 
 #if (USE_MQTT)
