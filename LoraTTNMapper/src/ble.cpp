@@ -13,6 +13,10 @@ const int LED = 2; // Could be different depending on the dev board. I used the 
 BLECharacteristic BatteryLevelCharacteristic(BLEUUID((uint16_t)0x2A19), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
 BLEDescriptor BatteryLevelDescriptor(BLEUUID((uint16_t)0x2901));
 
+BLECharacteristic RxCountCharacteristic(BLEUUID((uint16_t)0x2A19), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+BLEDescriptor RxCountDescriptor(BLEUUID((uint16_t)0x2901));
+
+
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
@@ -78,10 +82,21 @@ void setup_ble() {
   BatteryLevelCharacteristic.addDescriptor(new BLE2902());
 
   pServer->getAdvertising()->addServiceUUID(BatteryService);
-
   pBattery->start(); 
-  
-  
+
+//-------------------------------------------------------------------
+  // Lora Service
+  //-------------------------------------------------------------------
+
+  BLEService *pLora = pServer->createService(LORAService);
+  pLora->addCharacteristic(&RxCountCharacteristic);
+  RxCountDescriptor.setValue("Receiveded ");
+  RxCountCharacteristic.addDescriptor(&RxCountDescriptor);
+  RxCountCharacteristic.addDescriptor(new BLE2902());
+
+  pServer->getAdvertising()->addServiceUUID(LORAService);
+  pLora->start(); 
+
   
   //-------------------------------------------------------------------
   // BLE Server starten
@@ -101,13 +116,16 @@ if (deviceConnected) {
        pCharacteristic->setValue(dataBuffer.data.firmware_version);
     
     pCharacteristic->notify(); // Send the value to the app!
-    Serial.print("*** BLE Sent Value: ");  
+    Serial.print("BLE Device connected");  
 
 
-    i = 25;
+    i = dataBuffer.data.aliveCounter;
     BatteryLevelCharacteristic.setValue(&i, 1);
     BatteryLevelCharacteristic.notify();
 
+    i = dataBuffer.data.rxCounter;
+    RxCountCharacteristic.setValue(&i, 1);
+    RxCountCharacteristic.notify();
     
   }
 }

@@ -8,9 +8,9 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280 0
-#define USE_CAYENNE 0
+#define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
@@ -22,13 +22,13 @@
 #define USE_BLE 1
 #define USE_SERIAL_BT 0
 
-#define displayRefreshIntervall 1       // every x second
-#define displayMoveIntervall 5 // every x second
+#define displayRefreshIntervall 5       // every x second
+#define displayMoveIntervall 10 // every x second
 
 #define LORAenqueueMessagesIntervall 60 // every x seconds
 #define LORA_TX_INTERVAL 60
 
-#define sendCayenneIntervall 30 // every x seconds
+#define sendCayenneIntervall 20 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -102,6 +102,7 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
+   uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX

@@ -351,7 +351,7 @@ void t_send_cayenne()
 #endif
 
 #if (USE_BLE)
-  void ble_send();
+  ble_send();
 #endif
 
 #if (USE_DASH)
@@ -367,9 +367,9 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic()
 {
-  String stringOne;
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
+  dataBuffer.data.aliveCounter++;
 // Temperatur
 #if (USE_BME280)
   dataBuffer.data.temperature = bme.readTemperature();
@@ -401,10 +401,6 @@ void t_cyclic()
 
 #if (HAS_LORA)
 
-  ESP_LOGI(TAG, "Radio parameters: %s / %s / %s",
-           getSfName(updr2rps(LMIC.datarate)),
-           getBwName(updr2rps(LMIC.datarate)),
-           getCrName(updr2rps(LMIC.datarate)));
 
   if (LoraSendQueue != 0)
   {
@@ -416,7 +412,7 @@ void t_cyclic()
   }
 #endif
 
-  gps.encode();
+  //gps.encode();
   gps.checkGpsFix();
 
 // Refresh Display
@@ -571,7 +567,7 @@ void setup()
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.firmware_version = VERSION;
-  dataBuffer.data.tx_ack_req = 1;
+  dataBuffer.data.tx_ack_req = 0;
 
   setup_display();
   setup_sensors();
@@ -640,7 +636,7 @@ void setup()
   gps.init();
   //gps.softwareReset();
   gps.wakeup();
-  gps.ecoMode();
+  //gps.ecoMode();
 
   delay(2000); // Wait for GPS beeing stable
 

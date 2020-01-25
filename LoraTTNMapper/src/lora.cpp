@@ -88,7 +88,7 @@ void do_send(osjob_t *j)
       // Prepare upstream data transmission at the next possible time.
       gps.buildPacket(txBuffer);
       LMIC_setTxData2(1, txBuffer, sizeof(txBuffer), 0);
-      Serial.println(F("Packet queued"));
+      ESP_LOGI(TAG, "Send Lora ");
       digitalWrite(BUILTIN_LED, HIGH);
     }
     else
@@ -118,7 +118,7 @@ void t_LORA_send_from_queue(osjob_t *j)
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
         dump_single_message(SendBuffer);
-        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, dataBuffer.data.tx_ack_req);
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
       else
       {
@@ -264,6 +264,7 @@ void onEvent(ev_t ev)
     if (LMIC.txrxFlags & TXRX_ACK)
     {
       log_display("Received Ack");
+      dataBuffer.data.rxCounter++;
     }
     if (LMIC.dataLen)
     {
