@@ -17,7 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 0
+#define USE_ADXL345 1
 #define USE_INTERRUPTS 1
 #define USE_BLE 1
 #define USE_SERIAL_BT 0

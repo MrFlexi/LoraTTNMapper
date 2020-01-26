@@ -396,7 +396,7 @@ void t_cyclic()
 #endif
 
 #if (USE_ADXL345)
-  adxl_dumpValues();
+  //adxl_dumpValues();
 #endif
 
 #if (HAS_LORA)
@@ -614,7 +614,8 @@ void setup()
 
 #if (USE_INTERRUPTS)
 #ifdef ADXL_INT
-  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, CHANGE);
+  pinMode(ADXL_INT, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, RISING);
 #endif
 #endif
 

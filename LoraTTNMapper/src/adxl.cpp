@@ -48,13 +48,13 @@ void setup_adxl345()
   adxl.setInterruptMapping(ADXL345_INT_WATERMARK_BIT, ADXL345_INT1_PIN);
 
   //register interrupt actions - 1 == on; 0 == off
-  adxl.setInterrupt(ADXL345_INT_DATA_READY_BIT, 1);
+  adxl.setInterrupt(ADXL345_INT_DATA_READY_BIT, 0);
   adxl.setInterrupt(ADXL345_INT_SINGLE_TAP_BIT, 0);
   adxl.setInterrupt(ADXL345_INT_DOUBLE_TAP_BIT, 0);
   adxl.setInterrupt(ADXL345_INT_FREE_FALL_BIT, 0);
-  adxl.setInterrupt(ADXL345_INT_ACTIVITY_BIT, 1);
+  adxl.setInterrupt(ADXL345_INT_ACTIVITY_BIT, 0);
   adxl.setInterrupt(ADXL345_INT_INACTIVITY_BIT, 1);
-  adxl.setInterrupt(ADXL345_INT_WATERMARK_BIT, 1);
+  adxl.setInterrupt(ADXL345_INT_WATERMARK_BIT, 0);
 
   //setting lowest sampling rate
   adxl.setRate(6.25);
@@ -121,7 +121,11 @@ void adxl_event_handler()
   
   int x[32], y[32], z[32];
   byte fifoentries, intEvent;
-
+// block i2c bus access
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
   byte source = adxl.getInterruptSource();  
   print_byte(source);
 
@@ -130,6 +134,11 @@ void adxl_event_handler()
    if (adxl.triggered(source, ADXL345_INACTIVITY))
    { // if watermark interrupt occured   
     Serial.println("*** INACTIVITY ***"); 
+   }; 
+
+     if (adxl.triggered(source, ADXL345_ACTIVITY))
+   { // if watermark interrupt occured   
+    Serial.println("*** ACTIVITY ***"); 
    }; 
 
 
@@ -156,8 +165,10 @@ void adxl_event_handler()
         }
       }
     }
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
     delay(200);
 
-            
+  } 
+
  } 
 

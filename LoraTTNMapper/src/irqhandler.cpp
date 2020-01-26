@@ -34,11 +34,13 @@ void irqHandler(void *pvParameters)
 #endif
 
 #if (USE_INTERRUPTS)
+  #if (USE_ADXL345)
     if (InterruptStatus & ADXL_IRQ_BIT)
     {
       ESP_LOGI(TAG, "Interrupt %d", InterruptStatus);
-      //adxl_event_handler();
+      adxl_event_handler();
     }
+   #endif 
       
 #endif
   }
