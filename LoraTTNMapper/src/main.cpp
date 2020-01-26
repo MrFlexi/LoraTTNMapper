@@ -75,7 +75,7 @@ Ticker LORAsendMessageTicker;
 //--------------------------------------------------------------------------
 // Sensors
 //--------------------------------------------------------------------------
-#if (USE_BME)
+#if (USE_BME280)
 Adafruit_BME280 bme; // I2C   PIN 21 + 22
 #endif
 
@@ -469,6 +469,7 @@ void setup_wifi()
   if (WiFi.status() == WL_CONNECTED)
   {
     wifi_connected = true;
+    dataBuffer.data.wlan = true;
     ESP_LOGV(TAG, String(WiFi.localIP()));
     log_display(String(WiFi.localIP()));
     delay(2000);
@@ -478,6 +479,7 @@ void setup_wifi()
 
     //Turn off WiFi if no connection was made
     log_display("WIFI OFF");
+    dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
 
@@ -608,6 +610,9 @@ void setup()
 
 #if (USE_ADXL345)
   setup_adxl345();
+#endif
+
+#if (USE_INTERRUPTS)
 #ifdef ADXL_INT
   attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, CHANGE);
 #endif

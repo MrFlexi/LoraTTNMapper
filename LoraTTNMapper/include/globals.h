@@ -9,7 +9,7 @@
 
 #define USE_WIFI 1
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define USE_CAYENNE 1
 #define HAS_LORA 1
 #define USE_MQTT 0
@@ -18,7 +18,7 @@
 #define USE_GPS 1
 #define USE_DISPLAY 1
 #define USE_ADXL345 0
-#define USE_INTERRUPTS 0
+#define USE_INTERRUPTS 1
 #define USE_BLE 1
 #define USE_SERIAL_BT 0
 
@@ -61,7 +61,7 @@
 #include <Wire.h>
 #include "WiFi.h"
 
-#if (HAS_BME)
+#if (USE_BME280)
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #endif
@@ -106,6 +106,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
+  bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
   lmic_t lmic;
@@ -116,6 +117,7 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  String ip_address;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue
@@ -135,7 +137,7 @@ extern TaskHandle_t t_cyclic_HandlerTask;
 
 extern QueueHandle_t LoraSendQueue;
 
-#include "../src/hal/ttgobeam.h"
+#include "../src/hal/ttgobeam10.h"
 #include "power.h"
 #include "display.h"
 #include "gps.h"

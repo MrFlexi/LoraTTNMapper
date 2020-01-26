@@ -1,4 +1,5 @@
 #include "irqhandler.h"
+#include "globals.h"
 
 // Local logging tag
 static const char TAG[] = __FILE__;
@@ -32,9 +33,13 @@ void irqHandler(void *pvParameters)
       AXP192_event_handler();
 #endif
 
-#if (USE_ADXL345)
+#if (USE_INTERRUPTS)
     if (InterruptStatus & ADXL_IRQ_BIT)
-      adxl_event_handler();
+    {
+      ESP_LOGI(TAG, "Interrupt %d", InterruptStatus);
+      //adxl_event_handler();
+    }
+      
 #endif
   }
 }
@@ -65,7 +70,7 @@ void IRAM_ATTR PMU_IRQ()
 }
 #endif
 
-#if (USE_ADXL345)
+#if (USE_INTERRUPTS)
 void IRAM_ATTR ADXL_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;

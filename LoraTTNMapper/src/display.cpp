@@ -149,8 +149,8 @@ void showPage(int page)
       u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
 
       #if (USE_BLE)
-        u8g2.setFontMode(0);
-        u8g2.setDrawColor(1);
+        //u8g2.setFontMode(0);
+        //u8g2.setDrawColor(1);
         u8g2.drawStr(1, 64, "BLE");
       #else   
         u8g2.setFontMode(1);
@@ -163,14 +163,19 @@ void showPage(int page)
         u8g2.setDrawColor(1);
         u8g2.drawStr(30, 64, "MQTT");
       #else
-        u8g2.setFontMode(1);
-        u8g2.setDrawColor(0);             
-        u8g2.drawStr(30, 64, "MQTT");
+        //u8g2.setFontMode(1);
+        //u8g2.setDrawColor(0);             
+        //u8g2.drawStr(30, 64, "MQTT");
       #endif
 
+      if (dataBuffer.data.wlan)
+      {
+        u8g2.drawStr(60, 64, "WLAN");
+      }
 
-      u8g2.setFontMode(0);
-      u8g2.setDrawColor(0);
+
+      //u8g2.setFontMode(0);
+      //u8g2.setDrawColor(0);
       
 
       break;
@@ -219,13 +224,13 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bus: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
+      u8g2.printf("Bus+: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);

@@ -35,7 +35,7 @@ void IRAM_ATTR ButtonIRQ();
 void IRAM_ATTR PMU_IRQ();
 #endif
 
-#if (USE_ADXL345)
+#if (USE_INTERRUPTS)
 void IRAM_ATTR ADXL_IRQ();
 #endif
 
