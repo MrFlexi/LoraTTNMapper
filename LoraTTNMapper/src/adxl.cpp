@@ -12,6 +12,9 @@ void setup_adxl345()
   adxl.setInactivityThreshold(75); //62.5mg per increment
   adxl.setTimeInactivity(10);      // how many seconds of no activity is inactive?
 
+
+  adxl.setInterruptLevelBit(0);
+
   //look of activity movement on this axes - 1 == on; 0 == off
   adxl.setActivityX(1);
   adxl.setActivityY(1);

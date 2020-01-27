@@ -123,6 +123,9 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 
 void showPage(int page)
 {
+
+   String availableModules =""; 
+
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
     ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
@@ -144,46 +147,41 @@ void showPage(int page)
       sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
       u8g2.drawStr(1, 15, sbuf);
 
-      u8g2.setFont(u8g2_font_profont15_tr);     
+      u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
       u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
 
+       #if (USE_OTA)
+        availableModules +=  "OTA ";             
+      #endif
+
       #if (USE_BLE)
-        //u8g2.setFontMode(0);
-        //u8g2.setDrawColor(1);
-        u8g2.drawStr(1, 64, "BLE");
-      #else   
-        u8g2.setFontMode(1);
-        u8g2.setDrawColor(0);     
-        u8g2.drawStr(1, 64, "BLE");
+        availableModules +=  "BLE ";             
       #endif
 
       #if (USE_MQTT)
-        u8g2.setFontMode(0);
-        u8g2.setDrawColor(1);
-        u8g2.drawStr(30, 64, "MQTT");
-      #else
-        //u8g2.setFontMode(1);
-        //u8g2.setDrawColor(0);             
-        //u8g2.drawStr(30, 64, "MQTT");
+       availableModules += "MQTT ";       
+      #endif
+
+      #if (USE_CAYENNE)
+       availableModules += "CAY ";       
       #endif
 
       if (dataBuffer.data.wlan)
       {
-        u8g2.drawStr(60, 64, "WLAN");
+        availableModules += "WLAN "; 
       }
 
+      sprintf(sbuf, "%s", availableModules);
+      u8g2.drawStr(1, 64, sbuf);
 
-      //u8g2.setFontMode(0);
-      //u8g2.setDrawColor(0);
-      
 
       break;
 
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "LORA TX/RX");
-      u8g2.setFont(u8g2_font_ncenB08_tr);                 
+      u8g2.setFont(u8g2_font_profont12_tr);                 
       u8g2.setCursor(1,30);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
       u8g2.setCursor(64, 30);
@@ -199,7 +197,7 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "GPS");
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
       u8g2.setCursor(64, 30);
@@ -213,7 +211,7 @@ void showPage(int page)
     case PAGE_SOLAR:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Solar Panel");
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont11_tr);
 
 
 
@@ -242,13 +240,13 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sensors");
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       break;
 
     case PAGE_SLEEP:
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       //u8g2.setCursor(1, 30);
       //u8g2.printf("Sleeping until:%.2d", gps.tGps.satellites.value());
 
@@ -262,7 +260,7 @@ void showPage(int page)
         drawSymbol(1, 48, SUN);
       }
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 52);
       u8g2.printf("GPS: off");
       u8g2.setCursor(1, 64);
