@@ -152,24 +152,24 @@ void showPage(int page)
       u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
 
        #if (USE_OTA)
-        availableModules +=  "OTA ";             
+        availableModules = availableModules +  "OTA ";             
       #endif
 
       #if (USE_BLE)
-        availableModules +=  "BLE ";             
+        availableModules = availableModules + "BLE ";             
       #endif
 
       #if (USE_MQTT)
-       availableModules += "MQTT ";       
+       availableModules = availableModules + "MQTT ";       
       #endif
 
       #if (USE_CAYENNE)
-       availableModules += "CAY ";       
+       availableModules = availableModules + "CAY ";       
       #endif
 
       if (dataBuffer.data.wlan)
       {
-        availableModules += "WLAN "; 
+        availableModules = availableModules +"WLAN "; 
       }
 
       sprintf(sbuf, "%s", availableModules);

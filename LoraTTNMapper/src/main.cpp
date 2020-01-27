@@ -358,7 +358,6 @@ void t_send_cayenne()
   if (WiFi.status() == WL_CONNECTED)
     update_web_dash();
 #endif
-
 }
 
 void t_cyclicRTOS(void *pvParameters)
@@ -396,11 +395,12 @@ void t_cyclic()
 #endif
 
 #if (USE_ADXL345)
-  //adxl_dumpValues();
+
+  adxl_dumpValues();
+
 #endif
 
 #if (HAS_LORA)
-
 
   if (LoraSendQueue != 0)
   {
@@ -415,14 +415,12 @@ void t_cyclic()
   //gps.encode();
   gps.checkGpsFix();
 
-// Refresh Display
+  // Refresh Display
 
 #if (USE_DISPLAY)
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
-
-
 }
 
 void t_sleep()
@@ -557,6 +555,10 @@ void setup()
 
   delay(1000);
 
+#if (USE_ADXL345)
+  setup_adxl345();
+#endif
+
 #if (HAS_INA)
   ina3221.begin();
   Serial.print("Manufact. ID=0x");
@@ -576,7 +578,7 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-#if (USE_SERIAL_BT) 
+#if (USE_SERIAL_BT)
 #else
   //Turn off Bluetooth
   //log_display("Stop Bluethooth");
@@ -608,16 +610,7 @@ void setup()
 #endif
   delay(1000);
 
-#if (USE_ADXL345)
-  setup_adxl345();
-#endif
 
-#if (USE_INTERRUPTS)
-#ifdef ADXL_INT
-  pinMode(ADXL_INT, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, RISING);
-#endif
-#endif
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -700,6 +693,15 @@ void setup()
 
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
+#endif
+delay(1000);
+
+
+#if (USE_INTERRUPTS)
+#ifdef ADXL_INT
+  pinMode(ADXL_INT, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, RISING);
+#endif
 #endif
 
   log_display("Setup done");
