@@ -47,11 +47,11 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0              // Main switch
+#define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 6     // sleep after n minutes or
-#define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP 10     // sleep after n minutes or
+#define SLEEP_AFTER_N_TX_COUNT 3  // after n Lora TX events
 
 #include <lmic.h>
 #include <hal/hal.h>

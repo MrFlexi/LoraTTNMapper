@@ -15,9 +15,6 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 /* ---------------- plain format without special encoding ---------- */
 
-#if (PAYLOAD_ENCODER == 3)
-
-
 #define LPP_DIGITAL_INPUT 0  // 1 byte
 
 
@@ -108,26 +105,27 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 #if (USE_GPS)
   uint32_t lat, lon;
   int32_t alt;
-  uint8_t hdopGps;
+  int8_t hdopGps;
 
-  lat = (uint32_t)(tGps.location.lat() * 1e6 / 100);
-  lon = (uint32_t)(tGps.location.lng() * 1e6 / 100);
+  lat = (uint32_t)(tGps.location.lat() * 10000 );
+  lon = (uint32_t)(tGps.location.lng() * 10000 );
   alt = tGps.altitude.meters() * 100;
+  hdopGps =  (int8_t) tGps.hdop.value;
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_GPS;
 
-  buffer[cursor++] = (byte)((lat & 0xFF0000) >> 16);
-  buffer[cursor++] = (byte)((lat & 0x00FF00) >> 8);
-  buffer[cursor++] = (byte)((lat & 0x0000FF));
+  buffer[cursor++] = (byte) lat >> 16;
+  buffer[cursor++] = (byte) lat >> 8;
+  buffer[cursor++] = (byte) lat;
 
-  buffer[cursor++] = (byte)((lon & 0xFF0000) >> 16);
-  buffer[cursor++] = (byte)((lon & 0x00FF00) >> 8);
-  buffer[cursor++] = (byte)(lon & 0x0000FF);
+  buffer[cursor++] = (byte) lon  >> 16;
+  buffer[cursor++] = (byte) lon  >> 8;
+  buffer[cursor++] = (byte) lon;
 
-  buffer[cursor++] = (byte)((alt & 0xFF0000) >> 16);
-  buffer[cursor++] = (byte)((alt & 0x00FF00) >> 8);
-  buffer[cursor++] = (byte)(alt & 0x0000FF);
+  buffer[cursor++] = (byte) alt;
+  buffer[cursor++] = (byte) alt >> 8;
+  buffer[cursor++] = 
 #endif
 }
 

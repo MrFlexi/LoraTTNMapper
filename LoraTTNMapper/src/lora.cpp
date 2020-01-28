@@ -33,16 +33,16 @@ void t_enqueue_LORA_messages()
     // Clear the LORA send queue
     queue_aging();
 
+// ------------------------------------------------------------------
+// Enqueue all Port 1 messages --> TTN Mapper Integration
+// ------------------------------------------------------------------
+
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
       payload.reset();
       payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
-      payload.enqueue_port(1);
-
-      payload.reset();
-      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-      payload.enqueue_port(2);
+      payload.enqueue_port(1);      
     }
     else
     {
@@ -50,29 +50,36 @@ void t_enqueue_LORA_messages()
     }
 #endif
 
-#if (USE_BME280)
-    payload.reset();
-    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
-    payload.enqueue_port(2);
+// ------------------------------------------------------------------
+// Enqueue all Port 2 messages --> Cayenne Integration
+// ------------------------------------------------------------------
+
+payload.reset();
+
+#if (USE_BME280)    
+    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter    
 #endif
 
-#if (HAS_INA)
-    payload.reset();
+#if (HAS_INA)    
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
-    payload.addVoltage(12, dataBuffer.data.panel_current);
-    payload.enqueue_port(2);
+    payload.addVoltage(12, dataBuffer.data.panel_current);    
 #endif
 
-#if (HAS_PMU)
-    payload.reset();
+#if (USE_GPS)
+ payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message      
+ #endif     
+
+#if (HAS_PMU)    
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
     payload.addVoltage(21, dataBuffer.data.bus_current);
     payload.addVoltage(30, dataBuffer.data.bat_voltage);
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
-    payload.enqueue_port(2);
+    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);    
 #endif
+
+payload.enqueue_port(2);
+
   }
 }
 
