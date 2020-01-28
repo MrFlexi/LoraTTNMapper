@@ -22,10 +22,11 @@
 #define USE_BLE 1
 #define USE_SERIAL_BT 0
 
-#define displayRefreshIntervall 5       // every x second
-#define displayMoveIntervall 10 // every x second
+#define displayRefreshIntervall 5                 // every x second
+#define displayMoveIntervall 10                   // every x second
 
-#define LORAenqueueMessagesIntervall 120 // every x seconds
+#define LORAenqueueMessagesIntervall 30           // every x seconds
+#define LORAenqueueMessagesIntervall_lowPrio 120  // every x seconds
 #define LORA_TX_INTERVAL 20
 
 #define sendCayenneIntervall 20 // every x seconds

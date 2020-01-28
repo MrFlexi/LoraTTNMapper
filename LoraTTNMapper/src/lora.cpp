@@ -50,6 +50,24 @@ void t_enqueue_LORA_messages()
     }
 #endif
 
+
+  }
+}
+
+void t_enqueue_LORA_messages_lowPrio()
+{
+  String stringOne;
+
+  if (LoraSendQueue == 0)
+  {
+    ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
+  }
+  else
+  {
+
+    // Clear the LORA send queue
+    queue_aging();
+
 // ------------------------------------------------------------------
 // Enqueue all Port 2 messages --> Cayenne Integration
 // ------------------------------------------------------------------
@@ -82,6 +100,8 @@ payload.enqueue_port(2);
 
   }
 }
+
+
 
 void do_send(osjob_t *j)
 {

@@ -69,8 +69,10 @@ Ticker sleepTicker;
 Ticker displayTicker;
 Ticker displayMoveTicker;
 Ticker sendMessageTicker;
+Ticker sendMessageTicker_lowPrio;
 Ticker sendCayenneTicker;
-Ticker LORAsendMessageTicker;
+//Ticker LORAsendMessageTicker;
+
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -668,6 +670,8 @@ void setup()
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
+  sendMessageTicker
+  .attach(LORAenqueueMessagesIntervall_lowPrio, t_enqueue_LORA_messages_lowPrio);
 #endif
 
 #if (USE_CAYENNE)

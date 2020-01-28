@@ -110,7 +110,7 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
   lat = (uint32_t)(tGps.location.lat() * 10000 );
   lon = (uint32_t)(tGps.location.lng() * 10000 );
   alt = tGps.altitude.meters() * 100;
-  hdopGps =  (int8_t) tGps.hdop.value;
+  hdopGps =  (int8_t) tGps.hdop.value();
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_GPS;
@@ -125,7 +125,7 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 
   buffer[cursor++] = (byte) alt;
   buffer[cursor++] = (byte) alt >> 8;
-  buffer[cursor++] = 
+  buffer[cursor++] = hdopGps;
 #endif
 }
 
@@ -133,7 +133,6 @@ void PayloadConvert::enqueue_port(uint8_t port)
 {
   int ret;
   MessageBuffer_t SendBuffer; 
-
   
   SendBuffer.MessageSize = payload.getSize();
   SendBuffer.MessagePrio = 1;
@@ -148,7 +147,6 @@ void PayloadConvert::enqueue_port(uint8_t port)
   }
 }
 
-#endif
 
 void lora_queue_init(void)
 {
