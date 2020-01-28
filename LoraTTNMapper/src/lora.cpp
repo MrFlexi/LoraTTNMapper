@@ -30,6 +30,9 @@ void t_enqueue_LORA_messages()
   else
   {
 
+    // Clear the LORA send queue
+    queue_aging();
+
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
@@ -134,24 +137,29 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
+void queue_clean()
+{
+
+  MessageBuffer_t SendBuffer;
+}
+
 void queue_aging()
 {
   MessageBuffer_t SendBuffer;
 
   int n = uxQueueMessagesWaiting(LoraSendQueue);
-  if (n >= SEND_QUEUE_SIZE)
-  {
-    ESP_LOGI(TAG, "Queue Aging");
-    ESP_LOGI(TAG, "Messages waiting before aging: %d", n);
-    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
-    {
-      ESP_LOGI(TAG, "deleted element:");
-      dump_single_message(SendBuffer);
+      
+    //if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)       // delete one element
+    //{
+    //  ESP_LOGI(TAG, "deleted element:");
+    //  dump_single_message(SendBuffer);
+    //}
 
-    }
-    int n = uxQueueMessagesWaiting(LoraSendQueue);
-    ESP_LOGI(TAG, "Messages waiting after aging: %d", n);
-  }
+    xQueueReset(LoraSendQueue); // clear queue
+
+    int p = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Queue aging waiting bevore: %d, after: %d", n, p);
+  
 }
 
 void dump_queue()

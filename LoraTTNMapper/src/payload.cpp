@@ -136,9 +136,6 @@ void PayloadConvert::enqueue_port(uint8_t port)
   int ret;
   MessageBuffer_t SendBuffer; 
 
-  #if (HAS_LORA)
-  queue_aging(); 
-  #endif                                                             // check queue size and delete oldest entries if necessary
   
   SendBuffer.MessageSize = payload.getSize();
   SendBuffer.MessagePrio = 1;
