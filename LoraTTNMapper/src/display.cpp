@@ -187,7 +187,7 @@ void showPage(int page)
       u8g2.setCursor(64, 30);
       u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
       u8g2.setCursor(1, 45);
-      u8g2.printf("RX Len:%.2d", dataBuffer.data.lmic.dataLen);
+      u8g2.printf("RX %.3d Len:%.2d", dataBuffer.data.rxCounter, dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(1, 60);
       u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
       break;

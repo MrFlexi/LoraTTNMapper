@@ -266,7 +266,7 @@ void onEvent(ev_t ev)
       log_display("Received Ack");
       dataBuffer.data.rxCounter++;
     }
-    if (LMIC.dataLen)
+    if (LMIC.dataLen > 0)
     {
       sprintf(s, "Received %i bytes payload", LMIC.dataLen);
       log_display(s);
