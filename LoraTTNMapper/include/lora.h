@@ -24,9 +24,9 @@ void os_getDevEui(u1_t *buf);
 void os_getDevKey(u1_t *buf);
 
 static osjob_t sendjob;
-// Schedule TX every this many seconds (might become longer due to duty cycle limitations).
 
 void t_enqueue_LORA_messages();
+void t_enqueue_LORA_messages_lowPrio();
 void do_send(osjob_t *j);
 void t_LORA_send_from_queue(osjob_t *j);
 void dump_queue();

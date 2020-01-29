@@ -13,6 +13,7 @@
 #define AXP192_PRIMARY_ADDRESS (0x34)
 #define MCP_24AA02E64_PRIMARY_ADDRESS (0x50)
 #define QUECTEL_GPS_PRIMARY_ADDRESS (0x10)
+#define ADXL345 (0x53)
 
 
 int i2c_scan(void) {
@@ -57,6 +58,10 @@ int i2c_scan(void) {
 
       case MCP_24AA02E64_PRIMARY_ADDRESS:
         ESP_LOGI(TAG, "0x%X: 24AA02E64 serial EEPROM", addr);
+        break;
+
+      case ADXL345:
+        ESP_LOGI(TAG, "0x%X: ADXL345 3 Axis Accel", addr);
         break;
 
       default:

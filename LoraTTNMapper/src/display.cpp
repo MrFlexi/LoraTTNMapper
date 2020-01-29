@@ -123,6 +123,9 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 
 void showPage(int page)
 {
+
+   String availableModules =""; 
+
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
     ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
@@ -144,21 +147,44 @@ void showPage(int page)
       sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
       u8g2.drawStr(1, 15, sbuf);
 
-      u8g2.setFont(u8g2_font_profont15_tr);     
+      u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);      
+      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
+
+       #if (USE_OTA)
+        availableModules = availableModules +  "OTA ";             
+      #endif
+
+      #if (USE_BLE)
+        availableModules = availableModules + "BLE ";             
+      #endif
+
+      #if (USE_MQTT)
+       availableModules = availableModules + "MQTT ";       
+      #endif
+
+      #if (USE_CAYENNE)
+       availableModules = availableModules + "CAY ";       
+      #endif
+
+      if (dataBuffer.data.wlan)
+      {
+        availableModules = availableModules +"WLAN "; 
+      }
+      strcpy(sbuf, availableModules.c_str());      
+      u8g2.drawStr(1, 64, sbuf);
       break;
 
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "LORA TX/RX");
-      u8g2.setFont(u8g2_font_ncenB08_tr);                 
+      u8g2.setFont(u8g2_font_profont12_tr);                 
       u8g2.setCursor(1,30);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
       u8g2.setCursor(64, 30);
       u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
       u8g2.setCursor(1, 45);
-      u8g2.printf("RX Len:%.2d", dataBuffer.data.lmic.dataLen);
+      u8g2.printf("RX %.3d Len:%.2d", dataBuffer.data.rxCounter, dataBuffer.data.lmic.dataLen);
       u8g2.setCursor(1, 60);
       u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
       break;
@@ -168,7 +194,7 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "GPS");
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
       u8g2.setCursor(64, 30);
@@ -182,7 +208,9 @@ void showPage(int page)
     case PAGE_SOLAR:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Solar Panel");
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont11_tr);
+
+
 
 #if (HAS_INA)
       u8g2.setCursor(1, 30);
@@ -191,13 +219,13 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bus: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
+      u8g2.printf("Bus+: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("Bat: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -209,13 +237,13 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sensors");
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       break;
 
     case PAGE_SLEEP:
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       //u8g2.setCursor(1, 30);
       //u8g2.printf("Sleeping until:%.2d", gps.tGps.satellites.value());
 
@@ -229,7 +257,7 @@ void showPage(int page)
         drawSymbol(1, 48, SUN);
       }
 
-      u8g2.setFont(u8g2_font_profont11_mf);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 52);
       u8g2.printf("GPS: off");
       u8g2.setCursor(1, 64);
