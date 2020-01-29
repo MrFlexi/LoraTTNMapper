@@ -107,31 +107,32 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
   int32_t alt;
   int8_t hdopGps;
 
-  lat = (uint32_t)(tGps.location.lat() * 10000 );
-  lon = (uint32_t)(tGps.location.lng() * 10000 );
+  lat = (uint32_t)(tGps.location.lat() / 100 );
+  lon = (uint32_t)(tGps.location.lng() / 100 );
   alt = tGps.altitude.meters() * 100;
   hdopGps =  (int8_t) tGps.hdop.value();
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_GPS;
 
-  buffer[cursor++] = (byte) lat >> 16;
-  buffer[cursor++] = (byte) lat >> 8;
-  buffer[cursor++] = (byte) lat;
+  buffer[cursor++] = (byte)((lat & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((lat & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)((lat & 0x0000FF));
 
-  buffer[cursor++] = (byte) lon  >> 16;
-  buffer[cursor++] = (byte) lon  >> 8;
-  buffer[cursor++] = (byte) lon;
+  buffer[cursor++] = (byte)((lon & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((lon & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)(lon & 0x0000FF);
 
-  buffer[cursor++] = (byte) alt;
-  buffer[cursor++] = (byte) alt >> 8;
-  buffer[cursor++] = hdopGps;
+  buffer[cursor++] = (byte)((alt & 0xFF0000) >> 16);
+  buffer[cursor++] = (byte)((alt & 0x00FF00) >> 8);
+  buffer[cursor++] = (byte)(alt & 0x0000FF);
 #endif
 }
 
-void PayloadConvert::enqueue_port(uint8_t port)
+void PayloadConvert::enqueue_port(uint8_t port, sendprio_t prio)
 {
-  int ret;
+
+   int ret;
   MessageBuffer_t SendBuffer; 
   
   SendBuffer.MessageSize = payload.getSize();
@@ -140,11 +141,23 @@ void PayloadConvert::enqueue_port(uint8_t port)
 
   ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
+
+   if (uxQueueSpacesAvailable(LoraSendQueue) == 0) {
+      xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY);    
+      ESP_LOGW(TAG, "LORA sendqueue cleaned");
+    }
+
+switch (prio) {
+  case prio_high:  
+  ret = xQueueSendToFront(LoraSendQueue, &SendBuffer, 0);
+  if (ret != 1) { ESP_LOGI(TAG, "LORA sendqueue is full");  }
+  break;
+
+  default:
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
-  if (ret != 1)
-  {
-    ESP_LOGI(TAG, "LORA sendqueue is full");
-  }
+  if (ret != 1) { ESP_LOGI(TAG, "LORA sendqueue is full");  }
+}
+
 }
 
 

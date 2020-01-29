@@ -68,11 +68,8 @@ TaskHandle_t t_cyclic_HandlerTask = NULL;
 Ticker sleepTicker;
 Ticker displayTicker;
 Ticker displayMoveTicker;
-Ticker sendMessageTicker;
-Ticker sendMessageTicker_lowPrio;
+Ticker LORAsendMessageTicker;
 Ticker sendCayenneTicker;
-//Ticker LORAsendMessageTicker;
-
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -669,9 +666,7 @@ void setup()
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
 
 #if (HAS_LORA)
-  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
-  sendMessageTicker
-  .attach(LORAenqueueMessagesIntervall_lowPrio, t_enqueue_LORA_messages_lowPrio);
+  LORAsendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);  
 #endif
 
 #if (USE_CAYENNE)

@@ -17,17 +17,16 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 1
-#define USE_INTERRUPTS 1
+#define USE_ADXL345 0
+#define USE_INTERRUPTS 0
 #define USE_BLE 1
 #define USE_SERIAL_BT 0
 
 #define displayRefreshIntervall 5                 // every x second
 #define displayMoveIntervall 10                   // every x second
 
-#define LORAenqueueMessagesIntervall 30           // every x seconds
-#define LORAenqueueMessagesIntervall_lowPrio 120  // every x seconds
-#define LORA_TX_INTERVAL 20
+#define LORAenqueueMessagesIntervall 90           // every x seconds
+#define LORA_TX_INTERVAL 30
 
 #define sendCayenneIntervall 20 // every x seconds
 
@@ -48,9 +47,9 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
+#define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 10          // sleep for n minute
+#define TIME_TO_SLEEP 2          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 10     // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3  // after n Lora TX events
 
@@ -88,6 +87,8 @@ enum pmu_power_t
   pmu_power_off,
   pmu_power_sleep
 };
+
+enum sendprio_t { prio_low, prio_normal, prio_high };
 
 typedef struct
 {
