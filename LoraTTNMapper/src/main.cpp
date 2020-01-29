@@ -550,9 +550,8 @@ void setup()
   AXP192_init();
   AXP192_showstatus();
   AXP192_power_gps(ON);
-#endif
-
   delay(1000);
+#endif  
 
 #if (USE_ADXL345)
   setup_adxl345();
@@ -690,10 +689,12 @@ void setup()
   //    Cayenne_send();
   //#endif
 
+delay(1000);
+
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
 #endif
-delay(1000);
+
 
 
 #if (USE_INTERRUPTS)

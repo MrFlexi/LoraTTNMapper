@@ -70,14 +70,17 @@ void t_enqueue_LORA_messages()
 #endif
 
 #if (HAS_PMU)
-    payload.addVoltage(20, dataBuffer.data.bus_voltage);
-    payload.addVoltage(21, dataBuffer.data.bus_current);
-    payload.addVoltage(30, dataBuffer.data.bat_voltage);
-    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+    if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bus_current != 0 )  || ( dataBuffer.data.bat_voltage != 0 ) || ( dataBuffer.data.bat_charge_current != 0 ) || ( dataBuffer.data.bat_discharge_current != 0 ) )
+      {
+        payload.addVoltage(20, dataBuffer.data.bus_voltage);
+        payload.addVoltage(21, dataBuffer.data.bus_current);
+        payload.addVoltage(30, dataBuffer.data.bat_voltage);
+        payload.addVoltage(31, dataBuffer.data.bat_charge_current);
+        payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
+      }
 #endif
 
+    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     payload.enqueue_port(2, prio_low);
   }
 }
