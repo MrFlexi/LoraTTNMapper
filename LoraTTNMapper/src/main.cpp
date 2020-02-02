@@ -739,5 +739,16 @@ void loop()
 #if (HAS_BUTTON)
   readButton();
 #endif
-  delay(1);
+
+#if(USE_GYRO)
+if (mpuInterrupt)
+    {
+        gyro_handle_interrupt();
+    }
+
+    ledcWrite(ledChannel, brightness);
+    if (brightness > 0 ) brightness--;
+    delay(10);
+#endif
+
 }

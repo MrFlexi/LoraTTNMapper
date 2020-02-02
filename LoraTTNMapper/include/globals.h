@@ -8,7 +8,7 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280 1
 #define USE_CAYENNE 1
 #define HAS_LORA 1
@@ -17,16 +17,20 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 1
-#define USE_INTERRUPTS 1
-#define USE_BLE 1
+#define USE_ADXL345 0
+#define USE_INTERRUPTS 0
+#define USE_BLE 0
 #define USE_SERIAL_BT 0
+
+#define USE_GYRO  1
+#define USE_WAKEUP_MOTION 1
+#define INTERRUPT_PIN GPIO_NUM_4 // use pin 2 on Arduino Uno & most boards
 
 #define displayRefreshIntervall 5       // every x second
 #define displayMoveIntervall 10 // every x second
 
-#define LORAenqueueMessagesIntervall 120 // every x seconds
-#define LORA_TX_INTERVAL 20
+#define LORAenqueueMessagesIntervall 90 // every x seconds
+#define LORA_TX_INTERVAL 60
 
 #define sendCayenneIntervall 20 // every x seconds
 
@@ -170,8 +174,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "SecureOTA.h"
 #endif
 
-#if (USE_ADXL345)
-#include "adxl.h"
+#if (USE_GYRO)
+#include "gyro.h"
 #endif
 
 #if (USE_BLE)

@@ -5971,14 +5971,6 @@ GPIO32 Servo 2 Signal</text>
 <wire x1="147.32" y1="30.48" x2="147.32" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="INT"/>
-<pinref part="U$1" gate="G$1" pin="GPIO00"/>
-<wire x1="104.14" y1="88.9" x2="58.42" y2="88.9" width="0.1524" layer="91"/>
-<wire x1="58.42" y1="88.9" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="VDD_SWITCHABLE" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="DCDC1"/>
@@ -5990,6 +5982,14 @@ GPIO32 Servo 2 Signal</text>
 <pinref part="BME280" gate="A" pin="4"/>
 <wire x1="167.64" y1="91.44" x2="182.88" y2="91.44" width="0.1524" layer="91"/>
 <label x="187.96" y="91.44" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="INT"/>
+<pinref part="U$1" gate="G$1" pin="GPIO04"/>
+<wire x1="104.14" y1="88.9" x2="55.88" y2="88.9" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="88.9" x2="55.88" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
