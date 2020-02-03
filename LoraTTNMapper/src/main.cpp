@@ -366,6 +366,10 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic()
 {
+  if (dataBuffer.data.MotionCounter >= displayRefreshIntervall)
+  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - displayRefreshIntervall;
+  
+  
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
@@ -431,8 +435,7 @@ void t_sleep()
 
 #if (ESP_SLEEP)
   dataBuffer.data.sleepCounter--;
-  dataBuffer.data.MotionCounter--;
-
+  
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
@@ -555,7 +558,6 @@ void setup()
   AXP192_power_gps(ON);
 #endif
 
-  delay(1000);
 
 #if (USE_GYRO)
    setup_gyro();
@@ -629,7 +631,7 @@ void setup()
 #if (WAKEUP_MOTION)
 #if (USE_GYRO)
 #ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 1); //1 = High, 0 = Low
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
 #endif
 #endif
 #endif

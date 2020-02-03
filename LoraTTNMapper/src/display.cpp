@@ -149,7 +149,7 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
+      u8g2.printf("Sleep:%.2d %2d", dataBuffer.data.sleepCounter, dataBuffer.data.MotionCounter);     
 
        #if (USE_OTA)
         availableModules = availableModules +  "OTA ";             
@@ -251,17 +251,17 @@ void showPage(int page)
 
       if (dataBuffer.data.sleepCounter <= 0)
       {       
-         u8g2.drawStr(1, 30, "Reason: Counter"); 
+         u8g2.drawStr(1, 55, "Reason: Counter"); 
       }
 
       if (dataBuffer.data.MotionCounter <= 0 )
       {
-       u8g2.drawStr(1, 30, "Reason: Inactivity"); 
+       u8g2.drawStr(1, 55, "Reason: Inactivity"); 
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-       u8g2.drawStr(1, 30, "Reason: TX "); 
+       u8g2.drawStr(1, 55, "Reason: TX "); 
       }
 
       drawSymbol(1, 48, SUN);
@@ -271,6 +271,9 @@ void showPage(int page)
       break;
     }
 
+
+    u8g2.setCursor(100, 64);
+    u8g2.printf("%2d", dataBuffer.data.MotionCounter);
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }

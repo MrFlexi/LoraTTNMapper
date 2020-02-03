@@ -50,6 +50,42 @@ void IRAM_ATTR dmpDataReady()
     mpuInterrupt = true;
 }
 
+void gyro_dump_interrupt_source(uint8_t mpuIntStatus)
+{
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DATA_RDY_BIT))
+    {
+        Serial.println("DATA_RDY_BIT");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT))
+    {
+        Serial.println("DMP_INT_BIT");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_PLL_RDY_INT_BIT))
+    {
+        Serial.println("PLL_RDY_INT_BIT");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_I2C_MST_INT_BIT))
+    {
+        Serial.println("I2C_MST_INT_BIT ");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT))
+    {
+        Serial.println("FIFO_OFLOW_BIT ");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_ZMOT_BIT))
+    {
+        Serial.println("ZMOT_BIT");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
+    {
+        Serial.println("MOT_BIT");
+    }
+    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_FF_BIT))
+    {
+        Serial.println("FF_BIT ");
+    }
+}
+
 void checkSettings()
 {
     Serial.println();
@@ -94,8 +130,11 @@ void setup_gyro()
 
     Wire.begin();
     Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-    Serial.begin(115200);
 
+if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
     // initialize device
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
@@ -119,8 +158,8 @@ void setup_gyro()
     mpu.setIntFreefallEnabled(false);
 
     mpu.setIntMotionEnabled(true);
-    mpu.setMotionDetectionDuration(40);
-    mpu.setMotionDetectionThreshold(2);
+    mpu.setMotionDetectionDuration(50);
+    mpu.setMotionDetectionThreshold(3);
 
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu.setXGyroOffset(51);
@@ -140,7 +179,7 @@ void setup_gyro()
     Serial.println(F("Enabling DMP..."));
     mpu.setDMPEnabled(true);
 
-    mpu.setAccelerometerPowerOnDelay(3);
+    mpu.setAccelerometerPowerOnDelay(10);
     mpu.setDHPFMode(1);
 
     dmpReady = true;
@@ -148,60 +187,21 @@ void setup_gyro()
     // get expected DMP packet size for later comparison
     packetSize = mpu.dmpGetFIFOPacketSize();
 
-    // configure LED for output
-    
-  ledcSetup(ledChannel, freq, resolution);
-  
-  // attach the channel to the GPIO to be controlled
-  ledcAttachPin(LED_PIN, ledChannel);
-
-
     checkSettings();
 
 
     mpuIntStatus = mpu.getIntStatus();
     // set our DMP Ready flag so the main loop() function knows it's okay to use it
     Serial.print(F("DMP ready! Waiting for first interrupt..."));
-    Serial.println(mpuIntStatus);
+    gyro_dump_interrupt_source(mpuIntStatus);
+    pinMode(GYRO_INT_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), dmpDataReady, RISING);
-    delay(100);
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
+  }
+   
 }
 
-void gyro_dump_interrupt_source(uint8_t mpuIntStatus)
-{
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DATA_RDY_BIT))
-    {
-        Serial.println("DATA_RDY_BIT");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT))
-    {
-        Serial.println("DMP_INT_BIT");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_PLL_RDY_INT_BIT))
-    {
-        Serial.println("PLL_RDY_INT_BIT");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_I2C_MST_INT_BIT))
-    {
-        Serial.println("I2C_MST_INT_BIT ");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT))
-    {
-        Serial.println("FIFO_OFLOW_BIT ");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_ZMOT_BIT))
-    {
-        Serial.println("ZMOT_BIT");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
-    {
-        Serial.println("MOT_BIT");
-    }
-    if (mpuIntStatus & _BV(MPU6050_INTERRUPT_FF_BIT))
-    {
-        Serial.println("FF_BIT ");
-    }
-}
+
 
 void gyro_show_acc()
 {
@@ -313,12 +313,20 @@ void gyro_show_acc()
 void gyro_handle_interrupt( void)
 {
   mpuInterrupt = false;
+  // block i2c bus access
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
         mpuIntStatus = mpu.getIntStatus();
-        mpu.setIntMotionEnabled(false);
+        //mpu.setIntMotionEnabled(false);
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
+ 
         Serial.println(mpuIntStatus);
-        dataBuffer.data.MotionCounter = 255;
+        dataBuffer.data.MotionCounter = 60;
 
         gyro_dump_interrupt_source(mpuIntStatus);
         //show();
-        mpu.setIntMotionEnabled(true);
+        //mpu.setIntMotionEnabled(true);
+     }
 }
