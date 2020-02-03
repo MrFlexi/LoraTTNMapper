@@ -246,23 +246,26 @@ void showPage(int page)
       break;
 
     case PAGE_SLEEP:
-      u8g2.setFont(u8g2_font_profont12_tr);
-      //u8g2.setCursor(1, 30);
-      //u8g2.printf("Sleeping until:%.2d", gps.tGps.satellites.value());
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Sleep");
 
       if (dataBuffer.data.sleepCounter <= 0)
+      {       
+         u8g2.drawStr(1, 30, "Reason: Counter"); 
+      }
+
+      if (dataBuffer.data.MotionCounter <= 0 )
       {
-        drawSymbol(48, 50, RAIN);
+       u8g2.drawStr(1, 30, "Reason: Inactivity"); 
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-        drawSymbol(1, 48, SUN);
+       u8g2.drawStr(1, 30, "Reason: TX "); 
       }
 
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 52);
-      u8g2.printf("GPS: off");
+      drawSymbol(1, 48, SUN);
+      
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
       break;

@@ -17,7 +17,7 @@
 #define HAS_BUTTON              GPIO_NUM_38     // middle on board button
 #define HAS_PMU                 1               // AXP192 power management chip
 #define PMU_INT                 GPIO_NUM_35     // AXP192 interrupt
-#define ADXL_INT                GPIO_NUM_0      // ADXL Movement
+#define GYRO_INT_PIN            GPIO_NUM_4      // Gyroskop Movement Detection
 
 #define HAS_LED NOT_A_PIN
 

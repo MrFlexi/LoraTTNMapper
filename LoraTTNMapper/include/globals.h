@@ -17,14 +17,12 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 0
 #define USE_INTERRUPTS 0
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
 
 #define USE_GYRO  1
-#define USE_WAKEUP_MOTION 1
-#define INTERRUPT_PIN GPIO_NUM_4 // use pin 2 on Arduino Uno & most boards
+#define WAKEUP_MOTION 1
 
 #define displayRefreshIntervall 5       // every x second
 #define displayMoveIntervall 10 // every x second
@@ -51,10 +49,11 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0              // Main switch
+#define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 6     // sleep after n minutes or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  2 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
@@ -105,6 +104,7 @@ typedef struct
   uint8_t aliveCounter;     // aliveCounter
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
+  uint8_t MotionCounter;     // aliveCounter
   uint8_t txCounter;        // aliveCounter
    uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter

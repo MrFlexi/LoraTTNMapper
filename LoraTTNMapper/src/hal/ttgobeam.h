@@ -22,6 +22,8 @@
 #define BAT_MEASURE_ADC ADC1_GPIO35_CHANNEL // battery probe GPIO pin -> ADC1_CHANNEL_7
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
 
+#define GYRO_INT_PIN              GPIO_NUM_4      // ADXL Movement
+
 // GPS settings
 #define HAS_GPS 1 // use on board GPS
 #define GPS_TX          12

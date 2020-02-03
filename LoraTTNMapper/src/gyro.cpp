@@ -1,7 +1,12 @@
 #include "globals.h"
 #include "gyro.h"
 
+#include "I2Cdev.h"
+#include "MPU6050_6Axis_MotionApps_V6_12.h"
+
 MPU6050 mpu;
+
+volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
 
 #define OUTPUT_READABLE_YAWPITCHROLL
 #define OUTPUT_READABLE_WORLDACCEL
@@ -94,9 +99,8 @@ void setup_gyro()
     // initialize device
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
-    pinMode(INTERRUPT_PIN, INPUT);
-    pinMode(LED_PIN, OUTPUT);
-    digitalWrite(LED_PIN, HIGH);
+    pinMode(GYRO_INT_PIN, INPUT);
+ 
 
     // verify connection
     Serial.println(F("Testing device connections..."));
@@ -154,17 +158,13 @@ void setup_gyro()
 
     checkSettings();
 
-    // enable Arduino interrupt detection
-    Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
-    Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
-    Serial.println(F(")..."));
 
     mpuIntStatus = mpu.getIntStatus();
     // set our DMP Ready flag so the main loop() function knows it's okay to use it
     Serial.print(F("DMP ready! Waiting for first interrupt..."));
     Serial.println(mpuIntStatus);
-    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-    delay(2000);
+    attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), dmpDataReady, RISING);
+    delay(100);
 }
 
 void gyro_dump_interrupt_source(uint8_t mpuIntStatus)
@@ -316,7 +316,7 @@ void gyro_handle_interrupt( void)
         mpuIntStatus = mpu.getIntStatus();
         mpu.setIntMotionEnabled(false);
         Serial.println(mpuIntStatus);
-        brightness = 255;
+        dataBuffer.data.MotionCounter = 255;
 
         gyro_dump_interrupt_source(mpuIntStatus);
         //show();

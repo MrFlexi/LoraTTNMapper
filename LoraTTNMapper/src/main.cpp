@@ -431,7 +431,9 @@ void t_sleep()
 
 #if (ESP_SLEEP)
   dataBuffer.data.sleepCounter--;
-  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
+  dataBuffer.data.MotionCounter--;
+
+  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
 #if (HAS_PMU)
@@ -555,8 +557,8 @@ void setup()
 
   delay(1000);
 
-#if (USE_ADXL345)
-  setup_adxl345();
+#if (USE_GYRO)
+   setup_gyro();
 #endif
 
 #if (HAS_INA)
@@ -570,6 +572,8 @@ void setup()
 
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
+  dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
@@ -610,8 +614,6 @@ void setup()
 #endif
   delay(1000);
 
-
-
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
@@ -624,9 +626,11 @@ void setup()
 //esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
-#if (USE_ADXL345)
-#ifdef ADXL_INT
-  //esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
+#if (WAKEUP_MOTION)
+#if (USE_GYRO)
+#ifdef GYRO_INT_PIN
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 1); //1 = High, 0 = Low
+#endif
 #endif
 #endif
 
@@ -694,8 +698,7 @@ void setup()
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
 #endif
-delay(1000);
-
+  delay(1000);
 
 #if (USE_INTERRUPTS)
 #ifdef ADXL_INT
@@ -740,15 +743,10 @@ void loop()
   readButton();
 #endif
 
-#if(USE_GYRO)
-if (mpuInterrupt)
-    {
-        gyro_handle_interrupt();
-    }
-
-    ledcWrite(ledChannel, brightness);
-    if (brightness > 0 ) brightness--;
-    delay(10);
+#if (USE_GYRO)
+  if (mpuInterrupt)
+  {
+    gyro_handle_interrupt();
+  }  
 #endif
-
 }
