@@ -23,19 +23,19 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   //for (int i = 0; i < message_buffer.error_msg_count; i++)
   //{
    JsonObject msg = feeds.createNestedObject();
-    msg["Key"] = "CPU Temp"
-    msg["Description"] = "400m Schwimmen in 4 Minuten";
-    msg["Value"] = "22.8";    
+    msg["title"] = "CPU Temp";
+    msg["description"] = "400m Schwimmen in 4 Minuten";
+    msg["value"] = "22.8";    
     feeds.add(msg);    
 
-    msg["Key"] = "TX Counter";    
-    msg["Value"] = "15";    
+    msg["title"] = "TX Counter";    
+    msg["description"] = "15";    
     feeds.add(msg);    
 
   //}  
 
   serializeJson(ws_json, JsonStr);
-  serializeJsonPretty(ws_json, Serial);
+  //serializeJsonPretty(ws_json, Serial);
   return JsonStr;
 }
 
@@ -50,7 +50,7 @@ void t_broadcast_message(void *parameter)
   {    
         JsonStr = message_buffer_to_jsonstr(dataBuffer);
         ws.textAll(JsonStr);        
-    vTaskDelay(1000);
+    vTaskDelay(3000);
   }
 }
 

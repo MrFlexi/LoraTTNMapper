@@ -80,11 +80,7 @@
 								</TileContent>
 							</GenericTile>
 
-							<GenericTile id = "Tile_LED" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Make some Light" subheader="Toggel LED!" press="onButtonLedPressed">
-								<TileContent footer="off">
-									<ImageContent src="sap-icon://lightbulb"/>
-								</TileContent>
-							</GenericTile>
+	
 
 
 						</ScrollContainer>
@@ -94,7 +90,7 @@
 								<l:content>
 									<List headerText="Serial Monitor" items="{path: 'Terminal>/text_table'}">
 
-										<NotificationListItem priority="{Terminal>Priority}" datetime="{Terminal>Date}" title="{Terminal>Key}" description="{Terminal>Value}">
+										<NotificationListItem priority="{Terminal>priority}" datetime="{Terminal>date}" title="{Terminal>title}" description="{Terminal>description}">
 										</NotificationListItem>
 									</List>
 								</l:content>
@@ -102,32 +98,12 @@
 							</l:VerticalLayout>
 						</ScrollContainer>
 
-
-						<ScrollContainer id="RSSI" horizontal="false" vertical="true" height="100%">
-
-						</ScrollContainer>
-
-						<ScrollContainer id="TTN" horizontal="false" vertical="true" height="100%">
-
-						</ScrollContainer>
-
-						<ScrollContainer id="Memory" horizontal="false" vertical="true" height="100%">
-							<content>
-
-							</content>
-						</ScrollContainer>
-
 						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
 							<Text text="This is the root page of the second element"/>
 						</ScrollContainer>
 					</pages>
 				</NavContainer>
-
 			</l:VerticalLayout>
-
-
-
-
 		</tnt:mainContents>
 	</tnt:ToolPage>
 </core:View>
