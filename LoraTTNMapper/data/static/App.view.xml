@@ -62,9 +62,9 @@
 				<NavContainer id="pageContainer">
 					<pages>
 						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="ESP Alive Ticker" subheader="" press="press">
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Lora TX Counter" subheader="" press="press">
 								<TileContent unit="Pings" footer="last 24h">
-									<NumericContent scale="M" value="{Terminal>/roundtrips}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{Terminal>/TXCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -84,27 +84,22 @@
 								<TileContent footer="off">
 									<ImageContent src="sap-icon://lightbulb"/>
 								</TileContent>
-						</GenericTile>
+							</GenericTile>
 
 
 						</ScrollContainer>
-						
+
 						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
-							<l:VerticalLayout	class="sapUiContentPadding" width="100%">
+							<l:VerticalLayout class="sapUiContentPadding" width="100%">
 								<l:content>
-									<List headerText="Serial Monitor"	items="{path: 'Terminal>/text_table'}" >
-										
-										<NotificationListItem
-											priority="{Terminal>Priority}"
-											datetime="{Terminal>Date}"
-											title="{Terminal>Title}"
-											description="{Terminal>Description}"
-											>
+									<List headerText="Serial Monitor" items="{path: 'Terminal>/text_table'}">
+
+										<NotificationListItem priority="{Terminal>Priority}" datetime="{Terminal>Date}" title="{Terminal>Key}" description="{Terminal>Value}">
 										</NotificationListItem>
 									</List>
 								</l:content>
-	
-			</l:VerticalLayout>
+
+							</l:VerticalLayout>
 						</ScrollContainer>
 
 
@@ -122,7 +117,6 @@
 							</content>
 						</ScrollContainer>
 
-
 						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
 							<Text text="This is the root page of the second element"/>
 						</ScrollContainer>
@@ -131,8 +125,8 @@
 
 			</l:VerticalLayout>
 
-		
-			
+
+
 
 		</tnt:mainContents>
 	</tnt:ToolPage>

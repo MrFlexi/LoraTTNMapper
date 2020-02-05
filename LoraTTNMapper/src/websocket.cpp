@@ -3,35 +3,39 @@
 
 AsyncWebSocket ws("/ws");
 
-String message_buffer_to_jsonstr(deviceStatus_t message_buffer)
+String message_buffer_to_jsonstr(DataBuffer message_buffer)
 {
+ StaticJsonDocument<500> ws_json;
+  
   String JsonStr;
-  doc.clear();
+  ws_json.clear();
 
-  doc[""] = String( message_buffer.roundtrips);
-  doc["sensor"] = "gps";
-  doc["time"] = "10:05";
-  doc["text"] = "Hallo Welt";
-  doc["text_time"] = "SA 8:22:01";
-
-  doc["temperatur"] = String( message_buffer.temperatur);
+  ws_json["MotionCounter"] = String( dataBuffer.data.MotionCounter );
+  ws_json["TXCounter"] = "15";
+  ws_json["Temperatur"] = "22.5";
+  ws_json["text"] = "Hallo Welt";
+  ws_json["text_time"] = "SA 8:22:01";
 
   // Add the "feeds" array
-  JsonArray feeds = doc.createNestedArray("text_table");
+  JsonArray feeds = ws_json.createNestedArray("text_table");
   
 
   //for (int i = 0; i < message_buffer.error_msg_count; i++)
   //{
-  // JsonObject msg = feeds.createNestedObject();
-  //  msg["Title"] = error_tab[i].title;
-  //  //msg["Description"] = "400m Schwimmen in 4 Minuten";
-  //  //msg["Date"] = "13.10.1972";
-  //  msg["Priority"] = error_tab[i].priority;
-  //  feeds.add(msg);    
+   JsonObject msg = feeds.createNestedObject();
+    msg["Key"] = "CPU Temp"
+    msg["Description"] = "400m Schwimmen in 4 Minuten";
+    msg["Value"] = "22.8";    
+    feeds.add(msg);    
+
+    msg["Key"] = "TX Counter";    
+    msg["Value"] = "15";    
+    feeds.add(msg);    
+
   //}  
 
-  serializeJson(doc, JsonStr);
-  serializeJsonPretty(doc, Serial);
+  serializeJson(ws_json, JsonStr);
+  serializeJsonPretty(ws_json, Serial);
   return JsonStr;
 }
 
@@ -39,62 +43,14 @@ void t_broadcast_message(void *parameter)
 {
   // Task bound to core 0, Prio 0 =  very low
 
-  error_message_t error_message;
-
   String JsonStr;
   bool sendMessage = false;
 
   for (;;)
-  {
-    
-    // Check if values have been changed
-    if ( gs_message_buffer.temperatur != gs_message_buffer_old.temperatur or
-        gs_message_buffer.roundtrips != gs_message_buffer_old.roundtrips )
-    {
-     gs_message_buffer_old =  gs_message_buffer;
-     sendMessage = true;
-    }
-    
-    // Check if there is a new queue entry to display in terminal
-    if (queue != NULL)
-    {
-
-      int messagesWaiting = uxQueueMessagesWaiting(queue);
-    
-
-      gs_message_buffer.error_msg_count = messagesWaiting;
-
-      if (messagesWaiting > 0)
-      {
-        
-        Serial.print("Messages waiting: ");
-        Serial.println(messagesWaiting);
-        sendMessage = true;
-
-        for (int i = 0; i < messagesWaiting; i++)
-        {
-
-          xQueueReceive(queue, &error_message, portMAX_DELAY);
-          Serial.print(error_message.priority);
-          Serial.print("|");
-          Serial.println(error_message.title);
-
-          // Put into array
-          error_tab[i].priority = error_message.priority;
-          error_tab[i].title = error_message.title;
-        }
-      }
-
-      // Send message via Websocket to connected clients
-      if (sendMessage)
-      {
-        //JsonStr = message_buffer_to_jsonstr(gs_message_buffer, error_tab);
-        ws.textAll(JsonStr);
-        sendMessage = false;
-      }
-    }
-
-    delay(100);
+  {    
+        JsonStr = message_buffer_to_jsonstr(dataBuffer);
+        ws.textAll(JsonStr);        
+    vTaskDelay(1000);
   }
 }
 

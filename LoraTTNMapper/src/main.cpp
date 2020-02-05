@@ -62,6 +62,7 @@ touch_pad_t touchPin;
 //--------------------------------------------------------------------------
 
 TaskHandle_t irqHandlerTask = NULL;
+TaskHandle_t task_broadcast_message = NULL;
 TaskHandle_t moveDisplayHandlerTask = NULL;
 TaskHandle_t t_cyclic_HandlerTask = NULL;
 
@@ -558,11 +559,6 @@ void setup()
   AXP192_power_gps(ON);
 #endif
 
-
-#if (USE_GYRO)
-   setup_gyro();
-#endif
-
 #if (HAS_INA)
   ina3221.begin();
   Serial.print("Manufact. ID=0x");
@@ -692,6 +688,41 @@ void setup()
                           1);              // CPU core
 #endif
 
+
+#if (USE_WEBSOCKET)
+  xTaskCreate(
+      t_broadcast_message,      /* Task function. */
+      "Broadcast Message",      /* String with name of task. */
+      10000,                    /* Stack size in bytes. */
+      NULL,                     /* Parameter passed as input of the task */
+      10,                       /* Priority of the task. */
+      &task_broadcast_message); /* Task handle. */
+
+  
+  ESP_LOGI(TAG, "Mounting SPIFF Filesystem"); 
+  // External File System Initialisation
+  if (!SPIFFS.begin())
+  {
+    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");     
+    return;
+  }
+#endif    
+
+#if (USE_WEBSERVER)
+  server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("Index requested");
+    request->send(SPIFFS, "/index.html", "text/html");
+  });
+  server.begin();
+  server.serveStatic("/", SPIFFS, "/");
+#endif
+
+#if (USE_WEBSOCKET)
+  // Websocket
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
+#endif 
+
   //#if (USE_CAYENNE)
   //  if (WiFi.status() == WL_CONNECTED)
   //    Cayenne_send();
@@ -702,11 +733,9 @@ void setup()
 #endif
   delay(1000);
 
-#if (USE_INTERRUPTS)
-#ifdef ADXL_INT
-  pinMode(ADXL_INT, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, RISING);
-#endif
+
+#if (USE_GYRO)
+   setup_gyro();
 #endif
 
   log_display("Setup done");
