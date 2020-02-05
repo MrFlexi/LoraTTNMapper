@@ -11,16 +11,11 @@ sap.ui.define([
 ], function (jQuery, Fragment, MessageToast, Formatter, Controller, JSONModel, Popover, Button) {
 	"use strict";
 
-	var oModelLokList           = new sap.ui.model.json.JSONModel();
-	var oModelUserList          = new sap.ui.model.json.JSONModel();
-	var oModelMainController    = new sap.ui.model.json.JSONModel();
-	var oModelUser              = new sap.ui.model.json.JSONModel();
-	var oModelTerminal           = new sap.ui.model.json.JSONModel();
+	
+	var oModeldataBuffer           = new sap.ui.model.json.JSONModel();
 
 	var ws = new WebSocket("ws://192.168.43.34/ws");
-
-
-	
+		
 	var CController = Controller.extend("view.App", {
 
 		//ws:WebSocket("ws://192.168.43.34/ws"),		
@@ -36,21 +31,9 @@ sap.ui.define([
 			// Dynamisches Menü						
 			var MenuModel = new JSONModel("./static/menu.json");
 			oView.setModel(MenuModel);
-			
-			
-			this.getView().setModel(oModelLokList, "LokListModel");
-			this.getView().setModel(oModelUserList, "oModelUserList");
-			this.getView().setModel(oModelMainController, "oModelMainController");
-
-
-			var oData = {
-				recipient : {
-				   name : "World"
-				}
-			 };
-			var oModel2 = new JSONModel(oData);
-			this.getView().setModel(oModel2,"Test");	
-			 
+								
+			this.getView().setModel(oModeldataBuffer , "dataBuffer");
+								 
 			ws.onopen = function() {                  
 				// Web Socket is connected, send data using send()			
 			   //	 alert("WS open im controller");
@@ -59,10 +42,9 @@ sap.ui.define([
 				
 			ws.onmessage = function (evt)  { 
 				//alert("WS open2 im controller" + evt.data);				
-				var terminal_model = jQuery.parseJSON(evt.data)
-				oModelTerminal.setData(terminal_model);	
-				oView.setModel(oModelTerminal,"Terminal");
-						
+				var dataBuffer_model = jQuery.parseJSON(evt.data)
+				oModeldataBuffer.setData(dataBuffer_model);	
+				oView.setModel(oModeldataBuffer , "dataBuffer");						
 			 }; 
 	
 			 
@@ -77,8 +59,7 @@ sap.ui.define([
 
 		onButtonLedPressed: function (oEvent) {
 			alert("LED toggled");
-			ws.send("Hallo from Client");
-			
+			ws.send("Hallo from Client");			
 		},
 
 		onSliderliveChange: function(oEvent) {
@@ -90,9 +71,7 @@ sap.ui.define([
 			var viewId = this.getView().getId();
 			var toolPage = sap.ui.getCore().byId(viewId + "--toolPage");
 			var sideExpanded = toolPage.getSideExpanded();
-
 			this._setToggleButtonTooltip(sideExpanded);
-
 			toolPage.setSideExpanded(!toolPage.getSideExpanded());
 		},
 

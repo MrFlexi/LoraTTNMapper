@@ -23,14 +23,18 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   //for (int i = 0; i < message_buffer.error_msg_count; i++)
   //{
    JsonObject msg = feeds.createNestedObject();
-    msg["Key"] = "CPU Temp"
-    msg["Description"] = "400m Schwimmen in 4 Minuten";
-    msg["Value"] = "22.8";    
+    msg["title"] = "CPU Temp"
+    msg["description"] = "22.8 Grad Celsius";    
+    msg["date"] = "10 Sec";
+    msg["priority"] = "High";     
     feeds.add(msg);    
 
-    msg["Key"] = "TX Counter";    
-    msg["Value"] = "15";    
-    feeds.add(msg);    
+    msg["title"] = "CPU Temp";
+    msg["description"] = "10.8 Grad Celsius";    
+    msg["date"] = "3 days";
+    msg["priority"] = "low";     
+    feeds.add(msg);  
+
 
   //}  
 

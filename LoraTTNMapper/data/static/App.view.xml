@@ -64,25 +64,14 @@
 						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Lora TX Counter" subheader="" press="press">
 								<TileContent unit="Pings" footer="last 24h">
-									<NumericContent scale="M" value="{Terminal>/TXCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/TXCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="{Test>/recipient/name}" subheader="Hallo" press="press">
-								<TileContent footer="">
-									<ImageContent src="sap-icon://home-share" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU Temp" subheader="" press="press">
-								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{Terminal>/temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
+							
 
 							<GenericTile id = "Tile_LED" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Make some Light" subheader="Toggel LED!" press="onButtonLedPressed">
 								<TileContent footer="off">
-									<ImageContent src="sap-icon://lightbulb"/>
+									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -92,9 +81,9 @@
 						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
 							<l:VerticalLayout class="sapUiContentPadding" width="100%">
 								<l:content>
-									<List headerText="Serial Monitor" items="{path: 'Terminal>/text_table'}">
+									<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
 
-										<NotificationListItem priority="{Terminal>Priority}" datetime="{Terminal>Date}" title="{Terminal>Key}" description="{Terminal>Value}">
+										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
 										</NotificationListItem>
 									</List>
 								</l:content>
