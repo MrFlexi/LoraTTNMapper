@@ -13,16 +13,6 @@
 					</layoutData>
 				</Button>
 				<ToolbarSpacer width="20px"/>
-				<Button text="File" type="Transparent">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
-				<Button text="Hallo" type="Transparent">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
 				<Button text="" type="Transparent">
 					<layoutData>
 						<OverflowToolbarLayoutData priority="Low"/>
@@ -33,12 +23,6 @@
 						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
 					</layoutData>
 				</ToolbarSpacer>
-				<Button text="{oModelMainController>/0/user_name}" type="Transparent" press="handleLogonDialog">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
-					</layoutData>
-				</Button>
-
 			</tnt:ToolHeader>
 		</tnt:header>
 		<tnt:sideContent>
@@ -76,7 +60,7 @@
 
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{Terminal>/temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{Terminal>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 

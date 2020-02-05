@@ -11,13 +11,9 @@ sap.ui.define([
 ], function (jQuery, Fragment, MessageToast, Formatter, Controller, JSONModel, Popover, Button) {
 	"use strict";
 
-	var oModelLokList           = new sap.ui.model.json.JSONModel();
-	var oModelUserList          = new sap.ui.model.json.JSONModel();
-	var oModelMainController    = new sap.ui.model.json.JSONModel();
-	var oModelUser              = new sap.ui.model.json.JSONModel();
 	var oModelTerminal           = new sap.ui.model.json.JSONModel();
 
-	var ws = new WebSocket("ws://192.168.43.34/ws");
+	var ws = new WebSocket("ws://192.168.1.220/ws");
 
 
 	
@@ -37,19 +33,6 @@ sap.ui.define([
 			var MenuModel = new JSONModel("./static/menu.json");
 			oView.setModel(MenuModel);
 			
-			
-			this.getView().setModel(oModelLokList, "LokListModel");
-			this.getView().setModel(oModelUserList, "oModelUserList");
-			this.getView().setModel(oModelMainController, "oModelMainController");
-
-
-			var oData = {
-				recipient : {
-				   name : "World"
-				}
-			 };
-			var oModel2 = new JSONModel(oData);
-			this.getView().setModel(oModel2,"Test");	
 			 
 			ws.onopen = function() {                  
 				// Web Socket is connected, send data using send()			
