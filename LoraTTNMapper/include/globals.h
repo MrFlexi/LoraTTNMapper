@@ -21,6 +21,9 @@
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
 
+#define USE_WEBSERVER   1
+#define USE_WEBSOCKET   1
+
 #define USE_GYRO  1
 #define WAKEUP_MOTION 1
 
@@ -63,6 +66,14 @@
 #include "esp_sleep.h"
 #include <Wire.h>
 #include "WiFi.h"
+
+
+#if (USE_WEBSERVER)
+#include "SPIFFS.h"
+#include "ESPAsyncWebServer.h"
+#include "webserver.h"
+#include "websocket.h"
+#endif
 
 #if (USE_BME280)
 #include <Adafruit_Sensor.h>

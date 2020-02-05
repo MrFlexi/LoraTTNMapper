@@ -1,0 +1,139 @@
+<core:View xmlns:core="sap.ui.core" 
+	xmlns="sap.m" 
+	xmlns:l="sap.ui.layout" 
+	xmlns:tnt="sap.tnt" 
+	xmlns:html="http://www.w3.org/1999/xhtml" height="100%" controllerName="view.App">
+
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<tnt:ToolHeader>
+				<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press="onSideNavButtonPress">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+					</layoutData>
+				</Button>
+				<ToolbarSpacer width="20px"/>
+				<Button text="File" type="Transparent">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low"/>
+					</layoutData>
+				</Button>
+				<Button text="Hallo" type="Transparent">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low"/>
+					</layoutData>
+				</Button>
+				<Button text="" type="Transparent">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low"/>
+					</layoutData>
+				</Button>
+				<ToolbarSpacer>
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
+					</layoutData>
+				</ToolbarSpacer>
+				<Button text="{oModelMainController>/0/user_name}" type="Transparent" press="handleLogonDialog">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+					</layoutData>
+				</Button>
+
+			</tnt:ToolHeader>
+		</tnt:header>
+		<tnt:sideContent>
+			<tnt:SideNavigation expanded="true" itemSelect="onItemSelect">
+				<tnt:NavigationList items="{path: '/navigation'}">
+					<tnt:NavigationListItem text="{title}" icon="{icon}" enabled="{enabled}" expanded="{expanded}" items="{items}" key="{key}">
+						<tnt:NavigationListItem text="{title}" key="{key}" enabled="{enabled}">
+						</tnt:NavigationListItem>
+					</tnt:NavigationListItem>
+				</tnt:NavigationList>
+				<tnt:fixedItem>
+					<tnt:NavigationList items="{path: '/fixedNavigation'}">
+						<tnt:NavigationListItem text="{title}" icon="{icon}">
+						</tnt:NavigationListItem>
+					</tnt:NavigationList>
+				</tnt:fixedItem>
+			</tnt:SideNavigation>
+		</tnt:sideContent>
+		<tnt:mainContents>
+			<l:VerticalLayout width="100%" id="layout1">
+				<NavContainer id="pageContainer">
+					<pages>
+						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="ESP Alive Ticker" subheader="" press="press">
+								<TileContent unit="Pings" footer="last 24h">
+									<NumericContent scale="M" value="{Terminal>/roundtrips}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="{Test>/recipient/name}" subheader="Hallo" press="press">
+								<TileContent footer="">
+									<ImageContent src="sap-icon://home-share" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU Temp" subheader="" press="press">
+								<TileContent unit="Celsius" footer="">
+									<NumericContent scale="M" value="{Terminal>/temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile id = "Tile_LED" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Make some Light" subheader="Toggel LED!" press="onButtonLedPressed">
+								<TileContent footer="off">
+									<ImageContent src="sap-icon://lightbulb"/>
+								</TileContent>
+						</GenericTile>
+
+
+						</ScrollContainer>
+						
+						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
+							<l:VerticalLayout	class="sapUiContentPadding" width="100%">
+								<l:content>
+									<List headerText="Serial Monitor"	items="{path: 'Terminal>/text_table'}" >
+										
+										<NotificationListItem
+											priority="{Terminal>Priority}"
+											datetime="{Terminal>Date}"
+											title="{Terminal>Title}"
+											description="{Terminal>Description}"
+											>
+										</NotificationListItem>
+									</List>
+								</l:content>
+	
+			</l:VerticalLayout>
+						</ScrollContainer>
+
+
+						<ScrollContainer id="RSSI" horizontal="false" vertical="true" height="100%">
+
+						</ScrollContainer>
+
+						<ScrollContainer id="TTN" horizontal="false" vertical="true" height="100%">
+
+						</ScrollContainer>
+
+						<ScrollContainer id="Memory" horizontal="false" vertical="true" height="100%">
+							<content>
+
+							</content>
+						</ScrollContainer>
+
+
+						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
+							<Text text="This is the root page of the second element"/>
+						</ScrollContainer>
+					</pages>
+				</NavContainer>
+
+			</l:VerticalLayout>
+
+		
+			
+
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</core:View>
