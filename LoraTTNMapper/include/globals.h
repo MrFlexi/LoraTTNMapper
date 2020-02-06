@@ -9,9 +9,9 @@
 
 #define USE_WIFI 1
 #define USE_OTA 0
-#define USE_BME280 1
+#define USE_BME280 0
 #define USE_CAYENNE 0
-#define HAS_LORA 1
+#define HAS_LORA 0
 #define USE_MQTT 0
 #define HAS_INA 0
 #define USE_DASH 0
@@ -24,11 +24,11 @@
 #define USE_WEBSERVER   1
 #define USE_WEBSOCKET   1
 
-#define USE_GYRO  1
-#define WAKEUP_MOTION 1
+#define USE_GYRO  0
+#define WAKEUP_MOTION 0
 
-#define displayRefreshIntervall 2       // every x second
-#define displayMoveIntervall 5 // every x second
+#define displayRefreshIntervall 5       // every x second
+#define displayMoveIntervall 10 // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 60
@@ -52,7 +52,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
+#define ESP_SLEEP 0              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 6     // sleep after n minutes or

@@ -149,7 +149,10 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d %2d", dataBuffer.data.sleepCounter, dataBuffer.data.MotionCounter);     
+      u8g2.printf("Sleep:%.2d %2d", dataBuffer.data.sleepCounter, dataBuffer.data.MotionCounter);  
+      sprintf(sbuf, "%s", dataBuffer.data.ip_address);
+      u8g2.drawStr(1, 40, sbuf);
+
 
        #if (USE_OTA)
         availableModules = availableModules +  "OTA ";             

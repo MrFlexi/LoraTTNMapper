@@ -13,16 +13,6 @@
 					</layoutData>
 				</Button>
 				<ToolbarSpacer width="20px"/>
-				<Button text="File" type="Transparent">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
-				<Button text="Hallo" type="Transparent">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
 				<Button text="" type="Transparent">
 					<layoutData>
 						<OverflowToolbarLayoutData priority="Low"/>
@@ -33,12 +23,6 @@
 						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
 					</layoutData>
 				</ToolbarSpacer>
-				<Button text="{oModelMainController>/0/user_name}" type="Transparent" press="handleLogonDialog">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
-					</layoutData>
-				</Button>
-
 			</tnt:ToolHeader>
 		</tnt:header>
 		<tnt:sideContent>
@@ -67,23 +51,25 @@
 									<NumericContent scale="M" value="{dataBuffer>/TXCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-							
 
-							<GenericTile id = "Tile_LED" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Make some Light" subheader="Toggel LED!" press="onButtonLedPressed">
-								<TileContent footer="off">
-									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="{Test>/recipient/name}" subheader="Hallo" press="press">
+								<TileContent footer="">
+									<ImageContent src="sap-icon://home-share" />
 								</TileContent>
 							</GenericTile>
 
-
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU Temp" subheader="" press="press">
+								<TileContent unit="Celsius" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
 						</ScrollContainer>
 
 						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
 							<l:VerticalLayout class="sapUiContentPadding" width="100%">
 								<l:content>
 									<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
-
-										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
+									<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
 										</NotificationListItem>
 									</List>
 								</l:content>
@@ -91,32 +77,12 @@
 							</l:VerticalLayout>
 						</ScrollContainer>
 
-
-						<ScrollContainer id="RSSI" horizontal="false" vertical="true" height="100%">
-
-						</ScrollContainer>
-
-						<ScrollContainer id="TTN" horizontal="false" vertical="true" height="100%">
-
-						</ScrollContainer>
-
-						<ScrollContainer id="Memory" horizontal="false" vertical="true" height="100%">
-							<content>
-
-							</content>
-						</ScrollContainer>
-
 						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
 							<Text text="This is the root page of the second element"/>
 						</ScrollContainer>
 					</pages>
 				</NavContainer>
-
 			</l:VerticalLayout>
-
-
-
-
 		</tnt:mainContents>
 	</tnt:ToolPage>
 </core:View>

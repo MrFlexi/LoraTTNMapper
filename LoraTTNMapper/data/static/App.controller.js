@@ -11,29 +11,24 @@ sap.ui.define([
 ], function (jQuery, Fragment, MessageToast, Formatter, Controller, JSONModel, Popover, Button) {
 	"use strict";
 
+	var oModelData           = new sap.ui.model.json.JSONModel();
+
+	var ws = new WebSocket("ws://192.168.1.220/ws");
+	//var ws = new WebSocket("ws://localhost:8025/ws");
+
+
 	
-	var oModeldataBuffer           = new sap.ui.model.json.JSONModel();
-
-	var ws = new WebSocket("ws://192.168.43.34/ws");
-		
-	var CController = Controller.extend("view.App", {
-
-		//ws:WebSocket("ws://192.168.43.34/ws"),		
+	var CController = Controller.extend("view.App", {		
 		
 		onInit: function() {
-
-			var namespace = '';
-			//var ws =  new WebSocket("ws://192.168.43.34/ws");
-			
 
 			var oView = this.getView();
 
 			// Dynamisches Menü						
 			var MenuModel = new JSONModel("./static/menu.json");
 			oView.setModel(MenuModel);
-								
-			this.getView().setModel(oModeldataBuffer , "dataBuffer");
-								 
+			
+			 
 			ws.onopen = function() {                  
 				// Web Socket is connected, send data using send()			
 			   //	 alert("WS open im controller");
@@ -42,9 +37,9 @@ sap.ui.define([
 				
 			ws.onmessage = function (evt)  { 
 				//alert("WS open2 im controller" + evt.data);				
-				var dataBuffer_model = jQuery.parseJSON(evt.data)
-				oModeldataBuffer.setData(dataBuffer_model);	
-				oView.setModel(oModeldataBuffer , "dataBuffer");						
+				oModelData.setData(jQuery.parseJSON(evt.data));	
+				oView.setModel(oModelData,"dataBuffer");
+						
 			 }; 
 	
 			 

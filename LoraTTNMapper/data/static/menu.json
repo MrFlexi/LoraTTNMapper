@@ -10,13 +10,16 @@
         "key": "Terminal",
         "expanded": true
     
+    }, {
+        "title": "Info",
+        "icon": "sap-icon://cargo-train",
+        "key": "Info",
+        "expanded": true
+    
     }
 	],
 	
     "fixedNavigation": [{
-        "title": "GPS",
-        "icon": "sap-icon://employee"
-    }, {
         "title": "Lora Settings",
         "icon": "sap-icon://building"
     }, {

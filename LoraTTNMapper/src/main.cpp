@@ -368,9 +368,8 @@ void t_cyclicRTOS(void *pvParameters)
 void t_cyclic()
 {
   if (dataBuffer.data.MotionCounter >= displayRefreshIntervall)
-  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - displayRefreshIntervall;
-  
-  
+    dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - displayRefreshIntervall;
+
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
@@ -436,7 +435,7 @@ void t_sleep()
 
 #if (ESP_SLEEP)
   dataBuffer.data.sleepCounter--;
-  
+
   if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
@@ -457,6 +456,7 @@ void setup_wifi()
 {
 
 #if (USE_WIFI)
+  IPAddress ip;
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
 
@@ -474,9 +474,9 @@ void setup_wifi()
   {
     wifi_connected = true;
     dataBuffer.data.wlan = true;
-    ESP_LOGV(TAG, String(WiFi.localIP()));
-    log_display(String(WiFi.localIP()));
-    delay(2000);
+    ip = WiFi.localIP();
+    Serial.println(ip);
+    dataBuffer.data.ip_address = ip.toString();
   }
   else
   {
@@ -688,7 +688,6 @@ void setup()
                           1);              // CPU core
 #endif
 
-
 #if (USE_WEBSOCKET)
   xTaskCreate(
       t_broadcast_message,      /* Task function. */
@@ -698,15 +697,25 @@ void setup()
       10,                       /* Priority of the task. */
       &task_broadcast_message); /* Task handle. */
 
-  
-  ESP_LOGI(TAG, "Mounting SPIFF Filesystem"); 
+  ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
   {
-    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");     
+    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
     return;
   }
-#endif    
+  File root = SPIFFS.open("/");
+  File file = root.openNextFile();
+
+  while (file)
+  {
+
+    Serial.print("FILE: ");
+    Serial.println(file.name());
+    file = root.openNextFile();
+  }
+  delay(2000);
+#endif
 
 #if (USE_WEBSERVER)
   server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -721,7 +730,7 @@ void setup()
   // Websocket
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
-#endif 
+#endif
 
   //#if (USE_CAYENNE)
   //  if (WiFi.status() == WL_CONNECTED)
@@ -733,9 +742,8 @@ void setup()
 #endif
   delay(1000);
 
-
 #if (USE_GYRO)
-   setup_gyro();
+  setup_gyro();
 #endif
 
   log_display("Setup done");
@@ -778,6 +786,6 @@ void loop()
   if (mpuInterrupt)
   {
     gyro_handle_interrupt();
-  }  
+  }
 #endif
 }
