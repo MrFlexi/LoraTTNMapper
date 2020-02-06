@@ -12,8 +12,10 @@ sap.ui.define([
 	"use strict";
 
 	var oModelData           = new sap.ui.model.json.JSONModel();
+	var ip_address = location.host;
 
-	var ws = new WebSocket("ws://192.168.1.220/ws");
+	// var ws = new WebSocket("ws://192.168.1.220/ws");
+	var ws = new WebSocket(`ws://${ip_address}/ws`);
 	//var ws = new WebSocket("ws://localhost:8025/ws");
 
 
