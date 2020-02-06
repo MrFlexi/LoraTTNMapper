@@ -63,13 +63,32 @@
 									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
+
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
+								<TileContent unit="Volt" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bat_voltage}" valueColor="" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="charge current" press="press">
+								<TileContent unit="mA" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="discharge current" press="press">
+								<TileContent unit="mA" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
 						</ScrollContainer>
 
 						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
 							<l:VerticalLayout class="sapUiContentPadding" width="100%">
 								<l:content>
 									<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
-									<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
+										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
 										</NotificationListItem>
 									</List>
 								</l:content>
