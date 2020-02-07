@@ -52,6 +52,8 @@ void IRAM_ATTR dmpDataReady()
 
 void gyro_dump_interrupt_source(uint8_t mpuIntStatus)
 {
+    Serial.println("");
+    Serial.println("Gyro Interrupt:");
     if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DATA_RDY_BIT))
     {
         Serial.println("DATA_RDY_BIT");
@@ -323,7 +325,7 @@ void gyro_handle_interrupt( void)
         I2C_MUTEX_UNLOCK(); // release i2c bus access
  
         Serial.println(mpuIntStatus);
-        dataBuffer.data.MotionCounter = 60;
+        dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
 
         gyro_dump_interrupt_source(mpuIntStatus);
         //show();

@@ -46,9 +46,9 @@
 				<NavContainer id="pageContainer">
 					<pages>
 						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Lora TX Counter" subheader="" press="press">
-								<TileContent unit="Pings" footer="last 24h">
-									<NumericContent scale="M" value="{dataBuffer>/TXCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
+								<TileContent unit="" footer="sinc last reset">
+									<NumericContent scale="M" value="{dataBuffer>/bootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 

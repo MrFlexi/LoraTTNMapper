@@ -9,9 +9,9 @@
 
 #define USE_WIFI 1
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define USE_CAYENNE 0
-#define HAS_LORA 0
+#define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
 #define USE_DASH 0
@@ -24,16 +24,17 @@
 #define USE_WEBSERVER   1
 #define USE_WEBSOCKET   1
 
-#define USE_GYRO  0
-#define WAKEUP_MOTION 0
+#define USE_GYRO  1
+#define WAKEUP_MOTION 1
 
-#define displayRefreshIntervall 5       // every x second
-#define displayMoveIntervall 10 // every x second
+#define displayRefreshIntervall 2       // every x second
+#define displayMoveIntervall 5 // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 60
 
-#define sendCayenneIntervall 20 // every x seconds
+#define sendCayenneIntervall 120 // every x seconds
+#define sendWebserverIntervall 120 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -52,11 +53,10 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0              // Main switch
+#define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
-#define TIME_TO_NEXT_SLEEP 6     // sleep after n minutes or
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  60 // // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
@@ -116,6 +116,7 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t MotionCounter;     // aliveCounter
+  uint8_t bootCounter;
   uint8_t txCounter;        // aliveCounter
    uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter

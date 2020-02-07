@@ -149,9 +149,11 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d %2d", dataBuffer.data.sleepCounter, dataBuffer.data.MotionCounter);  
-      sprintf(sbuf, "%s", dataBuffer.data.ip_address);
+      u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
+      sprintf(sbuf, "%s", String(dataBuffer.data.ip_address));
       u8g2.drawStr(1, 40, sbuf);
+      sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
+      u8g2.drawStr(1, 50, sbuf);
 
 
        #if (USE_OTA)
@@ -252,25 +254,21 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");
 
-      if (dataBuffer.data.sleepCounter <= 0)
-      {       
-         u8g2.drawStr(1, 55, "Reason: Counter"); 
-      }
+       u8g2.setFont(u8g2_font_profont11_tr);
 
       if (dataBuffer.data.MotionCounter <= 0 )
       {
-       u8g2.drawStr(1, 55, "Reason: Inactivity"); 
+       u8g2.drawStr(30, 55, "Inactivity"); 
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-       u8g2.drawStr(1, 55, "Reason: TX "); 
+       u8g2.drawStr(30, 55, "TX "); 
       }
 
-      drawSymbol(1, 48, SUN);
-      
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
+      drawSymbol(1, 48, SUN);
       break;
     }
 

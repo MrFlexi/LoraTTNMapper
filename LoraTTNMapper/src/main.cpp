@@ -367,8 +367,7 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic()
 {
-  if (dataBuffer.data.MotionCounter >= displayRefreshIntervall)
-    dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - displayRefreshIntervall;
+  
 
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
@@ -398,11 +397,6 @@ void t_cyclic()
   dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
-#if (USE_ADXL345)
-
-  adxl_dumpValues();
-
-#endif
 
 #if (HAS_LORA)
 
@@ -416,7 +410,6 @@ void t_cyclic()
   }
 #endif
 
-  //gps.encode();
   gps.checkGpsFix();
 
   // Refresh Display
@@ -434,9 +427,13 @@ void t_sleep()
   //-----------------------------------------------------
 
 #if (ESP_SLEEP)
-  dataBuffer.data.sleepCounter--;
 
-  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
+dataBuffer.data.MotionCounter - 1;
+
+  //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
+  //{
+
+  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
 #if (HAS_PMU)
@@ -518,6 +515,8 @@ void setup()
 
   //Increment boot number and print it every reboot
   ++bootCount;
+  dataBuffer.data.bootCounter = bootCount;
+  
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
@@ -569,7 +568,6 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
   dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
 
   dataBuffer.data.firmware_version = VERSION;
@@ -617,7 +615,7 @@ void setup()
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
+  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
               " min");
 
 #ifdef HAS_BUTTON
@@ -659,44 +657,7 @@ void setup()
   button_init(HAS_BUTTON);
 #endif
 
-  //-------------------------------------------------------------------------------
-  // Tasks
-  //-------------------------------------------------------------------------------
-  log_display("Starting Tasks");
-
-  sleepTicker.attach(60, t_sleep);
-  displayTicker.attach(displayRefreshIntervall, t_cyclic);
-  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
-
-#if (HAS_LORA)
-  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
-#endif
-
-#if (USE_CAYENNE)
-  sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
-#endif
-
-// Interrupt ISR Handler
-#if (USE_INTERRUPTS)
-  ESP_LOGI(TAG, "Starting Interrupt Handler...");
-  xTaskCreatePinnedToCore(irqHandler,      // task function
-                          "irqhandler",    // name of task
-                          4096,            // stack size of task
-                          (void *)1,       // parameter of the task
-                          2,               // priority of the task
-                          &irqHandlerTask, // task handle
-                          1);              // CPU core
-#endif
-
 #if (USE_WEBSOCKET)
-  xTaskCreate(
-      t_broadcast_message,      /* Task function. */
-      "Broadcast Message",      /* String with name of task. */
-      10000,                    /* Stack size in bytes. */
-      NULL,                     /* Parameter passed as input of the task */
-      10,                       /* Priority of the task. */
-      &task_broadcast_message); /* Task handle. */
-
   ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
@@ -714,37 +675,82 @@ void setup()
     Serial.println(file.name());
     file = root.openNextFile();
   }
-  delay(2000);
+  delay(1000);
 #endif
 
 #if (USE_WEBSERVER)
+ if (WiFi.status() == WL_CONNECTED)
+ {
   server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
     Serial.println("Index requested");
     request->send(SPIFFS, "/index.html", "text/html");
   });
   server.begin();
   server.serveStatic("/", SPIFFS, "/");
+   }
 #endif
 
 #if (USE_WEBSOCKET)
-  // Websocket
+if (WiFi.status() == WL_CONNECTED)
+ {
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
+ }
 #endif
-
-  //#if (USE_CAYENNE)
-  //  if (WiFi.status() == WL_CONNECTED)
-  //    Cayenne_send();
-  //#endif
-
-#if (HAS_LORA)
-  t_enqueue_LORA_messages();
-#endif
-  delay(1000);
 
 #if (USE_GYRO)
   setup_gyro();
 #endif
+
+delay(2000);
+
+  //-------------------------------------------------------------------------------
+  // Tasks
+  //-------------------------------------------------------------------------------
+  log_display("Starting Tasks");
+
+  sleepTicker.attach(60, t_sleep);
+  displayTicker.attach(displayRefreshIntervall, t_cyclic);
+  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+
+#if (HAS_LORA)
+  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
+#endif
+
+#if (USE_CAYENNE)
+  sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
+#endif
+
+#if (USE_WEBSOCKET)
+if (WiFi.status() == WL_CONNECTED)
+ {
+  xTaskCreate(
+      t_broadcast_message,      /* Task function. */
+      "Broadcast Message",      /* String with name of task. */
+      10000,                    /* Stack size in bytes. */
+      NULL,                     /* Parameter passed as input of the task */
+      10,                       /* Priority of the task. */
+      &task_broadcast_message); /* Task handle. */
+ }
+#endif
+
+// Interrupt ISR Handler
+#if (USE_INTERRUPTS)
+  ESP_LOGI(TAG, "Starting Interrupt Handler...");
+  xTaskCreatePinnedToCore(irqHandler,      // task function
+                          "irqhandler",    // name of task
+                          4096,            // stack size of task
+                          (void *)1,       // parameter of the task
+                          2,               // priority of the task
+                          &irqHandlerTask, // task handle
+                          1);              // CPU core
+#endif
+
+
+#if (HAS_LORA)
+  t_enqueue_LORA_messages();
+#endif
+
 
   log_display("Setup done");
 
