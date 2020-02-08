@@ -247,11 +247,15 @@ void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
+  
+  dataBuffer.data.operation_mode = '0';
+
   Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
   {
   case ESP_SLEEP_WAKEUP_EXT0:
     Serial.println(F("external signal using RTC_IO"));
+    dataBuffer.data.operation_mode = '1';
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     Serial.println(F("external signal using RTC_CNTL"));
@@ -267,7 +271,7 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-    break;
+     break;
   }
 }
 
@@ -367,36 +371,43 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic()
 {
-  
 
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
-// Temperatur
+
+  //   I2C opperations
+
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
 #if (USE_BME280)
-  dataBuffer.data.temperature = bme.readTemperature();
-  dataBuffer.data.humidity = bme.readHumidity();
-  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+    dataBuffer.data.temperature = bme.readTemperature();
+    dataBuffer.data.humidity = bme.readHumidity();
+    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #if (HAS_PMU)
-  dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
-  dataBuffer.data.bus_current = pmu.getVbusCurrent();
+    dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
+    dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
-  dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
-  dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-  dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-  // AXP192_showstatus();
+    dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+    dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
+    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+    // AXP192_showstatus();
 #else
-  dataBuffer.data.bat_voltage = read_voltage() / 1000;
+    dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
 #if (HAS_INA)
-  //print_ina();
-  dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
-  dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
+    //print_ina();
+    dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
+    dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
+  }
 
 #if (HAS_LORA)
 
@@ -418,6 +429,13 @@ void t_cyclic()
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
+
+#if (USE_GYRO)
+  if (mpuInterrupt)
+  {
+    gyro_handle_interrupt();
+  }
+#endif
 }
 
 void t_sleep()
@@ -428,7 +446,7 @@ void t_sleep()
 
 #if (ESP_SLEEP)
 
-dataBuffer.data.MotionCounter - 1;
+  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
   //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   //{
@@ -516,7 +534,7 @@ void setup()
   //Increment boot number and print it every reboot
   ++bootCount;
   dataBuffer.data.bootCounter = bootCount;
-  
+
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
@@ -568,6 +586,7 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
+
   dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
 
   dataBuffer.data.firmware_version = VERSION;
@@ -679,30 +698,33 @@ void setup()
 #endif
 
 #if (USE_WEBSERVER)
- if (WiFi.status() == WL_CONNECTED)
- {
-  server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("Index requested");
-    request->send(SPIFFS, "/index.html", "text/html");
-  });
-  server.begin();
-  server.serveStatic("/", SPIFFS, "/");
-   }
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("Index requested");
+      request->send(SPIFFS, "/index.html", "text/html");
+    });
+    server.begin();
+    server.serveStatic("/", SPIFFS, "/");
+  }
 #endif
 
 #if (USE_WEBSOCKET)
-if (WiFi.status() == WL_CONNECTED)
- {
-  ws.onEvent(onWsEvent);
-  server.addHandler(&ws);
- }
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    ws.onEvent(onWsEvent);
+    server.addHandler(&ws);
+  }
 #endif
 
 #if (USE_GYRO)
   setup_gyro();
 #endif
 
-delay(2000);
+// get sensor values once
+t_cyclic();
+
+  delay(2000);
 
   //-------------------------------------------------------------------------------
   // Tasks
@@ -722,16 +744,16 @@ delay(2000);
 #endif
 
 #if (USE_WEBSOCKET)
-if (WiFi.status() == WL_CONNECTED)
- {
-  xTaskCreate(
-      t_broadcast_message,      /* Task function. */
-      "Broadcast Message",      /* String with name of task. */
-      10000,                    /* Stack size in bytes. */
-      NULL,                     /* Parameter passed as input of the task */
-      10,                       /* Priority of the task. */
-      &task_broadcast_message); /* Task handle. */
- }
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    xTaskCreate(
+        t_broadcast_message,      /* Task function. */
+        "Broadcast Message",      /* String with name of task. */
+        10000,                    /* Stack size in bytes. */
+        NULL,                     /* Parameter passed as input of the task */
+        10,                       /* Priority of the task. */
+        &task_broadcast_message); /* Task handle. */
+  }
 #endif
 
 // Interrupt ISR Handler
@@ -746,11 +768,9 @@ if (WiFi.status() == WL_CONNECTED)
                           1);              // CPU core
 #endif
 
-
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
 #endif
-
 
   log_display("Setup done");
 
@@ -786,12 +806,5 @@ void loop()
 
 #if (HAS_BUTTON)
   readButton();
-#endif
-
-#if (USE_GYRO)
-  if (mpuInterrupt)
-  {
-    gyro_handle_interrupt();
-  }
 #endif
 }

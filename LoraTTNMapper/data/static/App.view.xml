@@ -46,25 +46,33 @@
 				<NavContainer id="pageContainer">
 					<pages>
 						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
+
+							<l:HorizontalLayout allowWrapping="true">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
 								<TileContent unit="" footer="sinc last reset">
 									<NumericContent scale="M" value="{dataBuffer>/bootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="{Test>/recipient/name}" subheader="Hallo" press="press">
-								<TileContent footer="">
-									<ImageContent src="sap-icon://home-share" />
+						
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
+								<TileContent unit="" footer="count down">
+									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
+							</l:HorizontalLayout>
 
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU Temp" subheader="" press="press">
+							<l:HorizontalLayout allowWrapping="true">
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
+							</l:HorizontalLayout>
+
+							<l:HorizontalLayout allowWrapping="true">
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
 								<TileContent unit="Volt" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/bat_voltage}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
@@ -81,6 +89,7 @@
 									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
+							</l:HorizontalLayout>
 
 						</ScrollContainer>
 

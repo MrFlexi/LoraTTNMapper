@@ -17,7 +17,7 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_INTERRUPTS 0
+#define USE_INTERRUPTS 1
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
 
@@ -31,10 +31,10 @@
 #define displayMoveIntervall 5 // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
-#define LORA_TX_INTERVAL 60
+#define LORA_TX_INTERVAL 30
 
 #define sendCayenneIntervall 120 // every x seconds
-#define sendWebserverIntervall 120 // every x seconds
+#define sendWebserverIntervall 30 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -56,8 +56,8 @@
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #include <lmic.h>
 #include <hal/hal.h>
@@ -134,6 +134,7 @@ typedef struct
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
   String ip_address;
+  uint8_t operation_mode = 0;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue

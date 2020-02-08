@@ -11,13 +11,14 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   ws_json.clear();
 
   ws_json["MotionCounter"] = String( dataBuffer.data.MotionCounter );
+  ws_json["BootCounter"] = String( dataBuffer.data.bootCounter );
 
   ws_json["bat_voltage"] = dataBuffer.data.bat_voltage;
   ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
   ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
 
-  ws_json["TXCounter"] = "15";
-  ws_json["Temperatur"] = "22.5";
+  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
+  ws_json["Temperatur"] = String( dataBuffer.data.temperature );;
   ws_json["text"] = "Hallo Welt";
   ws_json["text_time"] = "SA 8:22:01";
 

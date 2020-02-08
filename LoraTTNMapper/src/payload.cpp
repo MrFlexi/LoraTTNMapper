@@ -136,11 +136,26 @@ void PayloadConvert::enqueue_port(uint8_t port)
   int ret;
   MessageBuffer_t SendBuffer; 
 
-  
   SendBuffer.MessageSize = payload.getSize();
   SendBuffer.MessagePrio = 1;
   SendBuffer.MessagePort = port;
 
+  int n = uxQueueMessagesWaiting(LoraSendQueue);
+  
+  // Clear first entry in queue if no space available
+  if (uxQueueSpacesAvailable(LoraSendQueue) == 0)
+  {
+    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)       // delete one element
+    {
+      ESP_LOGI(TAG, "Lora send queue element deleted:");
+      dump_single_message(SendBuffer);
+    }
+
+  int p = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Queue aging waiting bevore: %d, after: %d", n, p);
+    }
+
+// Insert new element at end of queue
   ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
