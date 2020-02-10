@@ -175,7 +175,9 @@ void showPage(int page)
        availableModules = availableModules + "GYRO ";       
       #endif
 
-      
+      #if (USE_WEBSERVER)
+       availableModules = availableModules + "WEB ";       
+      #endif
 
       if (dataBuffer.data.wlan)
       {

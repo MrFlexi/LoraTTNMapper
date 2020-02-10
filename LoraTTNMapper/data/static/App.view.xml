@@ -12,8 +12,14 @@
 						<OverflowToolbarLayoutData priority="NeverOverflow"/>
 					</layoutData>
 				</Button>
+
+				<Button id="bt_reboot" text="Reboot" icon="" type="Emphasized" press="reboot">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+					</layoutData>
+				</Button>
 				<ToolbarSpacer width="20px"/>
-				<Button text="" type="Transparent">
+				<Button id="bt_sleep" text="Sleep" type="Transparent" press="sleep">
 					<layoutData>
 						<OverflowToolbarLayoutData priority="Low"/>
 					</layoutData>
@@ -50,7 +56,7 @@
 							<l:HorizontalLayout allowWrapping="true">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
 								<TileContent unit="" footer="sinc last reset">
-									<NumericContent scale="M" value="{dataBuffer>/bootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 						
@@ -104,7 +110,7 @@
 
 							</l:VerticalLayout>
 							
-							<Button xmlns="sap.m" text="Reboot" id="button0" type="Emphasized" press="reboot"/>
+							
 
 						</ScrollContainer>
 

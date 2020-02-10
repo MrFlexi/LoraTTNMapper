@@ -34,7 +34,7 @@
 #define LORA_TX_INTERVAL 30
 
 #define sendCayenneIntervall 120 // every x seconds
-#define sendWebserverIntervall 30 // every x seconds
+#define sendWebserverIntervall 10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
