@@ -13,13 +13,9 @@ sap.ui.define([
 
 	var oModelData           = new sap.ui.model.json.JSONModel();
 	var ip_address = location.host;
-
-	// var ws = new WebSocket("ws://192.168.1.220/ws");
-	var ws = new WebSocket(`ws://${ip_address}/ws`);
-	//var ws = new WebSocket("ws://localhost:8025/ws");
-
-
 	
+	var ws = new WebSocket(`ws://${ip_address}/ws`);
+
 	var CController = Controller.extend("view.App", {		
 		
 		onInit: function() {
@@ -41,7 +37,7 @@ sap.ui.define([
 				//alert("WS open2 im controller" + evt.data);				
 				oModelData.setData(jQuery.parseJSON(evt.data));	
 				oView.setModel(oModelData,"dataBuffer");
-						
+
 			 }; 
 	
 			 
@@ -54,13 +50,9 @@ sap.ui.define([
 			sap.ui.getCore().byId(viewId + "--pageContainer").to(viewId + "--" + item.getKey());
 		},
 
-		onButtonLedPressed: function (oEvent) {
+		reboot: function (oEvent) {
 			alert("LED toggled");
-			ws.send("Hallo from Client");			
-		},
-
-		onSliderliveChange: function(oEvent) {
-		   
+			ws.send("reboot");		
 		},
 	
 
