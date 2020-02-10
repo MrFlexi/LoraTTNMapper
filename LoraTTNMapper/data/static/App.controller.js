@@ -38,11 +38,9 @@ sap.ui.define([
 				oModelData.setData(jQuery.parseJSON(evt.data));	
 				oView.setModel(oModelData,"dataBuffer");
 
-			 }; 
-	
+			 }; 	
 			 
-		},
-				
+		},				
 
 		onItemSelect: function(oEvent) {
 			var item = oEvent.getParameter('item');
