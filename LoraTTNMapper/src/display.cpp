@@ -155,8 +155,7 @@ void showPage(int page)
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
 
-
-       #if (USE_OTA)
+      #if (USE_OTA)
         availableModules = availableModules +  "OTA ";             
       #endif
 
@@ -171,6 +170,12 @@ void showPage(int page)
       #if (USE_CAYENNE)
        availableModules = availableModules + "CAY ";       
       #endif
+
+      #if (USE_GYRO)
+       availableModules = availableModules + "GYRO ";       
+      #endif
+
+      
 
       if (dataBuffer.data.wlan)
       {

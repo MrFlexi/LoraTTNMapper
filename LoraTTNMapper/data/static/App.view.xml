@@ -103,6 +103,9 @@
 								</l:content>
 
 							</l:VerticalLayout>
+							
+							<Button xmlns="sap.m" text="Reboot" id="button0" type="Emphasized" press="reboot"/>
+
 						</ScrollContainer>
 
 						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
