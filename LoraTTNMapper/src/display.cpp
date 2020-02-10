@@ -153,8 +153,7 @@ void showPage(int page)
       sprintf(sbuf, "%s", dataBuffer.data.ip_address);
       u8g2.drawStr(1, 40, sbuf);
 
-
-       #if (USE_OTA)
+      #if (USE_OTA)
         availableModules = availableModules +  "OTA ";             
       #endif
 
@@ -169,6 +168,12 @@ void showPage(int page)
       #if (USE_CAYENNE)
        availableModules = availableModules + "CAY ";       
       #endif
+
+      #if (USE_GYRO)
+       availableModules = availableModules + "GYRO ";       
+      #endif
+
+      
 
       if (dataBuffer.data.wlan)
       {
