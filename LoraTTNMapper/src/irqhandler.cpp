@@ -21,19 +21,21 @@ void irqHandler(void *pvParameters)
                     &InterruptStatus, // Receives the notification value
                     portMAX_DELAY);   // wait forever
 
+
 // button pressed?
 #ifdef HAS_BUTTON
     if (InterruptStatus & BUTTON_IRQ)
       readButton();
 #endif
 
+#if (USE_INTERRUPTS)
 // do we have a power event?
 #if (HAS_PMU)
     if (InterruptStatus & PMU_IRQ_BIT)
       AXP192_event_handler();
 #endif
 
-#if (USE_INTERRUPTS)
+
   #if (USE_ADXL345)
     if (InterruptStatus & ADXL_IRQ_BIT)
     {

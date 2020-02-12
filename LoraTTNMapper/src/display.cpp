@@ -149,9 +149,13 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%.2d", dataBuffer.data.sleepCounter);     
+      u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
+      sprintf(sbuf, "%s", String(dataBuffer.data.ip_address));
+      u8g2.drawStr(1, 40, sbuf);
+      sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
+      u8g2.drawStr(1, 50, sbuf);
 
-       #if (USE_OTA)
+      #if (USE_OTA)
         availableModules = availableModules +  "OTA ";             
       #endif
 
@@ -165,6 +169,14 @@ void showPage(int page)
 
       #if (USE_CAYENNE)
        availableModules = availableModules + "CAY ";       
+      #endif
+
+      #if (USE_GYRO)
+       availableModules = availableModules + "GYRO ";       
+      #endif
+
+      #if (USE_WEBSERVER)
+       availableModules = availableModules + "WEB ";       
       #endif
 
       if (dataBuffer.data.wlan)
@@ -243,28 +255,30 @@ void showPage(int page)
       break;
 
     case PAGE_SLEEP:
-      u8g2.setFont(u8g2_font_profont12_tr);
-      //u8g2.setCursor(1, 30);
-      //u8g2.printf("Sleeping until:%.2d", gps.tGps.satellites.value());
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Sleep");
 
-      if (dataBuffer.data.sleepCounter <= 0)
+       u8g2.setFont(u8g2_font_profont11_tr);
+
+      if (dataBuffer.data.MotionCounter <= 0 )
       {
-        drawSymbol(48, 50, RAIN);
+       u8g2.drawStr(30, 55, "Inactivity"); 
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-        drawSymbol(1, 48, SUN);
+       u8g2.drawStr(30, 55, "TX "); 
       }
 
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 52);
-      u8g2.printf("GPS: off");
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
+      drawSymbol(1, 48, SUN);
       break;
     }
 
+
+    u8g2.setCursor(100, 64);
+    u8g2.printf("%2d", dataBuffer.data.MotionCounter);
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }

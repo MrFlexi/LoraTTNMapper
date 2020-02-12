@@ -62,6 +62,7 @@ touch_pad_t touchPin;
 //--------------------------------------------------------------------------
 
 TaskHandle_t irqHandlerTask = NULL;
+TaskHandle_t task_broadcast_message = NULL;
 TaskHandle_t moveDisplayHandlerTask = NULL;
 TaskHandle_t t_cyclic_HandlerTask = NULL;
 
@@ -245,11 +246,15 @@ void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
+  
+  dataBuffer.data.operation_mode = '0';
+
   Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
   {
   case ESP_SLEEP_WAKEUP_EXT0:
     Serial.println(F("external signal using RTC_IO"));
+    dataBuffer.data.operation_mode = '1';
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     Serial.println(F("external signal using RTC_CNTL"));
@@ -265,7 +270,7 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-    break;
+     break;
   }
 }
 
@@ -365,39 +370,43 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic()
 {
+
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
-// Temperatur
+
+  //   I2C opperations
+
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
 #if (USE_BME280)
-  dataBuffer.data.temperature = bme.readTemperature();
-  dataBuffer.data.humidity = bme.readHumidity();
-  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+    dataBuffer.data.temperature = bme.readTemperature();
+    dataBuffer.data.humidity = bme.readHumidity();
+    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #if (HAS_PMU)
-  dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
-  dataBuffer.data.bus_current = pmu.getVbusCurrent();
+    dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
+    dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
-  dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
-  dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-  dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-  // AXP192_showstatus();
+    dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+    dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
+    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+    // AXP192_showstatus();
 #else
-  dataBuffer.data.bat_voltage = read_voltage() / 1000;
+    dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
 #if (HAS_INA)
-  //print_ina();
-  dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
-  dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
+    //print_ina();
+    dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
+    dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
 
-#if (USE_ADXL345)
-
-  adxl_dumpValues();
-
-#endif
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
+  }
 
 #if (HAS_LORA)
 
@@ -411,7 +420,6 @@ void t_cyclic()
   }
 #endif
 
-  //gps.encode();
   gps.checkGpsFix();
 
   // Refresh Display
@@ -419,6 +427,13 @@ void t_cyclic()
 #if (USE_DISPLAY)
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
+#endif
+
+#if (USE_GYRO)
+  if (mpuInterrupt)
+  {
+    gyro_handle_interrupt();
+  }
 #endif
 }
 
@@ -429,8 +444,13 @@ void t_sleep()
   //-----------------------------------------------------
 
 #if (ESP_SLEEP)
-  dataBuffer.data.sleepCounter--;
-  if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
+
+  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
+
+  //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
+  //{
+
+  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
 #if (HAS_PMU)
@@ -450,6 +470,7 @@ void setup_wifi()
 {
 
 #if (USE_WIFI)
+  IPAddress ip;
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
 
@@ -467,9 +488,9 @@ void setup_wifi()
   {
     wifi_connected = true;
     dataBuffer.data.wlan = true;
-    ESP_LOGV(TAG, String(WiFi.localIP()));
-    log_display(String(WiFi.localIP()));
-    delay(2000);
+    ip = WiFi.localIP();
+    Serial.println(ip);
+    dataBuffer.data.ip_address = ip.toString();
   }
   else
   {
@@ -511,6 +532,8 @@ void setup()
 
   //Increment boot number and print it every reboot
   ++bootCount;
+  dataBuffer.data.bootCounter = bootCount;
+
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
@@ -550,11 +573,6 @@ void setup()
   AXP192_init();
   AXP192_showstatus();
   AXP192_power_gps(ON);
-  delay(1000);
-#endif  
-
-#if (USE_ADXL345)
-  setup_adxl345();
 #endif
 
 #if (HAS_INA)
@@ -567,7 +585,9 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-  dataBuffer.data.sleepCounter = TIME_TO_NEXT_SLEEP;
+
+  dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
@@ -608,23 +628,23 @@ void setup()
 #endif
   delay(1000);
 
-
-
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("ESP32 wake-up timer " + String(TIME_TO_SLEEP) +
+  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
               " min");
 
 #ifdef HAS_BUTTON
 //esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
-#if (USE_ADXL345)
-#ifdef ADXL_INT
-  //esp_sleep_enable_ext0_wakeup(ADXL_INT, 0); //1 = High, 0 = Low
+#if (WAKEUP_MOTION)
+#if (USE_GYRO)
+#ifdef GYRO_INT_PIN
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
+#endif
 #endif
 #endif
 
@@ -655,6 +675,56 @@ void setup()
   button_init(HAS_BUTTON);
 #endif
 
+#if (USE_WEBSOCKET)
+  ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
+  // External File System Initialisation
+  if (!SPIFFS.begin())
+  {
+    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  File root = SPIFFS.open("/");
+  File file = root.openNextFile();
+
+  while (file)
+  {
+
+    Serial.print("FILE: ");
+    Serial.println(file.name());
+    file = root.openNextFile();
+  }
+  delay(1000);
+#endif
+
+#if (USE_WEBSERVER)
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("Index requested");
+      request->send(SPIFFS, "/index.html", "text/html");
+    });
+    server.begin();
+    server.serveStatic("/", SPIFFS, "/");
+  }
+#endif
+
+#if (USE_WEBSOCKET)
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    ws.onEvent(onWsEvent);
+    server.addHandler(&ws);
+  }
+#endif
+
+#if (USE_GYRO)
+  setup_gyro();
+#endif
+
+// get sensor values once
+t_cyclic();
+
+  delay(2000);
+
   //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
@@ -672,6 +742,19 @@ void setup()
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 #endif
 
+#if (USE_WEBSOCKET)
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    xTaskCreate(
+        t_broadcast_message,      /* Task function. */
+        "Broadcast Message",      /* String with name of task. */
+        10000,                    /* Stack size in bytes. */
+        NULL,                     /* Parameter passed as input of the task */
+        10,                       /* Priority of the task. */
+        &task_broadcast_message); /* Task handle. */
+  }
+#endif
+
 // Interrupt ISR Handler
 #if (USE_INTERRUPTS)
   ESP_LOGI(TAG, "Starting Interrupt Handler...");
@@ -684,24 +767,8 @@ void setup()
                           1);              // CPU core
 #endif
 
-  //#if (USE_CAYENNE)
-  //  if (WiFi.status() == WL_CONNECTED)
-  //    Cayenne_send();
-  //#endif
-
-delay(1000);
-
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
-#endif
-
-
-
-#if (USE_INTERRUPTS)
-#ifdef ADXL_INT
-  pinMode(ADXL_INT, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(ADXL_INT), ADXL_IRQ, RISING);
-#endif
 #endif
 
   log_display("Setup done");
@@ -739,5 +806,4 @@ void loop()
 #if (HAS_BUTTON)
   readButton();
 #endif
-  delay(1);
 }

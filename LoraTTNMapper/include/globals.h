@@ -8,58 +8,35 @@
 #include "esp_spi_flash.h"
 
 #define USE_WIFI 1
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280 1
-#define USE_CAYENNE 1
+#define USE_CAYENNE 0
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-#define USE_ADXL345 0
-#define USE_INTERRUPTS 0
-#define USE_BLE 1
-#define USE_SERIAL_BT 0
-
-#define displayRefreshIntervall 5                 // every x second
-#define displayMoveIntervall 10                   // every x second
-
-#define LORAenqueueMessagesIntervall 60           // every x seconds
-#define LORA_TX_INTERVAL 30
-
-#define sendCayenneIntervall 20 // every x seconds
-
-#define PAYLOAD_ENCODER 3
-#define PAYLOAD_BUFFER_SIZE 51
-#define SEND_QUEUE_SIZE 10
-#define PAD_TRESHOLD 40
-
-#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
-#define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
-#define I2CMUTEXREFRES_MS 40
-
-#define I2C_MUTEX_LOCK() \
-  (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
-
-#define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
-
-//--------------------------------------------------------------------------
-// ESP Sleep Mode
-//--------------------------------------------------------------------------
-#define ESP_SLEEP 0              // Main switch
-#define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 10          // sleep for n minute
 #define TIME_TO_NEXT_SLEEP 10     // sleep after n minutes or
 #define SLEEP_AFTER_N_TX_COUNT 3  // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
-#include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
 #include <Ticker.h>
 #include "esp_sleep.h"
 #include <Wire.h>
 #include "WiFi.h"
+
+
+#if (USE_WEBSERVER)
+#include "SPIFFS.h"
+#include "ESPAsyncWebServer.h"
+#include "webserver.h"
+#include "websocket.h"
+#endif
 
 #if (USE_BME280)
 #include <Adafruit_Sensor.h>
@@ -103,6 +80,8 @@ typedef struct
   uint8_t aliveCounter;     // aliveCounter
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
+  uint8_t MotionCounter;     // aliveCounter
+  uint8_t bootCounter;
   uint8_t txCounter;        // aliveCounter
    uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter
@@ -120,6 +99,7 @@ typedef struct
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
   String ip_address;
+  uint8_t operation_mode = 0;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue
@@ -172,8 +152,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "SecureOTA.h"
 #endif
 
-#if (USE_ADXL345)
-#include "adxl.h"
+#if (USE_GYRO)
+#include "gyro.h"
 #endif
 
 #if (USE_BLE)

@@ -37,25 +37,46 @@ void t_enqueue_LORA_messages()
     // Enqueue all Port 1 messages --> TTN Mapper Integration
     // ------------------------------------------------------------------
 
+ // -----------------------------------------------------------------------------
+ //   Port 1: TTN Mapper
+// -----------------------------------------------------------------------------
+
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
       payload.reset();
       payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
+<<<<<<< HEAD
       payload.enqueue_port(1, prio_high);
-    }
-    else
-    {
-      ESP_LOGV(TAG, "GPS no fix");
+=======
+      payload.enqueue_port(1);
+>>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
     }
 #endif
 
+
+ // -----------------------------------------------------------------------------
+ //   Port 2: Cayenne My Devices
+// -----------------------------------------------------------------------------
+
+payload.reset();
+
+#if (USE_GPS)
+    if (gps.checkGpsFix())
+    {
+      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+    }
+#endif
+
+<<<<<<< HEAD
     // ------------------------------------------------------------------
     // Enqueue all Port 2 messages --> Cayenne Integration
     // ------------------------------------------------------------------
 
     payload.reset();
 
+=======
+>>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
 #if (USE_BME280)
     payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
 #endif
@@ -63,12 +84,18 @@ void t_enqueue_LORA_messages()
 #if (HAS_INA)
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
+<<<<<<< HEAD
 #endif
 
 #if (USE_GPS)
     // payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+=======
+>>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
 #endif
 
+payload.enqueue_port(2);
+
+//Next Message-Block Port
 #if (HAS_PMU)
     if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bus_current != 0 )  || ( dataBuffer.data.bat_voltage != 0 ) || ( dataBuffer.data.bat_charge_current != 0 ) || ( dataBuffer.data.bat_discharge_current != 0 ) )
       {
@@ -146,28 +173,11 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
-void queue_clean()
-{
-
-  MessageBuffer_t SendBuffer;
-}
 
 void queue_aging()
 {
-  MessageBuffer_t SendBuffer;
-
-  int n = uxQueueMessagesWaiting(LoraSendQueue);
-
-  //if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)       // delete one element
-  //{
-  //  ESP_LOGI(TAG, "deleted element:");
-  //  dump_single_message(SendBuffer);
-  //}
-
-  xQueueReset(LoraSendQueue); // clear queue
-
-  int p = uxQueueMessagesWaiting(LoraSendQueue);
-  ESP_LOGI(TAG, "Queue aging waiting bevore: %d, after: %d", n, p);
+  
+  
 }
 
 void dump_queue()

@@ -1,0 +1,29 @@
+{  
+	"navigation": [{
+        "title": "Home",
+        "icon": "sap-icon://home",
+        "expanded": true,
+        "key": "Home"
+    }, {
+        "title": "Terminal",
+        "icon": "sap-icon://cargo-train",
+        "key": "Terminal",
+        "expanded": true
+    
+    }, {
+        "title": "Info",
+        "icon": "sap-icon://cargo-train",
+        "key": "Info",
+        "expanded": true
+    
+    }
+	],
+	
+    "fixedNavigation": [{
+        "title": "Lora Settings",
+        "icon": "sap-icon://building"
+    }, {
+        "title": "Battery Management",
+        "icon": "sap-icon://card"
+    }]
+ } 
