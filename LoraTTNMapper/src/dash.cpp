@@ -3,6 +3,8 @@
 #include "globals.h"
 #include "dash.h"
 
+#if (USE_DASH)
+
 AsyncWebServer async_server(80);
 
 void btnCallback(const char* id){
@@ -59,6 +61,8 @@ void update_web_dash(void)
   #endif
 
 }
+
+#endif
 
 
 

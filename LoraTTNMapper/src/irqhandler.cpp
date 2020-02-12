@@ -1,4 +1,5 @@
 #include "irqhandler.h"
+#include "globals.h"
 
 // Local logging tag
 static const char TAG[] = __FILE__;
@@ -20,21 +21,29 @@ void irqHandler(void *pvParameters)
                     &InterruptStatus, // Receives the notification value
                     portMAX_DELAY);   // wait forever
 
+
 // button pressed?
 #ifdef HAS_BUTTON
     if (InterruptStatus & BUTTON_IRQ)
       readButton();
 #endif
 
+#if (USE_INTERRUPTS)
 // do we have a power event?
 #if (HAS_PMU)
     if (InterruptStatus & PMU_IRQ_BIT)
       AXP192_event_handler();
 #endif
 
-#if (USE_ADXL345)
+
+  #if (USE_ADXL345)
     if (InterruptStatus & ADXL_IRQ_BIT)
+    {
+      ESP_LOGI(TAG, "Interrupt %d", InterruptStatus);
       adxl_event_handler();
+    }
+   #endif 
+      
 #endif
   }
 }
@@ -65,7 +74,7 @@ void IRAM_ATTR PMU_IRQ()
 }
 #endif
 
-#if (USE_ADXL345)
+#if (USE_INTERRUPTS)
 void IRAM_ATTR ADXL_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;

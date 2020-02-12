@@ -93,6 +93,11 @@ void AXP192_showstatus(void)
 void AXP192_event_handler(void)
 {
   ESP_LOGI(TAG, "PMU Event");
+if (!I2C_MUTEX_LOCK())
+    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
+
   pmu.readIRQ();
 
   if (pmu.isVbusOverVoltageIRQ())
@@ -134,6 +139,11 @@ void AXP192_event_handler(void)
 
   // refresh stored voltage value
   read_voltage();
+  I2C_MUTEX_UNLOCK(); // release i2c bus access
+
+
+  }
+
 }
 
 void AXP192_init(void)
