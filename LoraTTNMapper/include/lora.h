@@ -1,9 +1,9 @@
 #ifndef _LORA_H
 #define _LORA_H
 
-// #include "globals.h"
+#include "globals.h"
 
-const unsigned TX_INTERVAL = 30;
+// const unsigned LORA_TX_INTERVAL = 60;
 extern uint8_t txBuffer[9];
 extern QueueHandle_t LoraSendQueue;
 
@@ -24,7 +24,6 @@ void os_getDevEui(u1_t *buf);
 void os_getDevKey(u1_t *buf);
 
 static osjob_t sendjob;
-// Schedule TX every this many seconds (might become longer due to duty cycle limitations).
 
 void t_enqueue_LORA_messages();
 void do_send(osjob_t *j);
