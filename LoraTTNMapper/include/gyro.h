@@ -6,13 +6,12 @@
 #define _ADXL_H
 
 #include <Wire.h>
-#include <ADXL345.h>
-#include "globals.h"
+#include <Arduino.h>
 
-//extern ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
 
-void setup_adxl345( void );
-void adxl_dumpValues(void);
-void adxl_event_handler(void);
+extern volatile bool mpuInterrupt; // indicates whether MPU interrupt pin has gone high
+
+void setup_gyro(void);
+void gyro_handle_interrupt(void);
 
 #endif

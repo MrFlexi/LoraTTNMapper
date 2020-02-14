@@ -30,36 +30,48 @@ void t_enqueue_LORA_messages()
   else
   {
 
+    // Clear the LORA send queue
+    queue_aging();
+
+ // -----------------------------------------------------------------------------
+ //   Port 1: TTN Mapper
+// -----------------------------------------------------------------------------
+
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
       payload.reset();
       payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
       payload.enqueue_port(1);
-
-      payload.reset();
-      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-      payload.enqueue_port(2);
     }
-    else
+#endif
+
+
+ // -----------------------------------------------------------------------------
+ //   Port 2: Cayenne My Devices
+// -----------------------------------------------------------------------------
+
+payload.reset();
+
+#if (USE_GPS)
+    if (gps.checkGpsFix())
     {
-      ESP_LOGV(TAG, "GPS no fix");
+      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
     }
 #endif
 
 #if (USE_BME280)
-    payload.reset();
     payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
-    payload.enqueue_port(2);
 #endif
 
 #if (HAS_INA)
-    payload.reset();
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
-    payload.enqueue_port(2);
 #endif
 
+payload.enqueue_port(2);
+
+//Next Message-Block Port
 #if (HAS_PMU)
     payload.reset();
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
@@ -88,7 +100,7 @@ void do_send(osjob_t *j)
       // Prepare upstream data transmission at the next possible time.
       gps.buildPacket(txBuffer);
       LMIC_setTxData2(1, txBuffer, sizeof(txBuffer), 0);
-      Serial.println(F("Packet queued"));
+      ESP_LOGI(TAG, "Send Lora ");
       digitalWrite(BUILTIN_LED, HIGH);
     }
     else
@@ -118,7 +130,7 @@ void t_LORA_send_from_queue(osjob_t *j)
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
         dump_single_message(SendBuffer);
-        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, dataBuffer.data.tx_ack_req);
+        LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
       else
       {
@@ -134,24 +146,11 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
+
 void queue_aging()
 {
-  MessageBuffer_t SendBuffer;
-
-  int n = uxQueueMessagesWaiting(LoraSendQueue);
-  if (n >= SEND_QUEUE_SIZE)
-  {
-    ESP_LOGI(TAG, "Queue Aging");
-    ESP_LOGI(TAG, "Messages waiting before aging: %d", n);
-    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
-    {
-      ESP_LOGI(TAG, "deleted element:");
-      dump_single_message(SendBuffer);
-
-    }
-    int n = uxQueueMessagesWaiting(LoraSendQueue);
-    ESP_LOGI(TAG, "Messages waiting after aging: %d", n);
-  }
+  
+  
 }
 
 void dump_queue()
@@ -264,8 +263,9 @@ void onEvent(ev_t ev)
     if (LMIC.txrxFlags & TXRX_ACK)
     {
       log_display("Received Ack");
+      dataBuffer.data.rxCounter++;
     }
-    if (LMIC.dataLen)
+    if (LMIC.dataLen > 0)
     {
       sprintf(s, "Received %i bytes payload", LMIC.dataLen);
       log_display(s);

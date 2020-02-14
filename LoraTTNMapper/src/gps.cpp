@@ -19,10 +19,8 @@ void Neo6m::encode()
     {
       char data = GPSSerial.read();
       tGps.encode(data);
-      //Serial.print(data);
     }
   }
-  Serial.println("");
 }
 
 void Neo6m::buildPacket(uint8_t txBuffer[9])
@@ -63,7 +61,7 @@ bool Neo6m::checkGpsFix()
       tGps.altitude.isValid() &&
       tGps.altitude.age() < 2000)
   {
-    Serial.println("Valid gps Fix.");
+    Serial.println("Valid GPS fix.");
     return true;
   }
   else
