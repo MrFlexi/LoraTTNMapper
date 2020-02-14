@@ -91,31 +91,31 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
   switch (symbol)
   {
   case SUN:
-    u8g2.setFont(u8g2_font_open_iconic_weather_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
     u8g2.drawGlyph(x, y, 69);
     break;
   case SUN_CLOUD:
-    u8g2.setFont(u8g2_font_open_iconic_weather_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
     u8g2.drawGlyph(x, y, 65);
     break;
   case CLOUD:
-    u8g2.setFont(u8g2_font_open_iconic_weather_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
     u8g2.drawGlyph(x, y, 64);
     break;
   case RAIN:
-    u8g2.setFont(u8g2_font_open_iconic_weather_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
     u8g2.drawGlyph(x, y, 67);
     break;
   case THUNDER:
-    u8g2.setFont(u8g2_font_open_iconic_embedded_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
     u8g2.drawGlyph(x, y, 67);
     break;
   case SLEEP:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_all_2x_t);
     u8g2.drawGlyph(x, y, 72);
     break;
   case ICON_NOTES:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_all_2x_t);
     u8g2.drawGlyph(x, y, 225);
     break;
   }
@@ -150,7 +150,7 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
       u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
-      sprintf(sbuf, "%s", String(dataBuffer.data.ip_address));
+      sprintf(sbuf, "%s", dataBuffer.data.ip_address);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
@@ -181,7 +181,7 @@ void showPage(int page)
 
       if (dataBuffer.data.wlan)
       {
-        availableModules = availableModules +"WLAN "; 
+        availableModules = availableModules + "WLAN "; 
       }
 
       sprintf(sbuf, "%s", availableModules);
@@ -265,16 +265,20 @@ void showPage(int page)
 
       if (dataBuffer.data.MotionCounter <= 0 )
       {
-       u8g2.drawStr(30, 55, "Inactivity"); 
+       u8g2.drawStr(1, 55, "Inactivity"); 
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-       u8g2.drawStr(30, 55, "TX "); 
+       u8g2.drawStr(1, 55, "TX "); 
       }
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
+      #if (WAKEUP_MOTION)
+      u8g2.setCursor(64, 55);
+      u8g2.printf("move me !!", TIME_TO_SLEEP);
+      #endif
       drawSymbol(1, 48, SUN);
       break;
     }
