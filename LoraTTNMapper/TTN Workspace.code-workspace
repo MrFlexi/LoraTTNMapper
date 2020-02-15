@@ -19,6 +19,10 @@
 		{
 			"name": "Test Gyroskop",
 			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Test Gyroskop"
+		},
+		{
+			"name": "Gyro Teepot",
+			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Gyro Teepot"
 		}
 	],
 	"settings": {
