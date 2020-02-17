@@ -15,9 +15,6 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 
 /* ---------------- plain format without special encoding ---------- */
 
-#if (PAYLOAD_ENCODER == 3)
-
-
 #define LPP_DIGITAL_INPUT 0  // 1 byte
 
 
@@ -108,11 +105,12 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 #if (USE_GPS)
   uint32_t lat, lon;
   int32_t alt;
-  uint8_t hdopGps;
+  int8_t hdopGps;
 
-  lat = (uint32_t)(tGps.location.lat() * 1e6 / 100);
-  lon = (uint32_t)(tGps.location.lng() * 1e6 / 100);
+  lat = (uint32_t)(tGps.location.lat() / 100 );
+  lon = (uint32_t)(tGps.location.lng() / 100 );
   alt = tGps.altitude.meters() * 100;
+  hdopGps =  (int8_t) tGps.hdop.value();
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_GPS;
@@ -131,10 +129,8 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 #endif
 }
 
-void PayloadConvert::enqueue_port(uint8_t port)
+void PayloadConvert::enqueue_port(uint8_t port, sendprio_t prio)
 {
-  int ret;
-  MessageBuffer_t SendBuffer; 
 
   SendBuffer.MessageSize = payload.getSize();
   SendBuffer.MessagePrio = 1;
@@ -158,14 +154,25 @@ void PayloadConvert::enqueue_port(uint8_t port)
 // Insert new element at end of queue
   ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
   memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
+
+   if (uxQueueSpacesAvailable(LoraSendQueue) == 0) {
+      xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY);    
+      ESP_LOGW(TAG, "LORA sendqueue cleaned");
+    }
+
+switch (prio) {
+  case prio_high:  
+  ret = xQueueSendToFront(LoraSendQueue, &SendBuffer, 0);
+  if (ret != 1) { ESP_LOGI(TAG, "LORA sendqueue is full");  }
+  break;
+
+  default:
   ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
-  if (ret != 1)
-  {
-    ESP_LOGI(TAG, "LORA sendqueue is full");
-  }
+  if (ret != 1) { ESP_LOGI(TAG, "LORA sendqueue is full");  }
 }
 
-#endif
+}
+
 
 void lora_queue_init(void)
 {

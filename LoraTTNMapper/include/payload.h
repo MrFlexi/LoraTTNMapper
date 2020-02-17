@@ -47,7 +47,7 @@ public:
   PayloadConvert(uint8_t size);
   ~PayloadConvert();
 
-  void enqueue_port(uint8_t port);
+  void enqueue_port(uint8_t port, sendprio_t prio);
   void reset(void);
   uint8_t getSize(void);
   uint8_t *getBuffer(void);  
