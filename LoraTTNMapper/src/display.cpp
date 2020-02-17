@@ -124,8 +124,9 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 void showPage(int page)
 {
 
-   String availableModules =""; 
+    
    String IP_String = "";
+   String availableModules ="";
 
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
@@ -151,8 +152,8 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
       u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
-      IP_String = String(dataBuffer.data.ip_address);
-      //sprintf(sbuf, "%d.%d.%d.%d", dataBuffer.data.ip_address[0], dataBuffer.data.ip_address[1], dataBuffer.data.ip_address[2], dataBuffer.data.ip_address[3]);
+      IP_String = dataBuffer.data.ip_address;
+      
       sprintf(sbuf, "%s",  IP_String);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
