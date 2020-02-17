@@ -59,6 +59,7 @@
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
+#include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
 #include <Ticker.h>
@@ -100,8 +101,6 @@ enum pmu_power_t
   pmu_power_off,
   pmu_power_sleep
 };
-
-enum sendprio_t { prio_low, prio_normal, prio_high };
 
 typedef struct
 {

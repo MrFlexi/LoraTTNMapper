@@ -186,8 +186,11 @@ void showPage(int page)
       {
         availableModules = availableModules + "WLAN "; 
       }
-      strcpy(sbuf, availableModules.c_str());      
+
+      sprintf(sbuf, "%s", availableModules);
       u8g2.drawStr(1, 64, sbuf);
+
+
       break;
 
     case PAGE_LORA:
