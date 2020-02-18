@@ -247,7 +247,7 @@ void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-  
+
   dataBuffer.data.operation_mode = '0';
 
   Serial.print(F("WakeUp caused by: "));
@@ -271,7 +271,7 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-     break;
+    break;
   }
 }
 
@@ -465,6 +465,10 @@ void t_sleep()
     Serial.println("This will never be printed");
   }
 #endif
+
+#if (USE_FASTLED)
+  LED_showSleepCounter();
+#endif
 }
 
 void setup_wifi()
@@ -527,6 +531,12 @@ void createRTOStasks()
 
 void setup()
 {
+
+#if (USE_FASTLED)
+  setup_FastLed();
+  loop_FastLed();
+#endif
+
   Serial.begin(115200);
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
@@ -721,8 +731,8 @@ void setup()
   setup_gyro();
 #endif
 
-// get sensor values once
-t_cyclic();
+  // get sensor values once
+  t_cyclic();
 
   delay(2000);
 

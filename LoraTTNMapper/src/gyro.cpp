@@ -27,7 +27,7 @@ const int ledChannel = 0;
 const int resolution = 8;
 
 // orientation/motion vars
-Quaternion q;        // [w, x, y, z]         quaternion container
+Quaternion quat;        // [w, x, y, z]         quaternion container
 VectorInt16 aa;      // [x, y, z]            accel sensor measurements
 VectorInt16 gy;      // [x, y, z]            gyro sensor measurements
 VectorInt16 aaReal;  // [x, y, z]            gravity-free accel sensor measurements
@@ -223,7 +223,7 @@ void gyro_show_acc()
 
 #ifdef OUTPUT_READABLE_QUATERNION
         // display quaternion values in easy matrix form: w x y z
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
         Serial.print("quat\t");
         Serial.print(q.w);
         Serial.print("\t");
@@ -236,8 +236,8 @@ void gyro_show_acc()
 
 #ifdef OUTPUT_READABLE_EULER
         // display Euler angles in degrees
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetEuler(euler, &q);
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
+        mpu.dmpGetEuler(euler, &quat);
         Serial.print("euler\t");
         Serial.print(euler[0] * 180 / M_PI);
         Serial.print("\t");
@@ -248,9 +248,9 @@ void gyro_show_acc()
 
 #ifdef OUTPUT_READABLE_YAWPITCHROLL
         // display Euler angles in degrees
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &quat);
+        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
         Serial.print("ypr\t");
         Serial.print(ypr[0] * 180 / M_PI);
         Serial.print("\t");
@@ -279,9 +279,9 @@ void gyro_show_acc()
 
 #ifdef OUTPUT_READABLE_REALACCEL
         // display real acceleration, adjusted to remove gravity
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
         mpu.dmpGetAccel(&aa, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetGravity(&gravity, &quat);
         mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
         Serial.print("areal\t");
         Serial.print(aaReal.x);
@@ -294,11 +294,11 @@ void gyro_show_acc()
 #ifdef OUTPUT_READABLE_WORLDACCEL
         // display initial world-frame acceleration, adjusted to remove gravity
         // and rotated based on known orientation from quaternion
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
         mpu.dmpGetAccel(&aa, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetGravity(&gravity, &quat);
         mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-        mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+        mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &quat);
         Serial.print("aworld\t");
         Serial.print(aaWorld.x);
         Serial.print("\t");

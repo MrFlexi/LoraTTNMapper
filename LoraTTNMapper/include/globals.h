@@ -27,6 +27,8 @@
 #define USE_GYRO  1
 #define WAKEUP_MOTION 1
 
+#define USE_FASTLED 1
+
 #define displayRefreshIntervall 2       // every x second
 #define displayMoveIntervall 5 // every x second
 
@@ -193,6 +195,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_BLE)
 #include <ble.h>
+#endif
+
+#if (USE_FASTLED)
+#include <Led.h>
 #endif
 
 #endif
