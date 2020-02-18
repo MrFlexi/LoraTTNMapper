@@ -448,6 +448,10 @@ void t_sleep()
 
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
+#if (USE_FASTLED)
+  LED_showSleepCounter();
+#endif
+
   //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   //{
 
@@ -457,6 +461,9 @@ void t_sleep()
 #if (HAS_PMU)
     AXP192_power(pmu_power_sleep);
 #endif
+#if (USE_FASTLED)
+    LED_deepSleep();
+#endif
     gps.enable_sleep();
     Serial.flush();
     showPage(PAGE_SLEEP);
@@ -464,10 +471,6 @@ void t_sleep()
     esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
-#endif
-
-#if (USE_FASTLED)
-  LED_showSleepCounter();
 #endif
 }
 

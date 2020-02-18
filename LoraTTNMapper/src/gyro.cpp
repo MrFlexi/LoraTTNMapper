@@ -9,7 +9,7 @@ MPU6050 mpu;
 volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
 
 #define OUTPUT_READABLE_YAWPITCHROLL
-#define OUTPUT_READABLE_WORLDACCEL
+//#define OUTPUT_READABLE_WORLDACCEL
 
 
 #define LED_PIN 14               // (Arduino is 13, Teensy is 11, Teensy++ is 6)
@@ -275,6 +275,8 @@ void gyro_show_acc()
             */
         Serial.println();
 
+        LED_showDegree(int(ypr[0] * 180 / M_PI));
+
 #endif
 
 #ifdef OUTPUT_READABLE_REALACCEL
@@ -326,9 +328,18 @@ void gyro_handle_interrupt( void)
  
         Serial.println(mpuIntStatus);
         dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+        #if (USE_FASTLED)
+        //LED_showSleepCounter();
+       
+
+        if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
+    {
+        
+    }
+     #endif
 
         gyro_dump_interrupt_source(mpuIntStatus);
-        //show();
+        gyro_show_acc();
         //mpu.setIntMotionEnabled(true);
      }
 }
