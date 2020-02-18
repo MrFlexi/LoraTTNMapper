@@ -31,11 +31,7 @@ void t_enqueue_LORA_messages()
   {
 
     // Clear the LORA send queue
-    // queue_aging();
-
-    // ------------------------------------------------------------------
-    // Enqueue all Port 1 messages --> TTN Mapper Integration
-    // ------------------------------------------------------------------
+    queue_aging();
 
  // -----------------------------------------------------------------------------
  //   Port 1: TTN Mapper
@@ -46,11 +42,7 @@ void t_enqueue_LORA_messages()
     {
       payload.reset();
       payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
-<<<<<<< HEAD
-      payload.enqueue_port(1, prio_high);
-=======
       payload.enqueue_port(1);
->>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
     }
 #endif
 
@@ -68,15 +60,6 @@ payload.reset();
     }
 #endif
 
-<<<<<<< HEAD
-    // ------------------------------------------------------------------
-    // Enqueue all Port 2 messages --> Cayenne Integration
-    // ------------------------------------------------------------------
-
-    payload.reset();
-
-=======
->>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
 #if (USE_BME280)
     payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
 #endif
@@ -84,31 +67,21 @@ payload.reset();
 #if (HAS_INA)
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
-<<<<<<< HEAD
-#endif
-
-#if (USE_GPS)
-    // payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-=======
->>>>>>> 797bc4a66013162fdc57b25c87bebec192b71b91
 #endif
 
 payload.enqueue_port(2);
 
 //Next Message-Block Port
 #if (HAS_PMU)
-    if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bus_current != 0 )  || ( dataBuffer.data.bat_voltage != 0 ) || ( dataBuffer.data.bat_charge_current != 0 ) || ( dataBuffer.data.bat_discharge_current != 0 ) )
-      {
-        payload.addVoltage(20, dataBuffer.data.bus_voltage);
-        payload.addVoltage(21, dataBuffer.data.bus_current);
-        payload.addVoltage(30, dataBuffer.data.bat_voltage);
-        payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-        payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-      }
-#endif
-
+    payload.reset();
+    payload.addVoltage(20, dataBuffer.data.bus_voltage);
+    payload.addVoltage(21, dataBuffer.data.bus_current);
+    payload.addVoltage(30, dataBuffer.data.bat_voltage);
+    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
+    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
-    payload.enqueue_port(2, prio_low);
+    payload.enqueue_port(2);
+#endif
   }
 }
 
