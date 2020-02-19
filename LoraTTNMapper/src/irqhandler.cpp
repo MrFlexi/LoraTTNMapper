@@ -39,7 +39,8 @@ void irqHandler(void *pvParameters)
 #if (USE_GYRO )
 if (InterruptStatus & GYRO_IRQ_BIT)
   {
-  LED_showDegree( 10 );      
+    gyro_handle_interrupt();
+        
   }
 #endif
 

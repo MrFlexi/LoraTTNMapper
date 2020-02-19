@@ -14,5 +14,6 @@ extern volatile bool mpuInterrupt; // indicates whether MPU interrupt pin has go
 void setup_gyro(void);
 void gyro_handle_interrupt(void);
 double gyro_get_yaw();
+void gyro_get_values();
 
 #endif

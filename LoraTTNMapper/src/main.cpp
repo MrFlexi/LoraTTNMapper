@@ -433,8 +433,8 @@ void t_cyclic()
 #if (USE_GYRO)
   if (mpuInterrupt)
   {
-    gyro_handle_interrupt();    
-    dataBuffer.data.yaw = gyro_get_yaw();
+    //gyro_handle_interrupt();    
+    
   }
 
 #endif

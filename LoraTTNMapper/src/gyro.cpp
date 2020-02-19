@@ -151,8 +151,8 @@ void setup_gyro()
         mpu.setIntFreefallEnabled(false);
 
         mpu.setIntMotionEnabled(true);
-        mpu.setMotionDetectionDuration(50);
-        mpu.setMotionDetectionThreshold(3);
+        mpu.setMotionDetectionDuration(40);
+        mpu.setMotionDetectionThreshold(2);
 
         // supply your own gyro offsets here, scaled for min sensitivity
         mpu.setXGyroOffset(51);
@@ -220,7 +220,6 @@ double gyro_get_yaw()
     }
 }
 
-
 void gyro_get_values()
 {
     if (!I2C_MUTEX_LOCK())
@@ -246,15 +245,13 @@ void gyro_get_values()
         I2C_MUTEX_UNLOCK(); // release i2c bus access
 
         dataBuffer.data.yaw = ypr[0] * 180 / M_PI;
+        dataBuffer.data.pitch = ypr[1] * 180 / M_PI;
+        dataBuffer.data.roll = ypr[2] * 180 / M_PI;
     }
 }
 
-
-
 void gyro_show_acc()
 {
-
-
 
     //mpu.resetFIFO();
     fifoCount = mpu.getFIFOCount();
@@ -279,26 +276,7 @@ void gyro_show_acc()
     Serial.print(ypr[1] * 180 / M_PI);
     Serial.print("\t");
     Serial.print(ypr[2] * 180 / M_PI);
-    /*
-            mpu.dmpGetAccel(&aa, fifoBuffer);
-            Serial.print("\tRaw Accl XYZ\t");
-            Serial.print(aa.x);
-            Serial.print("\t");
-            Serial.print(aa.y);
-            Serial.print("\t");
-            Serial.print(aa.z);
-            mpu.dmpGetGyro(&gy, fifoBuffer);
-            Serial.print("\tRaw Gyro XYZ\t");
-            Serial.print(gy.x);
-            Serial.print("\t");
-            Serial.print(gy.y);
-            Serial.print("\t");
-            Serial.print(gy.z);
-            */
     Serial.println();
-
-    LED_showDegree(int(ypr[0] * 180 / M_PI));
-
 #endif
 }
 
@@ -318,15 +296,16 @@ void gyro_handle_interrupt(void)
         //mpu.setIntMotionEnabled(false);
         I2C_MUTEX_UNLOCK(); // release i2c bus access
 
-        Serial.println(mpuIntStatus);
-        dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
-#if (USE_FASTLED)
-        //LED_showSleepCounter();
-
         if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
         {
-        }
+
+            gyro_get_values();
+            dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+
+#if (USE_FASTLED)
+            LED_showDegree(dataBuffer.data.pitch);
 #endif
+        }
 
         gyro_dump_interrupt_source(mpuIntStatus);
         gyro_show_acc();
