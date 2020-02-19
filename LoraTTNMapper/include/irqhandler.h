@@ -12,6 +12,7 @@
 #define MATRIX_DISPLAY_IRQ 0x100
 #define PMU_IRQ_BIT 0x200
 #define ADXL_IRQ_BIT 0x400
+#define GYRO_IRQ_BIT 0x800
 
 #include "globals.h"
 
@@ -33,6 +34,10 @@ void IRAM_ATTR ButtonIRQ();
 
 #ifdef HAS_PMU
 void IRAM_ATTR PMU_IRQ();
+#endif
+
+#if (USE_GYRO)
+void IRAM_ATTR GYRO_IRQ();
 #endif
 
 

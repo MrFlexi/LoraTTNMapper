@@ -261,6 +261,26 @@ void showPage(int page)
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       break;
 
+
+    case PAGE_GYRO:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "GYRO");
+
+      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Yaw:%.2f", dataBuffer.data.yaw);
+      
+      u8g2.setCursor(1, 45);
+      u8g2.printf("Yaw:%.2f", dataBuffer.data.pitch);      
+
+      u8g2.setCursor(1, 60);
+      u8g2.printf("Yaw:%.2f", dataBuffer.data.roll);
+      
+      
+      
+      break;  
+
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");

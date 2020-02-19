@@ -33,18 +33,16 @@ void irqHandler(void *pvParameters)
 #if (HAS_PMU)
     if (InterruptStatus & PMU_IRQ_BIT)
       AXP192_event_handler();
+#endif        
 #endif
 
-
-  #if (USE_ADXL345)
-    if (InterruptStatus & ADXL_IRQ_BIT)
-    {
-      ESP_LOGI(TAG, "Interrupt %d", InterruptStatus);
-      adxl_event_handler();
-    }
-   #endif 
-      
+#if (USE_GYRO )
+if (InterruptStatus & GYRO_IRQ_BIT)
+  {
+  LED_showDegree( 10 );      
+  }
 #endif
+
   }
 }
 
@@ -86,6 +84,24 @@ void IRAM_ATTR ADXL_IRQ()
     portYIELD_FROM_ISR();
 }
 #endif
+
+
+
+#if (USE_GYRO)
+void IRAM_ATTR GYRO_IRQ()
+{
+    mpuInterrupt = true;
+
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  xTaskNotifyFromISR(irqHandlerTask, GYRO_IRQ_BIT, eSetBits,
+                     &xHigherPriorityTaskWoken);
+
+  if (xHigherPriorityTaskWoken)
+    portYIELD_FROM_ISR();
+}
+#endif
+
 
 void mask_user_IRQ()
 {

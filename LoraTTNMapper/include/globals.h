@@ -135,6 +135,9 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  double yaw = 0;
+  double pitch = 0;
+  double roll = 0;
   String ip_address;
   uint8_t operation_mode = 0;
 } deviceStatus_t;

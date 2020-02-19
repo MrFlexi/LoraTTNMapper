@@ -11,8 +11,7 @@ volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has g
 #define OUTPUT_READABLE_YAWPITCHROLL
 //#define OUTPUT_READABLE_WORLDACCEL
 
-
-#define LED_PIN 14               // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+#define LED_PIN 14 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
@@ -27,7 +26,7 @@ const int ledChannel = 0;
 const int resolution = 8;
 
 // orientation/motion vars
-Quaternion quat;        // [w, x, y, z]         quaternion container
+Quaternion quat;     // [w, x, y, z]         quaternion container
 VectorInt16 aa;      // [x, y, z]            accel sensor measurements
 VectorInt16 gy;      // [x, y, z]            gyro sensor measurements
 VectorInt16 aaReal;  // [x, y, z]            gravity-free accel sensor measurements
@@ -42,13 +41,6 @@ uint8_t teapotPacket[14] = {'$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r',
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
-
-
-
-void IRAM_ATTR dmpDataReady()
-{
-    mpuInterrupt = true;
-}
 
 void gyro_dump_interrupt_source(uint8_t mpuIntStatus)
 {
@@ -133,74 +125,128 @@ void setup_gyro()
     Wire.begin();
     Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
 
-if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-  else
-  {
-    // initialize device
-    Serial.println(F("Initializing I2C devices..."));
-    mpu.initialize();
-    pinMode(GYRO_INT_PIN, INPUT);
- 
+    if (!I2C_MUTEX_LOCK())
+        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    else
+    {
+        // initialize device
+        Serial.println(F("Initializing I2C devices..."));
+        mpu.initialize();
+        pinMode(GYRO_INT_PIN, INPUT);
 
-    // verify connection
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+        // verify connection
+        Serial.println(F("Testing device connections..."));
+        Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
 
-    // load and configure the DMP
-    Serial.println(F("Initializing DMP..."));
-    devStatus = mpu.dmpInitialize();
+        // load and configure the DMP
+        Serial.println(F("Initializing DMP..."));
+        devStatus = mpu.dmpInitialize();
 
-    mpu.setIntEnabled(false);
-    mpu.setIntZeroMotionEnabled(false);
-    mpu.setIntDataReadyEnabled(false);
-    mpu.setIntFIFOBufferOverflowEnabled(false);
-    mpu.setIntDMPEnabled(false);
-    mpu.setIntI2CMasterEnabled(false);
-    mpu.setIntFreefallEnabled(false);
+        mpu.setIntEnabled(false);
+        mpu.setIntZeroMotionEnabled(false);
+        mpu.setIntDataReadyEnabled(false);
+        mpu.setIntFIFOBufferOverflowEnabled(false);
+        mpu.setIntDMPEnabled(false);
+        mpu.setIntI2CMasterEnabled(false);
+        mpu.setIntFreefallEnabled(false);
 
-    mpu.setIntMotionEnabled(true);
-    mpu.setMotionDetectionDuration(50);
-    mpu.setMotionDetectionThreshold(3);
+        mpu.setIntMotionEnabled(true);
+        mpu.setMotionDetectionDuration(50);
+        mpu.setMotionDetectionThreshold(3);
 
-    // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(51);
-    mpu.setYGyroOffset(8);
-    mpu.setZGyroOffset(21);
-    mpu.setXAccelOffset(1150);
-    mpu.setYAccelOffset(-50);
-    mpu.setZAccelOffset(1060);
-    // make sure it worked (returns 0 if so)
+        // supply your own gyro offsets here, scaled for min sensitivity
+        mpu.setXGyroOffset(51);
+        mpu.setYGyroOffset(8);
+        mpu.setZGyroOffset(21);
+        mpu.setXAccelOffset(1150);
+        mpu.setYAccelOffset(-50);
+        mpu.setZAccelOffset(1060);
+        // make sure it worked (returns 0 if so)
 
-    // Calibration Time: generate offsets and calibrate our MPU6050
-    mpu.CalibrateAccel(6);
-    mpu.CalibrateGyro(6);
-    Serial.println();
-    mpu.PrintActiveOffsets();
-    // turn on the DMP, now that it's ready
-    Serial.println(F("Enabling DMP..."));
-    mpu.setDMPEnabled(true);
+        // Calibration Time: generate offsets and calibrate our MPU6050
+        mpu.CalibrateAccel(6);
+        mpu.CalibrateGyro(6);
+        Serial.println();
+        mpu.PrintActiveOffsets();
+        // turn on the DMP, now that it's ready
+        Serial.println(F("Enabling DMP..."));
+        mpu.setDMPEnabled(true);
 
-    mpu.setAccelerometerPowerOnDelay(10);
-    mpu.setDHPFMode(1);
+        mpu.setAccelerometerPowerOnDelay(10);
+        mpu.setDHPFMode(1);
 
-    dmpReady = true;
+        dmpReady = true;
 
-    // get expected DMP packet size for later comparison
-    packetSize = mpu.dmpGetFIFOPacketSize();
+        // get expected DMP packet size for later comparison
+        packetSize = mpu.dmpGetFIFOPacketSize();
 
-    checkSettings();
+        checkSettings();
+
+        mpuIntStatus = mpu.getIntStatus();
+        // set our DMP Ready flag so the main loop() function knows it's okay to use it
+        Serial.print(F("DMP ready! Waiting for first interrupt..."));
+        gyro_dump_interrupt_source(mpuIntStatus);
+        pinMode(GYRO_INT_PIN, INPUT_PULLUP);
+        attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), GYRO_IRQ, RISING);
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
+    }
+}
+
+double gyro_get_yaw()
+{
+    if (!I2C_MUTEX_LOCK())
+        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    else
+    {
+        //mpu.resetFIFO();
+        fifoCount = mpu.getFIFOCount();
+        Serial.print("Fifi Count");
+        Serial.println(fifoCount);
+
+        // wait for correct available data length, should be a VERY short wait
+        while (fifoCount < packetSize)
+            fifoCount = mpu.getFIFOCount();
+
+        // read a packet from FIFO
+        mpu.getFIFOBytes(fifoBuffer, packetSize);
+
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &quat);
+        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
+
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
+
+        return (ypr[0] * 180 / M_PI);
+    }
+}
 
 
-    mpuIntStatus = mpu.getIntStatus();
-    // set our DMP Ready flag so the main loop() function knows it's okay to use it
-    Serial.print(F("DMP ready! Waiting for first interrupt..."));
-    gyro_dump_interrupt_source(mpuIntStatus);
-    pinMode(GYRO_INT_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), dmpDataReady, RISING);
-    I2C_MUTEX_UNLOCK(); // release i2c bus access
-  }
-   
+void gyro_get_values()
+{
+    if (!I2C_MUTEX_LOCK())
+        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    else
+    {
+        //mpu.resetFIFO();
+        fifoCount = mpu.getFIFOCount();
+        Serial.print("Fifi Count");
+        Serial.println(fifoCount);
+
+        // wait for correct available data length, should be a VERY short wait
+        while (fifoCount < packetSize)
+            fifoCount = mpu.getFIFOCount();
+
+        // read a packet from FIFO
+        mpu.getFIFOBytes(fifoBuffer, packetSize);
+
+        mpu.dmpGetQuaternion(&quat, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &quat);
+        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
+
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
+
+        dataBuffer.data.yaw = ypr[0] * 180 / M_PI;
+    }
 }
 
 
@@ -209,55 +255,31 @@ void gyro_show_acc()
 {
 
 
-        //mpu.resetFIFO();
+
+    //mpu.resetFIFO();
+    fifoCount = mpu.getFIFOCount();
+    Serial.print("Fifi Count");
+    Serial.println(fifoCount);
+
+    // wait for correct available data length, should be a VERY short wait
+    while (fifoCount < packetSize)
         fifoCount = mpu.getFIFOCount();
-        Serial.print("Fifi Count"); Serial.println(fifoCount);
- 
-        // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize)
-            fifoCount = mpu.getFIFOCount();
 
-        // read a packet from FIFO
-        mpu.getFIFOBytes(fifoBuffer, packetSize);
-
-
-#ifdef OUTPUT_READABLE_QUATERNION
-        // display quaternion values in easy matrix form: w x y z
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        Serial.print("quat\t");
-        Serial.print(q.w);
-        Serial.print("\t");
-        Serial.print(q.x);
-        Serial.print("\t");
-        Serial.print(q.y);
-        Serial.print("\t");
-        Serial.println(q.z);
-#endif
-
-#ifdef OUTPUT_READABLE_EULER
-        // display Euler angles in degrees
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        mpu.dmpGetEuler(euler, &quat);
-        Serial.print("euler\t");
-        Serial.print(euler[0] * 180 / M_PI);
-        Serial.print("\t");
-        Serial.print(euler[1] * 180 / M_PI);
-        Serial.print("\t");
-        Serial.println(euler[2] * 180 / M_PI);
-#endif
+    // read a packet from FIFO
+    mpu.getFIFOBytes(fifoBuffer, packetSize);
 
 #ifdef OUTPUT_READABLE_YAWPITCHROLL
-        // display Euler angles in degrees
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &quat);
-        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
-        Serial.print("ypr\t");
-        Serial.print(ypr[0] * 180 / M_PI);
-        Serial.print("\t");
-        Serial.print(ypr[1] * 180 / M_PI);
-        Serial.print("\t");
-        Serial.print(ypr[2] * 180 / M_PI);
-        /*
+    // display Euler angles in degrees
+    mpu.dmpGetQuaternion(&quat, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &quat);
+    mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
+    Serial.print("ypr\t");
+    Serial.print(ypr[0] * 180 / M_PI);
+    Serial.print("\t");
+    Serial.print(ypr[1] * 180 / M_PI);
+    Serial.print("\t");
+    Serial.print(ypr[2] * 180 / M_PI);
+    /*
             mpu.dmpGetAccel(&aa, fifoBuffer);
             Serial.print("\tRaw Accl XYZ\t");
             Serial.print(aa.x);
@@ -273,40 +295,10 @@ void gyro_show_acc()
             Serial.print("\t");
             Serial.print(gy.z);
             */
-        Serial.println();
+    Serial.println();
 
-        LED_showDegree(int(ypr[0] * 180 / M_PI));
+    LED_showDegree(int(ypr[0] * 180 / M_PI));
 
-#endif
-
-#ifdef OUTPUT_READABLE_REALACCEL
-        // display real acceleration, adjusted to remove gravity
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        mpu.dmpGetAccel(&aa, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &quat);
-        mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-        Serial.print("areal\t");
-        Serial.print(aaReal.x);
-        Serial.print("\t");
-        Serial.print(aaReal.y);
-        Serial.print("\t");
-        Serial.println(aaReal.z);
-#endif
-
-#ifdef OUTPUT_READABLE_WORLDACCEL
-        // display initial world-frame acceleration, adjusted to remove gravity
-        // and rotated based on known orientation from quaternion
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        mpu.dmpGetAccel(&aa, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &quat);
-        mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-        mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &quat);
-        Serial.print("aworld\t");
-        Serial.print(aaWorld.x);
-        Serial.print("\t");
-        Serial.print(aaWorld.y);
-        Serial.print("\t");
-        Serial.println(aaWorld.z);
 #endif
 }
 
@@ -314,32 +306,30 @@ void gyro_show_acc()
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
-void gyro_handle_interrupt( void)
+void gyro_handle_interrupt(void)
 {
-  mpuInterrupt = false;
-  // block i2c bus access
-  if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-  else
-  {
+    mpuInterrupt = false;
+    // block i2c bus access
+    if (!I2C_MUTEX_LOCK())
+        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    else
+    {
         mpuIntStatus = mpu.getIntStatus();
         //mpu.setIntMotionEnabled(false);
         I2C_MUTEX_UNLOCK(); // release i2c bus access
- 
+
         Serial.println(mpuIntStatus);
         dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
-        #if (USE_FASTLED)
+#if (USE_FASTLED)
         //LED_showSleepCounter();
-       
 
         if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
-    {
-        
-    }
-     #endif
+        {
+        }
+#endif
 
         gyro_dump_interrupt_source(mpuIntStatus);
         gyro_show_acc();
         //mpu.setIntMotionEnabled(true);
-     }
+    }
 }

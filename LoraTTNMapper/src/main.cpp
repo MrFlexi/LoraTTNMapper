@@ -433,9 +433,15 @@ void t_cyclic()
 #if (USE_GYRO)
   if (mpuInterrupt)
   {
-    gyro_handle_interrupt();
+    gyro_handle_interrupt();    
+    dataBuffer.data.yaw = gyro_get_yaw();
   }
+
 #endif
+
+
+
+
 }
 
 void t_sleep()
@@ -820,4 +826,5 @@ void loop()
 #if (HAS_BUTTON)
   readButton();
 #endif
+
 }
