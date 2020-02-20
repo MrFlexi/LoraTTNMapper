@@ -28,6 +28,7 @@
 #define WAKEUP_MOTION 1
 
 #define USE_FASTLED 1
+#define USE_POTI 1
 
 #define displayRefreshIntervall 2       // every x second
 #define displayMoveIntervall 5 // every x second
@@ -127,6 +128,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
+  uint16_t potentiometer_a;   //
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
@@ -205,6 +207,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_FASTLED)
 #include <Led.h>
+#endif
+
+#if (USE_POTI)
+#include <AnalogSmooth.h>
 #endif
 
 #endif
