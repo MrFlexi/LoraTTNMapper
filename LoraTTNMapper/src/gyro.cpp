@@ -35,8 +35,6 @@ VectorFloat gravity; // [x, y, z]            gravity vector
 float euler[3];      // [psi, theta, phi]    Euler angle container
 float ypr[3];        // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
-// packet structure for InvenSense teapot demo
-uint8_t teapotPacket[14] = {'$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r', '\n'};
 
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
@@ -151,8 +149,8 @@ void setup_gyro()
         mpu.setIntFreefallEnabled(false);
 
         mpu.setIntMotionEnabled(true);
-        mpu.setMotionDetectionDuration(40);
-        mpu.setMotionDetectionThreshold(2);
+        mpu.setMotionDetectionDuration(70);
+        mpu.setMotionDetectionThreshold(3);
 
         // supply your own gyro offsets here, scaled for min sensitivity
         mpu.setXGyroOffset(51);
@@ -266,7 +264,7 @@ void gyro_handle_interrupt(void)
             gyro_get_values();
             dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
 
-#if (USE_FASTLED)
+#if (FASTLED_SHOW_DEGREE)
             LED_showDegree(dataBuffer.data.pitch);
 #endif
         }

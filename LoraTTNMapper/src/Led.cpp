@@ -7,8 +7,6 @@ uint8_t val_old;
 
 void setup_FastLed()
 {
-  delay(3000); // 3 second delay for recovery
-
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE, FASTLED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip)
@@ -74,7 +72,8 @@ void LED_sunset()
 
     // fill the entire strip with the current color
     fill_solid(leds, NUM_LEDS, color);
-    delay(50);
+    FastLED.show();
+    delay(20);
   }
 }
 
@@ -90,7 +89,8 @@ void LED_sunrise()
 
     // fill the entire strip with the current color
     fill_solid(leds, NUM_LEDS, color);
-    delay(50);
+    FastLED.show();
+    delay(20);
   }
 }
 
@@ -134,5 +134,33 @@ void LED_boot()
   {
     pride();
     FastLED.show();
+  }
+}
+
+void LED_wakeup()
+{
+
+  switch (dataBuffer.data.wakeup_reason)
+  {
+  case ESP_SLEEP_WAKEUP_EXT0:
+    //Serial.println(F("external signal using RTC_IO"));
+    LED_sunrise();
+    break;
+  case ESP_SLEEP_WAKEUP_EXT1:
+    //Serial.println(F("external signal using RTC_CNTL"));
+    break;
+  case ESP_SLEEP_WAKEUP_TIMER:
+    //Serial.println("by timer");
+    break;
+  case ESP_SLEEP_WAKEUP_TOUCHPAD:
+    //Serial.println(F("touchpad"));
+    break;
+  case ESP_SLEEP_WAKEUP_ULP:
+    //Serial.println(F("ULP program"));
+    break;
+  default:
+    //Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+    LED_boot();
+    break;
   }
 }

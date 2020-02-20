@@ -15,7 +15,7 @@
 #define USE_MQTT 0
 #define HAS_INA 0
 #define USE_DASH 0
-#define USE_GPS 1
+#define USE_GPS 0
 #define USE_DISPLAY 1
 #define USE_INTERRUPTS 1
 #define USE_BLE 0
@@ -28,10 +28,11 @@
 #define WAKEUP_MOTION 1
 
 #define USE_FASTLED 1
+#define FASTLED_SHOW_DEGREE 0
 #define USE_POTI 1
 
 #define displayRefreshIntervall 2       // every x second
-#define displayMoveIntervall 5 // every x second
+#define displayMoveIntervall 5          // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 30
@@ -145,6 +146,7 @@ typedef struct
   double roll = 0;
   String ip_address;
   uint8_t operation_mode = 0;
+  esp_sleep_wakeup_cause_t wakeup_reason;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue

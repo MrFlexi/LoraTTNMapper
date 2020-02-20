@@ -30,9 +30,6 @@ void t_enqueue_LORA_messages()
   else
   {
 
-    // Clear the LORA send queue
-    queue_aging();
-
  // -----------------------------------------------------------------------------
  //   Port 1: TTN Mapper
 // -----------------------------------------------------------------------------
@@ -146,12 +143,6 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
-
-void queue_aging()
-{
-  
-  
-}
 
 void dump_queue()
 {

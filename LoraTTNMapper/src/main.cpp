@@ -251,7 +251,7 @@ void print_wakeup_reason()
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  dataBuffer.data.operation_mode = '0';
+  dataBuffer.data.wakeup_reason = esp_sleep_get_wakeup_cause(); ;
 
   Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
@@ -259,11 +259,6 @@ void print_wakeup_reason()
   case ESP_SLEEP_WAKEUP_EXT0:
     Serial.println(F("external signal using RTC_IO"));
     dataBuffer.data.operation_mode = '1';
-
-#if (USE_FASTLED)
-    LED_sunrise();
-#endif
-
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     Serial.println(F("external signal using RTC_CNTL"));
@@ -279,10 +274,6 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-
-#if (USE_FASTLED)
-    LED_boot();
-#endif
     break;
   }
 }
@@ -393,6 +384,7 @@ void t_cyclic()
 #if (USE_POTI)
 #ifdef POTI_PIN
   dataBuffer.data.potentiometer_a = Poti_A.smooth(analogRead(POTI_PIN));
+  ESP_LOGI(TAG, "Poti %d", dataBuffer.data.potentiometer_a);
 #endif
 #endif
 
@@ -551,10 +543,6 @@ void setup()
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
-#if (USE_FASTLED)
-  setup_FastLed();
-#endif
-
   //Increment boot number and print it every reboot
   ++bootCount;
   dataBuffer.data.bootCounter = bootCount;
@@ -651,7 +639,7 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(1000);
+  delay(500);
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -680,7 +668,7 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(2000); // Wait for GPS beeing stable
+  delay(1000); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
@@ -748,7 +736,10 @@ void setup()
   // get sensor values once
   t_cyclic();
 
-  delay(2000);
+  #if (USE_FASTLED)
+  setup_FastLed();
+  LED_wakeup();
+  #endif
 
   //-------------------------------------------------------------------------------
   // Tasks

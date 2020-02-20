@@ -141,6 +141,7 @@ void showPage(int page)
 
     uint8_t icon = 0;
 
+    //page = PAGE_GYRO;
     switch (page)
     {
 
@@ -252,7 +253,7 @@ void showPage(int page)
 
       break;
 
-    case PAGE_SENSORS:
+      case PAGE_SENSORS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sensors");
 
@@ -271,16 +272,13 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      u8g2.printf("Yaw:%.2f", dataBuffer.data.yaw);
+      u8g2.printf("Yaw  :%.2f", dataBuffer.data.yaw);
       
       u8g2.setCursor(1, 45);
-      u8g2.printf("Yaw:%.2f", dataBuffer.data.pitch);      
+      u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);      
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("Yaw:%.2f", dataBuffer.data.roll);
-      
-      
-      
+      u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
       break;  
 
     case PAGE_SLEEP:

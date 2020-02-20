@@ -26,5 +26,6 @@ void LED_sunrise(void);
 void LED_showSleepCounter(void);
 void LED_deepSleep(void);
 void LED_showDegree(int i);
+void LED_wakeup(void);
 
 #endif
