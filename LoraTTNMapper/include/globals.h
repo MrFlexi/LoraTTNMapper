@@ -97,6 +97,9 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
+
+extern volatile bool mpuInterrupt;
+
 enum pmu_power_t
 {
   pmu_power_on,

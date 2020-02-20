@@ -14,6 +14,9 @@
 #define ADXL_IRQ_BIT 0x400
 #define GYRO_IRQ_BIT 0x800
 
+
+extern uint32_t InterruptStatusRegister;
+
 #include "globals.h"
 
 void irqHandler(void *pvParameters);

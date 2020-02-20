@@ -192,41 +192,9 @@ void setup_gyro()
     }
 }
 
-double gyro_get_yaw()
-{
-    if (!I2C_MUTEX_LOCK())
-        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-    else
-    {
-        //mpu.resetFIFO();
-        fifoCount = mpu.getFIFOCount();
-        Serial.print("Fifi Count");
-        Serial.println(fifoCount);
-
-        // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize)
-            fifoCount = mpu.getFIFOCount();
-
-        // read a packet from FIFO
-        mpu.getFIFOBytes(fifoBuffer, packetSize);
-
-        mpu.dmpGetQuaternion(&quat, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &quat);
-        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
-
-        I2C_MUTEX_UNLOCK(); // release i2c bus access
-
-        return (ypr[0] * 180 / M_PI);
-    }
-}
-
 void gyro_get_values()
 {
-    if (!I2C_MUTEX_LOCK())
-        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-    else
-    {
-        //mpu.resetFIFO();
+         //mpu.resetFIFO();
         fifoCount = mpu.getFIFOCount();
         Serial.print("Fifi Count");
         Serial.println(fifoCount);
@@ -240,14 +208,12 @@ void gyro_get_values()
 
         mpu.dmpGetQuaternion(&quat, fifoBuffer);
         mpu.dmpGetGravity(&gravity, &quat);
-        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
-
-        I2C_MUTEX_UNLOCK(); // release i2c bus access
+        mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);  
 
         dataBuffer.data.yaw = ypr[0] * 180 / M_PI;
         dataBuffer.data.pitch = ypr[1] * 180 / M_PI;
         dataBuffer.data.roll = ypr[2] * 180 / M_PI;
-    }
+  
 }
 
 void gyro_show_acc()
@@ -285,8 +251,7 @@ void gyro_show_acc()
 // ================================================================
 
 void gyro_handle_interrupt(void)
-{
-    mpuInterrupt = false;
+{    
     // block i2c bus access
     if (!I2C_MUTEX_LOCK())
         ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
@@ -294,11 +259,10 @@ void gyro_handle_interrupt(void)
     {
         mpuIntStatus = mpu.getIntStatus();
         //mpu.setIntMotionEnabled(false);
-        I2C_MUTEX_UNLOCK(); // release i2c bus access
+        
 
         if (mpuIntStatus & _BV(MPU6050_INTERRUPT_MOT_BIT))
         {
-
             gyro_get_values();
             dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
 
@@ -310,5 +274,6 @@ void gyro_handle_interrupt(void)
         gyro_dump_interrupt_source(mpuIntStatus);
         gyro_show_acc();
         //mpu.setIntMotionEnabled(true);
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
     }
 }
