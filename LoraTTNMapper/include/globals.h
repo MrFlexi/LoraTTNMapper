@@ -28,6 +28,7 @@
 #define WAKEUP_MOTION 1
 
 #define USE_FASTLED 1
+#define USE_POTI 1
 
 #define displayRefreshIntervall 2       // every x second
 #define displayMoveIntervall 5 // every x second
@@ -97,6 +98,9 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
+
+extern volatile bool mpuInterrupt;
+
 enum pmu_power_t
 {
   pmu_power_on,
@@ -124,6 +128,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
+  uint16_t potentiometer_a;   //
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
@@ -135,6 +140,9 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  double yaw = 0;
+  double pitch = 0;
+  double roll = 0;
   String ip_address;
   uint8_t operation_mode = 0;
 } deviceStatus_t;
@@ -199,6 +207,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_FASTLED)
 #include <Led.h>
+#endif
+
+#if (USE_POTI)
+#include <AnalogSmooth.h>
 #endif
 
 #endif

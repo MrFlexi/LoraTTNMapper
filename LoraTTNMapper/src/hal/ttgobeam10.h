@@ -19,6 +19,9 @@
 #define PMU_INT                 GPIO_NUM_35     // AXP192 interrupt
 #define GYRO_INT_PIN            GPIO_NUM_4      // Gyroskop Movement Detection
 #define FASTLED_DATA_PIN        GPIO_NUM_2
+#define POTI_PIN                GPIO_NUM_13
+
+#define GYRO_INT_PIN              GPIO_NUM_4      // ADXL Movement
 
 #define HAS_LED NOT_A_PIN
 

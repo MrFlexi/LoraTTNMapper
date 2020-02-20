@@ -19,7 +19,10 @@
 
 
 void setup_FastLed(void); 
-void loop_FastLed(void);
+void LED_boot(void);
+void LED_sunset(void);
+void LED_sunrise(void);
+
 void LED_showSleepCounter(void);
 void LED_deepSleep(void);
 void LED_showDegree(int i);

@@ -7,6 +7,9 @@
 
 #include "globals.h"
 
+// Defaults to window size 10
+AnalogSmooth Poti_A = AnalogSmooth();
+
 //--------------------------------------------------------------------------
 // OTA Settings
 //--------------------------------------------------------------------------
@@ -256,6 +259,11 @@ void print_wakeup_reason()
   case ESP_SLEEP_WAKEUP_EXT0:
     Serial.println(F("external signal using RTC_IO"));
     dataBuffer.data.operation_mode = '1';
+
+#if (USE_FASTLED)
+    LED_sunrise();
+#endif
+
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     Serial.println(F("external signal using RTC_CNTL"));
@@ -271,6 +279,10 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
+
+#if (USE_FASTLED)
+    LED_boot();
+#endif
     break;
   }
 }
@@ -376,8 +388,15 @@ void t_cyclic()
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
 
-  //   I2C opperations
 
+  //   Potentiometer 
+#if (USE_POTI)
+#ifdef POTI_PIN
+  dataBuffer.data.potentiometer_a = Poti_A.smooth(analogRead(POTI_PIN));
+#endif
+#endif
+
+  //   I2C opperations
   if (!I2C_MUTEX_LOCK())
     ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
@@ -429,13 +448,6 @@ void t_cyclic()
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
-
-#if (USE_GYRO)
-  if (mpuInterrupt)
-  {
-    gyro_handle_interrupt();
-  }
-#endif
 }
 
 void t_sleep()
@@ -449,11 +461,11 @@ void t_sleep()
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
 #if (USE_FASTLED)
-  LED_showSleepCounter();
+  if (dataBuffer.data.MotionCounter < TIME_TO_NEXT_SLEEP_WITHOUT_MOTION)
+  {
+    LED_showSleepCounter();
+  }
 #endif
-
-  //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
-  //{
 
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
@@ -462,7 +474,7 @@ void t_sleep()
     AXP192_power(pmu_power_sleep);
 #endif
 #if (USE_FASTLED)
-    LED_deepSleep();
+    LED_sunset();
 #endif
     gps.enable_sleep();
     Serial.flush();
@@ -535,14 +547,13 @@ void createRTOStasks()
 void setup()
 {
 
-#if (USE_FASTLED)
-  setup_FastLed();
-  loop_FastLed();
-#endif
-
   Serial.begin(115200);
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
+
+#if (USE_FASTLED)
+  setup_FastLed();
+#endif
 
   //Increment boot number and print it every reboot
   ++bootCount;
