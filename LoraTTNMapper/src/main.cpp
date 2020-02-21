@@ -8,7 +8,9 @@
 #include "globals.h"
 
 // Defaults to window size 10
+#if (USE_POTI)
 AnalogSmooth Poti_A = AnalogSmooth();
+#endif
 
 //--------------------------------------------------------------------------
 // OTA Settings
@@ -140,6 +142,8 @@ void Cayenne_send(void)
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+
+  Cayenne.virtualWrite(40, dataBuffer.data.bootCounter, "counter", "Analog");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -251,7 +255,7 @@ void print_wakeup_reason()
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  dataBuffer.data.wakeup_reason = esp_sleep_get_wakeup_cause(); ;
+  dataBuffer.data.wakeup_reason = wakeup_reason;
 
   Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
@@ -375,16 +379,13 @@ void t_cyclicRTOS(void *pvParameters)
 void t_cyclic()
 {
 
-  ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
 
-
-  //   Potentiometer 
+  //   Potentiometer
 #if (USE_POTI)
 #ifdef POTI_PIN
   dataBuffer.data.potentiometer_a = Poti_A.smooth(analogRead(POTI_PIN));
-  ESP_LOGI(TAG, "Poti %d", dataBuffer.data.potentiometer_a);
 #endif
 #endif
 
@@ -396,7 +397,7 @@ void t_cyclic()
 #if (USE_BME280)
     dataBuffer.data.temperature = bme.readTemperature();
     dataBuffer.data.humidity = bme.readHumidity();
-    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+
 #endif
 
 #if (HAS_PMU)
@@ -406,7 +407,7 @@ void t_cyclic()
     dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-    // AXP192_showstatus();
+
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
@@ -439,6 +440,13 @@ void t_cyclic()
 #if (USE_DISPLAY)
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
+#endif
+
+#if (CYCLIC_SHOW_LOG)
+  ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
+  ESP_LOGI(TAG, "Poti %d", dataBuffer.data.potentiometer_a);
+  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  AXP192_showstatus();
 #endif
 }
 
@@ -653,7 +661,7 @@ void setup()
 //esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
-#if (WAKEUP_MOTION)
+#if (WAKEUP_BY_MOTION)
 #if (USE_GYRO)
 #ifdef GYRO_INT_PIN
   esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
@@ -736,10 +744,11 @@ void setup()
   // get sensor values once
   t_cyclic();
 
-  #if (USE_FASTLED)
+#if (USE_FASTLED)
   setup_FastLed();
+  delay(100);
   LED_wakeup();
-  #endif
+#endif
 
   //-------------------------------------------------------------------------------
   // Tasks

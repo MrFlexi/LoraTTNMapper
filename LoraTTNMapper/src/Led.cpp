@@ -73,7 +73,7 @@ void LED_sunset()
     // fill the entire strip with the current color
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
-    delay(20);
+    delay(10);
   }
 }
 
@@ -85,12 +85,12 @@ void LED_sunrise()
     // HeatColors_p is a gradient palette built in to FastLED
     // that fades from black to red, orange, yellow, white
     // feel free to use another palette or define your own custom one
-    CRGB color = ColorFromPalette(HeatColors_p, heatIndex);
+    CRGB color = ColorFromPalette(LavaColors_p, heatIndex);
 
     // fill the entire strip with the current color
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
-    delay(20);
+    delay(10);
   }
 }
 
@@ -110,6 +110,17 @@ void LED_showSleepCounter()
     FastLED.show();
     val_old = val;
   }
+}
+
+void LED_bootcount()
+{
+  FastLED.clear();
+for (int l = 0; l <dataBuffer.data.bootCounter; l++)
+    {
+      leds[l] = CRGB::Yellow;
+    }
+  FastLED.show();
+
 }
 
 void LED_deepSleep()
@@ -150,7 +161,7 @@ void LED_wakeup()
     //Serial.println(F("external signal using RTC_CNTL"));
     break;
   case ESP_SLEEP_WAKEUP_TIMER:
-    //Serial.println("by timer");
+    LED_sunrise();
     break;
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
     //Serial.println(F("touchpad"));
@@ -163,4 +174,7 @@ void LED_wakeup()
     LED_boot();
     break;
   }
+  delay(2000);
+  LED_bootcount();
+  delay(2000);
 }

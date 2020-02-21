@@ -189,6 +189,7 @@ void showPage(int page)
         availableModules = availableModules + "WLAN "; 
       }
 
+      Serial.println(availableModules);
       sprintf(sbuf, "%s", availableModules);
       u8g2.drawStr(1, 64, sbuf);
 
@@ -299,7 +300,7 @@ void showPage(int page)
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
-      #if (WAKEUP_MOTION)
+      #if (WAKEUP_BY_MOTION)
       u8g2.setCursor(64, 55);
       u8g2.printf(" move me !!", TIME_TO_SLEEP);
       #endif

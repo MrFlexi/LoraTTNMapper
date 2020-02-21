@@ -124,7 +124,9 @@ if (!I2C_MUTEX_LOCK())
   if (pmu.isPEKShortPressIRQ())
   {
     ESP_LOGI(TAG, "Power Button --> Short Pressed");
+    #if (USE_FASTLED)
     LED_sunset();
+    #endif
     // enter_deepsleep(0, HAS_BUTTON);
   }
 
