@@ -114,8 +114,13 @@ void LED_showSleepCounter()
 
 void LED_bootcount()
 {
+  int i = 0;
   FastLED.clear();
-for (int l = 0; l <dataBuffer.data.bootCounter; l++)
+
+if ( dataBuffer.data.bootCounter <= NUM_LEDS) i = dataBuffer.data.bootCounter;
+else i = NUM_LEDS;
+
+for (int l = 0; l < i; l++)
     {
       leds[l] = CRGB::Yellow;
     }
