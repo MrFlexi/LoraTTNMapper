@@ -30,9 +30,6 @@ void t_enqueue_LORA_messages()
   else
   {
 
-    // Clear the LORA send queue
-    queue_aging();
-
  // -----------------------------------------------------------------------------
  //   Port 1: TTN Mapper
 // -----------------------------------------------------------------------------
@@ -53,11 +50,13 @@ void t_enqueue_LORA_messages()
 
 payload.reset();
 
+payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+
 #if (USE_GPS)
-    if (gps.checkGpsFix())
-    {
-      payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-    }
+    //if (gps.checkGpsFix())
+    //{
+    //  payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+    //}
 #endif
 
 #if (USE_BME280)
@@ -71,6 +70,8 @@ payload.reset();
 
 payload.enqueue_port(2);
 
+
+
 //Next Message-Block Port
 #if (HAS_PMU)
     payload.reset();
@@ -80,6 +81,7 @@ payload.enqueue_port(2);
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+
     payload.enqueue_port(2);
 #endif
   }
@@ -146,12 +148,6 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
-
-void queue_aging()
-{
-  
-  
-}
 
 void dump_queue()
 {

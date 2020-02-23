@@ -7,6 +7,11 @@
 
 #include "globals.h"
 
+// Defaults to window size 10
+#if (USE_POTI)
+AnalogSmooth Poti_A = AnalogSmooth();
+#endif
+
 //--------------------------------------------------------------------------
 // OTA Settings
 //--------------------------------------------------------------------------
@@ -137,6 +142,8 @@ void Cayenne_send(void)
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
   Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+
+  Cayenne.virtualWrite(40, dataBuffer.data.bootCounter, "counter", "Analog");
 }
 
 // Default function for processing actuator commands from the Cayenne Dashboard.
@@ -247,8 +254,8 @@ void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-  
-  dataBuffer.data.operation_mode = '0';
+
+  dataBuffer.data.wakeup_reason = wakeup_reason;
 
   Serial.print(F("WakeUp caused by: "));
   switch (wakeup_reason)
@@ -271,7 +278,7 @@ void print_wakeup_reason()
     break;
   default:
     Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-     break;
+    break;
   }
 }
 
@@ -372,12 +379,17 @@ void t_cyclicRTOS(void *pvParameters)
 void t_cyclic()
 {
 
-  ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
 
-  //   I2C opperations
+  //   Potentiometer
+#if (USE_POTI)
+#ifdef POTI_PIN
+  dataBuffer.data.potentiometer_a = Poti_A.smooth(analogRead(POTI_PIN));
+#endif
+#endif
 
+  //   I2C opperations
   if (!I2C_MUTEX_LOCK())
     ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
@@ -385,7 +397,7 @@ void t_cyclic()
 #if (USE_BME280)
     dataBuffer.data.temperature = bme.readTemperature();
     dataBuffer.data.humidity = bme.readHumidity();
-    ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+
 #endif
 
 #if (HAS_PMU)
@@ -395,7 +407,7 @@ void t_cyclic()
     dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-    // AXP192_showstatus();
+
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
@@ -430,11 +442,11 @@ void t_cyclic()
     showPage(PageNumber);
 #endif
 
-#if (USE_GYRO)
-  if (mpuInterrupt)
-  {
-    gyro_handle_interrupt();
-  }
+#if (CYCLIC_SHOW_LOG)
+  ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
+  ESP_LOGI(TAG, "Poti %d", dataBuffer.data.potentiometer_a);
+  ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  AXP192_showstatus();
 #endif
 }
 
@@ -448,14 +460,21 @@ void t_sleep()
 
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
-  //if (dataBuffer.data.sleepCounter <= 0 || dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
-  //{
+#if (USE_FASTLED)
+  if (dataBuffer.data.MotionCounter < TIME_TO_NEXT_SLEEP_WITHOUT_MOTION)
+  {
+    LED_showSleepCounter();
+  }
+#endif
 
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
 #if (HAS_PMU)
     AXP192_power(pmu_power_sleep);
+#endif
+#if (USE_FASTLED)
+    LED_sunset();
 #endif
     gps.enable_sleep();
     Serial.flush();
@@ -527,6 +546,7 @@ void createRTOStasks()
 
 void setup()
 {
+
   Serial.begin(115200);
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
@@ -627,7 +647,7 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(1000);
+  delay(500);
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -641,7 +661,7 @@ void setup()
 //esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
 #endif
 
-#if (WAKEUP_MOTION)
+#if (WAKEUP_BY_MOTION)
 #if (USE_GYRO)
 #ifdef GYRO_INT_PIN
   esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
@@ -656,7 +676,7 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(2000); // Wait for GPS beeing stable
+  delay(1000); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
@@ -721,10 +741,14 @@ void setup()
   setup_gyro();
 #endif
 
-// get sensor values once
-t_cyclic();
+  // get sensor values once
+  t_cyclic();
 
-  delay(2000);
+#if (USE_FASTLED)
+  setup_FastLed();
+  delay(100);
+  LED_wakeup();
+#endif
 
   //-------------------------------------------------------------------------------
   // Tasks

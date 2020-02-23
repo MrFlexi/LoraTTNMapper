@@ -124,6 +124,9 @@ if (!I2C_MUTEX_LOCK())
   if (pmu.isPEKShortPressIRQ())
   {
     ESP_LOGI(TAG, "Power Button --> Short Pressed");
+    #if (USE_FASTLED)
+    LED_sunset();
+    #endif
     // enter_deepsleep(0, HAS_BUTTON);
   }
 
@@ -136,12 +139,7 @@ if (!I2C_MUTEX_LOCK())
   }
 
   pmu.clearIRQ();
-
-  // refresh stored voltage value
-  read_voltage();
   I2C_MUTEX_UNLOCK(); // release i2c bus access
-
-
   }
 
 }

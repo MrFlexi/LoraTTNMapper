@@ -29,7 +29,6 @@ void t_enqueue_LORA_messages();
 void do_send(osjob_t *j);
 void t_LORA_send_from_queue(osjob_t *j);
 void dump_queue();
-void queue_aging();
 void dump_single_message(MessageBuffer_t SendBuffer);
 void setup_lora();
 #endif
