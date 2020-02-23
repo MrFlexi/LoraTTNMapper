@@ -7,10 +7,10 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
-#define USE_WIFI 1
+
 #define USE_OTA 0
 #define USE_BME280 1
-#define USE_CAYENNE 0
+
 #define HAS_LORA 1
 #define USE_MQTT 0
 #define HAS_INA 0
@@ -21,19 +21,25 @@
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
 
+#define USE_WIFI 1
 #define USE_WEBSERVER   1
 #define USE_WEBSOCKET   1
+#define USE_CAYENNE 1
 
 #define USE_GYRO  1
-#define WAKEUP_MOTION 1
+#define WAKEUP_BY_MOTION 1
+
+#define USE_FASTLED 1
+#define FASTLED_SHOW_DEGREE 0
+#define USE_POTI 0
 
 #define displayRefreshIntervall 2       // every x second
-#define displayMoveIntervall 5 // every x second
+#define displayMoveIntervall 5          // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 30
 
-#define sendCayenneIntervall 120 // every x seconds
+#define sendCayenneIntervall 60 // every x seconds
 #define sendWebserverIntervall 10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
@@ -55,7 +61,7 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 20         // sleep for n minute
+#define TIME_TO_SLEEP 10        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
@@ -65,7 +71,10 @@
 #include <Ticker.h>
 #include "esp_sleep.h"
 #include <Wire.h>
+
+#if (USE_WEBSERVER || USE_CAYENNE)
 #include "WiFi.h"
+#endif
 
 
 #if (USE_WEBSERVER)
@@ -95,6 +104,9 @@ const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
 extern WiFiClient wifiClient;
 
+
+extern volatile bool mpuInterrupt;
+
 enum pmu_power_t
 {
   pmu_power_on,
@@ -122,6 +134,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
+  uint16_t potentiometer_a;   //
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
@@ -133,8 +146,12 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  double yaw = 0;
+  double pitch = 0;
+  double roll = 0;
   String ip_address;
   uint8_t operation_mode = 0;
+  esp_sleep_wakeup_cause_t wakeup_reason;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue
@@ -193,6 +210,14 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_BLE)
 #include <ble.h>
+#endif
+
+#if (USE_FASTLED)
+#include <Led.h>
+#endif
+
+#if (USE_POTI)
+#include <AnalogSmooth.h>
 #endif
 
 #endif

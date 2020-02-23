@@ -111,11 +111,11 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
     u8g2.drawGlyph(x, y, 67);
     break;
   case SLEEP:
-    u8g2.setFont(u8g2_font_open_iconic_all_2x_t);
+    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
     u8g2.drawGlyph(x, y, 72);
     break;
   case ICON_NOTES:
-    u8g2.setFont(u8g2_font_open_iconic_all_2x_t);
+    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
     u8g2.drawGlyph(x, y, 225);
     break;
   }
@@ -124,7 +124,9 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 void showPage(int page)
 {
 
-   String availableModules =""; 
+    
+   String IP_String = "";
+   String availableModules ="";
 
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
@@ -139,6 +141,7 @@ void showPage(int page)
 
     uint8_t icon = 0;
 
+    //page = PAGE_GYRO;
     switch (page)
     {
 
@@ -150,7 +153,9 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);     
       u8g2.setCursor(1, 30);
       u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
-      sprintf(sbuf, "%s", dataBuffer.data.ip_address);
+      IP_String = dataBuffer.data.ip_address;
+      
+      sprintf(sbuf, "%s",  IP_String);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
@@ -184,6 +189,7 @@ void showPage(int page)
         availableModules = availableModules + "WLAN "; 
       }
 
+      Serial.println(availableModules);
       sprintf(sbuf, "%s", availableModules);
       u8g2.drawStr(1, 64, sbuf);
 
@@ -248,14 +254,33 @@ void showPage(int page)
 
       break;
 
-    case PAGE_SENSORS:
+      case PAGE_SENSORS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sensors");
 
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
+      u8g2.setCursor(1, 45);
+      u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
       break;
+
+
+    case PAGE_GYRO:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "GYRO");
+
+      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Yaw  :%.2f", dataBuffer.data.yaw);
+      
+      u8g2.setCursor(1, 45);
+      u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);      
+
+      u8g2.setCursor(1, 60);
+      u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
+      break;  
 
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -275,9 +300,9 @@ void showPage(int page)
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
-      #if (WAKEUP_MOTION)
+      #if (WAKEUP_BY_MOTION)
       u8g2.setCursor(64, 55);
-      u8g2.printf("move me !!", TIME_TO_SLEEP);
+      u8g2.printf(" move me !!", TIME_TO_SLEEP);
       #endif
       drawSymbol(1, 48, SUN);
       break;

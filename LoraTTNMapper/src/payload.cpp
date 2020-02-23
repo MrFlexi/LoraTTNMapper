@@ -21,6 +21,16 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 #define LPP_DIGITAL_INPUT 0  // 1 byte
 
 
+void PayloadConvert::addCount(uint8_t channel, uint16_t value)
+{ 
+  uint16_t volt = value * 100;
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_ANALOG_INPUT;
+  buffer[cursor++] = highByte(volt);
+  buffer[cursor++] = lowByte(volt);
+}
+
+
 void PayloadConvert::addFloat(uint8_t channel, float value)
 { 
   uint16_t volt = value * 100;

@@ -4,14 +4,21 @@
 // Local logging tag
 static const char TAG[] = __FILE__;
 
-// irq handler task, handles all our application level interrupts
+uint32_t InterruptStatusRegister = 0;
+
+//------------------------------------------------------------------------------------------
+// // Irq handler RTOStask, handles all our application level interrupts
+//------------------------------------------------------------------------------------------
+
 void irqHandler(void *pvParameters)
 {
 
-  configASSERT(((uint32_t)pvParameters) == 1); // FreeRTOS check
-
+  
+  const TickType_t xDelay = 250 / portTICK_PERIOD_MS;  // 100 ms = 10 times per second
   uint32_t InterruptStatus;
   static bool mask_irq = false;
+
+  configASSERT(((uint32_t)pvParameters) == 1); // FreeRTOS check
 
   // task remains in blocked state until it is notified by an irq
   for (;;)
@@ -21,32 +28,36 @@ void irqHandler(void *pvParameters)
                     &InterruptStatus, // Receives the notification value
                     portMAX_DELAY);   // wait forever
 
+#if (USE_INTERRUPTS)
 
 // button pressed?
 #ifdef HAS_BUTTON
-    if (InterruptStatus & BUTTON_IRQ)
+    if (InterruptStatusRegister & BUTTON_IRQ)
       readButton();
 #endif
 
-#if (USE_INTERRUPTS)
 // do we have a power event?
 #if (HAS_PMU)
-    if (InterruptStatus & PMU_IRQ_BIT)
+    if (InterruptStatusRegister & PMU_IRQ_BIT)
       AXP192_event_handler();
 #endif
 
-
-  #if (USE_ADXL345)
-    if (InterruptStatus & ADXL_IRQ_BIT)
+#if (USE_GYRO)
+    if (InterruptStatusRegister & GYRO_IRQ_BIT)
     {
-      ESP_LOGI(TAG, "Interrupt %d", InterruptStatus);
-      adxl_event_handler();
+      gyro_handle_interrupt();
     }
-   #endif 
-      
 #endif
+#endif
+
+  InterruptStatusRegister = 0;
+  vTaskDelay(xDelay);
   }
 }
+
+//------------------------------------------------------------------------------------------
+// Notify Interrupt Handler
+//------------------------------------------------------------------------------------------
 
 #ifdef HAS_BUTTON
 void IRAM_ATTR ButtonIRQ()
@@ -65,6 +76,7 @@ void IRAM_ATTR ButtonIRQ()
 void IRAM_ATTR PMU_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  InterruptStatusRegister |= PMU_IRQ_BIT;
 
   xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
                      &xHigherPriorityTaskWoken);
@@ -74,12 +86,16 @@ void IRAM_ATTR PMU_IRQ()
 }
 #endif
 
-#if (USE_INTERRUPTS)
-void IRAM_ATTR ADXL_IRQ()
+#if (USE_GYRO)
+void IRAM_ATTR GYRO_IRQ()
 {
+  mpuInterrupt = true;
+
+  InterruptStatusRegister |= GYRO_IRQ_BIT; // Set Gyro Interrupt Bit
+
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  xTaskNotifyFromISR(irqHandlerTask, ADXL_IRQ_BIT, eSetBits,
+  xTaskNotifyFromISR(irqHandlerTask, GYRO_IRQ_BIT, eSetBits,
                      &xHigherPriorityTaskWoken);
 
   if (xHigherPriorityTaskWoken)

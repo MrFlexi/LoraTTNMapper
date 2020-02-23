@@ -19,6 +19,14 @@
 		{
 			"name": "Test Gyroskop",
 			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Test Gyroskop"
+		},
+		{
+			"name": "Gyro Teepot",
+			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Gyro Teepot"
+		},
+		{
+			"name": "FastLed",
+			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\FastLed"
 		}
 	],
 	"settings": {
