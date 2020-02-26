@@ -27,6 +27,10 @@
 		{
 			"name": "FastLed",
 			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\FastLed"
+		},
+		{
+			"name": "Test RTOS 1",
+			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Test RTOS 1"
 		}
 	],
 	"settings": {
