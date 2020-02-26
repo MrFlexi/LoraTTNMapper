@@ -6,6 +6,7 @@
 #define _POTI_H
 
 #include <Arduino.h>
+#include "globals.h"
 
 void poti_setup_RTOS(void);
 

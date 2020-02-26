@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <driver/adc.h>
 #include <esp_adc_cal.h>
+#include "globals.h"
 
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
 #define DEFAULT_VREF 1100 
@@ -14,37 +15,6 @@ esp_adc_cal_characteristics_t *adc_characs =
 static const adc1_channel_t adc_channel = ADC1_GPIO35_CHANNEL;
 static const adc_atten_t atten = ADC_ATTEN_DB_11;
 static const adc_unit_t unit = ADC_UNIT_1;
-
-
-typedef struct
-{
-  uint16_t potentiometer_a;   //
-} deviceStatus_t;
-
-class DataBuffer
-{
-  public:
-    DataBuffer();
-    void set( deviceStatus_t input );
-    void get();  
-    deviceStatus_t data ;
-};
-
-DataBuffer::DataBuffer()
-{
-}
-
-void DataBuffer::set(deviceStatus_t input)
-{
-  data = input;
-}
-
-void DataBuffer::get()
-{
-}
-
-int globalIntVar = 5;
-DataBuffer dataBuffer;
 
 
 
@@ -75,7 +45,7 @@ void Poti_calibrate_voltage(void)
 }
 
 
-uint16_t Poti_read_voltage(adc1_channel_t channel)
+float Poti_read_voltage(adc1_channel_t channel)
 {
   uint16_t voltage = 0;
   uint32_t adc_reading = 0;
@@ -89,7 +59,7 @@ uint16_t Poti_read_voltage(adc1_channel_t channel)
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
 
-  return voltage;
+  return voltage * 1000;
 }
 
 

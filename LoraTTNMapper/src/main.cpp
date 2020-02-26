@@ -382,13 +382,6 @@ void t_cyclic()
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
 
-  //   Potentiometer
-#if (USE_POTI)
-#ifdef POTI_PIN
-  dataBuffer.data.potentiometer_a = Poti_A.smooth(analogRead(POTI_PIN));
-#endif
-#endif
-
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
     ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
@@ -799,8 +792,11 @@ void setup()
   log_display("Setup done");
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
-  //showPage(PAGE_VALUES);
+  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));  
+
+#if (USE_POTI)
+  poti_setup_RTOS();
+#endif
 }
 
 void loop()
