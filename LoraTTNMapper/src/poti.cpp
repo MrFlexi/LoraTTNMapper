@@ -58,8 +58,10 @@ float Poti_read_voltage(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
+  Serial.print(voltage);Serial.print("  ");Serial.println(adc_reading);
 
-  return voltage * 1000;
+  uniny = map(0, voltage, 0, 4096 );
+  return voltage / (float) 1000;
 }
 
 
@@ -84,7 +86,7 @@ void t_getADCValues( void * parameter ){
     locdataBuffer->data.potentiometer_a = Poti_read_voltage(adc_channel);
     //Serial.print(xPortGetCoreID());
  
-    vTaskDelay(200);
+    vTaskDelay(1000);
     }
  
 } 
