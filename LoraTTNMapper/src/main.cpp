@@ -437,7 +437,7 @@ void t_cyclic()
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
-  ESP_LOGI(TAG, "Poti %d", dataBuffer.data.potentiometer_a);
+  ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
   AXP192_showstatus();
 #endif
