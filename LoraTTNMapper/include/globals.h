@@ -31,7 +31,7 @@
 
 #define USE_FASTLED 1
 #define FASTLED_SHOW_DEGREE 0
-#define USE_POTI 0
+#define USE_POTI 1
 
 #define displayRefreshIntervall 2       // every x second
 #define displayMoveIntervall 5          // every x second
@@ -218,6 +218,7 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_POTI)
 #include <AnalogSmooth.h>
+#include "poti.h"
 #endif
 
 #endif

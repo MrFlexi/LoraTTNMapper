@@ -48,7 +48,7 @@ DataBuffer dataBuffer;
 
 
 
-void calibrate_voltage(void)
+void Poti_calibrate_voltage(void)
 {
 
 // configure ADC
@@ -75,7 +75,7 @@ void calibrate_voltage(void)
 }
 
 
-uint16_t read_voltage(adc1_channel_t channel)
+uint16_t Poti_read_voltage(adc1_channel_t channel)
 {
   uint16_t voltage = 0;
   uint32_t adc_reading = 0;
@@ -102,7 +102,7 @@ void globalIntTask( void * parameter ){
  
 }
 
-void globalClassTask( void * parameter ){
+void t_getADCValues( void * parameter ){
     DataBuffer *locdataBuffer;
     
     locdataBuffer = (DataBuffer *) parameter; 
@@ -111,35 +111,20 @@ void globalClassTask( void * parameter ){
     while (1) {
     //Serial.print("globalClassTask: ");
     //Serial.println( locdataBuffer->data.potentiometer_a );
-    locdataBuffer->data.potentiometer_a = read_voltage(adc_channel);
+    locdataBuffer->data.potentiometer_a = Poti_read_voltage(adc_channel);
     //Serial.print(xPortGetCoreID());
  
     vTaskDelay(200);
     }
  
-}
+} 
  
- 
-void setup() {
+void poti_setup_RTOS() {  
 
-  Serial.begin(112500);
-  delay(1000);
-
-  calibrate_voltage();
-
-  dataBuffer.data.potentiometer_a = 99;
- 
- xTaskCreatePinnedToCore(
-                    globalIntTask,             /* Task function. */
-                    "globalIntTask",           /* String with name of task. */
-                    10000,                     /* Stack size in words. */
-                    (void*)&globalIntVar,      /* Parameter passed as input of the task */
-                    1,                         /* Priority of the task. */
-                    NULL,
-                    0);                     /* Task handle. */
+  Poti_calibrate_voltage();  
 
   xTaskCreatePinnedToCore(
-                    globalClassTask,             /* Task function. */
+                    t_getADCValues,             /* Task function. */
                     "globalClassTask",           /* String with name of task. */
                     10000,                     /* Stack size in words. */
                     (void*)&dataBuffer,      /* Parameter passed as input of the task */
@@ -149,10 +134,5 @@ void setup() {
  
  
 }
- 
-void loop() {
-  delay(1000);
-  Serial.println(dataBuffer.data.potentiometer_a );
 
-}
  
