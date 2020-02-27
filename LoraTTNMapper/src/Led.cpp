@@ -4,6 +4,41 @@
 CRGB leds[NUM_LEDS];
 
 uint8_t val_old;
+uint8_t val_poti_old;
+
+uint8_t poti_scale[12] = {8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7};
+
+
+
+void task_LED_loop(void *parameter)
+{
+  DataBuffer *locdataBuffer;
+
+  locdataBuffer = (DataBuffer *)parameter;
+
+  int i = 0;
+  int val_poti_old = 0;
+
+  while (1)
+  {
+
+    int val = map(locdataBuffer->data.potentiometer_a, 0, 4096, 0, 11);
+
+    i = poti_scale[val];
+
+    Serial.print("Val");Serial.println(i);
+
+    if (val_poti_old != i)
+    {
+      FastLED.clear();
+      leds[i] = CRGB::Green;
+      FastLED.show();
+      val_poti_old = i;      
+    }
+    vTaskDelay(500);
+  }
+}
+
 
 void setup_FastLed()
 {
@@ -14,6 +49,15 @@ void setup_FastLed()
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
+
+  xTaskCreatePinnedToCore(
+      task_LED_loop,       /* Task function. */
+      "globalClassTask",   /* String with name of task. */
+      10000,               /* Stack size in words. */
+      (void *)&dataBuffer, /* Parameter passed as input of the task */
+      1,                   /* Priority of the task. */
+      NULL,
+      0); /* Task handle. */
 }
 
 // This function draws rainbows with an ever-changing,
@@ -80,7 +124,7 @@ void LED_sunset()
 void LED_sunrise()
 {
 
-  for (uint8_t heatIndex =0; heatIndex < 255; heatIndex++)
+  for (uint8_t heatIndex = 0; heatIndex < 255; heatIndex++)
   {
     // HeatColors_p is a gradient palette built in to FastLED
     // that fades from black to red, orange, yellow, white
@@ -112,20 +156,38 @@ void LED_showSleepCounter()
   }
 }
 
+void LED_poti()
+{
+  int i = 0;
+
+  int val = map(dataBuffer.data.potentiometer_a, 0, 4096, 0, 11);
+  i = poti_scale[val];
+
+  if (val_poti_old != i)
+  {
+    FastLED.clear();
+    leds[i] = CRGB::Green;
+    FastLED.show();
+    val_poti_old = i;
+    vTaskDelay(1000);
+  }
+}
+
 void LED_bootcount()
 {
   int i = 0;
   FastLED.clear();
 
-if ( dataBuffer.data.bootCounter <= NUM_LEDS) i = dataBuffer.data.bootCounter;
-else i = NUM_LEDS;
+  if (dataBuffer.data.bootCounter <= NUM_LEDS)
+    i = dataBuffer.data.bootCounter;
+  else
+    i = NUM_LEDS;
 
-for (int l = 0; l < i; l++)
-    {
-      leds[l] = CRGB::Yellow;
-    }
+  for (int l = 0; l < i; l++)
+  {
+    leds[l] = CRGB::Yellow;
+  }
   FastLED.show();
-
 }
 
 void LED_deepSleep()
@@ -183,3 +245,5 @@ void LED_wakeup()
   LED_bootcount();
   delay(2000);
 }
+
+

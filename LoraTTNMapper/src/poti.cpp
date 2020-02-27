@@ -45,7 +45,7 @@ void Poti_calibrate_voltage(void)
 }
 
 
-float Poti_read_voltage(adc1_channel_t channel)
+uint16_t ADC_read_ticks(adc1_channel_t channel)
 {
   uint16_t voltage = 0;
   uint32_t adc_reading = 0;
@@ -58,9 +58,29 @@ float Poti_read_voltage(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-  Serial.print(voltage);Serial.print("  ");Serial.println(adc_reading);
+  
+  uint16_t ticks = map(voltage, 0, 3.3, 0, 4096);
 
-  uniny = map(0, voltage, 0, 4096 );
+  Serial.print("ADC Ticks  ");Serial.println(ticks);
+
+  return ticks;
+}
+
+
+
+float ADC_read_voltage(adc1_channel_t channel)
+{
+  uint16_t voltage = 0;
+  uint32_t adc_reading = 0;
+
+  for (int i = 0; i < NO_OF_SAMPLES; i++)
+  {
+    adc_reading += adc1_get_raw(channel);
+  }
+
+  adc_reading /= NO_OF_SAMPLES;
+  // Convert ADC reading to voltage in mV
+  voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);   
   return voltage / (float) 1000;
 }
 
@@ -83,7 +103,7 @@ void t_getADCValues( void * parameter ){
     while (1) {
     //Serial.print("globalClassTask: ");
     //Serial.println( locdataBuffer->data.potentiometer_a );
-    locdataBuffer->data.potentiometer_a = Poti_read_voltage(adc_channel);
+    locdataBuffer->data.potentiometer_a = ADC_read_ticks(adc_channel);
     //Serial.print(xPortGetCoreID());
  
     vTaskDelay(1000);

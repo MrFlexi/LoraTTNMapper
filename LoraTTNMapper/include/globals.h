@@ -134,7 +134,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
-  float potentiometer_a;   //
+  uint16_t potentiometer_a;   //
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;

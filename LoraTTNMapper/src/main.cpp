@@ -558,7 +558,7 @@ void setup()
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
-  delay(1000);
+  delay(500);
 
   // Bluethooth Serial + BLE
 #if (USE_SERIAL_BT)
@@ -581,7 +581,7 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
-  delay(2000);
+  delay(500);
 
 #if (HAS_PMU)
   AXP192_init();
@@ -674,7 +674,7 @@ void setup()
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(1000);
+  delay(500);
 #endif
 
 #if (USE_DASH)
@@ -707,7 +707,7 @@ void setup()
     Serial.println(file.name());
     file = root.openNextFile();
   }
-  delay(1000);
+  delay(500);
 #endif
 
 #if (USE_WEBSERVER)
