@@ -400,7 +400,11 @@ void t_cyclic()
     dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
-
+    dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
+    dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
+    ESP_LOGI(TAG, "Bat+ %d",dataBuffer.data.bat_ChargeCoulomb);
+    ESP_LOGI(TAG, "Bat- %d",dataBuffer.data.bat_DischargeCoulomb);
+    
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
@@ -558,13 +562,13 @@ void setup()
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
-  delay(1000);
+  delay(500);
 
   // Bluethooth Serial + BLE
 #if (USE_SERIAL_BT)
   SerialBT.begin("T-BEAM_01"); //Bluetooth device name
   Serial.println("The device started, now you can pair it with bluetooth!");
-  delay(1000);
+  delay(500);
 #endif
 
 #if (USE_BLE)
@@ -581,7 +585,7 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
-  delay(2000);
+  delay(500);
 
 #if (HAS_PMU)
   AXP192_init();
@@ -669,12 +673,12 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(1000); // Wait for GPS beeing stable
+  delay(500); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(1000);
+  delay(500);
 #endif
 
 #if (USE_DASH)

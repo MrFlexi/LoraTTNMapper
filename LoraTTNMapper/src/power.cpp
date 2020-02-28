@@ -88,6 +88,9 @@ void AXP192_showstatus(void)
     ESP_LOGI(TAG, "USB powered %.2fV @ %.0fmAh", (pmu.getVbusVoltage() / 1000), pmu.getVbusCurrent());
   else
     ESP_LOGI(TAG, "USB not present");
+
+   int cur = pmu.getChargeControlCur();
+    Serial.printf("Current charge control current = %d mA \n", cur);
 }
 
 void AXP192_event_handler(void)

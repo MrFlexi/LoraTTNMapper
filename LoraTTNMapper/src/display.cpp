@@ -243,10 +243,10 @@ void showPage(int page)
       u8g2.printf("Bus+: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+      u8g2.printf("B+: %.2fV %.0fmA %dmAh", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current,dataBuffer.data.bat_ChargeCoulomb);
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      u8g2.printf("B-: %.2fV %.0fmA %dmAh", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current,dataBuffer.data.bat_DischargeCoulomb);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -262,7 +262,7 @@ void showPage(int page)
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       u8g2.setCursor(1, 45);
-      u8g2.printf("ADC: %.2fV", dataBuffer.data.potentiometer_a);
+      u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
       break;
 
 

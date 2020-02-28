@@ -4,6 +4,34 @@
 CRGB leds[NUM_LEDS];
 
 uint8_t val_old;
+uint8_t val_poti_old;
+
+uint8_t LED_poti_ring[12] = {6,7,8,9,10,11,0,1,2,3,4,5};
+
+void t_LED_loop( void * parameter ){
+    DataBuffer *locdataBuffer;
+
+    
+    locdataBuffer = (DataBuffer *) parameter; 
+ 
+    //Continuously sample ADC1
+    while (1) {
+
+    uint8_t val = map(locdataBuffer->data.potentiometer_a,213,3804,0,10 );
+    //Serial.print("LED");Serial.print(val);Serial.print(" ");Serial.print(locdataBuffer->data.potentiometer_a);
+
+    if (val != val_poti_old)
+    {
+      FastLED.clear();
+      leds[LED_poti_ring[val]] = CRGB::Gold;
+      FastLED.show();
+      val_poti_old = val;
+    }
+
+    vTaskDelay(200);
+    }
+ 
+} 
 
 void setup_FastLed()
 {
@@ -14,6 +42,17 @@ void setup_FastLed()
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
+ 
+
+  xTaskCreatePinnedToCore(
+                    t_LED_loop,             /* Task function. */
+                    "globalClassTask",           /* String with name of task. */
+                    10000,                     /* Stack size in words. */
+                    (void*)&dataBuffer,      /* Parameter passed as input of the task */
+                    1,                         /* Priority of the task. */
+                    NULL,
+                    0);                     /* Task handle. */
+ 
 }
 
 // This function draws rainbows with an ever-changing,

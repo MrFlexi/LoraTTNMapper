@@ -134,7 +134,7 @@ typedef struct
   uint8_t runmode;          // aliveCounter
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
-  float potentiometer_a;   //
+  uint16_t potentiometer_a;   //
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
@@ -146,6 +146,8 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  uint32_t bat_ChargeCoulomb = 0;
+  uint32_t bat_DischargeCoulomb = 0;
   double yaw = 0;
   double pitch = 0;
   double roll = 0;

@@ -5,7 +5,7 @@
 
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
 #define DEFAULT_VREF 1100 
-#define NO_OF_SAMPLES 64  // we do some multisampling to get better values
+#define NO_OF_SAMPLES 32  // we do some multisampling to get better values
 
 esp_adc_cal_characteristics_t *adc_characs =
     (esp_adc_cal_characteristics_t *)calloc(
@@ -58,21 +58,34 @@ float Poti_read_voltage(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-  Serial.print(voltage);Serial.print("  ");Serial.println(adc_reading);
+  //Serial.print(voltage);Serial.print("  ");Serial.println(adc_reading);
 
-  uniny = map(0, voltage, 0, 4096 );
+  voltage = map(voltage, 0, 3300, 0, 4096 );
   return voltage / (float) 1000;
 }
 
+uint16_t Poti_read_ticks(adc1_channel_t channel)
+{
+  uint16_t voltage = 0;
+  uint16_t ticks = 0;
+  uint32_t adc_reading = 0;
 
-void globalIntTask( void * parameter ){
- 
-    Serial.print("globalIntTask: ");
-    Serial.println(*((int*)parameter));            
- 
-    vTaskDelete( NULL );
- 
+  for (int i = 0; i < NO_OF_SAMPLES; i++)
+  {
+    adc_reading += adc1_get_raw(channel);
+  }
+
+  adc_reading /= NO_OF_SAMPLES;
+  // Convert ADC reading to voltage in mV
+  voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
+  
+
+  ticks = map(voltage, 0, 3300, 4096, 0 );
+  //Serial.print(voltage);Serial.print("  ");Serial.print(adc_reading);Serial.print("  ");Serial.println(ticks);
+  return ticks;
 }
+
+
 
 void t_getADCValues( void * parameter ){
     DataBuffer *locdataBuffer;
@@ -83,10 +96,9 @@ void t_getADCValues( void * parameter ){
     while (1) {
     //Serial.print("globalClassTask: ");
     //Serial.println( locdataBuffer->data.potentiometer_a );
-    locdataBuffer->data.potentiometer_a = Poti_read_voltage(adc_channel);
+    locdataBuffer->data.potentiometer_a = Poti_read_ticks(adc_channel);
     //Serial.print(xPortGetCoreID());
- 
-    vTaskDelay(1000);
+    vTaskDelay(200);
     }
  
 } 
