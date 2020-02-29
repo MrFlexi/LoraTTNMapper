@@ -12,7 +12,7 @@ esp_adc_cal_characteristics_t *adc_characs =
         1, sizeof(esp_adc_cal_characteristics_t));
 
 
-static const adc1_channel_t adc_channel = ADC1_GPIO35_CHANNEL;
+static const adc1_channel_t adc_channel = POTI_PIN;
 static const adc_atten_t atten = ADC_ATTEN_DB_11;
 static const adc_unit_t unit = ADC_UNIT_1;
 
@@ -98,7 +98,7 @@ void t_getADCValues( void * parameter ){
     //Serial.println( locdataBuffer->data.potentiometer_a );
     locdataBuffer->data.potentiometer_a = Poti_read_ticks(adc_channel);
     //Serial.print(xPortGetCoreID());
-    vTaskDelay(200);
+    vTaskDelay(250);
     }
  
 } 

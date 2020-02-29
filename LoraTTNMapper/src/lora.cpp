@@ -106,7 +106,7 @@ void do_send(osjob_t *j)
       digitalWrite(BUILTIN_LED, HIGH);
     }
     else
-      ESP_LOGV(TAG, "GPS no fix");
+      ESP_LOGE(TAG, "GPS no fix");
   }
 }
 
@@ -136,14 +136,14 @@ void t_LORA_send_from_queue(osjob_t *j)
       }
       else
       {
-        ESP_LOGV(TAG, "Queue is empty...");
+        ESP_LOGI(TAG, "Queue is empty...");
       }
     }
     else
     {
-      ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
+      ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
     }
-    ESP_LOGV(TAG, "New callback scheduled...");
+    ESP_LOGI(TAG, "New callback scheduled...");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
@@ -172,7 +172,7 @@ void dump_queue()
 
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
-  ESP_LOGV(TAG, "Message Dump");
+  ESP_LOGI(TAG, "Message Dump");
   Serial.println(" ");
   Serial.print(" P:");
   Serial.print(SendBuffer.MessagePort);

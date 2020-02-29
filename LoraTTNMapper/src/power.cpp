@@ -97,7 +97,7 @@ void AXP192_event_handler(void)
 {
   ESP_LOGI(TAG, "PMU Event");
 if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGI(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 
@@ -150,7 +150,9 @@ if (!I2C_MUTEX_LOCK())
 void AXP192_init(void)
 {
 
-  if (pmu.begin(Wire, AXP192_PRIMARY_ADDRESS) ==
+  //if (pmu.begin(Wire, AXP192_PRIMARY_ADDRESS) ==
+  //    AXP_FAIL)
+  if (pmu.begin(i2c_readBytes, i2c_writeBytes, AXP192_PRIMARY_ADDRESS) ==
       AXP_FAIL)
     ESP_LOGI(TAG, "AXP192 PMU initialization failed");
   else

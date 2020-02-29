@@ -124,7 +124,7 @@ void setup_gyro()
     Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
 
     if (!I2C_MUTEX_LOCK())
-        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+        ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
     else
     {
         // initialize device
@@ -252,7 +252,7 @@ void gyro_handle_interrupt(void)
 {    
     // block i2c bus access
     if (!I2C_MUTEX_LOCK())
-        ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+        ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
     else
     {
         mpuIntStatus = mpu.getIntStatus();

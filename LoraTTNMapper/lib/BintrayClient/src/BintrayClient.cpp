@@ -106,7 +106,7 @@ String BintrayClient::requestHTTPContent(const String &url) const
 
 String BintrayClient::getLatestVersion() const
 {
-    ESP_LOGV(TAG, "BINTRAY: Get latest firmware.");
+    ESP_LOGI(TAG, "BINTRAY: Get latest firmware.");
     String version;
     const String url = getLatestVersionRequestUrl();
     String jsonResult = requestHTTPContent(url);
