@@ -14,7 +14,7 @@ void irqHandler(void *pvParameters)
 {
 
   
-  const TickType_t xDelay = 250 / portTICK_PERIOD_MS;  // 100 ms = 10 times per second
+  const TickType_t xDelay = 100 / portTICK_PERIOD_MS;  // 100 ms = 10 times per second
   uint32_t InterruptStatus;
   static bool mask_irq = false;
 

@@ -7,10 +7,6 @@
 
 #include "globals.h"
 
-// Defaults to window size 10
-#if (USE_POTI)
-AnalogSmooth Poti_A = AnalogSmooth();
-#endif
 
 //--------------------------------------------------------------------------
 // OTA Settings
@@ -382,16 +378,7 @@ void t_cyclic()
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
 
-  //   I2C opperations
-  if (!I2C_MUTEX_LOCK())
-    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-  else
-  {
-#if (USE_BME280)
-    dataBuffer.data.temperature = bme.readTemperature();
-    dataBuffer.data.humidity = bme.readHumidity();
 
-#endif
 
 #if (HAS_PMU)
     dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
@@ -408,6 +395,19 @@ void t_cyclic()
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
+
+
+  //   I2C opperations
+  if (!I2C_MUTEX_LOCK())
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+  else
+  {
+#if (USE_BME280)
+    dataBuffer.data.temperature = bme.readTemperature();
+    dataBuffer.data.humidity = bme.readHumidity();
+
+#endif
+
 
 #if (HAS_INA)
     //print_ina();
