@@ -217,8 +217,7 @@ void gyro_get_values()
 void gyro_show_acc()
 {
 
-    //mpu.resetFIFO();
-    fifoCount = mpu.getFIFOCount();
+        fifoCount = mpu.getFIFOCount();
     Serial.print("Fifi Count");
     Serial.println(fifoCount);
 
