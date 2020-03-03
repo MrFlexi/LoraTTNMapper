@@ -177,6 +177,10 @@ void AXP192_init(void)
     pmu.clearIRQ();
 #endif // PMU_INT
 
+
+    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
+    pmu.setCoulombRegister(_BV(7) |  _BV(5));
+    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
     ESP_LOGI(TAG, "AXP192 PMU initialized");
   }
 }
