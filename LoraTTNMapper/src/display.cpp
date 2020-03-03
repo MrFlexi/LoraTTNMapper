@@ -7,7 +7,6 @@ uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 int PageNumber = 1;
 char sbuf[32];
 
-
 #if (USE_SERIAL_BT)
 BluetoothSerial SerialBT;
 #endif
@@ -19,7 +18,7 @@ void log_display(String s)
 
 #if (USE_SERIAL_BT)
   SerialBT.println(s);
- #endif 
+#endif
 
   if (dataBuffer.data.runmode < 1)
   {
@@ -53,19 +52,18 @@ void t_moveDisplay(void)
 {
 #if (USE_DISPLAY)
 
-    if (PageNumber < PAGE_COUNT)
-    {
-      PageNumber++;
-    }
-    else
-    {
-      PageNumber = 1;
-    }
-    //showPage(PageNumber);
-    
+  if (PageNumber < PAGE_COUNT)
+  {
+    PageNumber++;
+  }
+  else
+  {
+    PageNumber = 1;
+  }
+  //showPage(PageNumber);
+
 #endif
 }
-
 
 void setup_display(void)
 {
@@ -78,8 +76,6 @@ void setup_display(void)
   log_display("SAP GTT");
   log_display("TTN-ABP-Mapper");
 }
-
-
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 {
@@ -124,9 +120,8 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 void showPage(int page)
 {
 
-    
-   String IP_String = "";
-   String availableModules ="";
+  String IP_String = "";
+  String availableModules = "";
 
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
@@ -137,7 +132,7 @@ void showPage(int page)
     // u8g2_font_profont15_tr  W7 H15
     // u8g2_font_ncenB08_tr W12 H13
 
-    u8g2.clearBuffer();  
+    u8g2.clearBuffer();
 
     uint8_t icon = 0;
 
@@ -145,62 +140,61 @@ void showPage(int page)
     switch (page)
     {
 
-      case PAGE_TBEAM:
+    case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
       u8g2.drawStr(1, 15, sbuf);
 
-      u8g2.setFont(u8g2_font_profont12_tr);     
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);  
+      u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);
       IP_String = dataBuffer.data.ip_address;
-      
-      sprintf(sbuf, "%s",  IP_String);
+
+      sprintf(sbuf, "%s", IP_String);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
 
-      #if (USE_OTA)
-        availableModules = availableModules +  "OTA ";             
-      #endif
+#if (USE_OTA)
+      availableModules = availableModules + "OTA ";
+#endif
 
-      #if (USE_BLE)
-        availableModules = availableModules + "BLE ";             
-      #endif
+#if (USE_BLE)
+      availableModules = availableModules + "BLE ";
+#endif
 
-      #if (USE_MQTT)
-       availableModules = availableModules + "MQTT ";       
-      #endif
+#if (USE_MQTT)
+      availableModules = availableModules + "MQTT ";
+#endif
 
-      #if (USE_CAYENNE)
-       availableModules = availableModules + "CAY ";       
-      #endif
+#if (USE_CAYENNE)
+      availableModules = availableModules + "CAY ";
+#endif
 
-      #if (USE_GYRO)
-       availableModules = availableModules + "GYRO ";       
-      #endif
+#if (USE_GYRO)
+      availableModules = availableModules + "GYRO ";
+#endif
 
-      #if (USE_WEBSERVER)
-       availableModules = availableModules + "WEB ";       
-      #endif
+#if (USE_WEBSERVER)
+      availableModules = availableModules + "WEB ";
+#endif
 
       if (dataBuffer.data.wlan)
       {
-        availableModules = availableModules + "WLAN "; 
+        availableModules = availableModules + "WLAN ";
       }
 
       Serial.println(availableModules);
       sprintf(sbuf, "%s", availableModules);
       u8g2.drawStr(1, 64, sbuf);
 
-
       break;
 
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "LORA TX/RX");
-      u8g2.setFont(u8g2_font_profont12_tr);                 
-      u8g2.setCursor(1,30);
+      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setCursor(1, 30);
       u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
       u8g2.setCursor(64, 30);
       u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
@@ -231,8 +225,6 @@ void showPage(int page)
       u8g2.drawStr(1, 15, "Solar Panel");
       u8g2.setFont(u8g2_font_profont11_tr);
 
-
-
 #if (HAS_INA)
       u8g2.setCursor(1, 30);
       u8g2.printf("Sol: %.2fV %.0fmA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
@@ -241,12 +233,6 @@ void showPage(int page)
 #if (HAS_PMU)
       u8g2.setCursor(1, 40);
       u8g2.printf("Bus+: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
-
-      u8g2.setCursor(1, 50);
-      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
-
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -254,7 +240,28 @@ void showPage(int page)
 
       break;
 
-      case PAGE_SENSORS:
+    case PAGE_BAT:
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Batery");
+      u8g2.setFont(u8g2_font_profont11_tr);
+
+#if (HAS_PMU)
+      u8g2.setCursor(1, 30);
+      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+
+      u8g2.setCursor(1, 50);
+      u8g2.printf("+/-: %.2fmA ", dataBuffer.data.bat_DeltamAh);
+#else
+      u8g2.setCursor(1, 40);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
+
+      break;
+
+    case PAGE_SENSORS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sensors");
 
@@ -265,7 +272,6 @@ void showPage(int page)
       u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
       break;
 
-
     case PAGE_GYRO:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -274,40 +280,39 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Yaw  :%.2f", dataBuffer.data.yaw);
-      
+
       u8g2.setCursor(1, 45);
-      u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);      
+      u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);
 
       u8g2.setCursor(1, 60);
       u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
-      break;  
+      break;
 
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");
 
-       u8g2.setFont(u8g2_font_profont11_tr);
+      u8g2.setFont(u8g2_font_profont11_tr);
 
-      if (dataBuffer.data.MotionCounter <= 0 )
+      if (dataBuffer.data.MotionCounter <= 0)
       {
-       u8g2.drawStr(1, 55, "Inactivity"); 
+        u8g2.drawStr(1, 55, "Inactivity");
       }
 
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
-       u8g2.drawStr(1, 55, "TX "); 
+        u8g2.drawStr(1, 55, "TX ");
       }
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
-      #if (WAKEUP_BY_MOTION)
+#if (WAKEUP_BY_MOTION)
       u8g2.setCursor(64, 55);
       u8g2.printf(" move me !!", TIME_TO_SLEEP);
-      #endif
+#endif
       drawSymbol(1, 48, SUN);
       break;
     }
-
 
     u8g2.setCursor(100, 64);
     u8g2.printf("%2d", dataBuffer.data.MotionCounter);
