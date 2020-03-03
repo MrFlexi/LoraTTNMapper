@@ -406,7 +406,7 @@ void t_cyclic()
 
     //ESP_LOGI(TAG, "Bat+ %d",dataBuffer.data.bat_ChargeCoulomb);
     //ESP_LOGI(TAG, "Bat- %d",dataBuffer.data.bat_DischargeCoulomb);
-    ESP_LOGI(TAG, "delta %.2f mAh", );
+    ESP_LOGI(TAG, "delta %.2f mAh", dataBuffer.data.bat_DeltamAh);
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;

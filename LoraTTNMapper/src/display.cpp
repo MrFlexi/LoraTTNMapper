@@ -242,7 +242,7 @@ void showPage(int page)
 
     case PAGE_BAT:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Batery");
+      u8g2.drawStr(1, 15, "Battery");
       u8g2.setFont(u8g2_font_profont11_tr);
 
 #if (HAS_PMU)
