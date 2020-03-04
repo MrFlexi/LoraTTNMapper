@@ -8,6 +8,10 @@ extern uint8_t txBuffer[9];
 extern QueueHandle_t LoraSendQueue;
 
 
+#define TTN_COMMAND_RESET_COULOMB           0x01
+#define TTN_COMMAND_SLEEP                   0x02
+
+
 
 //--------------------------------------------------------------------------
 // LORA Settings

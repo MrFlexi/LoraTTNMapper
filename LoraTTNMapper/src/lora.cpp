@@ -277,6 +277,27 @@ void onEvent(ev_t ev)
           Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
         }
       }
+
+
+      switch ( LMIC.frame[LMIC.dataBeg + 1] )
+      {
+        case TTN_COMMAND_RESET_COULOMB:
+          Serial.println(F("TTN Command: Reset Coulomb Counter"));
+          pmu.ClearCoulombcounter();           
+          break;  
+
+        case TTN_COMMAND_SLEEP:
+           Serial.println(F("TTN Command: Sleep"));
+           ESP32_sleep();
+        break;
+        
+        default:
+         Serial.println(F("TTN Command unknown"));
+        break;
+      }
+
+
+
     }
     // Schedule next transmission
     log_display("Next TX started");

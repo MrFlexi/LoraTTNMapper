@@ -348,3 +348,23 @@ uint16_t read_voltage()
 
   return voltage;
 }
+
+
+void ESP32_sleep()
+{
+
+#if (HAS_PMU)
+  AXP192_power(pmu_power_sleep);
+#endif
+
+#if (USE_FASTLED)
+  LED_sunset();
+#endif
+
+  gps.enable_sleep();
+  Serial.flush();
+  showPage(PAGE_SLEEP);
+  ESP_LOGI(TAG, "Deep Sleep started");
+  esp_deep_sleep_start();
+  Serial.println("This will never be printed");
+}
