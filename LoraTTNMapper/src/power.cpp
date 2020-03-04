@@ -164,18 +164,13 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
 
-    #define AXP192EnableCoulombcounter 0x80
-    #define AXP192DisableCoulombcounter 0x00
-    #define AXP192StopCoulombcounter 0xc0
-    #define AXP192ClearCoulombcounter 0xa0
 
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
-   
-    pmu.setCoulombRegister(AXP192EnableCoulombcounter);
-    pmu.setCoulombRegister(AXP192ClearCoulombcounter);
+     
+    pmu.EnableCoulombcounter();    
+  
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
     ESP_LOGI(TAG, "AXP192 PMU initialized");
-
 
     // switch power rails on
     AXP192_power(pmu_power_on);

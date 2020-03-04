@@ -593,7 +593,11 @@ void setup()
 #if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
-  AXP192_power_gps(ON);
+  AXP192_power_gps(ON);  
+}
+
+
+
 #endif
 
 #if (HAS_INA)
