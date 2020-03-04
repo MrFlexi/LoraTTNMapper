@@ -400,6 +400,13 @@ void t_cyclic()
     dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+    dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
+    dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
+    dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
+
+    //ESP_LOGI(TAG, "Bat+ %d",dataBuffer.data.bat_ChargeCoulomb);
+    //ESP_LOGI(TAG, "Bat- %d",dataBuffer.data.bat_DischargeCoulomb);
+    ESP_LOGI(TAG, "delta %.2f mAh", dataBuffer.data.bat_DeltamAh);
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;

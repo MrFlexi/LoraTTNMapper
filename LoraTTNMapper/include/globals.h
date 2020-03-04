@@ -135,6 +135,9 @@ typedef struct
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a;   //
+  uint32_t bat_ChargeCoulomb = 0;
+  uint32_t bat_DischargeCoulomb = 0;
+  float    bat_DeltamAh = 0;
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;
