@@ -61,7 +61,7 @@ uint16_t ADC_read_ticks(adc1_channel_t channel)
   
   uint16_t ticks = map(voltage, 0, 3.3, 0, 4096);
 
-  Serial.print("ADC Ticks  ");Serial.println(ticks);
+  //Serial.print("ADC Ticks  ");Serial.println(ticks);
 
   return ticks;
 }

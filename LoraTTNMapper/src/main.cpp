@@ -141,7 +141,8 @@ void Cayenne_send(void)
 
   Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
   Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-  Cayenne.virtualWrite(33, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+  Cayenne.virtualWrite(32, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
+  Cayenne.virtualWrite(33, dataBuffer.data.bat_DeltamAh, "current", "Milliampere");
 
   Cayenne.virtualWrite(40, dataBuffer.data.bootCounter, "counter", "Analog");
 }
@@ -406,7 +407,7 @@ void t_cyclic()
 
     //ESP_LOGI(TAG, "Bat+ %d",dataBuffer.data.bat_ChargeCoulomb);
     //ESP_LOGI(TAG, "Bat- %d",dataBuffer.data.bat_DischargeCoulomb);
-    ESP_LOGI(TAG, "delta %.2f mAh", dataBuffer.data.bat_DeltamAh);
+    //ESP_LOGI(TAG, "delta %.2f mAh", dataBuffer.data.bat_DeltamAh);
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
@@ -554,13 +555,13 @@ void setup()
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
-  delay(500);
+  delay(100);
 
   // Bluethooth Serial + BLE
 #if (USE_SERIAL_BT)
   SerialBT.begin("T-BEAM_01"); //Bluetooth device name
   Serial.println("The device started, now you can pair it with bluetooth!");
-  delay(1000);
+  delay(100);
 #endif
 
 #if (USE_BLE)
@@ -577,7 +578,7 @@ void setup()
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
-  delay(500);
+  delay(100);
 
 #if (HAS_PMU)
   AXP192_init();
@@ -636,7 +637,7 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(500);
+  delay(100);
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -665,12 +666,12 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(1000); // Wait for GPS beeing stable
+  delay(100); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(500);
+  delay(100);
 #endif
 
 #if (USE_DASH)
@@ -703,7 +704,7 @@ void setup()
     Serial.println(file.name());
     file = root.openNextFile();
   }
-  delay(500);
+  delay(100);
 #endif
 
 #if (USE_WEBSERVER)

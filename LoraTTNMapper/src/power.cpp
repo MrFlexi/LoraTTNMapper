@@ -25,7 +25,7 @@ void AXP192_power(pmu_power_t powerlevel)
     break;
 
   case pmu_power_sleep:
-    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
     // we don't cut off DCDC1, because then display blocks i2c bus
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
@@ -42,21 +42,6 @@ void AXP192_power(pmu_power_t powerlevel)
   }
 }
 
-void AXP192_power_lora(bool on)
-{
-  if (on)
-  {
-    pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON); // Lora on T-Beam V1.0
-    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
-    ESP_LOGI(TAG, "Lora power ON");
-  }
-  else
-  {
-    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
-    pmu.setChgLEDMode(AXP20X_LED_OFF);
-    ESP_LOGI(TAG, "Lora power OFF");
-  }
-}
 
 void AXP192_power_gps(bool on)
 {
@@ -184,9 +169,6 @@ void AXP192_init(void)
                   1);
     pmu.clearIRQ();
 #endif // PMU_INT
-
-
- 
 
   }
 }

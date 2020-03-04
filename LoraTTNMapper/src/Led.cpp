@@ -26,8 +26,6 @@ void task_LED_loop(void *parameter)
 
     i = poti_scale[val];
 
-    Serial.print("Val");Serial.println(i);
-
     if (val_poti_old != i)
     {
       FastLED.clear();
