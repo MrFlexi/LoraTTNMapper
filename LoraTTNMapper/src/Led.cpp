@@ -13,7 +13,6 @@ uint8_t poti_scale[12] = {8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7};
 void task_LED_loop(void *parameter)
 {
   DataBuffer *locdataBuffer;
-
   locdataBuffer = (DataBuffer *)parameter;
 
   int i = 0;
@@ -22,6 +21,7 @@ void task_LED_loop(void *parameter)
   while (1)
   {
 
+    #if (FASTLED_SHOW_POTI)
     int val = map(locdataBuffer->data.potentiometer_a, 0, 4096, 0, 11);
 
     i = poti_scale[val];
@@ -33,6 +33,7 @@ void task_LED_loop(void *parameter)
       FastLED.show();
       val_poti_old = i;      
     }
+    #endif
     vTaskDelay(500);
   }
 }
@@ -48,6 +49,7 @@ void setup_FastLed()
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
+  #if(USE_FASTLED_RTOS)
   xTaskCreatePinnedToCore(
       task_LED_loop,       /* Task function. */
       "globalClassTask",   /* String with name of task. */
@@ -56,7 +58,8 @@ void setup_FastLed()
       1,                   /* Priority of the task. */
       NULL,
       0); /* Task handle. */
-}
+  #endif
+  }
 
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
@@ -191,8 +194,8 @@ void LED_bootcount()
 void LED_deepSleep()
 {
   FastLED.clear();
-  leds[8] = CRGB::LightSkyBlue;
-  FastLED.show();
+  //leds[8] = CRGB::LightSkyBlue;
+  //FastLED.show();
 }
 
 void LED_showDegree(int i)

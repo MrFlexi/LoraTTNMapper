@@ -14,7 +14,7 @@
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS    12
-#define BRIGHTNESS  20
+#define BRIGHTNESS  10
 
 
 

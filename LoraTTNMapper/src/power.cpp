@@ -341,6 +341,7 @@ void ESP32_sleep()
 
 #if (USE_FASTLED)
   LED_sunset();
+  LED_deepSleep();
 #endif
 
   gps.enable_sleep();
