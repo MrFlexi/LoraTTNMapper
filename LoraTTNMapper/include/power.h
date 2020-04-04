@@ -17,6 +17,8 @@ uint16_t read_voltage(void);
 float read_current(void);
 void calibrate_voltage(void);
 bool batt_sufficient(void);
+void ESP32_sleep();
+
 
 #if (HAS_PMU)
 #include <axp20x.h>
@@ -32,4 +34,6 @@ extern AXP20X_Class pmu;
 #endif // HAS_PMU
 
 #endif
+
+
 

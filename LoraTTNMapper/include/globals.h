@@ -30,7 +30,12 @@
 #define WAKEUP_BY_MOTION 1
 
 #define USE_FASTLED 1
+#define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
+#define FASTLED_SHOW_POTI 0
+
+
+
 #define USE_POTI 1
 
 #define displayRefreshIntervall 2       // every x second
@@ -61,8 +66,8 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 10        // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
+#define TIME_TO_SLEEP 25        // sleep for n minute
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #include <lmic.h>
@@ -135,6 +140,9 @@ typedef struct
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a;   //
+  uint32_t bat_ChargeCoulomb = 0;
+  uint32_t bat_DischargeCoulomb = 0;
+  float    bat_DeltamAh = 0;
   bool  wlan;
   float firmware_version;
   uint8_t bytesReceived;

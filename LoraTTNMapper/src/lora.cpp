@@ -80,6 +80,7 @@ payload.enqueue_port(2);
     payload.addVoltage(30, dataBuffer.data.bat_voltage);
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
+    payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
     payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
     payload.enqueue_port(2);
@@ -277,6 +278,27 @@ void onEvent(ev_t ev)
           Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
         }
       }
+
+
+      switch ( LMIC.frame[LMIC.dataBeg + 1] )
+      {
+        case TTN_COMMAND_RESET_COULOMB:
+          Serial.println(F("TTN Command: Reset Coulomb Counter"));
+          pmu.ClearCoulombcounter();           
+          break;  
+
+        case TTN_COMMAND_SLEEP:
+           Serial.println(F("TTN Command: Sleep"));
+           ESP32_sleep();
+        break;
+        
+        default:
+         Serial.println(F("TTN Command unknown"));
+        break;
+      }
+
+
+
     }
     // Schedule next transmission
     log_display("Next TX started");
