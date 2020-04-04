@@ -160,15 +160,17 @@ void AXP192_init(void)
     // switch power rails on
     AXP192_power(pmu_power_on);
 
-#ifdef PMU_INT
-    pinMode(PMU_INT, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PMU_INT), PMU_IRQ, FALLING);
+#if (USE_PMU_INTERRUPT)
+#ifdef PMU_INT_PIN
+    pinMode(PMU_INT_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT_PIN), PMU_IRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
-                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
+                     AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
                       AXP202_CHARGING_FINISHED_IRQ| AXP202_PEK_LONGPRESS_IRQ| AXP202_PEK_SHORTPRESS_IRQ,
                   1);
     pmu.clearIRQ();
 #endif // PMU_INT
+#endif
 
   }
 }

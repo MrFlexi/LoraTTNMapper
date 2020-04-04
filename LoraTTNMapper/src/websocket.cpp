@@ -1,6 +1,7 @@
 #include "globals.h"
 #include "websocket.h"
 
+#if (USE_WEBSERVER)
 AsyncWebSocket ws("/ws");
 
 String message_buffer_to_jsonstr(DataBuffer message_buffer)
@@ -160,3 +161,5 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     }
   }
 }
+
+#endif

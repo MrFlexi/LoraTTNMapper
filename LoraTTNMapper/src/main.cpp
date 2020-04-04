@@ -686,7 +686,7 @@ void setup()
   button_init(HAS_BUTTON);
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
@@ -719,7 +719,7 @@ void setup()
   }
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     ws.onEvent(onWsEvent);
@@ -757,7 +757,7 @@ void setup()
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     xTaskCreate(

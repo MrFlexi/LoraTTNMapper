@@ -13,8 +13,7 @@ uint32_t InterruptStatusRegister = 0;
 void irqHandler(void *pvParameters)
 {
 
-  
-  const TickType_t xDelay = 250 / portTICK_PERIOD_MS;  // 100 ms = 10 times per second
+  const TickType_t xDelay = 250 / portTICK_PERIOD_MS; // 100 ms = 10 times per second
   uint32_t InterruptStatus;
   static bool mask_irq = false;
 
@@ -38,8 +37,10 @@ void irqHandler(void *pvParameters)
 
 // do we have a power event?
 #if (HAS_PMU)
+#if (USE_PMU_INTERRUPT)
     if (InterruptStatusRegister & PMU_IRQ_BIT)
       AXP192_event_handler();
+#endif
 #endif
 
 #if (USE_GYRO)
@@ -50,8 +51,8 @@ void irqHandler(void *pvParameters)
 #endif
 #endif
 
-  InterruptStatusRegister = 0;
-  vTaskDelay(xDelay);
+    InterruptStatusRegister = 0;
+    vTaskDelay(xDelay);
   }
 }
 

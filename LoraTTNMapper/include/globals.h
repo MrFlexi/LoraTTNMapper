@@ -17,13 +17,15 @@
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
+
 #define USE_INTERRUPTS 1
+#define USE_PMU_INTERRUPT 0
+
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   1
-#define USE_WEBSOCKET   1
+#define USE_WEBSERVER   0 
 #define USE_CAYENNE 1
 
 #define USE_GYRO  1
@@ -34,12 +36,10 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
-
-
-#define USE_POTI 1
+#define USE_POTI 0
 
 #define displayRefreshIntervall 2       // every x second
-#define displayMoveIntervall 5          // every x second
+#define displayMoveIntervall 7          // every x second
 
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 30
@@ -66,7 +66,7 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 25        // sleep for n minute
+#define TIME_TO_SLEEP 10        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
