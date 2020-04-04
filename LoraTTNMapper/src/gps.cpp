@@ -61,7 +61,7 @@ bool Neo6m::checkGpsFix()
       tGps.altitude.isValid() &&
       tGps.altitude.age() < 2000)
   {
-    Serial.println("Valid GPS fix.");
+    //Serial.println("Valid GPS fix.");
     return true;
   }
   else

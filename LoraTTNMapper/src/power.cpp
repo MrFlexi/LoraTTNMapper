@@ -25,7 +25,7 @@ void AXP192_power(pmu_power_t powerlevel)
     break;
 
   case pmu_power_sleep:
-    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
     // we don't cut off DCDC1, because then display blocks i2c bus
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
@@ -42,21 +42,6 @@ void AXP192_power(pmu_power_t powerlevel)
   }
 }
 
-void AXP192_power_lora(bool on)
-{
-  if (on)
-  {
-    pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON); // Lora on T-Beam V1.0
-    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
-    ESP_LOGI(TAG, "Lora power ON");
-  }
-  else
-  {
-    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF);
-    pmu.setChgLEDMode(AXP20X_LED_OFF);
-    ESP_LOGI(TAG, "Lora power OFF");
-  }
-}
 
 void AXP192_power_gps(bool on)
 {
@@ -164,6 +149,14 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
 
+
+    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
+     
+    pmu.EnableCoulombcounter();    
+  
+    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
+    ESP_LOGI(TAG, "AXP192 PMU initialized");
+
     // switch power rails on
     AXP192_power(pmu_power_on);
 
@@ -177,7 +170,6 @@ void AXP192_init(void)
     pmu.clearIRQ();
 #endif // PMU_INT
 
-    ESP_LOGI(TAG, "AXP192 PMU initialized");
   }
 }
 
@@ -337,4 +329,25 @@ uint16_t read_voltage()
 #endif // HAS_PMU
 
   return voltage;
+}
+
+
+void ESP32_sleep()
+{
+
+#if (HAS_PMU)
+  AXP192_power(pmu_power_sleep);
+#endif
+
+#if (USE_FASTLED)
+  LED_sunset();
+  LED_deepSleep();
+#endif
+
+  gps.enable_sleep();
+  Serial.flush();
+  showPage(PAGE_SLEEP);
+  ESP_LOGI(TAG, "Deep Sleep started");
+  esp_deep_sleep_start();
+  Serial.println("This will never be printed");
 }
