@@ -154,6 +154,14 @@ CAYENNE_IN_DEFAULT()
   log_display("Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
   //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+switch (request.channel)
+  {
+  case 1:
+    Serial.println("Cayenne: Reset Coulomb Counter");
+    pmu.ClearCoulombcounter(); 
+    break;
+  }
+
 }
 
 #endif

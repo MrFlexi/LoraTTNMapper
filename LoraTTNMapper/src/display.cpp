@@ -253,7 +253,7 @@ void showPage(int page)
       u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("+/-: %.2fmA ", dataBuffer.data.bat_DeltamAh);
+      u8g2.printf("+/-: %.2fmAh ", dataBuffer.data.bat_DeltamAh);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
