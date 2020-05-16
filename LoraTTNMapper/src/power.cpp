@@ -112,7 +112,6 @@ if (!I2C_MUTEX_LOCK())
     #if (USE_FASTLED)
     LED_sunset();
     #endif
-    // enter_deepsleep(0, HAS_BUTTON);
   }
 
   // long press -> shutdown power, can be exited by another longpress

@@ -57,7 +57,7 @@ void t_broadcast_message(void *parameter)
   {    
         JsonStr = message_buffer_to_jsonstr(dataBuffer);
         ws.textAll(JsonStr);        
-    vTaskDelay(sendWebserverIntervall * 1000 );
+    vTaskDelay(sendWebsocketIntervall * 1000 );
   }
 }
 

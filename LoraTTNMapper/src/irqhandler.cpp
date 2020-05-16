@@ -30,7 +30,7 @@ void irqHandler(void *pvParameters)
 #if (USE_INTERRUPTS)
 
 // button pressed?
-#ifdef HAS_BUTTON
+#if (USE_BUTTON)
     if (InterruptStatusRegister & BUTTON_IRQ)
       readButton();
 #endif
@@ -60,7 +60,7 @@ void irqHandler(void *pvParameters)
 // Notify Interrupt Handler
 //------------------------------------------------------------------------------------------
 
-#ifdef HAS_BUTTON
+#if (USE_BUTTON)
 void IRAM_ATTR ButtonIRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;

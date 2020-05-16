@@ -31,7 +31,7 @@ void IRAM_ATTR DisplayIRQ();
 void IRAM_ATTR MatrixDisplayIRQ();
 #endif
 
-#ifdef HAS_BUTTON
+#ifdef USE_BUTTON
 void IRAM_ATTR ButtonIRQ();
 #endif
 

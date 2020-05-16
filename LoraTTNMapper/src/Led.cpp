@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "FastLed.h"
 
+#if (USE_FASTLED)
+
 CRGB leds[NUM_LEDS];
 
 uint8_t val_old;
@@ -242,9 +244,11 @@ void LED_wakeup()
     LED_boot();
     break;
   }
-  delay(2000);
+  delay(1000);
   LED_bootcount();
-  delay(2000);
+  delay(1000);
 }
+
+#endif
 
 

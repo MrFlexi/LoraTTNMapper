@@ -20,6 +20,7 @@
 
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 0
+#define USE_BUTTON 0
 
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
@@ -45,7 +46,7 @@
 #define LORA_TX_INTERVAL 30
 
 #define sendCayenneIntervall 60 // every x seconds
-#define sendWebserverIntervall 10 // every x seconds
+#define sendWebsocketIntervall 10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -58,7 +59,6 @@
 
 #define I2C_MUTEX_LOCK() \
   (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
-
 #define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
 
 //--------------------------------------------------------------------------
@@ -66,9 +66,9 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 10        // sleep for n minute
+#define TIME_TO_SLEEP 25        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
+#define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
 #include <lmic.h>
 #include <hal/hal.h>
@@ -107,7 +107,10 @@
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
+
+#if (USE_WIFI)
 extern WiFiClient wifiClient;
+#endif
 
 
 extern volatile bool mpuInterrupt;
@@ -196,7 +199,7 @@ extern QueueHandle_t LoraSendQueue;
 #include "mqtt.h"
 #endif
 
-#ifdef HAS_BUTTON
+#if (USE_BUTTON)
 #include "button.h"
 #endif
 
