@@ -646,26 +646,11 @@ void setup()
 #endif
   delay(100);
 
-//---------------------------------------------------------------
-// Deep sleep settings
-//---------------------------------------------------------------
-#if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
-              " min");
 
-#if (USE_BUTTON)
-//esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
-#endif
 
-#if (WAKEUP_BY_MOTION)
+
 #if (USE_GYRO)
-#ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
-#endif
-#endif
-#endif
-
+  setup_gyro();
 #endif
 
   gps.init();
@@ -799,15 +784,35 @@ void setup()
   poti_setup_RTOS();
 #endif
 
-#if (USE_GYRO)
-  setup_gyro();
+
+//---------------------------------------------------------------
+// Deep sleep settings
+//---------------------------------------------------------------
+#if (ESP_SLEEP)
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
+  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
+              " min");
+
+#if (USE_BUTTON)
+//esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
 #endif
+
+
+#if (WAKEUP_BY_MOTION)
+#if (USE_GYRO)
+#ifdef GYRO_INT_PIN
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
+#endif
+#endif
+#endif
+
+#endif
+
 
 log_display("Setup done");
 
 dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
 Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
-
 
 }
 
