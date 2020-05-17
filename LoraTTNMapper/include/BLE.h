@@ -1,9 +1,9 @@
-//--------------------------------------------------------------------------
-// U8G2 Display Setup  Definition
-//--------------------------------------------------------------------------
+
 
 // https://circuitdigest.com/microcontroller-projects/esp32-ble-server-how-to-use-gatt-services-for-battery-level-indication
 
+
+/*
 #ifndef _BLE_H
 #define _BLE_H
 
@@ -31,3 +31,4 @@ void ble_send(void);
 
 
 #endif
+*/

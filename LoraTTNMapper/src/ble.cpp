@@ -1,3 +1,4 @@
+/*
 #include "globals.h"
 #include "ble.h"
 
@@ -130,4 +131,5 @@ if (deviceConnected) {
   }
 }
 
+*/
 
