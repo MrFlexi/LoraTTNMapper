@@ -494,9 +494,9 @@ void setup_wifi()
   ESP_LOGI(TAG, "Connecting to WiFi..");
   int i = 0;
   wifi_connected = false;
-  while ((WiFi.status() != WL_CONNECTED) && (i < 10))
+  while ((WiFi.status() != WL_CONNECTED) && (i < 50))
   {
-    delay(1000);
+    delay(200);
     i++;
     Serial.print('.');
   }
@@ -673,12 +673,12 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(100); // Wait for GPS beeing stable
+  delay(50); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(100);
+  delay(50);
 #endif
 
 #if (USE_DASH)
@@ -736,16 +736,14 @@ void setup()
   }
 #endif
 
-#if (USE_GYRO)
-  setup_gyro();
-#endif
+
 
   // get sensor values once
   t_cyclic();
 
 #if (USE_FASTLED)
   setup_FastLed();
-  delay(100);
+  delay(50);
   LED_wakeup();
 #endif
 
@@ -795,14 +793,22 @@ void setup()
   t_enqueue_LORA_messages();
 #endif
 
-  log_display("Setup done");
-
-  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+  
 
 #if (USE_POTI)
   poti_setup_RTOS();
 #endif
+
+#if (USE_GYRO)
+  setup_gyro();
+#endif
+
+log_display("Setup done");
+
+dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
+Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+
+
 }
 
 void loop()

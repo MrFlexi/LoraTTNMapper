@@ -137,7 +137,7 @@ void LED_sunrise()
     // fill the entire strip with the current color
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
-    delay(10);
+    delay(5);
   }
 }
 
@@ -244,9 +244,6 @@ void LED_wakeup()
     LED_boot();
     break;
   }
-  delay(1000);
-  LED_bootcount();
-  delay(1000);
 }
 
 #endif
