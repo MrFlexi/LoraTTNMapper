@@ -644,10 +644,6 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(100);
-
-
-
 
 #if (USE_GYRO)
   setup_gyro();
