@@ -253,7 +253,7 @@ void showPage(int page)
       u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("+/-: %.2fmA ", dataBuffer.data.bat_DeltamAh);
+      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -294,6 +294,16 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont11_tr);
 
+#if (HAS_PMU)
+      u8g2.setCursor(1, 25);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+      u8g2.setCursor(1, 35);
+      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
+#else
+      u8g2.setCursor(1, 25);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
+
       if (dataBuffer.data.MotionCounter <= 0)
       {
         u8g2.drawStr(1, 55, "Inactivity");
@@ -310,7 +320,7 @@ void showPage(int page)
       u8g2.setCursor(64, 55);
       u8g2.printf(" move me !!", TIME_TO_SLEEP);
 #endif
-      drawSymbol(1, 48, SUN);
+      drawSymbol(60, 12, SUN);
       break;
     }
 

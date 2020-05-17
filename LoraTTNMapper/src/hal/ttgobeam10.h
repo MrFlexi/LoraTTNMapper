@@ -14,9 +14,9 @@
 #define HAS_LORA                1               // comment out if device shall not send data via LoRa
 #define CFG_sx1276_radio        1               // HPD13A LoRa SoC
 #define BOARD_HAS_PSRAM         1               // use extra 4MB external RAM
-#define HAS_BUTTON              GPIO_NUM_38     // middle on board button
+#define BUTTON_PIN              GPIO_NUM_38     // middle on board button
 #define HAS_PMU                 1               // AXP192 power management chip
-#define PMU_INT                 GPIO_NUM_35     // AXP192 interrupt
+#define PMU_INT_PIN             GPIO_NUM_35     // AXP192 interrupt
 #define GYRO_INT_PIN            GPIO_NUM_4      // Gyroskop Movement Detection
 #define FASTLED_DATA_PIN        GPIO_NUM_2
 #define POTI_PIN                GPIO_NUM_32

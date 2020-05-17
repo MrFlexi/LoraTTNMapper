@@ -16,7 +16,7 @@
 //#define DISPLAY_FLIP  1 // uncomment this for rotated display
 #define HAS_LED LED_BUILTIN
 #define LED_ACTIVE_LOW 1  // Onboard LED is active when pin is LOW
-#define HAS_BUTTON KEY_BUILTIN
+#define BUTTON_PIN KEY_BUILTIN
 
 // Pins for I2C interface of OLED Display
 #define MY_OLED_SDA (4)

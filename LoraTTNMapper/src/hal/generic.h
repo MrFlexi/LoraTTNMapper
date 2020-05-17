@@ -50,7 +50,7 @@
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
 
 #define HAS_LED (21) // on board  LED
-#define HAS_BUTTON (39) // on board button
+#define BUTTON_PIN (39) // on board button
 #define HAS_RGB_LED SmartLed rgb_led(LED_WS2812, 1, GPIO_NUM_0) // WS2812B RGB LED on GPIO0
 
 // GPS settings

@@ -18,7 +18,7 @@
 
 #define HAS_DISPLAY U8X8_SSD1306_128X64_NONAME_HW_I2C // OLED-Display on board
 #define HAS_LED LED_BUILTIN                           // white LED on board
-#define HAS_BUTTON KEY_BUILTIN                        // button "PROG" on board
+#define BUTTON_PIN KEY_BUILTIN                        // button "PROG" on board
 
 // Pins for I2C interface of OLED Display
 #define MY_OLED_SDA SDA_OLED

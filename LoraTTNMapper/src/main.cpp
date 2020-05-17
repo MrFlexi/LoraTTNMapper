@@ -117,7 +117,7 @@ CAYENNE_DISCONNECTED()
     {
       log_display("No wifi...");
     }
-    delay(2000);
+    delay(100);
   }
 }
 
@@ -154,6 +154,13 @@ CAYENNE_IN_DEFAULT()
   log_display("Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
   //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+  switch (request.channel)
+  {
+  case 1:
+    Serial.println("Cayenne: Reset Coulomb Counter");
+    pmu.ClearCoulombcounter();
+    break;
+  }
 }
 
 #endif
@@ -360,7 +367,8 @@ void t_send_cayenne()
 {
 
 #if (USE_CAYENNE)
-  Cayenne_send();
+  if (WiFi.status() == WL_CONNECTED)
+    Cayenne_send();
 #endif
 
 #if (USE_BLE)
@@ -475,7 +483,6 @@ void t_sleep()
 #endif
 }
 
-
 void setup_wifi()
 {
 
@@ -487,9 +494,9 @@ void setup_wifi()
   ESP_LOGI(TAG, "Connecting to WiFi..");
   int i = 0;
   wifi_connected = false;
-  while ((WiFi.status() != WL_CONNECTED) && (i < 10))
+  while ((WiFi.status() != WL_CONNECTED) && (i < 50))
   {
-    delay(1000);
+    delay(200);
     i++;
     Serial.print('.');
   }
@@ -583,7 +590,7 @@ void setup()
 #if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
-  AXP192_power_gps(ON);  
+  AXP192_power_gps(ON);
 #endif
 
 #if (HAS_INA)
@@ -607,11 +614,11 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-#if (USE_SERIAL_BT)
+#if (USE_SERIAL_BT || USE_BLE)
 #else
   //Turn off Bluetooth
-  //log_display("Stop Bluethooth");
-  //btStop();
+  log_display("BLUETHOOTH OFF");
+  btStop();
 #endif
 
 #if (USE_MQTT)
@@ -637,28 +644,9 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(100);
 
-//---------------------------------------------------------------
-// Deep sleep settings
-//---------------------------------------------------------------
-#if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
-              " min");
-
-#ifdef HAS_BUTTON
-//esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
-#endif
-
-#if (WAKEUP_BY_MOTION)
 #if (USE_GYRO)
-#ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
-#endif
-#endif
-#endif
-
+  setup_gyro();
 #endif
 
   gps.init();
@@ -666,12 +654,12 @@ void setup()
   gps.wakeup();
   //gps.ecoMode();
 
-  delay(100); // Wait for GPS beeing stable
+  delay(50); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(100);
+  delay(50);
 #endif
 
 #if (USE_DASH)
@@ -681,12 +669,14 @@ void setup()
   }
 #endif
 
-#ifdef HAS_BUTTON
-  pinMode(HAS_BUTTON, INPUT_PULLUP);
-  button_init(HAS_BUTTON);
+#if (USE_BUTTON)
+#ifdef BUTTON_PIN
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  button_init(BUTTON_PIN);
+#endif
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
@@ -719,7 +709,7 @@ void setup()
   }
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     ws.onEvent(onWsEvent);
@@ -727,16 +717,14 @@ void setup()
   }
 #endif
 
-#if (USE_GYRO)
-  setup_gyro();
-#endif
+
 
   // get sensor values once
   t_cyclic();
 
 #if (USE_FASTLED)
   setup_FastLed();
-  delay(100);
+  delay(50);
   LED_wakeup();
 #endif
 
@@ -757,7 +745,7 @@ void setup()
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     xTaskCreate(
@@ -786,14 +774,42 @@ void setup()
   t_enqueue_LORA_messages();
 #endif
 
-  log_display("Setup done");
-
-  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));  
+  
 
 #if (USE_POTI)
   poti_setup_RTOS();
 #endif
+
+
+//---------------------------------------------------------------
+// Deep sleep settings
+//---------------------------------------------------------------
+#if (ESP_SLEEP)
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
+  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
+              " min");
+
+#if (USE_BUTTON)
+//esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+#endif
+
+
+#if (WAKEUP_BY_MOTION)
+#if (USE_GYRO)
+#ifdef GYRO_INT_PIN
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
+#endif
+#endif
+#endif
+
+#endif
+
+
+log_display("Setup done");
+
+dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
+Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+
 }
 
 void loop()
@@ -821,7 +837,7 @@ void loop()
   }
 #endif
 
-#if (HAS_BUTTON)
+#if (USE_BUTTON)
   readButton();
 #endif
 }

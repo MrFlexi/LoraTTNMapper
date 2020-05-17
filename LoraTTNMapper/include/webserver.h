@@ -3,6 +3,8 @@
 
 #include <ArduinoJson.h>
 
+#if (USE_WEBSERVER)
  extern AsyncWebServer server;
+#endif
 
 #endif
