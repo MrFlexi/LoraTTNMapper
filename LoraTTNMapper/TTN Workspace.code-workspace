@@ -43,6 +43,10 @@
 		{
 			"name": "NodeMcu_CNY70_Position_Controll",
 			"path": "..\\..\\NodeMcu_CNY70_Position_Controll"
+		},
+		{
+			"name": "ESP32_MotorRotaryController",
+			"path": "..\\..\\ESP32_MotorRotaryController"
 		}
 	],
 	"settings": {
