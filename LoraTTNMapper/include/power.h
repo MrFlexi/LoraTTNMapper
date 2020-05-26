@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <driver/adc.h>
 #include <esp_adc_cal.h>
-#include "i2cscan.h"
 
 #define DEFAULT_VREF 1100 // tbd: use adc2_vref_to_gpio() for better estimate
 #define NO_OF_SAMPLES 64  // we do some multisampling to get better values

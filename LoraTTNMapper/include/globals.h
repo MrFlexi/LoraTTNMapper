@@ -95,7 +95,7 @@ typedef struct
   uint8_t LoraQueueCounter; // aliveCounter
   uint8_t sleepCounter;     // aliveCounter
   uint8_t MotionCounter;     // aliveCounter
-  uint8_t bootCounter;
+  uint16_t bootCounter;
   uint8_t txCounter;        // aliveCounter
    uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter
@@ -143,16 +143,16 @@ extern QueueHandle_t LoraSendQueue;
 
 #include "../src/hal/ttgobeam10.h"
 #include "power.h"
+#include "jsutilities.h"
 #include "display.h"
 #include "gps.h"
-#include "i2cscan.h"
 #include "irqhandler.h"
 
-#if (HAS_INA)
-#include "INA3221.h"
-#endif
-
 #include "payload.h"
+
+#if (HAS_INA)
+extern SDL_Arduino_INA3221 ina3221;
+#endif
 
 #if (USE_MQTT)
 #include "mqtt.h"

@@ -59,7 +59,7 @@ SemaphoreHandle_t I2Caccess;
 
 uint8_t msgWaiting = 0;
 
-RTC_DATA_ATTR int bootCount = 0;
+RTC_DATA_ATTR uint16_t bootCount = 0;
 touch_pad_t touchPin;
 
 //--------------------------------------------------------------------------
@@ -180,6 +180,9 @@ String stringOne = "";
 static const char TAG[] = __FILE__;
 
 #if (HAS_INA)
+
+SDL_Arduino_INA3221 ina3221;
+
 void print_ina()
 {
   Serial.println("");
@@ -214,123 +217,7 @@ void touch_callback()
   //placeholder callback function
 }
 
-void display_chip_info()
-{
-  // print chip information on startup if in verbose mode after coldstart
 
-  esp_chip_info_t chip_info;
-  esp_chip_info(&chip_info);
-  ESP_LOGI(TAG,
-           "This is ESP32 chip with %d CPU cores, WiFi%s%s, silicon revision "
-           "%d, %dMB %s Flash",
-           chip_info.cores,
-           (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-           (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "",
-           chip_info.revision, spi_flash_get_chip_size() / (1024 * 1024),
-           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
-                                                         : "external");
-  ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
-           ESP.getHeapSize(), ESP.getFreeHeap());
-
-#if (BOARD_HAS_PSRAM)
-  ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
-           ESP.getPsramSize(), ESP.getFreePsram());
-
-#endif
-
-  ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
-           ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
-  ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),
-           ESP.getFlashChipSpeed());
-
-#if (HAS_LORA)
-  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
-           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
-  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
-           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
-#endif // HAS_LORA
-
-#if (HAS_GPS)
-  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
-#endif
-}
-
-void print_wakeup_reason()
-{
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  dataBuffer.data.wakeup_reason = wakeup_reason;
-
-  Serial.print(F("WakeUp caused by: "));
-  switch (wakeup_reason)
-  {
-  case ESP_SLEEP_WAKEUP_EXT0:
-    Serial.println(F("external signal using RTC_IO"));
-    dataBuffer.data.operation_mode = '1';
-    break;
-  case ESP_SLEEP_WAKEUP_EXT1:
-    Serial.println(F("external signal using RTC_CNTL"));
-    break;
-  case ESP_SLEEP_WAKEUP_TIMER:
-    Serial.println("by timer");
-    break;
-  case ESP_SLEEP_WAKEUP_TOUCHPAD:
-    Serial.println(F("touchpad"));
-    break;
-  case ESP_SLEEP_WAKEUP_ULP:
-    Serial.println(F("ULP program"));
-    break;
-  default:
-    Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-    break;
-  }
-}
-
-void print_wakeup_touchpad()
-{
-  touch_pad_t pin;
-  touchPin = esp_sleep_get_touchpad_wakeup_status();
-  switch (touchPin)
-  {
-  case 0:
-    Serial.println("Touch detected on GPIO 4");
-    break;
-  case 1:
-    Serial.println("Touch detected on GPIO 0");
-    break;
-  case 2:
-    Serial.println("Touch detected on GPIO 2");
-    break;
-  case 3:
-    Serial.println("Touch detected on GPIO 15");
-    break;
-  case 4:
-    Serial.println("Touch detected on GPIO 13");
-    break;
-  case 5:
-    Serial.println("Touch detected on GPIO 12");
-    break;
-  case 6:
-    Serial.println("Touch detected on GPIO 14");
-    break;
-  case 7:
-    Serial.println("Touch detected on GPIO 27");
-    break;
-  case 8:
-    Serial.println("Touch detected on GPIO 33");
-    break;
-  case 9:
-    Serial.println("Touch detected on GPIO 32");
-    break;
-  default:
-    Serial.println("Wakeup not by touchpad");
-    break;
-  }
-}
 
 void setup_sensors()
 {
@@ -555,8 +442,20 @@ void setup()
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
-  // print_wakeup_touchpad();
   display_chip_info();
+  #if (HAS_LORA)
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+#endif // HAS_LORA
+
+#if (HAS_GPS)
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
+#endif
 
   // create some semaphores for syncing / mutexing tasks
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
@@ -574,13 +473,6 @@ void setup()
 #if (USE_BLE)
   setup_ble();
 #endif
-
-  // Preferences
-
-  //preferences.begin("config", false); // NVS Flash RW mode
-  //preferences.getULong("uptime", uptime_seconds_old);
-  //Serial.println("Uptime old: " + String(uptime_seconds_old));
-  //preferences.getString("info", lastword, sizeof(lastword));
 
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
@@ -603,9 +495,7 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-
   dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
-
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
@@ -650,9 +540,7 @@ void setup()
 #endif
 
   gps.init();
-  //gps.softwareReset();
   gps.wakeup();
-  //gps.ecoMode();
 
   delay(50); // Wait for GPS beeing stable
 
@@ -716,8 +604,6 @@ void setup()
     server.addHandler(&ws);
   }
 #endif
-
-
 
   // get sensor values once
   t_cyclic();
@@ -801,9 +687,7 @@ void setup()
 #endif
 #endif
 #endif
-
 #endif
-
 
 log_display("Setup done");
 
