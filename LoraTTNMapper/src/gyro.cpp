@@ -183,9 +183,14 @@ void setup_gyro()
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
         Serial.print(F("DMP ready! Waiting for first interrupt..."));
         //gyro_dump_interrupt_source(mpuIntStatus);
+        
+        I2C_MUTEX_UNLOCK(); // release i2c bus access
+
+        #if (WAKEUP_BY_MOTION)
         pinMode(GYRO_INT_PIN, INPUT_PULLUP);
         attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), GYRO_IRQ, RISING);
-        I2C_MUTEX_UNLOCK(); // release i2c bus access
+        #endif
+        
     }
 }
 

@@ -15,11 +15,8 @@
  limitations under the License.
 **/
 
-#include <WiFiClientSecure.h>
-#include <Update.h>
-#include <BintrayClient.h>
 #include "SecureOTA.h"
-#include "globals.h"
+
 
 const BintrayClient bintray(BINTRAY_USER, BINTRAY_REPO, BINTRAY_PACKAGE);
 
@@ -37,7 +34,7 @@ void checkFirmwareUpdates()
 {
   // Fetch the latest firmware version
   const String latest = bintray.getLatestVersion();
-  log_display("Firmware: " + String(VERSION) + " " + latest);
+  Serial.println("Firmware: " + latest);
   delay(500);
  
   if (latest.length() == 0)
@@ -47,11 +44,11 @@ void checkFirmwareUpdates()
   }
   else if (atof(latest.c_str()) <= VERSION )
   {
-    log_display("The firmware is up to date");
+    Serial.println("The firmware is up to date");
     return;
   }
 
-  log_display("New firmware: v." + latest);
+  Serial.println("New firmware: v." + latest);
   processOTAUpdate(latest);
 }
 
@@ -81,7 +78,7 @@ void processOTAUpdate(const String &version)
 
   if (!client.connect(currentHost.c_str(), port))
   {
-    log_display("Cannot connect " + currentHost);   
+    Serial.println("Cannot connect " + currentHost);   
     return;
   }
 
@@ -111,7 +108,7 @@ void processOTAUpdate(const String &version)
     {
       if (millis() - timeout > RESPONSE_TIMEOUT_MS)
       {
-       log_display("Client Timeout !");
+       Serial.println("Client Timeout !");
         client.stop();
         return;
       }
@@ -166,7 +163,7 @@ void processOTAUpdate(const String &version)
       if (line.startsWith("Content-Length: "))
       {
         contentLength = atoi((getHeaderValue(line, "Content-Length: ")).c_str());
-        log_display("kB: " + String(contentLength / 1024 ) );
+        Serial.println("kB: " + String(contentLength / 1024 ) );
       }
 
       if (line.startsWith("Content-Type: "))
@@ -186,7 +183,7 @@ void processOTAUpdate(const String &version)
   {
     if (Update.begin(contentLength))
     {
-      log_display("Starting Over-The-Air update");
+      Serial.println("Starting Over-The-Air update");
       size_t written = Update.writeStream(client);
 
       if (written == contentLength)
@@ -203,12 +200,12 @@ void processOTAUpdate(const String &version)
       {
         if (Update.isFinished())
         {
-          log_display("OTA completed. Rebooting ...");
+          Serial.println("OTA completed. Rebooting ...");
           ESP.restart();
         }
         else
         {
-          log_display("OTA error");
+          Serial.println("OTA error");
         }
       }
       else
@@ -218,7 +215,7 @@ void processOTAUpdate(const String &version)
     }
     else
     {
-      log_display("Not enough space");
+      Serial.println("Not enough space");
       client.flush();
     }
   }

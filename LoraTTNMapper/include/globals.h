@@ -10,16 +10,18 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  1
+#define DEVICE_ID  2
 
 
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
+#include "../src/hal/ttgobeam10.h"
 #endif
 
-#if DEVICE_ID == 2                 // TBEAM-02 Device EU ID = DE00000000000010
+#if DEVICE_ID == 2                 // TBEAM-02 Device EU ID = DE00000000000011
 #include "device_02.h"
+#include "../src/hal/ttgobeam10.h"
 #endif
 
 
@@ -141,10 +143,11 @@ extern TaskHandle_t t_cyclic_HandlerTask;
 
 extern QueueHandle_t LoraSendQueue;
 
-#include "../src/hal/ttgobeam10.h"
+
 #include "power.h"
 #include "jsutilities.h"
 #include "display.h"
+
 #include "gps.h"
 #include "irqhandler.h"
 

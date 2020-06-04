@@ -16,20 +16,26 @@ extern QueueHandle_t LoraSendQueue;
 //--------------------------------------------------------------------------
 // LORA Settings
 //--------------------------------------------------------------------------
+
+
+// LORA Bordspecific settings
+
+#if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 // LoRaWAN NwkSKey, network session key // msb
 static PROGMEM u1_t NWKSKEY[16] = {0x88, 0x06, 0xDA, 0xCF, 0x30, 0xFB, 0x44, 0xDC, 0x69, 0x0E, 0x15, 0xF8, 0xAD, 0xCB, 0x40, 0x6C};
 
 // LoRaWAN AppSKey, application session key // msb
 static u1_t PROGMEM APPSKEY[16] = {0xB3, 0xB1, 0x59, 0x5D, 0x24, 0xBD, 0xD2, 0xF5, 0x6A, 0x17, 0x0A, 0x94, 0xF2, 0xED, 0xDB, 0xC2};
-
-// LORA Bordspecific settings
-
-#if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
-static u4_t DEVADDR = 0x260118B7; // <-- Change this address for every node!
+static u4_t DEVADDR = 0x260118B7; // 
 #endif
 
-#if DEVICE_ID == 2                 // TBEAM-02 Device EU ID = DE00000000000010
-static u4_t DEVADDR = 0x260118B7; // <-- Change this address for every node!
+#if DEVICE_ID == 2                 // TBEAM-02 Device EU ID = DE00000000000011
+// LoRaWAN NwkSKey, network session key // msb
+static PROGMEM u1_t NWKSKEY[16] = { 0xEE, 0x1A, 0x8E, 0x21, 0x51, 0xCD, 0x64, 0xC5, 0x7D, 0xF7, 0x97, 0x5D, 0x69, 0xDD, 0x81, 0x26 };
+
+// LoRaWAN AppSKey, application session key // msb
+static u1_t PROGMEM APPSKEY[16] = { 0x59, 0xB9, 0x24, 0x25, 0xF3, 0xB5, 0xB3, 0xF6, 0x13, 0xCC, 0x0D, 0x6C, 0x98, 0xBD, 0x25, 0xF0};
+static u4_t DEVADDR = 0x26011F7F; // msb 
 #endif
 
 
