@@ -10,7 +10,7 @@
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
-#define USE_DISPLAY 0
+#define USE_DISPLAY 1
 
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 0

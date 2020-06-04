@@ -72,6 +72,9 @@ int i2c_scan(void) {
     } // switch
   }   // for loop
 
+   // Set back to 400KHz
+    Wire.setClock(400000);
+
   ESP_LOGI(TAG, "I2C scan done, %u devices found.", devices);
 
   return devices;
