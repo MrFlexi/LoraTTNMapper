@@ -280,7 +280,7 @@ void t_cyclic()
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 #if (USE_BME280)
