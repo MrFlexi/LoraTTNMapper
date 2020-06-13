@@ -14,7 +14,7 @@
 
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
-#define USE_BUTTON 0
+#define USE_BUTTON 1
 
 #define USE_BLE 0
 #define USE_SERIAL_BT 0
@@ -47,6 +47,9 @@
 #define SEND_QUEUE_SIZE 10
 #define PAD_TRESHOLD 40
 
+#define USE_GPS_MOTION 1
+#define GPS_MOTION_DISTANCE 20  // Meter
+
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
 #define HAS_DISPLAY U8G2_SSD1306_128X64_NONAME_F_HW_I2C
 
@@ -55,6 +58,6 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 25        // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  10 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 5 // after n Lora TX events
+#define TIME_TO_SLEEP 5        // sleep for n minute
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events

@@ -7,12 +7,11 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
+
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
 #define DEVICE_ID  2
-
-
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -23,8 +22,6 @@
 #include "device_02.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
-
-
 
 #define I2CMUTEXREFRES_MS 40
 #define I2C_MUTEX_LOCK() \
@@ -58,6 +55,8 @@
 #if (USE_SERIAL_BT)
 #include "BluetoothSerial.h"
 #endif
+
+#include "gps.h"
 
 #include "esp_log.h"
 //#include <Preferences.h>
@@ -108,6 +107,7 @@ typedef struct
   uint32_t bat_DischargeCoulomb = 0;
   float    bat_DeltamAh = 0;
   bool  wlan;
+  bool  pictureLoop = true;
   float firmware_version;
   uint8_t bytesReceived;
   lmic_t lmic;
@@ -124,6 +124,9 @@ typedef struct
   String ip_address;
   uint8_t operation_mode = 0;
   esp_sleep_wakeup_cause_t wakeup_reason;
+  TinyGPSLocation gps;
+  TinyGPSLocation gps_old;
+  double gps_distance;
 } deviceStatus_t;
 
 // Struct holding payload for data send queue
@@ -148,7 +151,7 @@ extern QueueHandle_t LoraSendQueue;
 #include "jsutilities.h"
 #include "display.h"
 
-#include "gps.h"
+
 #include "irqhandler.h"
 
 #include "payload.h"

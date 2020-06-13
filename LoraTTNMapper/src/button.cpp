@@ -16,29 +16,27 @@ void button_init(int pin)
 
   // attach events to the button
 
-  b->setOnDoubleClicked([]() {});
+  b->setOnDoubleClicked([]() {
+    ESP_LOGI(TAG, "Button double cklick");
+    if (dataBuffer.data.pictureLoop)
+          dataBuffer.data.pictureLoop = false;
+
+    if (!dataBuffer.data.pictureLoop)
+          dataBuffer.data.pictureLoop = true;
+
+    
+
+  });
 
   b->setOnClicked([]() {
     ESP_LOGI(TAG, "Button pressed");
-
-    if (PageNumber < PAGE_COUNT)
-    {
-      PageNumber++;
-    }
-    else
-    {
-      PageNumber = 1;
-    }
-
-    //showPage(PageNumber);
+  	t_moveDisplay();
   });
 
   b->setOnHolding([]() {
     ESP_LOGI(TAG, "Button Holding");
   });
 
-  // attach interrupt to the button
-  // attachInterrupt(digitalPinToInterrupt(pin), ButtonIRQ, CHANGE);
 }
 
 void readButton()

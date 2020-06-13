@@ -217,8 +217,6 @@ void touch_callback()
   //placeholder callback function
 }
 
-
-
 void setup_sensors()
 {
 #if (USE_BME280)
@@ -329,8 +327,6 @@ void t_cyclic()
   }
 #endif
 
-  gps.checkGpsFix();
-
   // Refresh Display
 
 #if (USE_DISPLAY)
@@ -352,9 +348,11 @@ void t_sleep()
   // Deep sleep
   //-----------------------------------------------------
 
-#if (ESP_SLEEP)
+gps.getDistance();
 
-  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
+#if (ESP_SLEEP)
+dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
+
 
 #if (USE_FASTLED)
   if (dataBuffer.data.MotionCounter < TIME_TO_NEXT_SLEEP_WITHOUT_MOTION)
@@ -365,7 +363,18 @@ void t_sleep()
 
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
-    ESP32_sleep();
+
+    #if (USE_GPS_MOTION)
+    if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
+    {
+      dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+      gps.resetDistance();
+
+    }
+    #endif
+
+    if (dataBuffer.data.MotionCounter <= 0)
+      ESP32_sleep();
   }
 #endif
 }
@@ -443,7 +452,7 @@ void setup()
 
   print_wakeup_reason();
   display_chip_info();
-  #if (HAS_LORA)
+#if (HAS_LORA)
   ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
            LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
   ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
@@ -660,12 +669,9 @@ void setup()
   t_enqueue_LORA_messages();
 #endif
 
-  
-
 #if (USE_POTI)
   poti_setup_RTOS();
 #endif
-
 
 //---------------------------------------------------------------
 // Deep sleep settings
@@ -676,9 +682,8 @@ void setup()
               " min");
 
 #if (USE_BUTTON)
-//esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
 #endif
-
 
 #if (WAKEUP_BY_MOTION)
 #if (USE_GYRO)
@@ -689,11 +694,10 @@ void setup()
 #endif
 #endif
 
-log_display("Setup done");
+  log_display("Setup done");
 
-dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
-
+  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
+  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
 }
 
 void loop()

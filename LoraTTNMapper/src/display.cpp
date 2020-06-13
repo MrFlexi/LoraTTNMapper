@@ -4,12 +4,51 @@
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
-int PageNumber = 1;
+int PageNumber = 0;
 char sbuf[32];
+uint8_t page_array[10];
+uint8_t max_page_counter;
+uint8_t page_counter = 0;
 
 #if (USE_SERIAL_BT)
 BluetoothSerial SerialBT;
 #endif
+
+void displayRegisterPages()
+{
+
+  max_page_counter = 0;
+
+  page_array[max_page_counter] = PAGE_TBEAM;
+
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_LORA;
+
+#if (USE_INA)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SOLAR;
+#endif
+
+#if (HAS_PMU)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_BAT;
+#endif
+
+#if (USE_GPS)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_GPS;
+#endif
+
+#if (USE_GYRO)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_GYRO;
+#endif
+
+#if (USE_BME280)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SENSORS;
+#endif
+}
 
 void log_display(String s)
 {
@@ -34,15 +73,7 @@ void t_moveDisplayRTOS(void *pvParameters)
   for (;;)
   {
 
-    if (PageNumber < PAGE_COUNT)
-    {
-      PageNumber++;
-    }
-    else
-    {
-      PageNumber = 1;
-    }
-    //showPage(PageNumber);
+    t_moveDisplay();
     vTaskDelay(displayMoveIntervall * 1000 / portTICK_PERIOD_MS);
   }
 #endif
@@ -52,16 +83,18 @@ void t_moveDisplay(void)
 {
 #if (USE_DISPLAY)
 
-  if (PageNumber < PAGE_COUNT)
+  if (dataBuffer.data.pictureLoop)
   {
-    PageNumber++;
+    if (page_counter < max_page_counter)
+    {
+      page_counter++;
+    }
+    else
+    {
+      page_counter = 0;
+    }
+    PageNumber = page_array[page_counter];
   }
-  else
-  {
-    PageNumber = 1;
-  }
-  //showPage(PageNumber);
-
 #endif
 }
 
@@ -75,6 +108,7 @@ void setup_display(void)
   u8g2.enableUTF8Print();
   log_display("SAP GTT");
   log_display("TTN-ABP-Mapper");
+  displayRegisterPages();
 }
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
@@ -131,15 +165,11 @@ void showPage(int page)
 
     // u8g2_font_profont15_tr  W7 H15
     // u8g2_font_ncenB08_tr W12 H13
-
     u8g2.clearBuffer();
-
     uint8_t icon = 0;
 
-    //page = PAGE_GYRO;
     switch (page)
     {
-
     case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
@@ -216,8 +246,9 @@ void showPage(int page)
       u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
 
       u8g2.setCursor(1, 40);
-      u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
-      u8g2.setCursor(64, 40);
+      u8g2.printf("Alt:%.4g m", gps.tGps.altitude.meters());
+      u8g2.setCursor(1, 60);
+      u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
       break;
 
     case PAGE_SOLAR:
@@ -326,6 +357,12 @@ void showPage(int page)
 
     u8g2.setCursor(100, 64);
     u8g2.printf("%2d", dataBuffer.data.MotionCounter);
+
+    u8g2.setCursor(115, 64);
+    if (dataBuffer.data.pictureLoop) u8g2.printf("P");
+  
+    
+          
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
