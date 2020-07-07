@@ -275,6 +275,7 @@ void t_cyclic()
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
+  gps.getDistance();
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())

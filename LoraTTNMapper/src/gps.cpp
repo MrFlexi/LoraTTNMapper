@@ -175,7 +175,6 @@ void Neo6m::resetDistance()
   {
     dataBuffer.data.gps = tGps.location; // Save actual position
     dataBuffer.data.gps_old = tGps.location;
-  }
 
   if (( dataBuffer.data.gps.lat() != 0.0 ) && ( dataBuffer.data.gps_old.lat() != 0.0))
   {
@@ -184,5 +183,10 @@ void Neo6m::resetDistance()
   }
   else dataBuffer.data.gps_distance = 0;
   ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
+
+
+  }
+
+  
 }
 Neo6m gps;
