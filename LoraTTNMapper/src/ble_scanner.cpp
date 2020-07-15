@@ -159,6 +159,6 @@ void ble_loop()
 
   pBLEScan->clearResults(); // delete results fromBLEScan buffer to release memory
 
-  //cleanDeviceList();
+  cleanDeviceList();
   printDeviceList();
 }
