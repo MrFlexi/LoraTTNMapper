@@ -48,6 +48,15 @@ void displayRegisterPages()
   max_page_counter++;
   page_array[max_page_counter] = PAGE_SENSORS;
 #endif
+
+#if (USE_BLE_SCANNER)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_CORONA;
+#endif
+
+
+
+
 }
 
 void log_display(String s)
@@ -190,7 +199,7 @@ void showPage(int page)
       availableModules = availableModules + "OTA ";
 #endif
 
-#if (USE_BLE)
+#if (USE_BLE_SCANNER)
       availableModules = availableModules + "BLE ";
 #endif
 
@@ -320,6 +329,17 @@ void showPage(int page)
       u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
       break;
 
+    case PAGE_CORONA:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Corona Count");
+
+      u8g2.setFont(u8g2_font_ncenB24_tr);
+      u8g2.setCursor(40, 52);
+      u8g2.printf("%i", dataBuffer.data.CoronaDeviceCount);
+
+      break;
+
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");
@@ -356,6 +376,10 @@ void showPage(int page)
       break;
     }
 
+    //---------------------------------
+    //----------   Footer   -----------
+    //---------------------------------
+    u8g2.setFont(u8g2_font_profont12_tr);
     u8g2.setCursor(100, 64);
     u8g2.printf("%2d", dataBuffer.data.MotionCounter);
 

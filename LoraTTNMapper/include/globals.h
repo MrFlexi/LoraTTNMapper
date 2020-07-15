@@ -100,6 +100,7 @@ typedef struct
   uint8_t txCounter;        // aliveCounter
    uint8_t rxCounter;        // aliveCounter
   uint8_t runmode;          // aliveCounter
+  uint8_t CoronaDeviceCount;
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a;   //
@@ -184,11 +185,10 @@ extern SDL_Arduino_INA3221 ina3221;
 #include "gyro.h"
 #endif
 
-/*
-#if (USE_BLE)
-#include <ble.h>
+#if (USE_BLE_SCANNER)
+#include "ble_scanner.h"
 #endif
-*/
+
 
 #if (USE_FASTLED)
 #include <Led.h>

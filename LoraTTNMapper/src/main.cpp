@@ -266,11 +266,33 @@ void t_send_cayenne()
 #endif
 }
 
+
 void t_cyclicRTOS(void *pvParameters)
 {
+
+  DataBuffer foo;
+
+  while (1)
+  {
+    #if (USE_BLE_SCANNER)
+    ble_loop();
+
+// Werte holen
+    foo = *((DataBuffer*)pvParameters);
+    
+    Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
+    foo.data.CoronaDeviceCount = getCoronaDeviceCount();
+
+    // Werte wieder zurückschreiben
+    *(DataBuffer*)pvParameters = foo;
+
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    #endif
+  }
 }
 
-void t_cyclic()
+
+void t_cyclic() // Intervall: Display Refresh
 {
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
@@ -349,11 +371,10 @@ void t_sleep()
   // Deep sleep
   //-----------------------------------------------------
 
-gps.getDistance();
+  gps.getDistance();
 
 #if (ESP_SLEEP)
-dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
-
+  dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
 #if (USE_FASTLED)
   if (dataBuffer.data.MotionCounter < TIME_TO_NEXT_SLEEP_WITHOUT_MOTION)
@@ -365,14 +386,13 @@ dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
 
-    #if (USE_GPS_MOTION)
+#if (USE_GPS_MOTION)
     if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
     {
       dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
       gps.resetDistance();
-
     }
-    #endif
+#endif
 
     if (dataBuffer.data.MotionCounter <= 0)
       ESP32_sleep();
@@ -424,18 +444,10 @@ void createRTOStasks()
   xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
-                          (void *)1,             // parameter of the task
+                          (void*)&dataBuffer,    // parameter of the task
                           2,                     // priority of the task
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core
-
-  xTaskCreatePinnedToCore(t_moveDisplayRTOS,       // task function
-                          "moveDisplay",           // name of task
-                          4096,                    // stack size of task
-                          (void *)1,               // parameter of the task
-                          2,                       // priority of the task
-                          &moveDisplayHandlerTask, // task handle
-                          1);                      // CPU core
 }
 
 void setup()
@@ -480,10 +492,6 @@ void setup()
   delay(100);
 #endif
 
-#if (USE_BLE)
-  setup_ble();
-#endif
-
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
@@ -514,7 +522,7 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-#if (USE_SERIAL_BT || USE_BLE)
+#if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
   //Turn off Bluetooth
   log_display("BLUETHOOTH OFF");
@@ -674,6 +682,11 @@ void setup()
   poti_setup_RTOS();
 #endif
 
+#if (USE_BLE_SCANNER)
+  ble_setup();
+  ble_loop();
+#endif
+
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
@@ -694,6 +707,12 @@ void setup()
 #endif
 #endif
 #endif
+
+  //---------------------------------------------------------------
+  // RTOS Tasks
+  //---------------------------------------------------------------
+
+  createRTOStasks();
 
   log_display("Setup done");
 

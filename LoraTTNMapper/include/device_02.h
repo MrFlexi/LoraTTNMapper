@@ -17,10 +17,11 @@
 #define USE_BUTTON 1
 
 #define USE_BLE 0
+#define USE_BLE_SCANNER 1
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   1 
+#define USE_WEBSERVER   0 
 #define USE_CAYENNE 1
 
 #define USE_GYRO  0
