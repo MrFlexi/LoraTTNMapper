@@ -131,6 +131,7 @@ void Cayenne_send(void)
   log_display("Cayenne send");
 
   Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
+  //Cayenne.virtualWrite(11, dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(),dataBuffer.data.gps.tGps.altitude.meters(),"gps","m");
   Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
