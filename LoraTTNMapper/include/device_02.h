@@ -17,7 +17,7 @@
 #define USE_BUTTON 1
 
 #define USE_BLE 0
-#define USE_BLE_SCANNER 1
+#define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
