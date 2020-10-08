@@ -11,10 +11,6 @@ long lastMsgAlive = 0;
 long lastMsgDist = 0;
 
 
-#if (USE_MQTT)
-
-
-
 void mqtt_loop()
 {
 // MQTT Connection
@@ -103,4 +99,3 @@ void setup_mqtt()
   log_display("Mqtt connected");
   MqttClient.publish("mrflexi/solarserver/info", "ESP32 is alive...");
 }
-#endif

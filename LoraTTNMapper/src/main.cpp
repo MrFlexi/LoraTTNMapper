@@ -24,9 +24,11 @@ bool wifi_connected = false;
 // Wifi Settings
 //--------------------------------------------------------------------------
 
-//const char ssid[] = "MrFlexi";
-//const char wifiPassword[] = "Linde-123";
-//WiFiClient wifiClient;
+#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
+WiFiClient wifiClient;
+#endif
+
+
 
 //--------------------------------------------------------------------------
 // Lora Helper

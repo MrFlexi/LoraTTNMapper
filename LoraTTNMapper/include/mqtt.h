@@ -5,7 +5,6 @@
 #if (USE_MQTT)
 #include <PubSubClient.h>
 
-extern PubSubClient MqttClient;
 
 //const char *mqtt_server = "192.168.1.144"; // Laptop
 //const char *mqtt_server = "test.mosquitto.org"; // Laptop
