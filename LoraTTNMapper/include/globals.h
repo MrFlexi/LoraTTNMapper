@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  3
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -23,10 +23,17 @@
 #include "../src/hal/ttgobeam10.h"
 #endif
 
+#if DEVICE_ID == 3                 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_03.h"
+#include "../src/hal/ttgobeam10.h"
+#endif
+
 #define I2CMUTEXREFRES_MS 40
 #define I2C_MUTEX_LOCK() \
   (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
 #define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
+
+
 
 #include <lmic.h>
 #include <hal/hal.h>

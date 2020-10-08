@@ -158,7 +158,9 @@ void PayloadConvert::enqueue_port(uint8_t port)
     if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)       // delete one element
     {
       ESP_LOGI(TAG, "Lora send queue element deleted:");
+      #if (HAS_LORA)
       dump_single_message(SendBuffer);
+      #endif
     }
 
   int p = uxQueueMessagesWaiting(LoraSendQueue);
