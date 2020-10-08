@@ -18,7 +18,7 @@
 #define EXT_POWER_OFF   1
 #define BAT_MEASURE_ADC ADC1_GPIO35_CHANNEL
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
-#define HAS_BUTTON GPIO_NUM_36 // on board button (next to reset)
+#define BUTTON_PIN GPIO_NUM_36 // on board button (next to reset)
 
 // Pins for I2C interface of OLED Display
 #define MY_OLED_SDA (21)

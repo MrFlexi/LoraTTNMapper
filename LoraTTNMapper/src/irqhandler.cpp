@@ -13,8 +13,7 @@ uint32_t InterruptStatusRegister = 0;
 void irqHandler(void *pvParameters)
 {
 
-  
-  const TickType_t xDelay = 250 / portTICK_PERIOD_MS;  // 100 ms = 10 times per second
+  const TickType_t xDelay = 250 / portTICK_PERIOD_MS; // 100 ms = 10 times per second
   uint32_t InterruptStatus;
   static bool mask_irq = false;
 
@@ -31,15 +30,17 @@ void irqHandler(void *pvParameters)
 #if (USE_INTERRUPTS)
 
 // button pressed?
-#ifdef HAS_BUTTON
+#if (USE_BUTTON)
     if (InterruptStatusRegister & BUTTON_IRQ)
       readButton();
 #endif
 
 // do we have a power event?
 #if (HAS_PMU)
+#if (USE_PMU_INTERRUPT)
     if (InterruptStatusRegister & PMU_IRQ_BIT)
       AXP192_event_handler();
+#endif
 #endif
 
 #if (USE_GYRO)
@@ -50,8 +51,8 @@ void irqHandler(void *pvParameters)
 #endif
 #endif
 
-  InterruptStatusRegister = 0;
-  vTaskDelay(xDelay);
+    InterruptStatusRegister = 0;
+    vTaskDelay(xDelay);
   }
 }
 
@@ -59,7 +60,7 @@ void irqHandler(void *pvParameters)
 // Notify Interrupt Handler
 //------------------------------------------------------------------------------------------
 
-#ifdef HAS_BUTTON
+#if (USE_BUTTON)
 void IRAM_ATTR ButtonIRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -87,6 +88,7 @@ void IRAM_ATTR PMU_IRQ()
 #endif
 
 #if (USE_GYRO)
+#if (WAKEUP_BY_MOTION)
 void IRAM_ATTR GYRO_IRQ()
 {
   mpuInterrupt = true;
@@ -101,6 +103,7 @@ void IRAM_ATTR GYRO_IRQ()
   if (xHigherPriorityTaskWoken)
     portYIELD_FROM_ISR();
 }
+#endif
 #endif
 
 void mask_user_IRQ()

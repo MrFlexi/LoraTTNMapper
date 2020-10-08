@@ -4,12 +4,60 @@
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
-int PageNumber = 1;
+int PageNumber = 0;
 char sbuf[32];
+uint8_t page_array[10];
+uint8_t max_page_counter;
+uint8_t page_counter = 0;
 
 #if (USE_SERIAL_BT)
 BluetoothSerial SerialBT;
 #endif
+
+void displayRegisterPages()
+{
+
+  max_page_counter = 0;
+
+  page_array[max_page_counter] = PAGE_TBEAM;
+
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_LORA;
+
+#if (USE_INA)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SOLAR;
+#endif
+
+#if (HAS_PMU)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_BAT;
+#endif
+
+#if (USE_GPS)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_GPS;
+#endif
+
+#if (USE_GYRO)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_GYRO;
+#endif
+
+#if (USE_BME280)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SENSORS;
+#endif
+
+#if (USE_BLE_SCANNER)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_CORONA;
+#endif
+
+
+
+
+}
 
 void log_display(String s)
 {
@@ -34,15 +82,7 @@ void t_moveDisplayRTOS(void *pvParameters)
   for (;;)
   {
 
-    if (PageNumber < PAGE_COUNT)
-    {
-      PageNumber++;
-    }
-    else
-    {
-      PageNumber = 1;
-    }
-    //showPage(PageNumber);
+    t_moveDisplay();
     vTaskDelay(displayMoveIntervall * 1000 / portTICK_PERIOD_MS);
   }
 #endif
@@ -52,16 +92,18 @@ void t_moveDisplay(void)
 {
 #if (USE_DISPLAY)
 
-  if (PageNumber < PAGE_COUNT)
+  if (dataBuffer.data.pictureLoop)
   {
-    PageNumber++;
+    if (page_counter < max_page_counter)
+    {
+      page_counter++;
+    }
+    else
+    {
+      page_counter = 0;
+    }
+    PageNumber = page_array[page_counter];
   }
-  else
-  {
-    PageNumber = 1;
-  }
-  //showPage(PageNumber);
-
 #endif
 }
 
@@ -69,12 +111,14 @@ void setup_display(void)
 {
   u8g2.begin();
   u8g2.setFont(u8g2_font_profont11_mf);                         // set the font for the terminal window
+  u8g2.setContrast(255);
   u8g2log.begin(u8g2, U8LOG_WIDTH, U8LOG_HEIGHT, u8log_buffer); // connect to u8g2, assign buffer
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
   u8g2.enableUTF8Print();
   log_display("SAP GTT");
   log_display("TTN-ABP-Mapper");
+  displayRegisterPages();
 }
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
@@ -125,21 +169,17 @@ void showPage(int page)
 
   // block i2c bus access
   if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 
     // u8g2_font_profont15_tr  W7 H15
     // u8g2_font_ncenB08_tr W12 H13
-
     u8g2.clearBuffer();
-
     uint8_t icon = 0;
 
-    //page = PAGE_GYRO;
     switch (page)
     {
-
     case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
@@ -159,7 +199,7 @@ void showPage(int page)
       availableModules = availableModules + "OTA ";
 #endif
 
-#if (USE_BLE)
+#if (USE_BLE_SCANNER)
       availableModules = availableModules + "BLE ";
 #endif
 
@@ -216,8 +256,9 @@ void showPage(int page)
       u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
 
       u8g2.setCursor(1, 40);
-      u8g2.printf("Alt:%.4g", gps.tGps.altitude.meters());
-      u8g2.setCursor(64, 40);
+      u8g2.printf("Alt:%.4g m", gps.tGps.altitude.meters());
+      u8g2.setCursor(1, 60);
+      u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
       break;
 
     case PAGE_SOLAR:
@@ -253,7 +294,7 @@ void showPage(int page)
       u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("+/-: %.2fmA ", dataBuffer.data.bat_DeltamAh);
+      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -288,11 +329,32 @@ void showPage(int page)
       u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
       break;
 
+    case PAGE_CORONA:
+
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "Corona Count");
+
+      u8g2.setFont(u8g2_font_ncenB24_tr);
+      u8g2.setCursor(40, 52);
+      u8g2.printf("%i", dataBuffer.data.CoronaDeviceCount);
+
+      break;
+
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");
 
       u8g2.setFont(u8g2_font_profont11_tr);
+
+#if (HAS_PMU)
+      u8g2.setCursor(1, 25);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+      u8g2.setCursor(1, 35);
+      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
+#else
+      u8g2.setCursor(1, 25);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
 
       if (dataBuffer.data.MotionCounter <= 0)
       {
@@ -310,12 +372,22 @@ void showPage(int page)
       u8g2.setCursor(64, 55);
       u8g2.printf(" move me !!", TIME_TO_SLEEP);
 #endif
-      drawSymbol(1, 48, SUN);
+      drawSymbol(60, 12, SUN);
       break;
     }
 
+    //---------------------------------
+    //----------   Footer   -----------
+    //---------------------------------
+    u8g2.setFont(u8g2_font_profont12_tr);
     u8g2.setCursor(100, 64);
     u8g2.printf("%2d", dataBuffer.data.MotionCounter);
+
+    u8g2.setCursor(115, 64);
+    if (dataBuffer.data.pictureLoop) u8g2.printf("P");
+  
+    
+          
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }

@@ -79,7 +79,7 @@ void AXP192_event_handler(void)
 {
   ESP_LOGI(TAG, "PMU Event");
 if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 
@@ -112,7 +112,6 @@ if (!I2C_MUTEX_LOCK())
     #if (USE_FASTLED)
     LED_sunset();
     #endif
-    // enter_deepsleep(0, HAS_BUTTON);
   }
 
   // long press -> shutdown power, can be exited by another longpress
@@ -160,15 +159,17 @@ void AXP192_init(void)
     // switch power rails on
     AXP192_power(pmu_power_on);
 
-#ifdef PMU_INT
-    pinMode(PMU_INT, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PMU_INT), PMU_IRQ, FALLING);
+#if (USE_PMU_INTERRUPT)
+#ifdef PMU_INT_PIN
+    pinMode(PMU_INT_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(PMU_INT_PIN), PMU_IRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
-                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
+                     AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
                       AXP202_CHARGING_FINISHED_IRQ| AXP202_PEK_LONGPRESS_IRQ| AXP202_PEK_SHORTPRESS_IRQ,
                   1);
     pmu.clearIRQ();
 #endif // PMU_INT
+#endif
 
   }
 }
@@ -203,7 +204,7 @@ uint8_t i2c_readBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len)
   }
   else
   {
-    ESP_LOGW(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
     return 0xFF;
   }
 }
@@ -228,7 +229,7 @@ uint8_t i2c_writeBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len)
   }
   else
   {
-    ESP_LOGW(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
     return 0xFF;
   }
 }

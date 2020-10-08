@@ -59,7 +59,7 @@ SemaphoreHandle_t I2Caccess;
 
 uint8_t msgWaiting = 0;
 
-RTC_DATA_ATTR int bootCount = 0;
+RTC_DATA_ATTR uint16_t bootCount = 0;
 touch_pad_t touchPin;
 
 //--------------------------------------------------------------------------
@@ -117,7 +117,7 @@ CAYENNE_DISCONNECTED()
     {
       log_display("No wifi...");
     }
-    delay(2000);
+    delay(100);
   }
 }
 
@@ -131,6 +131,7 @@ void Cayenne_send(void)
   log_display("Cayenne send");
 
   Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
+  //Cayenne.virtualWrite(11, dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(),dataBuffer.data.gps.tGps.altitude.meters(),"gps","m");
   Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
@@ -154,6 +155,13 @@ CAYENNE_IN_DEFAULT()
   log_display("Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
   //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+  switch (request.channel)
+  {
+  case 1:
+    Serial.println("Cayenne: Reset Coulomb Counter");
+    pmu.ClearCoulombcounter();
+    break;
+  }
 }
 
 #endif
@@ -173,6 +181,9 @@ String stringOne = "";
 static const char TAG[] = __FILE__;
 
 #if (HAS_INA)
+
+SDL_Arduino_INA3221 ina3221;
+
 void print_ina()
 {
   Serial.println("");
@@ -205,124 +216,6 @@ void print_ina()
 void touch_callback()
 {
   //placeholder callback function
-}
-
-void display_chip_info()
-{
-  // print chip information on startup if in verbose mode after coldstart
-
-  esp_chip_info_t chip_info;
-  esp_chip_info(&chip_info);
-  ESP_LOGI(TAG,
-           "This is ESP32 chip with %d CPU cores, WiFi%s%s, silicon revision "
-           "%d, %dMB %s Flash",
-           chip_info.cores,
-           (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-           (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "",
-           chip_info.revision, spi_flash_get_chip_size() / (1024 * 1024),
-           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
-                                                         : "external");
-  ESP_LOGI(TAG, "Internal Total heap %d, internal Free Heap %d",
-           ESP.getHeapSize(), ESP.getFreeHeap());
-
-#if (BOARD_HAS_PSRAM)
-  ESP_LOGI(TAG, "SPIRam Total heap %d, SPIRam Free Heap %d",
-           ESP.getPsramSize(), ESP.getFreePsram());
-
-#endif
-
-  ESP_LOGI(TAG, "ChipRevision %d, Cpu Freq %d, SDK Version %s",
-           ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
-  ESP_LOGI(TAG, "Flash Size %d, Flash Speed %d", ESP.getFlashChipSize(),
-           ESP.getFlashChipSpeed());
-
-#if (HAS_LORA)
-  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
-           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
-  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
-           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
-#endif // HAS_LORA
-
-#if (HAS_GPS)
-  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
-#endif
-}
-
-void print_wakeup_reason()
-{
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  dataBuffer.data.wakeup_reason = wakeup_reason;
-
-  Serial.print(F("WakeUp caused by: "));
-  switch (wakeup_reason)
-  {
-  case ESP_SLEEP_WAKEUP_EXT0:
-    Serial.println(F("external signal using RTC_IO"));
-    dataBuffer.data.operation_mode = '1';
-    break;
-  case ESP_SLEEP_WAKEUP_EXT1:
-    Serial.println(F("external signal using RTC_CNTL"));
-    break;
-  case ESP_SLEEP_WAKEUP_TIMER:
-    Serial.println("by timer");
-    break;
-  case ESP_SLEEP_WAKEUP_TOUCHPAD:
-    Serial.println(F("touchpad"));
-    break;
-  case ESP_SLEEP_WAKEUP_ULP:
-    Serial.println(F("ULP program"));
-    break;
-  default:
-    Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-    break;
-  }
-}
-
-void print_wakeup_touchpad()
-{
-  touch_pad_t pin;
-  touchPin = esp_sleep_get_touchpad_wakeup_status();
-  switch (touchPin)
-  {
-  case 0:
-    Serial.println("Touch detected on GPIO 4");
-    break;
-  case 1:
-    Serial.println("Touch detected on GPIO 0");
-    break;
-  case 2:
-    Serial.println("Touch detected on GPIO 2");
-    break;
-  case 3:
-    Serial.println("Touch detected on GPIO 15");
-    break;
-  case 4:
-    Serial.println("Touch detected on GPIO 13");
-    break;
-  case 5:
-    Serial.println("Touch detected on GPIO 12");
-    break;
-  case 6:
-    Serial.println("Touch detected on GPIO 14");
-    break;
-  case 7:
-    Serial.println("Touch detected on GPIO 27");
-    break;
-  case 8:
-    Serial.println("Touch detected on GPIO 33");
-    break;
-  case 9:
-    Serial.println("Touch detected on GPIO 32");
-    break;
-  default:
-    Serial.println("Wakeup not by touchpad");
-    break;
-  }
 }
 
 void setup_sensors()
@@ -360,7 +253,8 @@ void t_send_cayenne()
 {
 
 #if (USE_CAYENNE)
-  Cayenne_send();
+  if (WiFi.status() == WL_CONNECTED)
+    Cayenne_send();
 #endif
 
 #if (USE_BLE)
@@ -373,19 +267,42 @@ void t_send_cayenne()
 #endif
 }
 
+
 void t_cyclicRTOS(void *pvParameters)
 {
+
+  DataBuffer foo;
+
+  while (1)
+  {
+    #if (USE_BLE_SCANNER)
+    ble_loop();
+
+// Werte holen
+    foo = *((DataBuffer*)pvParameters);
+    
+    Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
+    foo.data.CoronaDeviceCount = getCoronaDeviceCount();
+
+    // Werte wieder zurückschreiben
+    *(DataBuffer*)pvParameters = foo;
+
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    #endif
+  }
 }
 
-void t_cyclic()
+
+void t_cyclic() // Intervall: Display Refresh
 {
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
+  gps.getDistance();
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
-    ESP_LOGV(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 #if (USE_BME280)
@@ -434,8 +351,6 @@ void t_cyclic()
   }
 #endif
 
-  gps.checkGpsFix();
-
   // Refresh Display
 
 #if (USE_DISPLAY)
@@ -457,8 +372,9 @@ void t_sleep()
   // Deep sleep
   //-----------------------------------------------------
 
-#if (ESP_SLEEP)
+  gps.getDistance();
 
+#if (ESP_SLEEP)
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
 #if (USE_FASTLED)
@@ -470,11 +386,20 @@ void t_sleep()
 
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
   {
-    ESP32_sleep();
+
+#if (USE_GPS_MOTION)
+    if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
+    {
+      dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+      gps.resetDistance();
+    }
+#endif
+
+    if (dataBuffer.data.MotionCounter <= 0)
+      ESP32_sleep();
   }
 #endif
 }
-
 
 void setup_wifi()
 {
@@ -487,9 +412,9 @@ void setup_wifi()
   ESP_LOGI(TAG, "Connecting to WiFi..");
   int i = 0;
   wifi_connected = false;
-  while ((WiFi.status() != WL_CONNECTED) && (i < 10))
+  while ((WiFi.status() != WL_CONNECTED) && (i < 50))
   {
-    delay(1000);
+    delay(200);
     i++;
     Serial.print('.');
   }
@@ -517,21 +442,15 @@ void setup_wifi()
 void createRTOStasks()
 {
 
+#if (USE_BLE_SCANNER)
   xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
-                          (void *)1,             // parameter of the task
+                          (void*)&dataBuffer,    // parameter of the task
                           2,                     // priority of the task
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core
-
-  xTaskCreatePinnedToCore(t_moveDisplayRTOS,       // task function
-                          "moveDisplay",           // name of task
-                          4096,                    // stack size of task
-                          (void *)1,               // parameter of the task
-                          2,                       // priority of the task
-                          &moveDisplayHandlerTask, // task handle
-                          1);                      // CPU core
+#endif
 }
 
 void setup()
@@ -548,8 +467,20 @@ void setup()
   Serial.println("Boot number: " + String(bootCount));
 
   print_wakeup_reason();
-  // print_wakeup_touchpad();
   display_chip_info();
+#if (HAS_LORA)
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+#endif // HAS_LORA
+
+#if (HAS_GPS)
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
+#endif
 
   // create some semaphores for syncing / mutexing tasks
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
@@ -564,17 +495,6 @@ void setup()
   delay(100);
 #endif
 
-#if (USE_BLE)
-  setup_ble();
-#endif
-
-  // Preferences
-
-  //preferences.begin("config", false); // NVS Flash RW mode
-  //preferences.getULong("uptime", uptime_seconds_old);
-  //Serial.println("Uptime old: " + String(uptime_seconds_old));
-  //preferences.getString("info", lastword, sizeof(lastword));
-
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
@@ -583,7 +503,7 @@ void setup()
 #if (HAS_PMU)
   AXP192_init();
   AXP192_showstatus();
-  AXP192_power_gps(ON);  
+  AXP192_power_gps(ON);
 #endif
 
 #if (HAS_INA)
@@ -596,9 +516,7 @@ void setup()
 #endif
 
   dataBuffer.data.txCounter = 0;
-
   dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
-
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
@@ -607,11 +525,11 @@ void setup()
   setup_wifi();
   calibrate_voltage();
 
-#if (USE_SERIAL_BT)
+#if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
   //Turn off Bluetooth
-  //log_display("Stop Bluethooth");
-  //btStop();
+  log_display("BLUETHOOTH OFF");
+  btStop();
 #endif
 
 #if (USE_MQTT)
@@ -637,41 +555,20 @@ void setup()
     checkFirmwareUpdates();
   }
 #endif
-  delay(100);
 
-//---------------------------------------------------------------
-// Deep sleep settings
-//---------------------------------------------------------------
-#if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
-              " min");
-
-#ifdef HAS_BUTTON
-//esp_sleep_enable_ext0_wakeup(HAS_BUTTON, 0); //1 = High, 0 = Low
-#endif
-
-#if (WAKEUP_BY_MOTION)
 #if (USE_GYRO)
-#ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
-#endif
-#endif
-#endif
-
+  setup_gyro();
 #endif
 
   gps.init();
-  //gps.softwareReset();
   gps.wakeup();
-  //gps.ecoMode();
 
-  delay(100); // Wait for GPS beeing stable
+  delay(50); // Wait for GPS beeing stable
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(100);
+  delay(50);
 #endif
 
 #if (USE_DASH)
@@ -681,12 +578,14 @@ void setup()
   }
 #endif
 
-#ifdef HAS_BUTTON
-  pinMode(HAS_BUTTON, INPUT_PULLUP);
-  button_init(HAS_BUTTON);
+#if (USE_BUTTON)
+#ifdef BUTTON_PIN
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  button_init(BUTTON_PIN);
+#endif
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
@@ -719,7 +618,7 @@ void setup()
   }
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     ws.onEvent(onWsEvent);
@@ -727,16 +626,12 @@ void setup()
   }
 #endif
 
-#if (USE_GYRO)
-  setup_gyro();
-#endif
-
   // get sensor values once
   t_cyclic();
 
 #if (USE_FASTLED)
   setup_FastLed();
-  delay(100);
+  delay(50);
   LED_wakeup();
 #endif
 
@@ -757,7 +652,7 @@ void setup()
   sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
 #endif
 
-#if (USE_WEBSOCKET)
+#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     xTaskCreate(
@@ -786,14 +681,46 @@ void setup()
   t_enqueue_LORA_messages();
 #endif
 
-  log_display("Setup done");
-
-  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));  
-
 #if (USE_POTI)
   poti_setup_RTOS();
 #endif
+
+#if (USE_BLE_SCANNER)
+  ble_setup();
+  ble_loop();
+#endif
+
+//---------------------------------------------------------------
+// Deep sleep settings
+//---------------------------------------------------------------
+#if (ESP_SLEEP)
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
+  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
+              " min");
+
+#if (USE_BUTTON)
+  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+#endif
+
+#if (WAKEUP_BY_MOTION)
+#if (USE_GYRO)
+#ifdef GYRO_INT_PIN
+  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
+#endif
+#endif
+#endif
+#endif
+
+  //---------------------------------------------------------------
+  // RTOS Tasks
+  //---------------------------------------------------------------
+
+  createRTOStasks();
+
+  log_display("Setup done");
+
+  dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
+  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
 }
 
 void loop()
@@ -821,7 +748,7 @@ void loop()
   }
 #endif
 
-#if (HAS_BUTTON)
+#if (USE_BUTTON)
   readButton();
 #endif
 }

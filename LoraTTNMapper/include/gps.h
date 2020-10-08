@@ -17,6 +17,8 @@ public:
     void wakeup();
     void softwareReset();
     void ecoMode();
+    void getDistance();
+    void resetDistance();
     TinyGPSPlus tGps;
 
 private:
