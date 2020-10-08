@@ -51,12 +51,13 @@ void t_enqueue_LORA_messages()
 payload.reset();
 
 payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 #if (USE_GPS)
-    //if (gps.checkGpsFix())
-    //{
-    //  payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-    //}
+    if (gps.checkGpsFix())
+    {
+     payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+    }
 #endif
 
 #if (USE_BME280)
@@ -68,23 +69,25 @@ payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
-payload.enqueue_port(2);
-
+//payload.enqueue_port(2);
 
 
 //Next Message-Block Port
 #if (HAS_PMU)
-    payload.reset();
+    //payload.reset();
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
     payload.addVoltage(21, dataBuffer.data.bus_current);
     payload.addVoltage(30, dataBuffer.data.bat_voltage);
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
-    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+ 
 
-    payload.enqueue_port(2);
+    //payload.enqueue_port(2);
 #endif
+
+
+payload.enqueue_port(2);
   }
 }
 

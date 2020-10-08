@@ -37,7 +37,7 @@
 #define displayRefreshIntervall 2       // every x second
 #define displayMoveIntervall 7          // every x second
 
-#define LORAenqueueMessagesIntervall 90 // every x seconds
+#define LORAenqueueMessagesIntervall 60 // every x seconds
 #define LORA_TX_INTERVAL 30
 
 #define sendCayenneIntervall 60 // every x seconds

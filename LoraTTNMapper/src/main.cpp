@@ -442,6 +442,7 @@ void setup_wifi()
 void createRTOStasks()
 {
 
+#if (USE_BLE_SCANNER)
   xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
@@ -449,6 +450,7 @@ void createRTOStasks()
                           2,                     // priority of the task
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core
+#endif
 }
 
 void setup()

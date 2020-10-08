@@ -95,7 +95,9 @@ function lppDecode(bytes) {
         var s_no   = bytes[i++];
         var s_type = bytes[i++];
         if (typeof sensor_types[s_type] == 'undefined') {
-            throw 'Sensor type error!: ' + s_type;
+            posi = i - 1;
+            throw 'Sensor type error!: ' + s_type + ' Sno:' + _no + ' Pos:' + i;
+           
         }
 
         var s_value = 0;
