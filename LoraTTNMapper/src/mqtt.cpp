@@ -4,7 +4,8 @@
 
 PubSubClient MqttClient(wifiClient);
 
-const char *mqtt_server = "192.168.1.100"; // Raspberry
+//const char *mqtt_server = "192.168.1.100"; // Raspberry
+const char *mqtt_server = "85.209.49.65"; // Netcup
 const char *mqtt_topic = "mrflexi/solarserver/";
 
 long lastMsgAlive = 0;
@@ -92,7 +93,7 @@ void setup_mqtt()
     reconnect();
   }
 
-  log_display("Mqtt connected");
+  log_display("MQTT connected");
   MqttClient.publish("mrflexi/solarserver/info", "ESP32 is alive...");
 }
 
@@ -100,35 +101,27 @@ void setup_mqtt()
 void mqtt_send()
 {
 
- StaticJsonDocument<500> ws_json;
-  
-  char buffer[500];
-  ws_json.clear();
-
-  ws_json["BootCounter"] = String( dataBuffer.data.bootCounter );
-
-  ws_json["bat_voltage"] = dataBuffer.data.bat_voltage;
-  ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
-  ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
-
-  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
-  ws_json["temperatur"] = String( dataBuffer.data.temperature );;
+  const int capacity=JSON_OBJECT_SIZE(7)+JSON_OBJECT_SIZE(2);
+  StaticJsonDocument<capacity> doc;
  
-  // Add the "feeds" array
-  JsonArray feeds = ws_json.createNestedArray("text_table");
-  
-   JsonObject msg = feeds.createNestedObject();
-    msg["title"] = "CPU Temp";
-    msg["description"] = "400m Schwimmen in 4 Minuten";
-    msg["value"] = "22.8";    
-    feeds.add(msg);    
+  doc.clear();
 
-    msg["title"] = "TX Counter";    
-    msg["description"] = "15";    
-    feeds.add(msg);    
+  doc["BootCounter"] = String( dataBuffer.data.bootCounter );
+
+  doc["bat_voltage"] = dataBuffer.data.bat_voltage;
+  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+  doc["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+
+  doc["TXCounter"] = String( dataBuffer.data.txCounter );
+  doc["temperatur"] = String( dataBuffer.data.temperature );
+
+  // Add the "location" 
+  JsonObject location = doc.createNestedObject("location");
+  location["lat"]=48.748010;
+  location["lon"]=2.293491;
  
-
-  serializeJson(ws_json, buffer);
-  MqttClient.publish(mqtt_topic,buffer);
-  serializeJsonPretty(ws_json, Serial);
+ char buffer[500];
+  serializeJson(doc, buffer);
+  MqttClient.publish("mrflexi/device",buffer);
+  serializeJsonPretty(doc, Serial);
 }

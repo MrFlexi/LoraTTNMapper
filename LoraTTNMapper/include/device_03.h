@@ -10,11 +10,14 @@
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 0
+
+
 #define USE_DISPLAY 1
+#define CYCLIC_SHOW_LOG 1
 
 #define USE_INTERRUPTS 0
 #define USE_PMU_INTERRUPT 0
-#define USE_BUTTON 1
+#define USE_BUTTON 0
 
 #define USE_BLE 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
@@ -40,8 +43,8 @@
 #define LORAenqueueMessagesIntervall 60 // every x seconds
 #define LORA_TX_INTERVAL 30
 
-#define sendCayenneIntervall 60 // every x seconds
-#define sendWebsocketIntervall 10 // every x seconds
+#define sendCycleIntervall      60 // every x seconds
+#define sendWebsocketIntervall  10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51

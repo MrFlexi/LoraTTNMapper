@@ -21,8 +21,10 @@ void displayRegisterPages()
 
   page_array[max_page_counter] = PAGE_TBEAM;
 
+#if (HAS_LORA)
   max_page_counter++;
   page_array[max_page_counter] = PAGE_LORA;
+#endif
 
 #if (USE_INA)
   max_page_counter++;

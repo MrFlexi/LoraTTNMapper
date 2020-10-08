@@ -75,7 +75,7 @@ Ticker sleepTicker;
 Ticker displayTicker;
 Ticker displayMoveTicker;
 Ticker sendMessageTicker;
-Ticker sendCayenneTicker;
+Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
 //--------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void setup_sensors()
 #endif
 }
 
-void t_send_cayenne()
+void t_send_cycle()
 {
 
 #if (USE_CAYENNE)
@@ -264,6 +264,11 @@ void t_send_cayenne()
 #if (USE_DASH)
   if (WiFi.status() == WL_CONNECTED)
     update_web_dash();
+#endif
+
+#if (USE_MQTT)
+  if (WiFi.status() == WL_CONNECTED)
+    mqtt_loop();
 #endif
 }
 
@@ -296,7 +301,10 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
+
+  #if (USE_GPS)
   gps.getDistance();
+  #endif
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
@@ -306,7 +314,6 @@ void t_cyclic() // Intervall: Display Refresh
 #if (USE_BME280)
     dataBuffer.data.temperature = bme.readTemperature();
     dataBuffer.data.humidity = bme.readHumidity();
-
 #endif
 
 #if (HAS_PMU)
@@ -356,6 +363,10 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
+#if (USE_MQTT)
+  mqtt_send();
+#endif
+
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
@@ -363,9 +374,7 @@ void t_cyclic() // Intervall: Display Refresh
   AXP192_showstatus();
 #endif
 
-#if (USE_MQTT)
-  void mqtt_send();
-#endif
+
 }
 
 void t_sleep()
@@ -562,10 +571,12 @@ void setup()
   setup_gyro();
 #endif
 
+
+#if (USE_GPS)
   gps.init();
   gps.wakeup();
-
   delay(50); // Wait for GPS beeing stable
+#endif
 
 #if (HAS_LORA)
   setup_lora();
@@ -645,14 +656,13 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+  
+  sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
 
-#if (USE_CAYENNE)
-  sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
-#endif
 
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
