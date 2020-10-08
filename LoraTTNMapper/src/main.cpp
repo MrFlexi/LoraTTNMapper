@@ -28,8 +28,6 @@ bool wifi_connected = false;
 WiFiClient wifiClient;
 #endif
 
-
-
 //--------------------------------------------------------------------------
 // Lora Helper
 //--------------------------------------------------------------------------
@@ -269,7 +267,6 @@ void t_send_cayenne()
 #endif
 }
 
-
 void t_cyclicRTOS(void *pvParameters)
 {
 
@@ -277,23 +274,22 @@ void t_cyclicRTOS(void *pvParameters)
 
   while (1)
   {
-    #if (USE_BLE_SCANNER)
+#if (USE_BLE_SCANNER)
     ble_loop();
 
-// Werte holen
-    foo = *((DataBuffer*)pvParameters);
-    
+    // Werte holen
+    foo = *((DataBuffer *)pvParameters);
+
     Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
     foo.data.CoronaDeviceCount = getCoronaDeviceCount();
 
     // Werte wieder zurückschreiben
-    *(DataBuffer*)pvParameters = foo;
+    *(DataBuffer *)pvParameters = foo;
 
     vTaskDelay(10000 / portTICK_PERIOD_MS);
-    #endif
+#endif
   }
 }
-
 
 void t_cyclic() // Intervall: Display Refresh
 {
@@ -365,6 +361,10 @@ void t_cyclic() // Intervall: Display Refresh
   ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
   AXP192_showstatus();
+#endif
+
+#if (USE_MQTT)
+  void mqtt_send();
 #endif
 }
 
@@ -448,7 +448,7 @@ void createRTOStasks()
   xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
-                          (void*)&dataBuffer,    // parameter of the task
+                          (void *)&dataBuffer,   // parameter of the task
                           2,                     // priority of the task
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core

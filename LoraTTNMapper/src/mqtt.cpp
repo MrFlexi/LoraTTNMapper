@@ -80,11 +80,7 @@ void reconnect()
 }
 
 
-void mqtt_send()
-{
-  
 
-}
 void setup_mqtt()
 {
 
@@ -98,4 +94,41 @@ void setup_mqtt()
 
   log_display("Mqtt connected");
   MqttClient.publish("mrflexi/solarserver/info", "ESP32 is alive...");
+}
+
+
+void mqtt_send()
+{
+
+ StaticJsonDocument<500> ws_json;
+  
+  char buffer[500];
+  ws_json.clear();
+
+  ws_json["BootCounter"] = String( dataBuffer.data.bootCounter );
+
+  ws_json["bat_voltage"] = dataBuffer.data.bat_voltage;
+  ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+  ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+
+  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
+  ws_json["temperatur"] = String( dataBuffer.data.temperature );;
+ 
+  // Add the "feeds" array
+  JsonArray feeds = ws_json.createNestedArray("text_table");
+  
+   JsonObject msg = feeds.createNestedObject();
+    msg["title"] = "CPU Temp";
+    msg["description"] = "400m Schwimmen in 4 Minuten";
+    msg["value"] = "22.8";    
+    feeds.add(msg);    
+
+    msg["title"] = "TX Counter";    
+    msg["description"] = "15";    
+    feeds.add(msg);    
+ 
+
+  serializeJson(ws_json, buffer);
+  MqttClient.publish(mqtt_topic,buffer);
+  serializeJsonPretty(ws_json, Serial);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 #if (USE_MQTT)
 #include <PubSubClient.h>
