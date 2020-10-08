@@ -3,17 +3,17 @@
 
 
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 
 #define HAS_LORA 0
-#define USE_MQTT 0
+#define USE_MQTT 1
 #define HAS_INA 0
 #define USE_DASH 0
-#define USE_GPS 1
+#define USE_GPS 0
 #define USE_DISPLAY 1
 
-#define USE_INTERRUPTS 1
-#define USE_PMU_INTERRUPT 1
+#define USE_INTERRUPTS 0
+#define USE_PMU_INTERRUPT 0
 #define USE_BUTTON 1
 
 #define USE_BLE 0
@@ -22,7 +22,7 @@
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   0 
-#define USE_CAYENNE 1
+#define USE_CAYENNE 0
 
 #define USE_GYRO  0
 #define WAKEUP_BY_MOTION 0
@@ -48,7 +48,7 @@
 #define SEND_QUEUE_SIZE 10
 #define PAD_TRESHOLD 40
 
-#define USE_GPS_MOTION 1
+#define USE_GPS_MOTION 0
 #define GPS_MOTION_DISTANCE 20  // Meter
 
 #define LOG_LOCAL_LEVEL ESP_LOG_DEBUG

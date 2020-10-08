@@ -42,8 +42,9 @@
 #include "esp_sleep.h"
 #include <Wire.h>
 
-#if (USE_WEBSERVER || USE_CAYENNE)
+#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
 #include "WiFi.h"
+extern WiFiClient wifiClient;
 #endif
 
 
@@ -74,10 +75,6 @@
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
-
-#if (USE_WIFI)
-extern WiFiClient wifiClient;
-#endif
 
 
 extern volatile bool mpuInterrupt;

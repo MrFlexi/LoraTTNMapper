@@ -2,7 +2,31 @@
 #include "mqtt.h"
 
 
+PubSubClient MqttClient(wifiClient);
+
+const char *mqtt_server = "192.168.1.100"; // Raspberry
+const char *mqtt_topic = "mrflexi/solarserver/";
+
+long lastMsgAlive = 0;
+long lastMsgDist = 0;
+
+
 #if (USE_MQTT)
+
+
+
+void mqtt_loop()
+{
+// MQTT Connection
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (!MqttClient.connected())
+    {
+      reconnect();
+    }
+    MqttClient.loop();
+  }
+}
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
@@ -36,22 +60,22 @@ void callback(char *topic, byte *payload, unsigned int length)
 void reconnect()
 {
   // Loop until we're reconnected
-  while (!client.connected())
+  while (!MqttClient.connected())
   {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("Mqtt Client"))
+    if (MqttClient.connect("Mqtt Client"))
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("MrFlexi/nodemcu", "connected");
+      MqttClient.publish("MrFlexi/nodemcu", "connected");
       // ... and resubscribe
-      client.subscribe(mqtt_topic);
+      MqttClient.subscribe(mqtt_topic);
     }
     else
     {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(MqttClient.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
@@ -59,18 +83,24 @@ void reconnect()
   }
 }
 
+
+void mqtt_send()
+{
+  
+
+}
 void setup_mqtt()
 {
 
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  MqttClient.setServer(mqtt_server, 1883);
+  MqttClient.setCallback(callback);
 
-  if (!client.connected())
+  if (!MqttClient.connected())
   {
     reconnect();
   }
 
   log_display("Mqtt connected");
-  client.publish("mrflexi/solarserver/info", "ESP32 is alive...");
+  MqttClient.publish("mrflexi/solarserver/info", "ESP32 is alive...");
 }
 #endif

@@ -737,15 +737,7 @@ void loop()
 #endif
 
 #if (USE_MQTT)
-  // MQTT Connection
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    if (!client.connected())
-    {
-      reconnect();
-    }
-    client.loop();
-  }
+  mqtt_loop();
 #endif
 
 #if (USE_BUTTON)
