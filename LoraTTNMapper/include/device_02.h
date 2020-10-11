@@ -1,12 +1,11 @@
 
 #pragma once
 
-
+#define DEVICE_NAME "TBEAM-02"
 #define USE_OTA 0
-#define USE_BME280 0
-
+#define USE_BME280 1
 #define HAS_LORA 1
-#define USE_MQTT 0
+
 #define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
@@ -23,9 +22,10 @@
 #define USE_WIFI 1
 #define USE_WEBSERVER   0 
 #define USE_CAYENNE 1
+#define USE_MQTT 1
 
 #define USE_GYRO  0
-#define WAKEUP_BY_MOTION 0
+#define WAKEUP_BY_MOTION 0              // via gyro
 
 #define USE_FASTLED 0
 #define USE_FASTLED_RTOS 0
@@ -40,7 +40,7 @@
 #define LORAenqueueMessagesIntervall 60 // every x seconds
 #define LORA_TX_INTERVAL 30
 
-#define sendCayenneIntervall 60 // every x seconds
+#define sendCycleIntervall      60 // every x seconds
 #define sendWebsocketIntervall 10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
@@ -59,6 +59,6 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5        // sleep for n minute
+#define TIME_TO_SLEEP 20        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events

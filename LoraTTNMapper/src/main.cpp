@@ -300,6 +300,8 @@ void t_cyclic() // Intervall: Display Refresh
 {
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
+  dataBuffer.data.cpu_temperature = ( temprature_sens_read() - 32 ) / 1.8;
+
   dataBuffer.data.aliveCounter++;
 
   #if (USE_GPS)
@@ -728,11 +730,12 @@ void setup()
   //---------------------------------------------------------------
 
   createRTOStasks();
-
   log_display("Setup done");
-
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+
+  Serial.print("CPU Temperature: ");
+  Serial.print((temprature_sens_read() - 32) / 1.8);
 }
 
 void loop()

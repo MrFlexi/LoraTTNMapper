@@ -311,7 +311,9 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
-      u8g2.setCursor(1, 45);
+       u8g2.setCursor(1, 45);
+      u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
+      u8g2.setCursor(1, 60);
       u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
       break;
 
