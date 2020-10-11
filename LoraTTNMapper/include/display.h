@@ -15,7 +15,7 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-#define PAGE_COUNT 7
+#define PAGE_COUNT 8
 
 #define PAGE_TBEAM 1
 #define PAGE_LORA 2
@@ -24,6 +24,7 @@
 #define PAGE_BAT 5
 #define PAGE_SENSORS 6
 #define PAGE_GYRO 7
+#define PAGE_CORONA 8
 
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 

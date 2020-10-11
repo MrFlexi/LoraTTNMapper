@@ -146,4 +146,47 @@ bool Neo6m::checkGpsFix()
     GPSSerial.write(CFG_RST, sizeof(CFG_RST));
   }
 
+void Neo6m::getDistance()
+{
+  // Calculate distance between 2 Points
+  if (checkGpsFix()) // IS a GPS Position available
+  {
+    dataBuffer.data.gps = tGps.location; // Save actual position
+
+    if (dataBuffer.data.gps_old.lat() == 0.0) // Store first available position in gps_old for later distance calculation
+    {
+      dataBuffer.data.gps_old = tGps.location;
+    }
+  }
+
+  if (( dataBuffer.data.gps.lat() != 0.0 ) && ( dataBuffer.data.gps_old.lat() != 0.0))
+  {
+    dataBuffer.data.gps_distance = gps.tGps.distanceBetween(dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(), dataBuffer.data.gps_old.lat(), dataBuffer.data.gps_old.lng());
+
+  }
+  else dataBuffer.data.gps_distance = 0;
+  ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
+}
+
+void Neo6m::resetDistance()
+{
+
+  if (checkGpsFix()) // IS a GPS Position available
+  {
+    dataBuffer.data.gps = tGps.location; // Save actual position
+    dataBuffer.data.gps_old = tGps.location;
+
+  if (( dataBuffer.data.gps.lat() != 0.0 ) && ( dataBuffer.data.gps_old.lat() != 0.0))
+  {
+    dataBuffer.data.gps_distance = gps.tGps.distanceBetween(dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(), dataBuffer.data.gps_old.lat(), dataBuffer.data.gps_old.lng());
+
+  }
+  else dataBuffer.data.gps_distance = 0;
+  ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
+
+
+  }
+
+  
+}
 Neo6m gps;

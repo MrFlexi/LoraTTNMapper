@@ -1,25 +1,20 @@
-#ifndef _INA3221_H
-#define _INA3221_H
+#ifndef _JSUTILITIES_H
+#define _JSUTILITIES_H
 
-#include "globals.h"
+#include <Arduino.h>
+#include "esp_system.h"
+#include "esp_spi_flash.h"
+#include <Wire.h>
 
-
-/**************************************************************************/
-/*! 
-    Initial code from INA219 code (Basically just a core structure left)
-    @author   K. Townsend (Adafruit Industries)
-	@license  BSD (see BSDlicense.txt)
-	
-	*/
-/**************************************************************************/
-
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
+#if (USE_OTA)
+#include "SecureOTA.h"
 #endif
 
-#include <Wire.h>
+int i2c_scan(void);
+void print_wakeup_reason();
+void print_wakeup_touchpad();
+void display_chip_info();
+
 
 /*=========================================================================
     I2C ADDRESS/BITS
@@ -92,7 +87,13 @@ class SDL_Arduino_INA3221{
 
 };
 
-extern SDL_Arduino_INA3221 ina3221;
+
+
+
+
+
+
+
+
 
 #endif
-

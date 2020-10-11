@@ -88,6 +88,7 @@ void IRAM_ATTR PMU_IRQ()
 #endif
 
 #if (USE_GYRO)
+#if (WAKEUP_BY_MOTION)
 void IRAM_ATTR GYRO_IRQ()
 {
   mpuInterrupt = true;
@@ -102,6 +103,7 @@ void IRAM_ATTR GYRO_IRQ()
   if (xHigherPriorityTaskWoken)
     portYIELD_FROM_ISR();
 }
+#endif
 #endif
 
 void mask_user_IRQ()
