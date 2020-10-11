@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  3
+#define DEVICE_ID  2
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -93,6 +93,7 @@ typedef struct
   float temperature;        // temperature signal
   float humidity;           // humidity signal
   float pressure;           // pressure signal
+  float cpu_temperature;    // raw temperature signal
   float raw_temperature;    // raw temperature signal
   float raw_humidity;       // raw humidity signal
   float gas;                // raw gas sensor signal

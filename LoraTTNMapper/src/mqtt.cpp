@@ -101,7 +101,7 @@ void setup_mqtt()
 void mqtt_send()
 {
 
-  const int capacity=JSON_OBJECT_SIZE(10)+JSON_OBJECT_SIZE(2);
+  const int capacity=JSON_OBJECT_SIZE(11)+JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
  
   doc.clear();
@@ -119,6 +119,8 @@ void mqtt_send()
  
   doc["TXCounter"] = String( dataBuffer.data.txCounter );
   doc["temperature"] = String( dataBuffer.data.temperature );
+  doc["humidity"] = String( dataBuffer.data.humidity);
+  doc["cpu_temperature"] = String( dataBuffer.data.cpu_temperature);
 
   // Add the "location" 
   JsonObject location = doc.createNestedObject("location");

@@ -6,6 +6,21 @@
 #include "esp_spi_flash.h"
 #include <Wire.h>
 
+
+ #ifdef __cplusplus
+  extern "C" {
+ #endif
+ 
+  uint8_t temprature_sens_read();
+ 
+#ifdef __cplusplus
+}
+#endif
+ 
+uint8_t temprature_sens_read();
+
+
+
 #if (USE_OTA)
 #include "SecureOTA.h"
 #endif

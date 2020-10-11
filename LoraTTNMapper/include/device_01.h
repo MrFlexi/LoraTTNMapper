@@ -1,7 +1,7 @@
 
 #pragma once
 
-
+#define DEVICE_NAME "TBEAM-01"
 #define USE_OTA 0
 #define USE_BME280 1
 
@@ -39,7 +39,7 @@
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 30
 
-#define sendCayenneIntervall 60 // every x seconds
+#define sendCycleIntervall      60 // every x seconds
 #define sendWebsocketIntervall 10 // every x seconds
 
 #define PAYLOAD_ENCODER 3
