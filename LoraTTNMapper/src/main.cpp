@@ -24,9 +24,9 @@ bool wifi_connected = false;
 // Wifi Settings
 //--------------------------------------------------------------------------
 
-//const char ssid[] = "MrFlexi";
-//const char wifiPassword[] = "Linde-123";
-//WiFiClient wifiClient;
+#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
+WiFiClient wifiClient;
+#endif
 
 //--------------------------------------------------------------------------
 // Lora Helper
@@ -75,7 +75,7 @@ Ticker sleepTicker;
 Ticker displayTicker;
 Ticker displayMoveTicker;
 Ticker sendMessageTicker;
-Ticker sendCayenneTicker;
+Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
 //--------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void setup_sensors()
 #endif
 }
 
-void t_send_cayenne()
+void t_send_cycle()
 {
 
 #if (USE_CAYENNE)
@@ -265,8 +265,12 @@ void t_send_cayenne()
   if (WiFi.status() == WL_CONNECTED)
     update_web_dash();
 #endif
-}
 
+#if (USE_MQTT)
+  if (WiFi.status() == WL_CONNECTED)
+    mqtt_send();
+#endif
+}
 
 void t_cyclicRTOS(void *pvParameters)
 {
@@ -275,30 +279,32 @@ void t_cyclicRTOS(void *pvParameters)
 
   while (1)
   {
-    #if (USE_BLE_SCANNER)
+#if (USE_BLE_SCANNER)
     ble_loop();
 
-// Werte holen
-    foo = *((DataBuffer*)pvParameters);
-    
+    // Werte holen
+    foo = *((DataBuffer *)pvParameters);
+
     Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
     foo.data.CoronaDeviceCount = getCoronaDeviceCount();
 
     // Werte wieder zurückschreiben
-    *(DataBuffer*)pvParameters = foo;
+    *(DataBuffer *)pvParameters = foo;
 
     vTaskDelay(10000 / portTICK_PERIOD_MS);
-    #endif
+#endif
   }
 }
-
 
 void t_cyclic() // Intervall: Display Refresh
 {
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.aliveCounter++;
+
+  #if (USE_GPS)
   gps.getDistance();
+  #endif
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
@@ -308,7 +314,6 @@ void t_cyclic() // Intervall: Display Refresh
 #if (USE_BME280)
     dataBuffer.data.temperature = bme.readTemperature();
     dataBuffer.data.humidity = bme.readHumidity();
-
 #endif
 
 #if (HAS_PMU)
@@ -358,12 +363,18 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
+
+
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  #if (HAS_PMU)
   AXP192_showstatus();
+  #endif
 #endif
+
+
 }
 
 void t_sleep()
@@ -446,7 +457,7 @@ void createRTOStasks()
   xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
                           "t_cyclic",            // name of task
                           4096,                  // stack size of task
-                          (void*)&dataBuffer,    // parameter of the task
+                          (void *)&dataBuffer,   // parameter of the task
                           2,                     // priority of the task
                           &t_cyclic_HandlerTask, // task handle
                           1);                    // CPU core
@@ -560,10 +571,12 @@ void setup()
   setup_gyro();
 #endif
 
+
+#if (USE_GPS)
   gps.init();
   gps.wakeup();
-
   delay(50); // Wait for GPS beeing stable
+#endif
 
 #if (HAS_LORA)
   setup_lora();
@@ -643,14 +656,13 @@ void setup()
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+  
+  sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
 
-#if (USE_CAYENNE)
-  sendCayenneTicker.attach(sendCayenneIntervall, t_send_cayenne);
-#endif
 
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
@@ -737,15 +749,7 @@ void loop()
 #endif
 
 #if (USE_MQTT)
-  // MQTT Connection
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    if (!client.connected())
-    {
-      reconnect();
-    }
-    client.loop();
-  }
+  mqtt_loop();
 #endif
 
 #if (USE_BUTTON)

@@ -287,7 +287,9 @@ void onEvent(ev_t ev)
       {
         case TTN_COMMAND_RESET_COULOMB:
           Serial.println(F("TTN Command: Reset Coulomb Counter"));
-          pmu.ClearCoulombcounter();           
+          #if (HAS_PMU)
+          pmu.ClearCoulombcounter();    
+          #endif       
           break;  
 
         case TTN_COMMAND_SLEEP:

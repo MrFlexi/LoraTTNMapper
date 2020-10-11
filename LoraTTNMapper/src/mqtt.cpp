@@ -2,7 +2,28 @@
 #include "mqtt.h"
 
 
-#if (USE_MQTT)
+PubSubClient MqttClient(wifiClient);
+
+//const char *mqtt_server = "192.168.1.100"; // Raspberry
+const char *mqtt_server = "85.209.49.65"; // Netcup
+const char *mqtt_topic = "mrflexi/solarserver/";
+
+long lastMsgAlive = 0;
+long lastMsgDist = 0;
+
+
+void mqtt_loop()
+{
+// MQTT Connection
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (!MqttClient.connected())
+    {
+      reconnect();
+    }
+    MqttClient.loop();
+  }
+}
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
@@ -36,22 +57,22 @@ void callback(char *topic, byte *payload, unsigned int length)
 void reconnect()
 {
   // Loop until we're reconnected
-  while (!client.connected())
+  while (!MqttClient.connected())
   {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("Mqtt Client"))
+    if (MqttClient.connect("Mqtt Client"))
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("MrFlexi/nodemcu", "connected");
+      MqttClient.publish("MrFlexi/nodemcu", "connected");
       // ... and resubscribe
-      client.subscribe(mqtt_topic);
+      MqttClient.subscribe(mqtt_topic);
     }
     else
     {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(MqttClient.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
@@ -59,18 +80,53 @@ void reconnect()
   }
 }
 
+
+
 void setup_mqtt()
 {
 
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  MqttClient.setServer(mqtt_server, 1883);
+  MqttClient.setCallback(callback);
 
-  if (!client.connected())
+  if (!MqttClient.connected())
   {
     reconnect();
   }
 
-  log_display("Mqtt connected");
-  client.publish("mrflexi/solarserver/info", "ESP32 is alive...");
+  log_display("MQTT connected");
+  MqttClient.publish("mrflexi/solarserver/info", "ESP32 is alive...");
 }
-#endif
+
+
+void mqtt_send()
+{
+
+  const int capacity=JSON_OBJECT_SIZE(10)+JSON_OBJECT_SIZE(2);
+  StaticJsonDocument<capacity> doc;
+ 
+  doc.clear();
+
+  doc["device"] = DEVICE_NAME;
+  doc["BootCounter"] = String( dataBuffer.data.bootCounter );
+
+  doc["bat_voltage"] = dataBuffer.data.bat_voltage;
+  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+  doc["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+
+  doc["panel_voltage"] = dataBuffer.data.panel_voltage;
+  doc["panel_current"] = dataBuffer.data.panel_current;
+ 
+  doc["TXCounter"] = String( dataBuffer.data.txCounter );
+  doc["temperature"] = String( dataBuffer.data.temperature );
+
+  // Add the "location" 
+  JsonObject location = doc.createNestedObject("location");
+  location["lat"]=48.748010;
+  location["lon"]=2.293491;
+ 
+ char buffer[500];
+  serializeJson(doc, buffer);
+  MqttClient.publish("mrflexi/device",buffer);
+  serializeJsonPretty(doc, Serial);
+}
