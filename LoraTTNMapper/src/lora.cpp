@@ -50,8 +50,8 @@ void t_enqueue_LORA_messages()
 
 payload.reset();
 
-payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
-payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+//payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+//payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 #if (USE_GPS)
     if (gps.checkGpsFix())

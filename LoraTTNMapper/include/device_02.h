@@ -6,7 +6,7 @@
 #define USE_BME280 1
 #define HAS_LORA 1
 
-#define HAS_INA 1
+#define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
@@ -59,6 +59,6 @@
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 5        // sleep for n minute
+#define TIME_TO_SLEEP 20        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
