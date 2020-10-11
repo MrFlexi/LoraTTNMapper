@@ -101,19 +101,24 @@ void setup_mqtt()
 void mqtt_send()
 {
 
-  const int capacity=JSON_OBJECT_SIZE(7)+JSON_OBJECT_SIZE(2);
+  const int capacity=JSON_OBJECT_SIZE(10)+JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
  
   doc.clear();
 
+  doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String( dataBuffer.data.bootCounter );
 
   doc["bat_voltage"] = dataBuffer.data.bat_voltage;
   doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
   doc["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
 
+  doc["panel_voltage"] = dataBuffer.data.panel_voltage;
+  doc["panel_current"] = dataBuffer.data.panel_current;
+ 
   doc["TXCounter"] = String( dataBuffer.data.txCounter );
-  doc["temperatur"] = String( dataBuffer.data.temperature );
+  doc["temperature"] = String( dataBuffer.data.temperature );
 
   // Add the "location" 
   JsonObject location = doc.createNestedObject("location");

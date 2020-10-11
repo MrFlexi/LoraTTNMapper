@@ -268,7 +268,7 @@ void t_send_cycle()
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
-    mqtt_loop();
+    mqtt_send();
 #endif
 }
 
@@ -363,15 +363,15 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
-#if (USE_MQTT)
-  mqtt_send();
-#endif
+
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  #if (HAS_PMU)
   AXP192_showstatus();
+  #endif
 #endif
 
 

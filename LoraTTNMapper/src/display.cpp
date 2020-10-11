@@ -26,7 +26,7 @@ void displayRegisterPages()
   page_array[max_page_counter] = PAGE_LORA;
 #endif
 
-#if (USE_INA)
+#if (HAS_INA)
   max_page_counter++;
   page_array[max_page_counter] = PAGE_SOLAR;
 #endif
