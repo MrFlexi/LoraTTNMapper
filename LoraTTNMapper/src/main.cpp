@@ -304,9 +304,9 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.aliveCounter++;
 
-  #if (USE_GPS)
-  gps.getDistance();
-  #endif
+  //#if (USE_GPS)
+  //gps.getDistance();
+  //#endif
 
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
@@ -499,7 +499,6 @@ void setup()
   I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
-  delay(100);
 
   // Bluethooth Serial + BLE
 #if (USE_SERIAL_BT)
@@ -515,8 +514,11 @@ void setup()
 
 #if (HAS_PMU)
   AXP192_init();
+  delay(100);
   AXP192_showstatus();
+  delay(100);
   AXP192_power_gps(ON);
+  delay(1000);
 #endif
 
 #if (HAS_INA)
@@ -537,6 +539,7 @@ void setup()
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
+  delay(500); 
 
 #if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
@@ -554,6 +557,7 @@ void setup()
   {
     Cayenne.begin(username, password, clientID, ssid, wifiPassword);
     log_display("Cayenne connected...");
+    delay(500); 
   }
 #endif
 
@@ -577,13 +581,13 @@ void setup()
 #if (USE_GPS)
   gps.init();
   gps.wakeup();
-  delay(50); // Wait for GPS beeing stable
+  delay(500); // Wait for GPS beeing stable
 #endif
 
 #if (HAS_LORA)
   setup_lora();
   lora_queue_init();
-  delay(50);
+  delay(500);
 #endif
 
 #if (USE_DASH)
@@ -641,8 +645,7 @@ void setup()
   }
 #endif
 
-  // get sensor values once
-  t_cyclic();
+
 
 #if (USE_FASTLED)
   setup_FastLed();
@@ -650,34 +653,7 @@ void setup()
   LED_wakeup();
 #endif
 
-  //-------------------------------------------------------------------------------
-  // Tasks
-  //-------------------------------------------------------------------------------
-  log_display("Starting Tasks");
-
-  sleepTicker.attach(60, t_sleep);
-  displayTicker.attach(displayRefreshIntervall, t_cyclic);
-  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
   
-  sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
-
-#if (HAS_LORA)
-  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
-#endif
-
-
-#if (USE_WEBSERVER)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    xTaskCreate(
-        t_broadcast_message,      /* Task function. */
-        "Broadcast Message",      /* String with name of task. */
-        10000,                    /* Stack size in bytes. */
-        NULL,                     /* Parameter passed as input of the task */
-        10,                       /* Priority of the task. */
-        &task_broadcast_message); /* Task handle. */
-  }
-#endif
 
 // Interrupt ISR Handler
 #if (USE_INTERRUPTS)
@@ -725,14 +701,49 @@ void setup()
 #endif
 #endif
 
+//-------------------------------------------------------------------------------
+  // Tasks
+  //-------------------------------------------------------------------------------
+  log_display("Starting Tasks");
+  delay(500); 
+
+  sleepTicker.attach(60, t_sleep);
+  displayTicker.attach(displayRefreshIntervall, t_cyclic);
+  displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+  
+  sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
+
+#if (HAS_LORA)
+  sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
+#endif
+
+
+#if (USE_WEBSERVER)
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    xTaskCreate(
+        t_broadcast_message,      /* Task function. */
+        "Broadcast Message",      /* String with name of task. */
+        10000,                    /* Stack size in bytes. */
+        NULL,                     /* Parameter passed as input of the task */
+        10,                       /* Priority of the task. */
+        &task_broadcast_message); /* Task handle. */
+  }
+#endif
+
   //---------------------------------------------------------------
   // RTOS Tasks
   //---------------------------------------------------------------
-
+#if (USE_BLE_SCANNER)
   createRTOStasks();
+#endif
+
   log_display("Setup done");
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
+  
+  // get sensor values once
+  t_cyclic();
 
   Serial.print("CPU Temperature: ");
   Serial.print((temprature_sens_read() - 32) / 1.8);

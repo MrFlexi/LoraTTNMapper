@@ -32,7 +32,7 @@
 #define USE_GYRO  0
 #define WAKEUP_BY_MOTION 0
 
-#define USE_FASTLED 0
+#define USE_FASTLED 1
 #define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0

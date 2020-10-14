@@ -19,9 +19,14 @@ void mqtt_loop()
   {
     if (!MqttClient.connected())
     {
+     Serial.print("MQTT Loop: MQTT Client not connected ");
       reconnect();
     }
     MqttClient.loop();
+  }
+  else  
+  {
+  Serial.print("MQTT Loop: Wifi not connected ");
   }
 }
 
@@ -101,7 +106,7 @@ void setup_mqtt()
 void mqtt_send()
 {
 
-  const int capacity=JSON_OBJECT_SIZE(11)+JSON_OBJECT_SIZE(2);
+  const int capacity=JSON_OBJECT_SIZE(16)+JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
  
   doc.clear();
@@ -109,10 +114,11 @@ void mqtt_send()
   doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String( dataBuffer.data.bootCounter );
 
-  doc["bat_voltage"] = dataBuffer.data.bat_voltage;
-  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
-  doc["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
-  doc["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+  doc["bat_voltage"] = String( dataBuffer.data.bat_voltage);
+  //doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
+  //doc["bat_discharge_current"] = String( dataBuffer.data.bat_discharge_current);
+  //doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
+  //doc["bat_fuel_gauge"] = String( dataBuffer.data.bat_DeltamAh);
 
   doc["panel_voltage"] = dataBuffer.data.panel_voltage;
   doc["panel_current"] = dataBuffer.data.panel_current;
@@ -124,11 +130,14 @@ void mqtt_send()
 
   // Add the "location" 
   JsonObject location = doc.createNestedObject("location");
-  location["lat"]=48.748010;
-  location["lon"]=2.293491;
+  location["lat"]= dataBuffer.data.gps.lat();
+  location["lon"]= dataBuffer.data.gps.lng();
  
- char buffer[500];
+ char buffer[600];
   serializeJson(doc, buffer);
+  //Serial.println();
+  //Serial.println(buffer);
+  //Serial.println();
   MqttClient.publish("mrflexi/device",buffer);
   serializeJsonPretty(doc, Serial);
 }
