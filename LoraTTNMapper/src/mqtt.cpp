@@ -92,6 +92,8 @@ void setup_mqtt()
 
   MqttClient.setServer(mqtt_server, 1883);
   MqttClient.setCallback(callback);
+  MqttClient.setBufferSize(500);
+
 
   if (!MqttClient.connected())
   {
@@ -115,10 +117,10 @@ void mqtt_send()
   doc["BootCounter"] = String( dataBuffer.data.bootCounter );
 
   doc["bat_voltage"] = String( dataBuffer.data.bat_voltage);
-  //doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
-  //doc["bat_discharge_current"] = String( dataBuffer.data.bat_discharge_current);
-  //doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
-  //doc["bat_fuel_gauge"] = String( dataBuffer.data.bat_DeltamAh);
+  doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
+  doc["bat_discharge_current"] = String( dataBuffer.data.bat_discharge_current);
+  doc["bat_charge_current"] = String( dataBuffer.data.bat_charge_current);
+  doc["bat_fuel_gauge"] = String( dataBuffer.data.bat_DeltamAh);
 
   doc["panel_voltage"] = dataBuffer.data.panel_voltage;
   doc["panel_current"] = dataBuffer.data.panel_current;
