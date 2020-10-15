@@ -31,9 +31,18 @@ void mqtt_loop()
 void callback(char *topic, byte *payload, unsigned int length)
 {
 
+  
+    // char json[] = "{\"command\": {\"action\":\"sleep_time\", \"value\":\"10\"}}";
+    //    {"comand": {
+    //                   "action":"sleep_time", 
+    //                   "value":"10"
+    //                  }
+    //      }  
+  
+ 
   String message = "";
 
-  Serial.print("Message arrived [");
+  Serial.print("MQTT message in [");
   u8g2log.print(topic);
   u8g2log.print("\n");
   Serial.print(topic);
@@ -51,8 +60,10 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   // Check if there is a incomming command
   const char *action = doc["command"]["action"];
+  const char *value = doc["command"]["value"];
   if (action)
   {
+      Serial.print( action ); Serial.println( value ); 
 
     if ( action== "reset_gauge")
     {
@@ -61,7 +72,13 @@ void callback(char *topic, byte *payload, unsigned int length)
       pmu.ClearCoulombcounter();
 #endif
     }
-  }
+
+
+if ( action== "sleep_time")
+    {     
+      dataBuffer.settings.sleep_time = atoi( value );
+    }
+  }  
 }
 
 void reconnect()
