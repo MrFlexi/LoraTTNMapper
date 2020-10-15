@@ -54,6 +54,13 @@
 						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
 
 							<l:HorizontalLayout allowWrapping="true">
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+								<TileContent unit="" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/SleepTime}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
 								<TileContent unit="" footer="sinc last reset">
 									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />

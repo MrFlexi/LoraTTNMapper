@@ -166,16 +166,6 @@ CAYENNE_IN_DEFAULT()
 
 #endif
 
-//--------------------------------------------------------------------------
-// Store preferences in NVS Flash
-//--------------------------------------------------------------------------
-//Preferences preferences;
-char lastword[10];
-
-unsigned long uptime_seconds_old;
-unsigned long uptime_seconds_new;
-unsigned long uptime_seconds_actual;
-
 String stringOne = "";
 
 static const char TAG[] = __FILE__;
@@ -300,7 +290,7 @@ void t_cyclic() // Intervall: Display Refresh
 {
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
-  dataBuffer.data.cpu_temperature = ( temprature_sens_read() - 32 ) / 1.8;
+  dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
 
   dataBuffer.data.aliveCounter++;
 
@@ -365,18 +355,14 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
-
-
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
   ESP_LOGI(TAG, "Poti %.2f", dataBuffer.data.potentiometer_a);
   ESP_LOGI(TAG, "BME280  %.1f C/%.1f%", dataBuffer.data.temperature, dataBuffer.data.humidity);
-  #if (HAS_PMU)
+#if (HAS_PMU)
   AXP192_showstatus();
-  #endif
 #endif
-
-
+#endif
 }
 
 void t_sleep()
@@ -470,6 +456,14 @@ void setup()
 {
 
   Serial.begin(115200);
+
+  //--------------------------------------------------------------------
+  // Load Settings
+  //--------------------------------------------------------------------
+  save_settings();
+  load_settings();
+
+  
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
@@ -539,7 +533,7 @@ void setup()
   setup_sensors();
   setup_wifi();
   calibrate_voltage();
-  delay(500); 
+  delay(500);
 
 #if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
@@ -557,7 +551,7 @@ void setup()
   {
     Cayenne.begin(username, password, clientID, ssid, wifiPassword);
     log_display("Cayenne connected...");
-    delay(500); 
+    delay(500);
   }
 #endif
 
@@ -576,7 +570,6 @@ void setup()
 #if (USE_GYRO)
   setup_gyro();
 #endif
-
 
 #if (USE_GPS)
   gps.init();
@@ -645,15 +638,11 @@ void setup()
   }
 #endif
 
-
-
 #if (USE_FASTLED)
   setup_FastLed();
   delay(50);
   LED_wakeup();
 #endif
-
-  
 
 // Interrupt ISR Handler
 #if (USE_INTERRUPTS)
@@ -701,22 +690,21 @@ void setup()
 #endif
 #endif
 
-//-------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
-  delay(500); 
+  delay(500);
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
-  
+
   sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
-
 
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
@@ -741,7 +729,7 @@ void setup()
   log_display("Setup done");
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
-  
+
   // get sensor values once
   t_cyclic();
 
