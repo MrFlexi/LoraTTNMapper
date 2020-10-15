@@ -20,12 +20,10 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
 
   ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
   ws_json["Temperatur"] = String( dataBuffer.data.temperature );;
-  ws_json["text"] = "Hallo Welt";
-  ws_json["text_time"] = "SA 8:22:01";
+  ws_json["SleepTime"] = String( dataBuffer.settings.sleep_time );;  
 
   // Add the "feeds" array
-  JsonArray feeds = ws_json.createNestedArray("text_table");
-  
+  JsonArray feeds = ws_json.createNestedArray("text_table");  
 
   //for (int i = 0; i < message_buffer.error_msg_count; i++)
   //{

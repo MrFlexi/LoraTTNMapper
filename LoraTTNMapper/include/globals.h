@@ -41,6 +41,7 @@
 #include <Ticker.h>
 #include "esp_sleep.h"
 #include <Wire.h>
+#include "settings.h"
 
 #if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
 #include "WiFi.h"
@@ -132,8 +133,15 @@ typedef struct
   esp_sleep_wakeup_cause_t wakeup_reason;
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;
-  double gps_distance;
+  double gps_distance;  
 } deviceStatus_t;
+
+
+typedef struct
+{
+  uint8_t sleep_time;
+} deviceSettings_t;
+
 
 // Struct holding payload for data send queue
 typedef struct
@@ -152,14 +160,10 @@ extern TaskHandle_t t_cyclic_HandlerTask;
 
 extern QueueHandle_t LoraSendQueue;
 
-
 #include "power.h"
 #include "jsutilities.h"
 #include "display.h"
-
-
 #include "irqhandler.h"
-
 #include "payload.h"
 
 #if (HAS_INA)

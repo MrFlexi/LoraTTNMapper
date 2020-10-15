@@ -62,6 +62,7 @@ class DataBuffer
     void set( deviceStatus_t input );
     void get();  
     deviceStatus_t data ;
+    deviceSettings_t settings;
 };
 
 extern DataBuffer dataBuffer;
@@ -69,7 +70,5 @@ extern DataBuffer dataBuffer;
 #if (USE_SERIAL_BT)
 extern BluetoothSerial SerialBT;
 #endif
-
-//extern deviceStatus_t sensorValues;
 
 #endif
