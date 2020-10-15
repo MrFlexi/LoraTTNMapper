@@ -77,6 +77,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 if ( action== "sleep_time")
     {     
       dataBuffer.settings.sleep_time = atoi( value );
+      save_settings();
     }
   }  
 }
