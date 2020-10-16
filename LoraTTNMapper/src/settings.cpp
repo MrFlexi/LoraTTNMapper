@@ -9,6 +9,7 @@ void load_settings()
 
 DynamicJsonDocument doc(2048);
 
+Serial.println();
 Serial.println("Loading settings...");   
 
 if (fileSystem.openFromFile("/settings.jsn", doc)) {
@@ -24,6 +25,7 @@ if (fileSystem.openFromFile("/settings.jsn", doc)) {
 void save_settings()
 {
 
+Serial.println();
  Serial.println("Saving settings...");   
 
 dataBuffer.settings.sleep_time = 5;
@@ -35,7 +37,7 @@ DynamicJsonDocument doc(2048);
 
 
    serializeJsonPretty(doc, Serial);
-  if (fileSystem.saveToFile("/Float.txt", doc)) {
+  if (fileSystem.saveToFile("/settings.jsn", doc)) {
         Serial.println("Successfully wrote data to file");
     }
 

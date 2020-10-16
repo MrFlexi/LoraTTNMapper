@@ -1,11 +1,13 @@
 #include "globals.h"
 #include "mqtt.h"
 
+#if (USE_MQTT)
 PubSubClient MqttClient(wifiClient);
 
 //const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_server = "85.209.49.65"; // Netcup
 const char *mqtt_topic = "mrflexi/device";
+const char *mqtt_topic_in = "mrflexi/device/in";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
@@ -17,14 +19,14 @@ void mqtt_loop()
   {
     if (!MqttClient.connected())
     {
-      Serial.print("MQTT Loop: MQTT Client not connected ");
+      ESP_LOGI(TAG,"MQTT Loop: MQTT Client not connected ");
       reconnect();
     }
     MqttClient.loop();
   }
   else
   {
-    Serial.print("MQTT Loop: Wifi not connected ");
+    ESP_LOGE(TAG,"MQTT Loop: Wifi not connected ");
   }
 }
 
@@ -42,19 +44,15 @@ void callback(char *topic, byte *payload, unsigned int length)
  
   String message = "";
 
-  Serial.print("MQTT message in [");
-  u8g2log.print(topic);
-  u8g2log.print("\n");
-  Serial.print(topic);
-  Serial.print("] ");
+  ESP_LOGI(TAG,"MQTT message topic %s", topic);
+  
   for (int i = 0; i < length; i++)
   {
-    Serial.print((char)payload[i]);
     message += (char)payload[i];
   }
 
   // Convert Payload to a JSON object
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<500> doc;
   deserializeJson(doc, message);
   serializeJsonPretty(doc, Serial);
 
@@ -63,11 +61,11 @@ void callback(char *topic, byte *payload, unsigned int length)
   const char *value = doc["command"]["value"];
   if (action)
   {
-      Serial.print( action ); Serial.println( value ); 
-
+      ESP_LOGI(TAG, " action: %s  value: %s", action, value);
+      
     if ( action== "reset_gauge")
     {
-      Serial.println("MQTT: Reset Coulomb Counter");
+      ESP_LOGI(TAG,"MQTT: Reset Coulomb Counter");
 #if (HAS_PMU)
       pmu.ClearCoulombcounter();
 #endif
@@ -87,21 +85,19 @@ void reconnect()
   // Loop until we're reconnected
   while (!MqttClient.connected())
   {
-    Serial.print("Attempting MQTT connection...");
+    ESP_LOGI(TAG,"Attempting MQTT connection...");
     // Attempt to connect
     if (MqttClient.connect("Mqtt Client"))
     {
-      Serial.println("connected");
-      // Once connected, publish an announcement...
+      ESP_LOGI(TAG,"connected");
       MqttClient.publish(mqtt_topic, "connected");
-      // ... and resubscribe
-      MqttClient.subscribe(mqtt_topic);
+      MqttClient.subscribe(mqtt_topic_in);
     }
     else
     {
-      Serial.print("failed, rc=");
+      ESP_LOGE(TAG,"failed, rc=");
       Serial.print(MqttClient.state());
-      Serial.println(" try again in 5 seconds");
+      ESP_LOGE(TAG," try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -110,31 +106,31 @@ void reconnect()
 
 void setup_mqtt()
 {
-
+if (WiFi.status() == WL_CONNECTED)
+  {
   MqttClient.setServer(mqtt_server, 1883);
   MqttClient.setCallback(callback);
   MqttClient.setBufferSize(500);
+  MqttClient.setSocketTimeout(120);
 
   if (!MqttClient.connected())
   {
     reconnect();
   }
-
   log_display("MQTT connected");
   MqttClient.publish(mqtt_topic, "ESP32 is alive...");
+  }
 }
 
 void mqtt_send()
 {
-
   const int capacity = JSON_OBJECT_SIZE(16) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
-
+  
+  ESP_LOGI(TAG,"MQTT send");
   doc.clear();
-
   doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String(dataBuffer.data.bootCounter);
-
   doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
   doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
   doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
@@ -156,9 +152,8 @@ void mqtt_send()
 
   char buffer[600];
   serializeJson(doc, buffer);
-  //Serial.println();
-  //Serial.println(buffer);
-  //Serial.println();
   MqttClient.publish(mqtt_topic, buffer);
   serializeJsonPretty(doc, Serial);
+  Serial.println();
 }
+#endif

@@ -50,7 +50,7 @@ void t_enqueue_LORA_messages()
 
 payload.reset();
 
-//payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
 //payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 #if (USE_GPS)
@@ -81,8 +81,6 @@ payload.reset();
     payload.addVoltage(31, dataBuffer.data.bat_charge_current);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
- 
-
     //payload.enqueue_port(2);
 #endif
 

@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  3
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -43,7 +43,7 @@
 #include <Wire.h>
 #include "settings.h"
 
-#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
+#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI )
 #include "WiFi.h"
 extern WiFiClient wifiClient;
 #endif

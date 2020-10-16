@@ -1,18 +1,15 @@
 
 #pragma once
 
-#define DEVICE_NAME "ESP-01"
+#define DEVICE_NAME "esp-01"
 #define USE_OTA 0
 #define USE_BME280 1
 
-#define HAS_LORA 0
-#define USE_MQTT 1
-#define HAS_INA 1
+#define HAS_INA  0
 #define USE_DASH 0
 #define USE_GPS 0
 
 #define HAS_PMU 0
-
 
 #define USE_DISPLAY 1
 #define CYCLIC_SHOW_LOG 1
@@ -26,13 +23,15 @@
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
+#define USE_MQTT 1
 #define USE_WEBSERVER   0 
 #define USE_CAYENNE 0
+#define HAS_LORA 0
 
 #define USE_GYRO  0
 #define WAKEUP_BY_MOTION 0
 
-#define USE_FASTLED 1
+#define USE_FASTLED 0
 #define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
