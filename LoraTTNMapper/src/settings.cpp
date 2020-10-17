@@ -9,24 +9,18 @@ void load_settings()
 
 DynamicJsonDocument doc(2048);
 
-Serial.println();
-Serial.println("Loading settings...");   
+ESP_LOGI(TAG,"Loading settings...");   
 
 if (fileSystem.openFromFile("/settings.jsn", doc)) {
-        Serial.println("Successfully read file and parsed data: ");
-        serializeJsonPretty(doc, Serial);
+      serializeJsonPretty(doc, Serial);
     }
-
-  dataBuffer.settings.sleep_time = doc["sleep_time"];
- Serial.println(dataBuffer.settings.sleep_time);  
-
+dataBuffer.settings.sleep_time = doc["sleep_time"];
 }
 
 void save_settings()
 {
 
-Serial.println();
- Serial.println("Saving settings...");   
+ESP_LOGI(TAG,"Saving settings...");   
 
 dataBuffer.settings.sleep_time = 5;
 
@@ -38,7 +32,7 @@ DynamicJsonDocument doc(2048);
 
    serializeJsonPretty(doc, Serial);
   if (fileSystem.saveToFile("/settings.jsn", doc)) {
-        Serial.println("Successfully wrote data to file");
+      ESP_LOGI(TAG,"Successfully wrote data to file");
     }
 
 }

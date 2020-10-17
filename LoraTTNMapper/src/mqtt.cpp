@@ -6,7 +6,7 @@ PubSubClient MqttClient(wifiClient);
 
 //const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_server = "85.209.49.65"; // Netcup
-const char *mqtt_topic = "mrflexi/device";
+const char *mqtt_topic = "mrflexi/device/";
 const char *mqtt_topic_in = "mrflexi/device/in";
 
 long lastMsgAlive = 0;
@@ -19,21 +19,20 @@ void mqtt_loop()
   {
     if (!MqttClient.connected())
     {
-      ESP_LOGI(TAG,"MQTT Loop: MQTT Client not connected ");
+      ESP_LOGE(TAG,"MQTT Client not connected ");
       reconnect();
     }
     MqttClient.loop();
   }
   else
   {
-    ESP_LOGE(TAG,"MQTT Loop: Wifi not connected ");
+    ESP_LOGE(TAG,"Wifi not connected ");
   }
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
 
-  
     // char json[] = "{\"command\": {\"action\":\"sleep_time\", \"value\":\"10\"}}";
     //    {"comand": {
     //                   "action":"sleep_time", 
@@ -41,7 +40,6 @@ void callback(char *topic, byte *payload, unsigned int length)
     //                  }
     //      }  
   
- 
   String message = "";
 
   ESP_LOGI(TAG,"MQTT message topic %s", topic);
@@ -87,7 +85,7 @@ void reconnect()
   {
     ESP_LOGI(TAG,"Attempting MQTT connection...");
     // Attempt to connect
-    if (MqttClient.connect("Mqtt Client"))
+    if (MqttClient.connect(DEVICE_NAME))
     {
       ESP_LOGI(TAG,"connected");
       MqttClient.publish(mqtt_topic, "connected");
@@ -122,12 +120,23 @@ if (WiFi.status() == WL_CONNECTED)
   }
 }
 
+void doConcat(const char *a, const char *b, const char *c, char *out) {
+    strcpy(out, a);
+    strcat(out, b);
+    strcat(out, c);
+}
+
 void mqtt_send()
 {
   const int capacity = JSON_OBJECT_SIZE(16) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
-  
-  ESP_LOGI(TAG,"MQTT send");
+  char topic_out[40];
+
+
+  // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
+  doConcat(mqtt_topic, DEVICE_NAME, "/data", topic_out );
+  ESP_LOGI(TAG,"MQTT send:  %s", topic_out );
+
   doc.clear();
   doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String(dataBuffer.data.bootCounter);
@@ -152,8 +161,9 @@ void mqtt_send()
 
   char buffer[600];
   serializeJson(doc, buffer);
-  MqttClient.publish(mqtt_topic, buffer);
-  serializeJsonPretty(doc, Serial);
+  MqttClient.publish(topic_out, buffer);
+  serializeJsonPretty(doc, buffer);
+  ESP_LOGI(TAG,"Payload: %s", buffer);
   Serial.println();
 }
 #endif
