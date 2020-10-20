@@ -107,6 +107,19 @@ void pride()
   }
 }
 
+void LED_HeatColor(uint8_t heatIndex)
+{
+    // HeatColors_p is a gradient palette built in to FastLED
+    // that fades from black to red, orange, yellow, white
+    // feel free to use another palette or define your own custom one
+    CRGB color = ColorFromPalette(HeatColors_p, heatIndex);
+
+    // fill the entire strip with the current color
+    fill_solid(leds, NUM_LEDS, color);
+    FastLED.show();
+    ESP_LOGI(TAG, "Heat Color: %i",heatIndex );
+}
+
 void LED_sunset()
 {
 

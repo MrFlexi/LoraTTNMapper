@@ -22,6 +22,7 @@ void setup_FastLed(void);
 void LED_boot(void);
 void LED_sunset(void);
 void LED_sunrise(void);
+void LED_HeatColor(uint8_t heatIndex);
 
 void LED_showSleepCounter(void);
 void LED_deepSleep(void);

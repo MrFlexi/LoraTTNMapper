@@ -7,10 +7,18 @@ PubSubClient MqttClient(wifiClient);
 //const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_server = "85.209.49.65"; // Netcup
 const char *mqtt_topic = "mrflexi/device/";
-const char *mqtt_topic_in = "mrflexi/device/in";
+const char *mqtt_topic_mosi = "/mosi";
+const char *mqtt_topic_miso = "/miso";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
+
+void doConcat(const char *a, const char *b, const char *c, char *out)
+{
+  strcpy(out, a);
+  strcat(out, b);
+  strcat(out, c);
+}
 
 void mqtt_loop()
 {
@@ -19,31 +27,31 @@ void mqtt_loop()
   {
     if (!MqttClient.connected())
     {
-      ESP_LOGE(TAG,"MQTT Client not connected ");
+      ESP_LOGE(TAG, "MQTT Client not connected ");
       reconnect();
     }
     MqttClient.loop();
   }
   else
   {
-    ESP_LOGE(TAG,"Wifi not connected ");
+    ESP_LOGE(TAG, "Wifi not connected ");
   }
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
 
-    // char json[] = "{\"command\": {\"action\":\"sleep_time\", \"value\":\"10\"}}";
-    //    {"comand": {
-    //                   "action":"sleep_time", 
-    //                   "value":"10"
-    //                  }
-    //      }  
-  
+  // char json[] = "{\"command\": {\"action\":\"sleep_time\", \"value\":\"10\"}}";
+  //    {"comand": {
+  //                   "action":"sleep_time",
+  //                   "value":"10"
+  //                  }
+  //      }
+
   String message = "";
 
-  ESP_LOGI(TAG,"MQTT message topic %s", topic);
-  
+  ESP_LOGI(TAG, "MQTT message topic %s", topic);
+
   for (int i = 0; i < length; i++)
   {
     message += (char)payload[i];
@@ -55,47 +63,60 @@ void callback(char *topic, byte *payload, unsigned int length)
   serializeJsonPretty(doc, Serial);
 
   // Check if there is a incomming command
+  
   const char *action = doc["command"]["action"];
   const char *value = doc["command"]["value"];
-  if (action)
-  {
-      ESP_LOGI(TAG, " action: %s  value: %s", action, value);
-      
-    if ( action== "reset_gauge")
+
+  String action2 = String( action );
+  Serial.println(action2);
+
+  ESP_LOGI(TAG, " action: %s  value: %s", action2, value);
+
+  if ( action2 == "LED_HeatColor")
     {
-      ESP_LOGI(TAG,"MQTT: Reset Coulomb Counter");
+      ESP_LOGI(TAG, "MQTT: LED Heat Color");
+      LED_HeatColor(atoi(value));
+    }
+
+    if (action2 == "reset_gauge")
+    {
+      ESP_LOGI(TAG, "MQTT: Reset Coulomb Counter");
 #if (HAS_PMU)
       pmu.ClearCoulombcounter();
 #endif
     }
 
-
-if ( action== "sleep_time")
-    {     
-      dataBuffer.settings.sleep_time = atoi( value );
+    if (action2 == "sleep_time")
+    {
+      ESP_LOGI(TAG, "MQTT: sleep time");
+      dataBuffer.settings.sleep_time = atoi(value);
       save_settings();
     }
-  }  
-}
+  }
 
 void reconnect()
 {
+
+  char topic_in[40];
+  // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
+  doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_mosi, topic_in);
+
   // Loop until we're reconnected
   while (!MqttClient.connected())
   {
-    ESP_LOGI(TAG,"Attempting MQTT connection...");
+    ESP_LOGI(TAG, "Attempting MQTT connection...");
     // Attempt to connect
     if (MqttClient.connect(DEVICE_NAME))
     {
-      ESP_LOGI(TAG,"connected");
+      ESP_LOGI(TAG, "connected");
       MqttClient.publish(mqtt_topic, "connected");
-      MqttClient.subscribe(mqtt_topic_in);
+      MqttClient.subscribe(topic_in);
     }
     else
     {
-      ESP_LOGE(TAG,"failed, rc=");
+      ESP_LOGE(TAG, "failed, rc=");
       Serial.print(MqttClient.state());
-      ESP_LOGE(TAG," try again in 5 seconds");
+      ESP_LOGE(TAG, " try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -104,26 +125,20 @@ void reconnect()
 
 void setup_mqtt()
 {
-if (WiFi.status() == WL_CONNECTED)
+  if (WiFi.status() == WL_CONNECTED)
   {
-  MqttClient.setServer(mqtt_server, 1883);
-  MqttClient.setCallback(callback);
-  MqttClient.setBufferSize(500);
-  MqttClient.setSocketTimeout(120);
+    MqttClient.setServer(mqtt_server, 1883);
+    MqttClient.setCallback(callback);
+    MqttClient.setBufferSize(500);
+    MqttClient.setSocketTimeout(120);
 
-  if (!MqttClient.connected())
-  {
-    reconnect();
+    if (!MqttClient.connected())
+    {
+      reconnect();
+    }
+    log_display("MQTT connected");
+    MqttClient.publish(mqtt_topic, "ESP32 is alive...");
   }
-  log_display("MQTT connected");
-  MqttClient.publish(mqtt_topic, "ESP32 is alive...");
-  }
-}
-
-void doConcat(const char *a, const char *b, const char *c, char *out) {
-    strcpy(out, a);
-    strcat(out, b);
-    strcat(out, c);
 }
 
 void mqtt_send()
@@ -132,10 +147,9 @@ void mqtt_send()
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
-
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
-  doConcat(mqtt_topic, DEVICE_NAME, "/data", topic_out );
-  ESP_LOGI(TAG,"MQTT send:  %s", topic_out );
+  doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
+  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
 
   doc.clear();
   doc["device"] = DEVICE_NAME;
@@ -163,7 +177,7 @@ void mqtt_send()
   serializeJson(doc, buffer);
   MqttClient.publish(topic_out, buffer);
   serializeJsonPretty(doc, buffer);
-  ESP_LOGI(TAG,"Payload: %s", buffer);
+  ESP_LOGI(TAG, "Payload: %s", buffer);
   Serial.println();
 }
 #endif

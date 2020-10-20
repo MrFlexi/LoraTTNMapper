@@ -22,7 +22,7 @@
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   0 
-#define USE_CAYENNE 1
+#define USE_CAYENNE 0
 #define USE_MQTT 1
 
 #define USE_GYRO  1
