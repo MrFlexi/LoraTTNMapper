@@ -95,10 +95,37 @@ void IRAM_ATTR resetModule() {
 
 void setup_watchdog()
 {
+  ESP_LOGI(TAG, "Setup watchdog");
   wdt_timer = timerBegin(0, 80, true);                  //timer 0, div 80
   timerAttachInterrupt(wdt_timer, &resetModule, true);  //attach callback
   timerAlarmWrite(wdt_timer, wdtTimeout * 1000, false); //set time in us
   timerAlarmEnable(wdt_timer);                          //enable interrupt
+}
+
+
+
+void setup_filesystem()
+{
+  //---------------------------------------------------------------
+  // Mounting File System SPIFFS
+  //---------------------------------------------------------------
+
+ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
+  // External File System Initialisation
+  if (!SPIFFS.begin())
+  {
+    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  File root = SPIFFS.open("/");
+  File file = root.openNextFile();
+
+  while (file)
+  {
+    ESP_LOGI(TAG, "%s",file.name());
+    file = root.openNextFile();
+  }
+  delay(100);
 }
 
 //--------------------------------------------------------------------------
@@ -366,6 +393,7 @@ void t_cyclic() // Intervall: Display Refresh
   // Refresh Display
 
 #if (USE_DISPLAY)
+ESP_LOGI(TAG, "update display");
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
@@ -378,6 +406,7 @@ void t_cyclic() // Intervall: Display Refresh
   AXP192_showstatus();
 #endif
 #endif
+
 }
 
 void t_sleep()
@@ -475,6 +504,7 @@ void setup()
   //--------------------------------------------------------------------
   // Load Settings
   //--------------------------------------------------------------------  
+  setup_filesystem();
   loadConfiguration();
   
   dataBuffer.data.runmode = 0;
@@ -610,28 +640,8 @@ void setup()
 #endif
 #endif
 
-  //---------------------------------------------------------------
-  // Mounting File System SPIFFS
-  //---------------------------------------------------------------
 
-ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
-  // External File System Initialisation
-  if (!SPIFFS.begin())
-  {
-    ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
-    return;
-  }
-  File root = SPIFFS.open("/");
-  File file = root.openNextFile();
 
-  while (file)
-  {
-
-    Serial.print("FILE: ");
-    Serial.println(file.name());
-    file = root.openNextFile();
-  }
-  delay(100);
 
 
 #if (USE_WEBSERVER)
@@ -660,17 +670,7 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   LED_wakeup();
 #endif
 
-// Interrupt ISR Handler
-#if (USE_INTERRUPTS)
-  ESP_LOGI(TAG, "Starting Interrupt Handler...");
-  xTaskCreatePinnedToCore(irqHandler,      // task function
-                          "irqhandler",    // name of task
-                          4096,            // stack size of task
-                          (void *)1,       // parameter of the task
-                          2,               // priority of the task
-                          &irqHandlerTask, // task handle
-                          1);              // CPU core
-#endif
+
 
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
@@ -715,7 +715,6 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
-
   sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
 
 #if (HAS_LORA)
@@ -735,6 +734,18 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   }
 #endif
 
+// Interrupt ISR Handler
+#if (USE_INTERRUPTS)
+  ESP_LOGI(TAG, "Starting Interrupt Handler...");
+  xTaskCreatePinnedToCore(irqHandler,      // task function
+                          "irqhandler",    // name of task
+                          4096,            // stack size of task
+                          (void *)1,       // parameter of the task
+                          2,               // priority of the task
+                          &irqHandlerTask, // task handle
+                          1);              // CPU core
+#endif
+
   //---------------------------------------------------------------
   // RTOS Tasks
   //---------------------------------------------------------------
@@ -742,20 +753,18 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   createRTOStasks();
 #endif
 
-  log_display("Setup done");
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
-  Serial.println("Runmode5: " + String(dataBuffer.data.runmode));
-
+  ESP_LOGI(TAG, "Setup done");
+  ESP_LOGI(TAG, "#----------------------------------------------------------#");
   // get sensor values once
   t_cyclic();
-
-  Serial.print("CPU Temperature: ");
-  Serial.print((temprature_sens_read() - 32) / 1.8);
 }
+
+
 
 void loop()
 {
-  timerWrite(wdt_timer, 0); //reset timer (feed watchdog)
+  //timerWrite(wdt_timer, 0); //reset timer (feed watchdog)
   
 #if (HAS_LORA)
   os_runloop_once();

@@ -22,7 +22,11 @@ void loadConfiguration()
   }
   else
   {
-    dataBuffer.settings.sleep_time = doc["sleep_time"];
+    ESP_LOGI(TAG, "Loading settings ");
+    serializeJsonPretty(doc, Serial);
+    
+    const char *value = doc["settings"]["sleep_time"];
+    dataBuffer.settings.sleep_time = atoi(doc["settings"]["sleep_time"]);
 
     if (dataBuffer.settings.sleep_time > 0)
     {

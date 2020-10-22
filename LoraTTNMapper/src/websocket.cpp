@@ -53,9 +53,10 @@ void t_broadcast_message(void *parameter)
 
   for (;;)
   {    
+        ESP_LOGI(TAG, "broadcast");
         JsonStr = message_buffer_to_jsonstr(dataBuffer);
-        ws.textAll(JsonStr);        
-    vTaskDelay(sendWebsocketIntervall * 1000 );
+        ws.textAll(JsonStr);      
+        vTaskDelay(sendWebsocketIntervall * 1000 );
   }
 }
 

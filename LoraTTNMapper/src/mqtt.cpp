@@ -68,9 +68,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   const char *value = doc["command"]["value"];
 
   String action = String( action_in );
-  Serial.println(action);
-
-  ESP_LOGI(TAG, " action: %s  value: %s", action, value);
+  ESP_LOGI(TAG, " action: %s  value: %s", action_in, value);
 
   #if (USE_FASTLED)
   if ( action2 == "LED_HeatColor")
@@ -147,7 +145,7 @@ void setup_mqtt()
 
 void mqtt_send()
 {
-  const int capacity = JSON_OBJECT_SIZE(19) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(22) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 

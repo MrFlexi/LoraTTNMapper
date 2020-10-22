@@ -22,6 +22,7 @@
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   1 
+#define sendWebsocketIntervall          10 // every x seconds
 #define USE_CAYENNE     0
 #define USE_MQTT 1
 
@@ -42,7 +43,7 @@
 #define LORA_TX_INTERVAL 30
 
 #define sendCycleIntervall      60 // every x seconds
-#define sendWebsocketIntervall  30 // every x seconds
+
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 60
