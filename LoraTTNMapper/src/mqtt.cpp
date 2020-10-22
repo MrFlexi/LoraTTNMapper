@@ -64,21 +64,23 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   // Check if there is a incomming command
   
-  const char *action = doc["command"]["action"];
+  const char *action_in = doc["command"]["action"];
   const char *value = doc["command"]["value"];
 
-  String action2 = String( action );
-  Serial.println(action2);
+  String action = String( action_in );
+  Serial.println(action);
 
-  ESP_LOGI(TAG, " action: %s  value: %s", action2, value);
+  ESP_LOGI(TAG, " action: %s  value: %s", action, value);
 
+  #if (USE_FASTLED)
   if ( action2 == "LED_HeatColor")
     {
       ESP_LOGI(TAG, "MQTT: LED Heat Color");
       LED_HeatColor(atoi(value));
     }
+  #endif  
 
-    if (action2 == "reset_gauge")
+    if (action == "reset_gauge")
     {
       ESP_LOGI(TAG, "MQTT: Reset Coulomb Counter");
 #if (HAS_PMU)
@@ -86,10 +88,12 @@ void callback(char *topic, byte *payload, unsigned int length)
 #endif
     }
 
-    if (action2 == "sleep_time")
+
+    if (action == "sleep_time")
     {
-      ESP_LOGI(TAG, "MQTT: sleep time");
+
       dataBuffer.settings.sleep_time = atoi(value);
+      ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);      
       save_settings();
     }
   }
@@ -143,7 +147,7 @@ void setup_mqtt()
 
 void mqtt_send()
 {
-  const int capacity = JSON_OBJECT_SIZE(16) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(19) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
@@ -160,6 +164,9 @@ void mqtt_send()
   doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
   doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
 
+  doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
+  doc["bus_current"] = String( dataBuffer.data.bus_current);   
+
   doc["panel_voltage"] = dataBuffer.data.panel_voltage;
   doc["panel_current"] = dataBuffer.data.panel_current;
 
@@ -167,6 +174,8 @@ void mqtt_send()
   doc["temperature"] = String(dataBuffer.data.temperature);
   doc["humidity"] = String(dataBuffer.data.humidity);
   doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
+  doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+  
 
   // Add the "location"
   JsonObject location = doc.createNestedObject("location");

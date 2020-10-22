@@ -317,10 +317,6 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.aliveCounter++;
 
-  //#if (USE_GPS)
-  //gps.getDistance();
-  //#endif
-
   //   I2C opperations
   if (!I2C_MUTEX_LOCK())
     ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
@@ -341,10 +337,6 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
-
-    //ESP_LOGI(TAG, "Bat+ %d",dataBuffer.data.bat_ChargeCoulomb);
-    //ESP_LOGI(TAG, "Bat- %d",dataBuffer.data.bat_DischargeCoulomb);
-    //ESP_LOGI(TAG, "delta %.2f mAh", dataBuffer.data.bat_DeltamAh);
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
@@ -482,10 +474,8 @@ void setup()
 
   //--------------------------------------------------------------------
   // Load Settings
-  //--------------------------------------------------------------------
-  save_settings();
+  //--------------------------------------------------------------------  
   load_settings();
-
   
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
@@ -696,8 +686,8 @@ void setup()
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR * 60);
-  log_display("Deep Sleep " + String(TIME_TO_SLEEP) +
+  esp_sleep_enable_timer_wakeup( dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60);
+  log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
               " min");
 
 #if (USE_BUTTON)
@@ -717,7 +707,7 @@ void setup()
   // Tasks
   //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
-  delay(500);
+  delay(100);
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);

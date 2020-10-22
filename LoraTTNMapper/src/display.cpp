@@ -371,10 +371,10 @@ void showPage(int page)
       }
 
       u8g2.setCursor(1, 64);
-      u8g2.printf("Sleeping for %.2d min", TIME_TO_SLEEP);
+      u8g2.printf("Sleeping for %.2d min", dataBuffer.settings.sleep_time );
 #if (WAKEUP_BY_MOTION)
       u8g2.setCursor(64, 55);
-      u8g2.printf(" move me !!", TIME_TO_SLEEP);
+      u8g2.printf(" move me !!", dataBuffer.settings.sleep_time );
 #endif
       drawSymbol(60, 12, SUN);
       break;
