@@ -37,7 +37,7 @@
 #define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
 
 
-
+#include "SPIFFS.h"
 #include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
@@ -53,7 +53,6 @@ extern WiFiClient wifiClient;
 
 
 #if (USE_WEBSERVER)
-#include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 #include "webserver.h"
 #include "websocket.h"

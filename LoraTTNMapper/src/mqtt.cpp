@@ -94,7 +94,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 
       dataBuffer.settings.sleep_time = atoi(value);
       ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);      
-      save_settings();
+      saveConfiguration();
     }
   }
 

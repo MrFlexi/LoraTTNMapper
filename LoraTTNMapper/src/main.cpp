@@ -475,7 +475,7 @@ void setup()
   //--------------------------------------------------------------------
   // Load Settings
   //--------------------------------------------------------------------  
-  load_settings();
+  loadConfiguration();
   
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
@@ -610,8 +610,11 @@ void setup()
 #endif
 #endif
 
-#if (USE_WEBSERVER)
-  ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
+  //---------------------------------------------------------------
+  // Mounting File System SPIFFS
+  //---------------------------------------------------------------
+
+ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
   {
@@ -629,7 +632,7 @@ void setup()
     file = root.openNextFile();
   }
   delay(100);
-#endif
+
 
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)

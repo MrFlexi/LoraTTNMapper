@@ -6,3 +6,6 @@
 
 void load_settings();
 void save_settings();
+
+void saveConfiguration();
+void loadConfiguration();
