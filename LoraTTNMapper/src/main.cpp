@@ -12,6 +12,14 @@
 AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
+
+//--------------------------------------------------------------------------
+// Watchdog
+//--------------------------------------------------------------------------
+const int wdtTimeout = 3000;  //time in ms to trigger the watchdog
+hw_timer_t *wdt_timer = NULL;
+
+
 //--------------------------------------------------------------------------
 // OTA Settings
 //--------------------------------------------------------------------------
@@ -77,6 +85,21 @@ Ticker displayMoveTicker;
 Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
+
+
+
+void IRAM_ATTR resetModule() {
+  ets_printf("reboot\n");
+  esp_restart();
+}
+
+void setup_watchdog()
+{
+  wdt_timer = timerBegin(0, 80, true);                  //timer 0, div 80
+  timerAttachInterrupt(wdt_timer, &resetModule, true);  //attach callback
+  timerAlarmWrite(wdt_timer, wdtTimeout * 1000, false); //set time in us
+  timerAlarmEnable(wdt_timer);                          //enable interrupt
+}
 
 //--------------------------------------------------------------------------
 // Sensors
@@ -739,6 +762,8 @@ void setup()
 
 void loop()
 {
+  timerWrite(wdt_timer, 0); //reset timer (feed watchdog)
+  
 #if (HAS_LORA)
   os_runloop_once();
 #endif
