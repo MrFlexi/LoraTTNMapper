@@ -68,14 +68,27 @@ void callback(char *topic, byte *payload, unsigned int length)
   const char *value = doc["command"]["value"];
 
   String action = String( action_in );
-  ESP_LOGI(TAG, " action: %s  value: %s", action_in, value);
+  ESP_LOGI(TAG, " action: %s  value: %s", action.c_str(), value);
 
   #if (USE_FASTLED)
-  if ( action2 == "LED_HeatColor")
+  if ( action == "LED_HeatColor")
     {
       ESP_LOGI(TAG, "MQTT: LED Heat Color");
       LED_HeatColor(atoi(value));
     }
+
+  if ( action == "LED_on")
+    {
+      ESP_LOGI(TAG, "MQTT: LED on");
+      LED_on(atoi(value));
+    }
+
+  if ( action == "LED_off")
+    {
+      ESP_LOGI(TAG, "MQTT: LED off");
+      LED_off();
+    }
+
   #endif  
 
     if (action == "reset_gauge")

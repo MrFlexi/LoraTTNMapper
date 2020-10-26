@@ -13,12 +13,6 @@ AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
 
-//--------------------------------------------------------------------------
-// Watchdog
-//--------------------------------------------------------------------------
-const int wdtTimeout = 3000;  //time in ms to trigger the watchdog
-hw_timer_t *wdt_timer = NULL;
-
 
 //--------------------------------------------------------------------------
 // OTA Settings
@@ -85,22 +79,6 @@ Ticker displayMoveTicker;
 Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
-
-
-
-void IRAM_ATTR resetModule() {
-  ets_printf("reboot\n");
-  esp_restart();
-}
-
-void setup_watchdog()
-{
-  ESP_LOGI(TAG, "Setup watchdog");
-  wdt_timer = timerBegin(0, 80, true);                  //timer 0, div 80
-  timerAttachInterrupt(wdt_timer, &resetModule, true);  //attach callback
-  timerAlarmWrite(wdt_timer, wdtTimeout * 1000, false); //set time in us
-  timerAlarmEnable(wdt_timer);                          //enable interrupt
-}
 
 
 
@@ -670,8 +648,6 @@ void setup()
   LED_wakeup();
 #endif
 
-
-
 #if (HAS_LORA)
   t_enqueue_LORA_messages();
 #endif
@@ -752,6 +728,13 @@ void setup()
 #if (USE_BLE_SCANNER)
   createRTOStasks();
 #endif
+  
+  //---------------------------------------------------------------
+  // Watchdog 
+  //---------------------------------------------------------------
+  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  esp_task_wdt_add(NULL); //add current thread to WDT watch
+
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
@@ -764,7 +747,7 @@ void setup()
 
 void loop()
 {
-  //timerWrite(wdt_timer, 0); //reset timer (feed watchdog)
+esp_task_wdt_reset(); //reset timer ...feed watchdog
   
 #if (HAS_LORA)
   os_runloop_once();

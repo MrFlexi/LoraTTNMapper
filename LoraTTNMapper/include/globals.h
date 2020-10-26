@@ -6,15 +6,14 @@
 #include <FreeRTOS.h>
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+#include <esp_task_wdt.h>
 
-
-
-
+#define WDT_TIMEOUT 10           // Watchdog time out 3 seconds
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  1
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
