@@ -41,8 +41,8 @@
 #define LORAenqueueMessagesIntervall 90 // every x seconds
 #define LORA_TX_INTERVAL 30
 
-#define sendCycleIntervall      60 // every x seconds
-#define sendWebsocketIntervall 10 // every x seconds
+#define sendCycleIntervall     10 // every x seconds
+#define sendWebsocketIntervall  5 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51

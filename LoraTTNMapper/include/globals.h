@@ -6,10 +6,9 @@
 #include <FreeRTOS.h>
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+#include <esp_task_wdt.h>
 
-
-
-
+#define WDT_TIMEOUT 10           // Watchdog time out 3 seconds
 
 //--------------------------------------------------------------------------
 // Device Settings
