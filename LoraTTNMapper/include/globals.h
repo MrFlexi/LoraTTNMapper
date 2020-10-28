@@ -8,6 +8,7 @@
 #include "esp_spi_flash.h"
 #include <esp_task_wdt.h>
 
+
 #define WDT_TIMEOUT 10           // Watchdog time out 3 seconds
 
 //--------------------------------------------------------------------------
@@ -134,13 +135,14 @@ typedef struct
   esp_sleep_wakeup_cause_t wakeup_reason;
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;
-  double gps_distance;  
+  double gps_distance;
 } deviceStatus_t;
 
 
 typedef struct
 {
   uint8_t sleep_time;
+  const char* log_print_buffer;
 } deviceSettings_t;
 
 

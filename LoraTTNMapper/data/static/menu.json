@@ -5,9 +5,9 @@
         "expanded": true,
         "key": "Home"
     }, {
-        "title": "Terminal",
+        "title": "ESP Log",
         "icon": "sap-icon://cargo-train",
-        "key": "Terminal",
+        "key": "ESPLog",
         "expanded": true
     
     }, {

@@ -13,6 +13,40 @@ AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
 
+//--------------------------------------------------------------------------
+// log to spiffs
+//--------------------------------------------------------------------------
+
+#if (USE_SPIFF_LOGGING)
+static char log_print_buffer[512];
+
+int vprintf_into_spiffs(const char* szFormat, va_list args) {
+	//write evaluated format string into buffer
+	int ret = vsnprintf (log_print_buffer, sizeof(log_print_buffer), szFormat, args);
+
+  dataBuffer.settings.log_print_buffer = log_print_buffer;
+
+	//output is now in buffer. write to file.
+	if(ret >= 0) {
+    if(!SPIFFS.exists("/LOGS.txt")) {
+      File writeLog = SPIFFS.open("/LOGS.txt", FILE_WRITE);
+      if(!writeLog) Serial.println("Couldn't open spiffs_log.txt"); 
+      delay(50);
+      writeLog.close();
+    }
+    
+		File spiffsLogFile = SPIFFS.open("/LOGS.txt", FILE_APPEND);
+		//debug output
+		//printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
+		spiffsLogFile.write((uint8_t*) log_print_buffer, (size_t) ret);
+		//to be safe in case of crashes: flush the output
+		spiffsLogFile.flush();
+		spiffsLogFile.close();
+	}
+	return ret;
+}
+#endif
+
 
 //--------------------------------------------------------------------------
 // OTA Settings
@@ -484,6 +518,20 @@ void setup()
   //--------------------------------------------------------------------  
   setup_filesystem();
   loadConfiguration();
+
+
+//--------------------------------------------------------------------
+  // Logging
+  //--------------------------------------------------------------------  
+  
+  #if (USE_SPIFF_LOGGING)
+  esp_log_set_vprintf(&vprintf_into_spiffs);  
+  esp_log_level_set("TAG", ESP_LOG_DEBUG);
+  //write into log
+  esp_log_write(ESP_LOG_DEBUG, "TAG", "Hello World\n");
+  #endif
+
+
   
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
@@ -620,18 +668,8 @@ void setup()
 
 
 
-
-
 #if (USE_WEBSERVER)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request) {
-      Serial.println("Index requested");
-      request->send(SPIFFS, "/index.html", "text/html");
-    });
-    server.begin();
-    server.serveStatic("/", SPIFFS, "/");
-  }
+  setup_webserver();
 #endif
 
 #if (USE_WEBSERVER)

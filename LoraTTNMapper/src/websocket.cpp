@@ -18,9 +18,11 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
   ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
 
-  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
-  ws_json["Temperatur"] = String( dataBuffer.data.temperature );;
-  ws_json["SleepTime"] = String( dataBuffer.settings.sleep_time );;  
+  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );
+  ws_json["Temperatur"] = String( dataBuffer.data.temperature );
+  ws_json["SleepTime"] = String( dataBuffer.settings.sleep_time );  
+
+  ws_json["ESPLog"] = String( dataBuffer.settings.log_print_buffer );  
 
   // Add the "feeds" array
   JsonArray feeds = ws_json.createNestedArray("text_table");  

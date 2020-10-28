@@ -11,9 +11,12 @@
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
+
+#define USE_SPIFF_LOGGING 1
+
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
-#define USE_PMU_INTERRUPT 1
+#define USE_PMU_INTERRUPT 0
 #define USE_BUTTON 1
 
 #define USE_BLE 0
