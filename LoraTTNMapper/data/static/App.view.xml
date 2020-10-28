@@ -106,13 +106,20 @@
 
 						</ScrollContainer>
 
-						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
+						<ScrollContainer id="ESPLog" horizontal="false" vertical="true" height="100%">
 							<l:VerticalLayout class="sapUiContentPadding" width="100%">
 								<l:content>
-									<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
+								<VBox class="sapUiSmallMargin">
+								<Text 
+								renderWhitespace="true"
+								wrapping="true"
+								text="{dataBuffer>ESPLog}"/>
+								</VBox>
+								
+								<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
 										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
 										</NotificationListItem>
-									</List>
+								</List>
 								</l:content>
 
 							</l:VerticalLayout>

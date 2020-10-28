@@ -24,6 +24,8 @@ int vprintf_into_spiffs(const char* szFormat, va_list args) {
 	//write evaluated format string into buffer
 	int ret = vsnprintf (log_print_buffer, sizeof(log_print_buffer), szFormat, args);
 
+  dataBuffer.settings.log_print_buffer = log_print_buffer;
+
 	//output is now in buffer. write to file.
 	if(ret >= 0) {
     if(!SPIFFS.exists("/LOGS.txt")) {

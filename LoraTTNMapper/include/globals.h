@@ -135,13 +135,14 @@ typedef struct
   esp_sleep_wakeup_cause_t wakeup_reason;
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;
-  double gps_distance;  
+  double gps_distance;
 } deviceStatus_t;
 
 
 typedef struct
 {
   uint8_t sleep_time;
+  const char* log_print_buffer;
 } deviceSettings_t;
 
 
