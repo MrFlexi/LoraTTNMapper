@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "settings.h"
 
-eSPIFFS fileSystem;
+// eSPIFFS fileSystem;
 String message;
 
 const char *filename = "/settings.jsn";
