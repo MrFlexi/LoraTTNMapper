@@ -73,6 +73,10 @@ void AXP192_showstatus(void)
     ESP_LOGI(TAG, "USB powered %.2fV @ %.0fmAh", (pmu.getVbusVoltage() / 1000), pmu.getVbusCurrent());
   else
     ESP_LOGI(TAG, "USB not present");
+
+
+  int cur = pmu.getChargeControlCur();
+  ESP_LOGI(TAG, "Current charge control current = %d mA \n", cur);
 }
 
 void AXP192_event_handler(void)
@@ -150,10 +154,11 @@ void AXP192_init(void)
 
 
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
-     
     pmu.EnableCoulombcounter();    
-  
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
+
+    pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_550MA); 
+
     ESP_LOGI(TAG, "AXP192 PMU initialized");
 
     // switch power rails on

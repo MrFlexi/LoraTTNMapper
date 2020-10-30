@@ -5,6 +5,9 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+// Upload data to ESP 32 SPIFFS
+//pio run -t uploadfs
+
 #include "globals.h"
 
 // Defaults to window size 10
@@ -12,10 +15,12 @@
 AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
+static const char TAG[] = __FILE__;
 
 //--------------------------------------------------------------------------
 // log to spiffs
 //--------------------------------------------------------------------------
+
 
 #if (USE_SPIFF_LOGGING)
 static char log_print_buffer[512];
@@ -230,7 +235,7 @@ CAYENNE_IN_DEFAULT()
 
 String stringOne = "";
 
-static const char TAG[] = __FILE__;
+
 
 #if (HAS_INA)
 
@@ -405,10 +410,13 @@ void t_cyclic() // Intervall: Display Refresh
   // Refresh Display
 
 #if (USE_DISPLAY)
-ESP_LOGI(TAG, "update display");
+ESP_LOGV(TAG, "update display");
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
+
+
+esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -525,10 +533,17 @@ void setup()
   //--------------------------------------------------------------------  
   
   #if (USE_SPIFF_LOGGING)
+
+if ( SPIFFS.exists("/LOGS.txt")) {
+SPIFFS.remove("/LOGS.txt");
+}
+
+
   esp_log_set_vprintf(&vprintf_into_spiffs);  
-  esp_log_level_set("TAG", ESP_LOG_DEBUG);
+  esp_log_level_set(TAG, ESP_LOG_INFO);
   //write into log
-  esp_log_write(ESP_LOG_DEBUG, "TAG", "Hello World\n");
+  esp_log_write(ESP_LOG_INFO, TAG, "Hello World2\n");
+  esp_log_write(ESP_LOG_INFO, TAG, "starting...\n");
   #endif
 
 

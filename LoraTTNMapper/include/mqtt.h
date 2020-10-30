@@ -16,5 +16,6 @@ void callback(char *topic, byte *payload, unsigned int length);
 void reconnect();
 void mqtt_send();
 void setup_mqtt();
+void mqtt_send_irq();
 
 #endif

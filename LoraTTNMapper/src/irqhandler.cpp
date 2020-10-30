@@ -39,7 +39,11 @@ void irqHandler(void *pvParameters)
 #if (HAS_PMU)
 #if (USE_PMU_INTERRUPT)
     if (InterruptStatusRegister & PMU_IRQ_BIT)
+    {
+      mqtt_send_irq();
       AXP192_event_handler();
+    }
+      
 #endif
 #endif
 

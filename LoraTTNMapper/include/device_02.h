@@ -2,7 +2,7 @@
 #pragma once
 
 #define DEVICE_NAME "tbeam-02"
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280 1
 #define HAS_LORA 1
 
@@ -16,7 +16,7 @@
 
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
-#define USE_PMU_INTERRUPT 0
+#define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
 
 #define USE_BLE 0
