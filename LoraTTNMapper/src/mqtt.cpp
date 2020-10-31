@@ -175,7 +175,8 @@ void mqtt_send()
   doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
   doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
   doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-
+  doc["bat_max_charge_curr"] = String(dataBuffer.data.bat_max_charge_curr);
+  
   doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
   doc["bus_current"] = String( dataBuffer.data.bus_current);   
 

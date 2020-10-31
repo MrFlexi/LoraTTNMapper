@@ -47,6 +47,9 @@
 		{
 			"name": "ESP32_MotorRotaryController",
 			"path": "..\\..\\ESP32_MotorRotaryController"
+		},
+		{
+			"path": "..\\..\\AXP202X_Library"
 		}
 	],
 	"settings": {

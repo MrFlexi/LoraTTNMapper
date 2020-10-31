@@ -381,6 +381,7 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
+    dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
@@ -782,11 +783,7 @@ SPIFFS.remove("/LOGS.txt");
   createRTOStasks();
 #endif
   
-  //---------------------------------------------------------------
-  // Watchdog 
-  //---------------------------------------------------------------
-  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
+  
 
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
@@ -794,16 +791,23 @@ SPIFFS.remove("/LOGS.txt");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
   // get sensor values once
   t_cyclic();
+
+  //---------------------------------------------------------------
+  // Watchdog 
+  //---------------------------------------------------------------
+  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  // esp_task_wdt_add(NULL); //add current thread to WDT watch
+  enableLoopWDT();
+  ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
 }
-
-
 
 void loop()
 {
-esp_task_wdt_reset(); //reset timer ...feed watchdog
+// esp_task_wdt_reset(); //reset timer ...feed watchdog
+feedLoopWDT();
   
 #if (HAS_LORA)
-  os_runloop_once();
+os_runloop_once();
 #endif
 
 #if (USE_CAYENNE)

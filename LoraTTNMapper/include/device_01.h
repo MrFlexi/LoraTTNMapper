@@ -7,7 +7,7 @@
 
 #define HAS_LORA 1
 #define USE_MQTT 0
-#define HAS_INA 1
+#define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
@@ -21,14 +21,14 @@
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   0 
+#define USE_WEBSERVER   1 
 #define USE_CAYENNE 0
 #define USE_MQTT 1
 
-#define USE_GYRO  1
+#define USE_GYRO  0
 #define WAKEUP_BY_MOTION 0
 
-#define USE_FASTLED 1
+#define USE_FASTLED 0
 #define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
@@ -42,7 +42,7 @@
 #define LORA_TX_INTERVAL 30
 
 #define sendCycleIntervall     10 // every x seconds
-#define sendWebsocketIntervall  5 // every x seconds
+#define sendWebsocketIntervall  30 // every x seconds
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -55,7 +55,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0             // Main switch
+#define ESP_SLEEP 1             // Main switch
 #define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 25        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
