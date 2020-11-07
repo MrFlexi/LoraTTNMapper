@@ -10,9 +10,6 @@ uint8_t page_array[10];
 uint8_t max_page_counter;
 uint8_t page_counter = 0;
 
-#if (USE_SERIAL_BT)
-BluetoothSerial SerialBT;
-#endif
 
 void displayRegisterPages()
 {
@@ -20,6 +17,8 @@ void displayRegisterPages()
   max_page_counter = 0;
 
   page_array[max_page_counter] = PAGE_TBEAM;
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_MODULS;
 
 #if (HAS_LORA)
   max_page_counter++;
@@ -41,20 +40,12 @@ void displayRegisterPages()
   page_array[max_page_counter] = PAGE_GPS;
 #endif
 
-#if (USE_GYRO)
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_GYRO;
-#endif
-
 #if (USE_BME280)
   max_page_counter++;
   page_array[max_page_counter] = PAGE_SENSORS;
 #endif
 
-#if (USE_BLE_SCANNER)
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_CORONA;
-#endif
+
 
 
 
@@ -189,14 +180,34 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%2d ", dataBuffer.data.MotionCounter);
-      IP_String = dataBuffer.data.ip_address;
-
-      sprintf(sbuf, "%s", IP_String);
+      u8g2.printf("Sleep:%2d/%3d ", dataBuffer.data.MotionCounter, dataBuffer.settings.sleep_time);
+      IP_String = String(dataBuffer.data.ip_address); 
+      sprintf(sbuf, "IP: %s", IP_String);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
 
+      break;
+      case PAGE_MODULS:
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      sprintf(sbuf, "Moduls");
+      u8g2.drawStr(1, 15, sbuf);
+      
+      
+      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setCursor(1, 30);
+      if (dataBuffer.data.wlan)  u8g2.setDrawColor(0);
+      else u8g2.setDrawColor(1);
+      u8g2.printf("WLAN");
+
+      u8g2.setDrawColor(1);
+      u8g2.setCursor(64, 30);
+      u8g2.printf("LORA");
+      //u8g2.setCursor(1, 45);
+      //u8g2.printf("RX %.3d Len:%.2d", dataBuffer.data.rxCounter, dataBuffer.data.lmic.dataLen);
+      //u8g2.setCursor(1, 60);
+      //u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
+      
 #if (USE_OTA)
       availableModules = availableModules + "OTA ";
 #endif
@@ -228,9 +239,10 @@ void showPage(int page)
 
       Serial.println(availableModules);
       sprintf(sbuf, "%s", availableModules);
-      u8g2.drawStr(1, 64, sbuf);
+      u8g2.drawStr(1, 20, sbuf);
 
       break;
+
 
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -371,11 +383,8 @@ void showPage(int page)
       }
 
       u8g2.setCursor(1, 64);
-      u8g2.printf("Sleeping for %.2d min", dataBuffer.settings.sleep_time );
-#if (WAKEUP_BY_MOTION)
-      u8g2.setCursor(64, 55);
-      u8g2.printf(" move me !!", dataBuffer.settings.sleep_time );
-#endif
+      u8g2.printf("Sleeping for %3d min", dataBuffer.settings.sleep_time );
+
       drawSymbol(60, 12, SUN);
       break;
     }

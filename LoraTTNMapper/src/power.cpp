@@ -158,7 +158,7 @@ void AXP192_init(void)
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
     pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_550MA);
-    pmu.setVoffVoltage(AXPxxx_VOFF_VOLTAGE33);
+    pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
 
 
     ESP_LOGI(TAG, "AXP192 PMU initialized");

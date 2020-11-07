@@ -15,7 +15,7 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-#define PAGE_COUNT 8
+//#define PAGE_COUNT 8
 
 #define PAGE_TBEAM 1
 #define PAGE_LORA 2
@@ -25,6 +25,7 @@
 #define PAGE_SENSORS 6
 #define PAGE_GYRO 7
 #define PAGE_CORONA 8
+#define PAGE_MODULS 9
 
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
 
@@ -33,7 +34,6 @@
 #define U8LOG_HEIGHT 6
 
 #include <U8g2lib.h>
-//#include <ss_oled.h>
 
 extern HAS_DISPLAY u8g2;             // 
 extern U8G2LOG u8g2log;             // Create a U8g2log object
@@ -67,8 +67,5 @@ class DataBuffer
 
 extern DataBuffer dataBuffer;
 
-#if (USE_SERIAL_BT)
-extern BluetoothSerial SerialBT;
-#endif
 
 #endif

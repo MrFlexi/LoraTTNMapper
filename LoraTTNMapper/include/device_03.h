@@ -18,18 +18,12 @@
 #define USE_PMU_INTERRUPT 0
 #define USE_BUTTON 0
 
-#define USE_BLE 0
-#define USE_BLE_SCANNER 0               // Corona Warn App
-#define USE_SERIAL_BT 0
-
 #define USE_WIFI 1
 #define USE_MQTT 1
 #define USE_WEBSERVER   1 
 #define USE_CAYENNE 0
 #define HAS_LORA 0
 
-#define USE_GYRO  0
-#define WAKEUP_BY_MOTION 0
 
 #define USE_FASTLED 1
 #define USE_FASTLED_RTOS 0
@@ -62,7 +56,6 @@
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1              // Main switch
-#define uS_TO_S_FACTOR 1000000   //* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  24       // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events

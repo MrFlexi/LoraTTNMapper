@@ -318,11 +318,6 @@ void t_send_cycle()
   ble_send();
 #endif
 
-#if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED)
-    update_web_dash();
-#endif
-
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
     mqtt_send();
@@ -336,20 +331,7 @@ void t_cyclicRTOS(void *pvParameters)
 
   while (1)
   {
-#if (USE_BLE_SCANNER)
-    ble_loop();
 
-    // Werte holen
-    foo = *((DataBuffer *)pvParameters);
-
-    Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
-    foo.data.CoronaDeviceCount = getCoronaDeviceCount();
-
-    // Werte wieder zurückschreiben
-    *(DataBuffer *)pvParameters = foo;
-
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-#endif
   }
 }
 
@@ -503,19 +485,6 @@ void setup_wifi()
 #endif
 }
 
-void createRTOStasks()
-{
-
-#if (USE_BLE_SCANNER)
-  xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
-                          "t_cyclic",            // name of task
-                          4096,                  // stack size of task
-                          (void *)&dataBuffer,   // parameter of the task
-                          2,                     // priority of the task
-                          &t_cyclic_HandlerTask, // task handle
-                          1);                    // CPU core
-#endif
-}
 
 void setup()
 {
@@ -579,12 +548,6 @@ SPIFFS.remove("/LOGS.txt");
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
 
-  // Bluethooth Serial + BLE
-#if (USE_SERIAL_BT)
-  SerialBT.begin("T-BEAM_01"); //Bluetooth device name
-  Serial.println("The device started, now you can pair it with bluetooth!");
-  delay(100);
-#endif
 
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
@@ -623,7 +586,7 @@ SPIFFS.remove("/LOGS.txt");
 #if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
   //Turn off Bluetooth
-  log_display("BLUETHOOTH OFF");
+  log_display("Bluethooth off");
   btStop();
 #endif
 
@@ -719,7 +682,9 @@ SPIFFS.remove("/LOGS.txt");
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup( dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60);
+
+  uint64_t s_time_us = dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60;
+  esp_sleep_enable_timer_wakeup( s_time_us );
   log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
               " min");
 
@@ -727,20 +692,14 @@ SPIFFS.remove("/LOGS.txt");
   esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
 #endif
 
-#if (WAKEUP_BY_MOTION)
-#if (USE_GYRO)
-#ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
 #endif
-#endif
-#endif
-#endif
+
 
   //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
-  delay(100);
+  delay(10);
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
@@ -776,15 +735,7 @@ SPIFFS.remove("/LOGS.txt");
                           1);              // CPU core
 #endif
 
-  //---------------------------------------------------------------
-  // RTOS Tasks
-  //---------------------------------------------------------------
-#if (USE_BLE_SCANNER)
-  createRTOStasks();
-#endif
-  
-  
-
+ 
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
@@ -795,16 +746,16 @@ SPIFFS.remove("/LOGS.txt");
   //---------------------------------------------------------------
   // Watchdog 
   //---------------------------------------------------------------
-  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  //esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
   // esp_task_wdt_add(NULL); //add current thread to WDT watch
-  enableLoopWDT();
+  //enableLoopWDT();
   ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
 }
 
 void loop()
 {
 // esp_task_wdt_reset(); //reset timer ...feed watchdog
-feedLoopWDT();
+//feedLoopWDT();
   
 #if (HAS_LORA)
 os_runloop_once();

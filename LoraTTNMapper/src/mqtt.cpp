@@ -117,8 +117,10 @@ void reconnect()
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_mosi, topic_in);
 
+  int i = 0;
+
   // Loop until we're reconnected
-  while (!MqttClient.connected())
+  while (!MqttClient.connected() && (i < 4 ) )
   {
     ESP_LOGI(TAG, "Attempting MQTT connection...");
     // Attempt to connect
@@ -134,8 +136,9 @@ void reconnect()
       Serial.print(MqttClient.state());
       ESP_LOGE(TAG, " try again in 5 seconds");
       // Wait 5 seconds before retrying
-      delay(5000);
+      delay(1000);
     }
+    i++;
   }
 }
 
@@ -165,8 +168,9 @@ void mqtt_send()
 
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
-  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-
+  
+  if (MqttClient.connected())
+  {
   doc.clear();
   doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String(dataBuffer.data.bootCounter);
@@ -198,9 +202,14 @@ void mqtt_send()
   char buffer[600];
   serializeJson(doc, buffer);
   MqttClient.publish(topic_out, buffer);
-  serializeJsonPretty(doc, buffer);
-  ESP_LOGI(TAG, "Payload: %s", buffer);
-  Serial.println();
+  //serializeJsonPretty(doc, buffer);
+  //ESP_LOGI(TAG, "Payload: %s", buffer);
+  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
 }
 
 
@@ -210,6 +219,8 @@ void mqtt_send_irq()
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
+if (MqttClient.connected())
+{
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_irq, topic_out);
   ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
@@ -224,6 +235,10 @@ void mqtt_send_irq()
   MqttClient.publish(topic_out, buffer);
   //serializeJsonPretty(doc, buffer);
   //ESP_LOGI(TAG, "Payload: %s", buffer);
-  Serial.println();
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
 }
 #endif
