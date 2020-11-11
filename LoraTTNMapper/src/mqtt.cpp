@@ -184,8 +184,9 @@ void mqtt_send()
   doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
   doc["bus_current"] = String( dataBuffer.data.bus_current);   
 
-  doc["panel_voltage"] = dataBuffer.data.panel_voltage;
-  doc["panel_current"] = dataBuffer.data.panel_current;
+  Serial.println(dataBuffer.data.panel_voltage);
+  doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
+  doc["panel_current"] = String(dataBuffer.data.panel_current);
 
   doc["TXCounter"] = String(dataBuffer.data.txCounter);
   doc["temperature"] = String(dataBuffer.data.temperature);

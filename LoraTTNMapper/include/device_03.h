@@ -3,9 +3,9 @@
 
 #define DEVICE_NAME "esp-01"
 #define USE_OTA 0
-#define USE_BME280 1
+#define USE_BME280 0
 
-#define HAS_INA  0
+#define HAS_INA  1
 #define USE_DASH 0
 #define USE_GPS 0
 
@@ -55,7 +55,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
+#define ESP_SLEEP 0              // Main switch
 #define TIME_TO_SLEEP  24       // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events

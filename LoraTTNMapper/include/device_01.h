@@ -7,7 +7,6 @@
 
 #define HAS_LORA 1
 #define HAS_INA 0
-#define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -22,7 +21,7 @@
 #define USE_CAYENNE 0
 #define USE_MQTT 1
 
-#define USE_FASTLED 0
+#define USE_FASTLED 1
 #define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
@@ -49,7 +48,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1             // Main switch
+#define ESP_SLEEP 0             // Main switch
 
 #define TIME_TO_SLEEP 25        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
