@@ -9,12 +9,13 @@
 #include <esp_task_wdt.h>
 
 
-#define WDT_TIMEOUT 10           // Watchdog time out 3 seconds
+#define WDT_TIMEOUT 10          // Watchdog time out x seconds
+#define uS_TO_S_FACTOR 1000000UL  //* Conversion factor for micro seconds to seconds */
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  3
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -26,7 +27,7 @@
 #include "../src/hal/ttgobeam10.h"
 #endif
 
-#if DEVICE_ID == 3                 // TBEAM-02 Device EU ID = DE00000000000011
+#if DEVICE_ID == 3                 // 
 #include "device_03.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
@@ -63,14 +64,8 @@ extern WiFiClient wifiClient;
 #include <Adafruit_BME280.h>
 #endif
 
-#if (USE_SERIAL_BT)
-#include "BluetoothSerial.h"
-#endif
-
 #include "gps.h"
-
 #include "esp_log.h"
-//#include <Preferences.h>
 
 //--------------------------------------------------------------------------
 // Wifi Settings
@@ -78,7 +73,6 @@ extern WiFiClient wifiClient;
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
-
 
 extern volatile bool mpuInterrupt;
 
@@ -115,6 +109,7 @@ typedef struct
   uint32_t bat_ChargeCoulomb = 0;
   uint32_t bat_DischargeCoulomb = 0;
   float    bat_DeltamAh = 0;
+  uint8_t  bat_max_charge_curr = 0;
   bool  wlan;
   bool  pictureLoop = true;
   float firmware_version;
@@ -181,24 +176,12 @@ extern SDL_Arduino_INA3221 ina3221;
 #include "button.h"
 #endif
 
-#if (USE_DASH)
-#include "dash.h"
-#endif
-
 #if (HAS_LORA)
 #include "lora.h"
 #endif
 
 #if (USE_OTA)
 #include "SecureOTA.h"
-#endif
-
-#if (USE_GYRO)
-#include "gyro.h"
-#endif
-
-#if (USE_BLE_SCANNER)
-#include "ble_scanner.h"
 #endif
 
 

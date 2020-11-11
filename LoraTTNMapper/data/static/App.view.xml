@@ -111,25 +111,20 @@
 								<l:content>
 								<VBox class="sapUiSmallMargin">
 								<Text 
-								renderWhitespace="true"
+								renderWhitespace="false"
 								wrapping="true"
-								text="{dataBuffer>ESPLog}"/>
+								text="{dataBuffer>/ESPLog}"/>
 								</VBox>
-								
-								<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
-										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
-										</NotificationListItem>
-								</List>
-								</l:content>
-
+							</l:content>
 							</l:VerticalLayout>
-							
-							
-
-						</ScrollContainer>
+							</ScrollContainer>
 
 						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
 							<Text text="This is the root page of the second element"/>
+							<List headerText="Messages" items="{path: 'dataBuffer>/text_table'}">
+										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
+										</NotificationListItem>
+								</List>
 						</ScrollContainer>
 					</pages>
 				</NavContainer>

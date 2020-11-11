@@ -5,48 +5,7 @@
 			"path": "."
 		},
 		{
-			"name": "GPS_USART",
-			"path": "C:\\Users\\TTv060\\Desktop\\Projects\\LoraTTNMapper\\GPS_USART"
-		},
-		{
-			"name": "Test ADXL",
-			"path": "D:\\Jochen\\Projekte\\Arduino\\Sketches\\Test ADXL"
-		},
-		{
-			"name": "ADXL Test 2",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\ADXL Test 2"
-		},
-		{
-			"name": "Test Gyroskop",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Test Gyroskop"
-		},
-		{
-			"name": "Gyro Teepot",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Gyro Teepot"
-		},
-		{
-			"name": "FastLed",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\FastLed"
-		},
-		{
-			"name": "Test RTOS 1",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\Test RTOS 1"
-		},
-		{
-			"name": "ESP32_LEGO_BOOST",
-			"path": "..\\..\\ESP32_LEGO_BOOST"
-		},
-		{
-			"name": "NodeMcu_Cny70",
-			"path": "C:\\Users\\Jogi\\Documents\\PlatformIO\\Projects\\NodeMcu_Cny70"
-		},
-		{
-			"name": "NodeMcu_CNY70_Position_Controll",
-			"path": "..\\..\\NodeMcu_CNY70_Position_Controll"
-		},
-		{
-			"name": "ESP32_MotorRotaryController",
-			"path": "..\\..\\ESP32_MotorRotaryController"
+			"path": "..\\..\\AXP202X_Library"
 		}
 	],
 	"settings": {

@@ -9,6 +9,7 @@ const char *mqtt_server = "85.209.49.65"; // Netcup
 const char *mqtt_topic = "mrflexi/device/";
 const char *mqtt_topic_mosi = "/mosi";
 const char *mqtt_topic_miso = "/miso";
+const char *mqtt_topic_irq = "/miso/irq";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
@@ -116,8 +117,10 @@ void reconnect()
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_mosi, topic_in);
 
+  int i = 0;
+
   // Loop until we're reconnected
-  while (!MqttClient.connected())
+  while (!MqttClient.connected() && (i < 4 ) )
   {
     ESP_LOGI(TAG, "Attempting MQTT connection...");
     // Attempt to connect
@@ -133,8 +136,9 @@ void reconnect()
       Serial.print(MqttClient.state());
       ESP_LOGE(TAG, " try again in 5 seconds");
       // Wait 5 seconds before retrying
-      delay(5000);
+      delay(1000);
     }
+    i++;
   }
 }
 
@@ -164,8 +168,9 @@ void mqtt_send()
 
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
-  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-
+  
+  if (MqttClient.connected())
+  {
   doc.clear();
   doc["device"] = DEVICE_NAME;
   doc["BootCounter"] = String(dataBuffer.data.bootCounter);
@@ -174,12 +179,14 @@ void mqtt_send()
   doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
   doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
   doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-
+  doc["bat_max_charge_curr"] = String(dataBuffer.data.bat_max_charge_curr);
+  
   doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
   doc["bus_current"] = String( dataBuffer.data.bus_current);   
 
-  doc["panel_voltage"] = dataBuffer.data.panel_voltage;
-  doc["panel_current"] = dataBuffer.data.panel_current;
+  Serial.println(dataBuffer.data.panel_voltage);
+  doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
+  doc["panel_current"] = String(dataBuffer.data.panel_current);
 
   doc["TXCounter"] = String(dataBuffer.data.txCounter);
   doc["temperature"] = String(dataBuffer.data.temperature);
@@ -196,8 +203,43 @@ void mqtt_send()
   char buffer[600];
   serializeJson(doc, buffer);
   MqttClient.publish(topic_out, buffer);
-  serializeJsonPretty(doc, buffer);
-  ESP_LOGI(TAG, "Payload: %s", buffer);
-  Serial.println();
+  //serializeJsonPretty(doc, buffer);
+  //ESP_LOGI(TAG, "Payload: %s", buffer);
+  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
+}
+
+
+void mqtt_send_irq()
+{
+  const int capacity = JSON_OBJECT_SIZE(10) + JSON_OBJECT_SIZE(2);
+  StaticJsonDocument<capacity> doc;
+  char topic_out[40];
+
+if (MqttClient.connected())
+{
+  // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
+  doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_irq, topic_out);
+  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+
+  doc.clear();
+  doc["device"] = DEVICE_NAME;
+  doc["BootCounter"] = String(dataBuffer.data.bootCounter);
+  doc["irq"] = "IRQ";
+  
+  char buffer[600];
+  serializeJson(doc, buffer);
+  MqttClient.publish(topic_out, buffer);
+  //serializeJsonPretty(doc, buffer);
+  //ESP_LOGI(TAG, "Payload: %s", buffer);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
 }
 #endif

@@ -5,6 +5,9 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+// Upload data to ESP 32 SPIFFS
+//pio run -t uploadfs
+
 #include "globals.h"
 
 // Defaults to window size 10
@@ -12,10 +15,12 @@
 AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
+static const char TAG[] = __FILE__;
 
 //--------------------------------------------------------------------------
 // log to spiffs
 //--------------------------------------------------------------------------
+
 
 #if (USE_SPIFF_LOGGING)
 static char log_print_buffer[512];
@@ -230,7 +235,7 @@ CAYENNE_IN_DEFAULT()
 
 String stringOne = "";
 
-static const char TAG[] = __FILE__;
+
 
 #if (HAS_INA)
 
@@ -313,11 +318,6 @@ void t_send_cycle()
   ble_send();
 #endif
 
-#if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED)
-    update_web_dash();
-#endif
-
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
     mqtt_send();
@@ -331,20 +331,7 @@ void t_cyclicRTOS(void *pvParameters)
 
   while (1)
   {
-#if (USE_BLE_SCANNER)
-    ble_loop();
 
-    // Werte holen
-    foo = *((DataBuffer *)pvParameters);
-
-    Serial.printf("Corona Count/Ble Count = : %i / %i \n", getCoronaDeviceCount(), getBleDeviceCount());
-    foo.data.CoronaDeviceCount = getCoronaDeviceCount();
-
-    // Werte wieder zurückschreiben
-    *(DataBuffer *)pvParameters = foo;
-
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-#endif
   }
 }
 
@@ -376,6 +363,7 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
+    dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
 
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
@@ -405,10 +393,13 @@ void t_cyclic() // Intervall: Display Refresh
   // Refresh Display
 
 #if (USE_DISPLAY)
-ESP_LOGI(TAG, "update display");
+ESP_LOGV(TAG, "update display");
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
+
+
+esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -494,19 +485,6 @@ void setup_wifi()
 #endif
 }
 
-void createRTOStasks()
-{
-
-#if (USE_BLE_SCANNER)
-  xTaskCreatePinnedToCore(t_cyclicRTOS,          // task function
-                          "t_cyclic",            // name of task
-                          4096,                  // stack size of task
-                          (void *)&dataBuffer,   // parameter of the task
-                          2,                     // priority of the task
-                          &t_cyclic_HandlerTask, // task handle
-                          1);                    // CPU core
-#endif
-}
 
 void setup()
 {
@@ -525,10 +503,17 @@ void setup()
   //--------------------------------------------------------------------  
   
   #if (USE_SPIFF_LOGGING)
+
+if ( SPIFFS.exists("/LOGS.txt")) {
+SPIFFS.remove("/LOGS.txt");
+}
+
+
   esp_log_set_vprintf(&vprintf_into_spiffs);  
-  esp_log_level_set("TAG", ESP_LOG_DEBUG);
+  esp_log_level_set(TAG, ESP_LOG_INFO);
   //write into log
-  esp_log_write(ESP_LOG_DEBUG, "TAG", "Hello World\n");
+  esp_log_write(ESP_LOG_INFO, TAG, "Hello World2\n");
+  esp_log_write(ESP_LOG_INFO, TAG, "starting...\n");
   #endif
 
 
@@ -563,12 +548,6 @@ void setup()
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
 
-  // Bluethooth Serial + BLE
-#if (USE_SERIAL_BT)
-  SerialBT.begin("T-BEAM_01"); //Bluetooth device name
-  Serial.println("The device started, now you can pair it with bluetooth!");
-  delay(100);
-#endif
 
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
@@ -607,7 +586,7 @@ void setup()
 #if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
   //Turn off Bluetooth
-  log_display("BLUETHOOTH OFF");
+  log_display("Bluethooth off");
   btStop();
 #endif
 
@@ -703,7 +682,9 @@ void setup()
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
-  esp_sleep_enable_timer_wakeup( dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60);
+
+  uint64_t s_time_us = dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60;
+  esp_sleep_enable_timer_wakeup( s_time_us );
   log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
               " min");
 
@@ -711,20 +692,14 @@ void setup()
   esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
 #endif
 
-#if (WAKEUP_BY_MOTION)
-#if (USE_GYRO)
-#ifdef GYRO_INT_PIN
-  esp_sleep_enable_ext0_wakeup(GYRO_INT_PIN, 0); //1 = High, 0 = Low
 #endif
-#endif
-#endif
-#endif
+
 
   //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
-  delay(100);
+  delay(10);
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
@@ -760,35 +735,30 @@ void setup()
                           1);              // CPU core
 #endif
 
-  //---------------------------------------------------------------
-  // RTOS Tasks
-  //---------------------------------------------------------------
-#if (USE_BLE_SCANNER)
-  createRTOStasks();
-#endif
-  
-  //---------------------------------------------------------------
-  // Watchdog 
-  //---------------------------------------------------------------
-  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
-
+ 
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
   // get sensor values once
   t_cyclic();
+
+  //---------------------------------------------------------------
+  // Watchdog 
+  //---------------------------------------------------------------
+  //esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  // esp_task_wdt_add(NULL); //add current thread to WDT watch
+  //enableLoopWDT();
+  ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
 }
-
-
 
 void loop()
 {
-esp_task_wdt_reset(); //reset timer ...feed watchdog
+// esp_task_wdt_reset(); //reset timer ...feed watchdog
+//feedLoopWDT();
   
 #if (HAS_LORA)
-  os_runloop_once();
+os_runloop_once();
 #endif
 
 #if (USE_CAYENNE)
