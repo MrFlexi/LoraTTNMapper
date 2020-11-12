@@ -1,5 +1,5 @@
 #include "globals.h"
-#include "ina.h"
+#include "i2c_sensors.h"
 
 
 #if (HAS_INA219)
@@ -88,3 +88,60 @@ ina3221.begin();
 }
 
 #endif
+
+
+#if (USE_BME280)
+
+  Adafruit_BME280 bme;
+
+  void setup_bme280()
+  {
+  ESP_LOGI(TAG, "BME280 Setup...");
+  unsigned status;
+
+  status = bme.begin(0x76);
+  if (!status)
+  {
+    ESP_LOGI(TAG, "Could not find a valid BME280 sensor");
+  }
+  else
+  {
+    Serial.println();
+    Serial.print("Temperature = ");
+    Serial.print(bme.readTemperature());
+    Serial.println(" *C");
+    Serial.print("Pressure = ");
+    Serial.print(bme.readPressure() / 100.0F);
+    Serial.println(" hPa");
+    Serial.print("Approx. Altitude = ");
+    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    Serial.println(" m");
+    Serial.print("Humidity = ");
+    Serial.print(bme.readHumidity());
+    Serial.println(" %");
+    Serial.println();
+  }
+  }
+#endif
+
+
+
+
+
+
+void setup_i2c_sensors()
+{
+
+#if (HAS_INA3221)
+setup_ina3221();
+#endif
+
+#if (HAS_INA219)
+setup_ina219();
+#endif
+
+#if (USE_BME280)
+setup_bme280();
+#endif
+
+}

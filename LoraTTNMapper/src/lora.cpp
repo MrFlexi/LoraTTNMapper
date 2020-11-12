@@ -217,6 +217,16 @@ void setup_lora()
   LMIC_setDrTxpow(DR_SF12, 14);
 
   t_LORA_send_from_queue(&sendjob);
+
+
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+
 }
 
 void onEvent(ev_t ev)
