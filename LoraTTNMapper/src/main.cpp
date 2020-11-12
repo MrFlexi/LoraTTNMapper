@@ -237,38 +237,9 @@ String stringOne = "";
 
 
 
-#if (HAS_INA)
 
-SDL_Arduino_INA3221 ina3221;
 
-void print_ina()
-{
-  Serial.println("");
-  float shuntvoltage1 = 0;
-  float busvoltage1 = 0;
-  float current_mA1 = 0;
-  float loadvoltage1 = 0;
 
-  busvoltage1 = ina3221.getBusVoltage_V(1);
-  shuntvoltage1 = ina3221.getShuntVoltage_mV(1);
-  current_mA1 = -ina3221.getCurrent_mA(1); // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
-  loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
-
-  Serial.print("Bus Voltage:");
-  Serial.print(busvoltage1);
-  Serial.println(" V");
-  Serial.print("Shunt Voltage:");
-  Serial.print(shuntvoltage1);
-  Serial.println(" mV");
-  Serial.print("Battery Load Voltage:");
-  Serial.print(loadvoltage1);
-  Serial.println(" V");
-  Serial.print("Battery Current 1:");
-  Serial.print(current_mA1);
-  Serial.println(" mA");
-  Serial.println("");
-}
-#endif
 
 void touch_callback()
 {
@@ -369,11 +340,18 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
-#if (HAS_INA)
-    //print_ina();
+#if (HAS_INA3221)
+    print_ina3221();
     dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
     dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
+
+#if (HAS_INA219)
+    print_ina219();
+    dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
+    dataBuffer.data.panel_current = ina219.getCurrent_mA();
+#endif
+
 
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
@@ -563,14 +541,15 @@ SPIFFS.remove("/LOGS.txt");
   delay(1000);
 #endif
 
-#if (HAS_INA)
-  ina3221.begin();
-  Serial.print("Manufact. ID=0x");
-  int MID;
-  MID = ina3221.getManufID();
-  Serial.println(MID, HEX);
-  print_ina();
+#if (HAS_INA3221)
+  setup_ina3221();
 #endif
+
+#if (HAS_INA219)
+setup_ina219();  
+#endif
+
+
 
   dataBuffer.data.txCounter = 0;
   dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;

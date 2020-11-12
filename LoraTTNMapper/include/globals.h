@@ -164,9 +164,15 @@ extern QueueHandle_t LoraSendQueue;
 #include "irqhandler.h"
 #include "payload.h"
 
-#if (HAS_INA)
-extern SDL_Arduino_INA3221 ina3221;
+#if (HAS_INA3221)
+#include "ina.h"
 #endif
+
+#if (HAS_INA219)
+#include "ina.h"
+#endif
+
+
 
 #if (USE_MQTT)
 #include "mqtt.h"

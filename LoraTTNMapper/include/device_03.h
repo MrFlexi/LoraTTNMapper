@@ -5,7 +5,8 @@
 #define USE_OTA 0
 #define USE_BME280 0
 
-#define HAS_INA  1
+#define HAS_INA3221  0
+#define HAS_INA219 1
 #define USE_DASH 0
 #define USE_GPS 0
 
