@@ -145,12 +145,6 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   delay(100);
 }
 
-//--------------------------------------------------------------------------
-// Sensors
-//--------------------------------------------------------------------------
-#if (USE_BME280)
-Adafruit_BME280 bme; // I2C   PIN 21 + 22
-#endif
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -235,76 +229,16 @@ CAYENNE_IN_DEFAULT()
 
 String stringOne = "";
 
-
-
-#if (HAS_INA)
-
-SDL_Arduino_INA3221 ina3221;
-
-void print_ina()
-{
-  Serial.println("");
-  float shuntvoltage1 = 0;
-  float busvoltage1 = 0;
-  float current_mA1 = 0;
-  float loadvoltage1 = 0;
-
-  busvoltage1 = ina3221.getBusVoltage_V(1);
-  shuntvoltage1 = ina3221.getShuntVoltage_mV(1);
-  current_mA1 = -ina3221.getCurrent_mA(1); // minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
-  loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000);
-
-  Serial.print("Bus Voltage:");
-  Serial.print(busvoltage1);
-  Serial.println(" V");
-  Serial.print("Shunt Voltage:");
-  Serial.print(shuntvoltage1);
-  Serial.println(" mV");
-  Serial.print("Battery Load Voltage:");
-  Serial.print(loadvoltage1);
-  Serial.println(" V");
-  Serial.print("Battery Current 1:");
-  Serial.print(current_mA1);
-  Serial.println(" mA");
-  Serial.println("");
-}
-#endif
-
 void touch_callback()
 {
   //placeholder callback function
 }
 
-void setup_sensors()
-{
-#if (USE_BME280)
-  ESP_LOGI(TAG, "BME280 Setup...");
-  unsigned status;
 
-  status = bme.begin(0x76);
-  if (!status)
-  {
-    ESP_LOGI(TAG, "Could not find a valid BME280 sensor");
-  }
-  else
-  {
-    Serial.println();
-    Serial.print("Temperature = ");
-    Serial.print(bme.readTemperature());
-    Serial.println(" *C");
-    Serial.print("Pressure = ");
-    Serial.print(bme.readPressure() / 100.0F);
-    Serial.println(" hPa");
-    Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial.println(" m");
-    Serial.print("Humidity = ");
-    Serial.print(bme.readHumidity());
-    Serial.println(" %");
-    Serial.println();
-  }
-#endif
-}
+
+//---------------------------------------------------------------------------------
+// Send Messages via Cayenne or MQTT
+//---------------------------------------------------------------------------------
 
 void t_send_cycle()
 {
@@ -314,9 +248,6 @@ void t_send_cycle()
     Cayenne_send();
 #endif
 
-#if (USE_BLE)
-  ble_send();
-#endif
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
@@ -334,6 +265,12 @@ void t_cyclicRTOS(void *pvParameters)
 
   }
 }
+
+
+
+//---------------------------------------------------------------------------------
+// Get sensor values and update display
+//---------------------------------------------------------------------------------
 
 void t_cyclic() // Intervall: Display Refresh
 {
@@ -369,11 +306,18 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
 
-#if (HAS_INA)
-    //print_ina();
+#if (HAS_INA3221)
+    print_ina3221();
     dataBuffer.data.panel_voltage = ina3221.getBusVoltage_V(1);
     dataBuffer.data.panel_current = ina3221.getCurrent_mA(1);
 #endif
+
+#if (HAS_INA219)
+    print_ina219();
+    dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
+    dataBuffer.data.panel_current = ina219.getCurrent_mA();
+#endif
+
 
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
@@ -412,12 +356,12 @@ esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temp
 
 }
 
+
+//---------------------------------------------------------------------------------
+// Check deep sleep conditions
+//---------------------------------------------------------------------------------
 void t_sleep()
 {
-  //-----------------------------------------------------
-  // Deep sleep
-  //-----------------------------------------------------
-
   gps.getDistance();
 
 #if (ESP_SLEEP)
@@ -446,6 +390,8 @@ void t_sleep()
   }
 #endif
 }
+
+
 
 void setup_wifi()
 {
@@ -497,7 +443,6 @@ void setup()
   setup_filesystem();
   loadConfiguration();
 
-
 //--------------------------------------------------------------------
   // Logging
   //--------------------------------------------------------------------  
@@ -529,15 +474,6 @@ SPIFFS.remove("/LOGS.txt");
 
   print_wakeup_reason();
   display_chip_info();
-#if (HAS_LORA)
-  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
-           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
-  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
-           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
-           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
-#endif // HAS_LORA
 
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
@@ -563,13 +499,8 @@ SPIFFS.remove("/LOGS.txt");
   delay(1000);
 #endif
 
-#if (HAS_INA)
-  ina3221.begin();
-  Serial.print("Manufact. ID=0x");
-  int MID;
-  MID = ina3221.getManufID();
-  Serial.println(MID, HEX);
-  print_ina();
+#if (HAS_INA3221 || HAS_INA219 || USE_BME280 )
+setup_i2c_sensors();
 #endif
 
   dataBuffer.data.txCounter = 0;
@@ -577,8 +508,7 @@ SPIFFS.remove("/LOGS.txt");
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
-  setup_display();
-  setup_sensors();
+  setup_display(); 
   setup_wifi();
   calibrate_voltage();
   delay(500);
@@ -631,12 +561,6 @@ SPIFFS.remove("/LOGS.txt");
   delay(500);
 #endif
 
-#if (USE_DASH)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    create_web_dash();
-  }
-#endif
 
 #if (USE_BUTTON)
 #ifdef BUTTON_PIN
@@ -646,12 +570,8 @@ SPIFFS.remove("/LOGS.txt");
 #endif
 
 
-
 #if (USE_WEBSERVER)
   setup_webserver();
-#endif
-
-#if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
     ws.onEvent(onWsEvent);
@@ -673,16 +593,11 @@ SPIFFS.remove("/LOGS.txt");
   poti_setup_RTOS();
 #endif
 
-#if (USE_BLE_SCANNER)
-  ble_setup();
-  ble_loop();
-#endif
 
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
-
   uint64_t s_time_us = dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60;
   esp_sleep_enable_timer_wakeup( s_time_us );
   log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
@@ -710,6 +625,11 @@ SPIFFS.remove("/LOGS.txt");
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
 
+
+
+ //-------------------------------------------------------------------------------
+ // Websocket Task
+ //-------------------------------------------------------------------------------
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -749,7 +669,7 @@ SPIFFS.remove("/LOGS.txt");
   //esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
   // esp_task_wdt_add(NULL); //add current thread to WDT watch
   //enableLoopWDT();
-  ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
+  //ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
 }
 
 void loop()

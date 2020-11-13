@@ -5,16 +5,16 @@
 #define USE_OTA 0
 #define USE_BME280 0
 
-#define HAS_INA  1
-#define USE_DASH 0
-#define USE_GPS 0
+#define HAS_INA3221  1
+#define HAS_INA219 1
+#define USE_GPS 1
 
-#define HAS_PMU 0
+#define HAS_PMU 1
 
 #define USE_DISPLAY 1
 #define CYCLIC_SHOW_LOG 1
 
-#define USE_INTERRUPTS 0
+#define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 0
 #define USE_BUTTON 0
 
@@ -32,14 +32,14 @@
 
 #define USE_POTI 0
 
-#define displayRefreshIntervall 2       // every x second
-#define displayMoveIntervall 7          // every x second
+#define displayRefreshIntervall 2       // get sensor values and update display     ---> t_cyclic
+#define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
-#define LORAenqueueMessagesIntervall 60 // every x seconds
-#define LORA_TX_INTERVAL 30
+#define LORAenqueueMessagesIntervall 60 // Queue Lora messages
+#define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 
-#define sendCycleIntervall      60 // every x seconds
-#define sendWebsocketIntervall  10 // every x seconds
+#define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall  10 // Update Webpage
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51

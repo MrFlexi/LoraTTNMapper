@@ -59,10 +59,6 @@ extern WiFiClient wifiClient;
 #include "websocket.h"
 #endif
 
-#if (USE_BME280)
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#endif
 
 #include "gps.h"
 #include "esp_log.h"
@@ -164,9 +160,10 @@ extern QueueHandle_t LoraSendQueue;
 #include "irqhandler.h"
 #include "payload.h"
 
-#if (HAS_INA)
-extern SDL_Arduino_INA3221 ina3221;
+#if (HAS_INA3221 || HAS_INA219 || USE_BME280 )
+#include "i2c_sensors.h"
 #endif
+
 
 #if (USE_MQTT)
 #include "mqtt.h"
