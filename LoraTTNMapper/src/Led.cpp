@@ -168,7 +168,7 @@ if ( value > FastLED.getBrightness() )
     FastLED.setBrightness(heatIndex);
 
     // fill the entire strip with the current color
-    fill_solid(leds, NUM_LEDS, color);
+    fill_solid(leds, NUM_LEDS, CRGB::White);
     FastLED.show();
     delay(1);
   }
@@ -181,7 +181,7 @@ else
     CRGB color = ColorFromPalette(LavaColors_p, heatIndex);
 
     FastLED.setBrightness(heatIndex);
-    fill_solid(leds, NUM_LEDS, color);
+    fill_solid(leds, NUM_LEDS, CRGB::White);
     FastLED.show();
     delay(1);
   }

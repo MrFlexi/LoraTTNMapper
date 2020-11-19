@@ -3,7 +3,7 @@
 
 #define DEVICE_NAME "tbeam-02"
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 
 #define HAS_INA 0

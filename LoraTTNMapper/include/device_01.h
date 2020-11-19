@@ -49,8 +49,8 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 0             // Main switch
+#define ESP_SLEEP 1            // Main switch
 
-#define TIME_TO_SLEEP 25        // sleep for n minute
+#define TIME_TO_SLEEP 5        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events

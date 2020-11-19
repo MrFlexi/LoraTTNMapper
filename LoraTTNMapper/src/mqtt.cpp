@@ -23,6 +23,7 @@ void doConcat(const char *a, const char *b, const char *c, char *out)
 
 void mqtt_loop()
 {
+  
   // MQTT Connection
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -108,6 +109,13 @@ void callback(char *topic, byte *payload, unsigned int length)
       ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);      
       saveConfiguration();
     }
+
+    if (action == "set_experiment")
+    {
+      dataBuffer.settings.experiment = value;
+      ESP_LOGI(TAG, "MQTT: Experiment", dataBuffer.settings.experiment);      
+      saveConfiguration();
+    }
   }
 
 void reconnect()
@@ -169,6 +177,8 @@ void mqtt_send()
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
   
+if (!MqttClient.connected()) reconnect();
+
   if (MqttClient.connected())
   {
   doc.clear();
@@ -193,6 +203,8 @@ void mqtt_send()
   doc["humidity"] = String(dataBuffer.data.humidity);
   doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
   doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+  doc["experiment"] = String(dataBuffer.settings.experiment);
+ 
   
 
   // Add the "location"

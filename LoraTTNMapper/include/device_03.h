@@ -3,13 +3,13 @@
 
 #define DEVICE_NAME "esp-01"
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 
-#define HAS_INA3221  1
+#define HAS_INA3221  0
 #define HAS_INA219 1
-#define USE_GPS 1
+#define USE_GPS 0
 
-#define HAS_PMU 1
+#define HAS_PMU 0
 
 #define USE_DISPLAY 1
 #define CYCLIC_SHOW_LOG 1

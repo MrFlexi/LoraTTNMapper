@@ -3,7 +3,7 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-#define SEALEVELPRESSURE_HPA (1013.25)
+
 
 // Upload data to ESP 32 SPIFFS
 //pio run -t uploadfs
@@ -16,6 +16,12 @@ AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
 static const char TAG[] = __FILE__;
+
+
+AnalogSmooth smooth_temp = AnalogSmooth();
+AnalogSmooth smooth_discur = AnalogSmooth();
+AnalogSmooth smooth_batvol = AnalogSmooth();
+
 
 //--------------------------------------------------------------------------
 // log to spiffs
@@ -286,7 +292,7 @@ void t_cyclic() // Intervall: Display Refresh
   else
   {
 #if (USE_BME280)
-    dataBuffer.data.temperature = bme.readTemperature();
+    dataBuffer.data.temperature = smooth_temp.smooth(bme.readTemperature());
     dataBuffer.data.humidity = bme.readHumidity();
 #endif
 
@@ -294,9 +300,9 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
     dataBuffer.data.bus_current = pmu.getVbusCurrent();
 
-    dataBuffer.data.bat_voltage = pmu.getBattVoltage() / 1000;
+    dataBuffer.data.bat_voltage = smooth_batvol.smooth(pmu.getBattVoltage() / 1000);
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+    dataBuffer.data.bat_discharge_current = smooth_discur.smooth(pmu.getBattDischargeCurrent());
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();

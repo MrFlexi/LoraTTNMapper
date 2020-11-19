@@ -157,14 +157,13 @@ void AXP192_init(void)
     pmu.EnableCoulombcounter();    
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
-    pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_550MA);
+    pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
     pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
-
-
-    ESP_LOGI(TAG, "AXP192 PMU initialized");
-
     // switch power rails on
     AXP192_power(pmu_power_on);
+    
+
+
 
 #if (USE_PMU_INTERRUPT)
 #ifdef PMU_INT_PIN
@@ -177,7 +176,7 @@ void AXP192_init(void)
     pmu.clearIRQ();
 #endif // PMU_INT
 #endif
-
+ESP_LOGI(TAG, "AXP192 PMU initialized");
   }
 }
 

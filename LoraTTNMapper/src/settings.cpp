@@ -27,6 +27,7 @@ void loadConfiguration()
     
     const char *value = doc["settings"]["sleep_time"];
     dataBuffer.settings.sleep_time = atoi(doc["settings"]["sleep_time"]);
+    dataBuffer.settings.experiment = doc["settings"]["sleep_time"];
 
     if (dataBuffer.settings.sleep_time > 0)
     {
@@ -57,6 +58,7 @@ void saveConfiguration() {
   JsonObject obj = doc.createNestedObject("settings");
 
   obj["sleep_time"] = String(dataBuffer.settings.sleep_time);
+  obj["experiment"] = String(dataBuffer.settings.experiment);
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {

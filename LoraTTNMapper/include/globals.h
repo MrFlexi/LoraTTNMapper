@@ -11,6 +11,7 @@
 
 #define WDT_TIMEOUT 10          // Watchdog time out x seconds
 #define uS_TO_S_FACTOR 1000000UL  //* Conversion factor for micro seconds to seconds */
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 //--------------------------------------------------------------------------
 // Device Settings
@@ -46,6 +47,7 @@
 #include "esp_sleep.h"
 #include <Wire.h>
 #include "settings.h"
+#include <AnalogSmooth.h>
 
 #if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI )
 #include "WiFi.h"
@@ -134,6 +136,8 @@ typedef struct
 {
   uint8_t sleep_time;
   const char* log_print_buffer;
+  const char* experiment;
+  
 } deviceSettings_t;
 
 
@@ -187,7 +191,7 @@ extern QueueHandle_t LoraSendQueue;
 #endif
 
 #if (USE_POTI)
-#include <AnalogSmooth.h>
+
 #include "poti.h"
 #endif
 
