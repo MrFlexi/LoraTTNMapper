@@ -10,7 +10,6 @@ uint8_t page_array[10];
 uint8_t max_page_counter;
 uint8_t page_counter = 0;
 
-
 void displayRegisterPages()
 {
 
@@ -44,12 +43,6 @@ void displayRegisterPages()
   max_page_counter++;
   page_array[max_page_counter] = PAGE_SENSORS;
 #endif
-
-
-
-
-
-
 }
 
 void log_display(String s)
@@ -103,7 +96,7 @@ void t_moveDisplay(void)
 void setup_display(void)
 {
   u8g2.begin();
-  u8g2.setFont(u8g2_font_profont11_mf);                         // set the font for the terminal window
+  u8g2.setFont(u8g2_font_profont11_mf); // set the font for the terminal window
   u8g2.setContrast(255);
   u8g2log.begin(u8g2, U8LOG_WIDTH, U8LOG_HEIGHT, u8log_buffer); // connect to u8g2, assign buffer
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
@@ -181,23 +174,24 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Sleep:%2d/%3d ", dataBuffer.data.MotionCounter, dataBuffer.settings.sleep_time);
-      IP_String = String(dataBuffer.data.ip_address); 
+      IP_String = String(dataBuffer.data.ip_address);
       sprintf(sbuf, "IP: %s", IP_String);
       u8g2.drawStr(1, 40, sbuf);
       sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
       u8g2.drawStr(1, 50, sbuf);
 
       break;
-      case PAGE_MODULS:
+    case PAGE_MODULS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       sprintf(sbuf, "Moduls");
       u8g2.drawStr(1, 15, sbuf);
-      
-      
+
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      if (dataBuffer.data.wlan)  u8g2.setDrawColor(0);
-      else u8g2.setDrawColor(1);
+      if (dataBuffer.data.wlan)
+        u8g2.setDrawColor(0);
+      else
+        u8g2.setDrawColor(1);
       u8g2.printf("WLAN");
 
       u8g2.setDrawColor(1);
@@ -207,7 +201,7 @@ void showPage(int page)
       //u8g2.printf("Exp: %s", dataBuffer.settings.experiment);
       //u8g2.setCursor(1, 60);
       //u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
-      
+
 #if (USE_OTA)
       availableModules = availableModules + "OTA ";
 #endif
@@ -237,12 +231,12 @@ void showPage(int page)
         availableModules = availableModules + "WLAN ";
       }
 
-      Serial.println(availableModules);
-      sprintf(sbuf, "%s", availableModules);
-      u8g2.drawStr(1, 20, sbuf);
+      
+      //sprintf(sbuf, "%s", availableModules);
+      //u8g2.drawStr(1, 20, sbuf);
+      //ESP_LOGI(TAG, "Modules: %s", sbuf);
 
       break;
-
 
     case PAGE_LORA:
       u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -323,7 +317,7 @@ void showPage(int page)
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
-       u8g2.setCursor(1, 45);
+      u8g2.setCursor(1, 45);
       u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
       u8g2.setCursor(1, 60);
       u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
@@ -383,7 +377,7 @@ void showPage(int page)
       }
 
       u8g2.setCursor(1, 64);
-      u8g2.printf("Sleeping for %3d min", dataBuffer.settings.sleep_time );
+      u8g2.printf("Sleeping for %3d min", dataBuffer.settings.sleep_time);
 
       drawSymbol(60, 12, SUN);
       break;
@@ -397,10 +391,9 @@ void showPage(int page)
     u8g2.printf("%2d", dataBuffer.data.MotionCounter);
 
     u8g2.setCursor(115, 64);
-    if (dataBuffer.data.pictureLoop) u8g2.printf("P");
-  
-    
-          
+    if (dataBuffer.data.pictureLoop)
+      u8g2.printf("P");
+
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
