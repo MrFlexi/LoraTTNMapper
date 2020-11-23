@@ -74,6 +74,8 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 //Next Message-Block Port
 #if (HAS_PMU)
+  if ( dataBuffer.data.pmu_data_available )
+  {
     //payload.reset();
     payload.addVoltage(20, dataBuffer.data.bus_voltage);
     payload.addVoltage(21, dataBuffer.data.bus_current);
@@ -82,6 +84,7 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
     payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
     //payload.enqueue_port(2);
+  }
 #endif
 
 
@@ -214,7 +217,7 @@ void setup_lora()
   LMIC.dn2Dr = DR_SF9;
 
   // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
-  LMIC_setDrTxpow(DR_SF12, 14);
+  LMIC_setDrTxpow(LORA_DATARATE, 14);
 
   t_LORA_send_from_queue(&sendjob);
 

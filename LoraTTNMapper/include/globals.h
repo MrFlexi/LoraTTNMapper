@@ -12,11 +12,12 @@
 #define WDT_TIMEOUT 10          // Watchdog time out x seconds
 #define uS_TO_S_FACTOR 1000000UL  //* Conversion factor for micro seconds to seconds */
 #define SEALEVELPRESSURE_HPA (1013.25)
+#define LORA_DATARATE   DR_SF7
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  3
+#define DEVICE_ID  1
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -113,6 +114,7 @@ typedef struct
   float firmware_version;
   uint8_t bytesReceived;
   lmic_t lmic;
+  bool pmu_data_available;
   float panel_voltage = 0;
   float panel_current = 0;
   float bus_voltage = 0;

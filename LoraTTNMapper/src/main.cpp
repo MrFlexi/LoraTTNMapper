@@ -308,6 +308,8 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
     dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
 
+    if ( ( dataBuffer.data.bus_voltage > 0 ) || (dataBuffer.data.bat_voltage > 0)  ) dataBuffer.data.pmu_data_available = true;
+    else dataBuffer.data.pmu_data_available = false;
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
