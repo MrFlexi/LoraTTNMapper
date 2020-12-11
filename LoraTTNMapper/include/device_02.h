@@ -3,7 +3,7 @@
 
 #define DEVICE_NAME "tbeam-02"
 #define USE_OTA 0
-#define USE_BME280 1
+#define USE_BME280 0
 #define HAS_LORA 1
 
 #define HAS_INA 0
@@ -41,7 +41,7 @@
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
-#define LORA_DATARATE DR_SF7
+#define LORA_DATARATE DR_SF9
 
 #define sendCycleIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  60 // Update Webpage

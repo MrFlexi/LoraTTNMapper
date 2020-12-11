@@ -56,7 +56,7 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
-     payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+     //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
     }
 #endif
 

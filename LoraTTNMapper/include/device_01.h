@@ -51,6 +51,7 @@
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1            // Main switch
+#define AUTO_POWER_SAVE 1      // If battery voltage < 3.5  --> sleep for 120 Minutes
 
 #define TIME_TO_SLEEP 5        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
