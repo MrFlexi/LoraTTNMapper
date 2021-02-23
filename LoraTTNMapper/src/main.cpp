@@ -606,17 +606,8 @@ setup_i2c_sensors();
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
-  uint64_t s_time_us = dataBuffer.settings.sleep_time * uS_TO_S_FACTOR * 60;
-  esp_sleep_enable_timer_wakeup( s_time_us );
-  log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
-              " min");
-
-#if (USE_BUTTON)
-  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+ set_sleep_time();
 #endif
-
-#endif
-
 
   //-------------------------------------------------------------------------------
   // Tasks

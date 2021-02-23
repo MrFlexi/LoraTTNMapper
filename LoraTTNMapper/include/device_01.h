@@ -53,5 +53,12 @@
 #define ESP_SLEEP 1            // Main switch
 
 #define TIME_TO_SLEEP 5        // sleep for n minute
+#define TIME_TO_SLEEP_BAT_HIGH  10        // sleep for n minute
+#define TIME_TO_SLEEP_BAT_LOW   54        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
+
+#define BAT_LOW   3.5         // sleep for n minute
+#define BAT_HIGH  4.1 
+
+
