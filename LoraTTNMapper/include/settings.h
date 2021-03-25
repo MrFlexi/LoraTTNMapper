@@ -5,3 +5,4 @@
 
 void saveConfiguration();
 void loadConfiguration();
+void set_sleep_time();

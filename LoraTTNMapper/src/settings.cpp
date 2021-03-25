@@ -7,6 +7,32 @@ String message;
 const char *filename = "/settings.jsn";
 
 
+void esp_set_deep_sleep_minutes(uint32_t value)
+{
+  uint64_t s_time_us = value * uS_TO_S_FACTOR * 60;
+  esp_sleep_enable_timer_wakeup(s_time_us);
+  log_display("Set deep sleep to" + String(dataBuffer.settings.sleep_time) +
+              " min");
+  dataBuffer.settings.sleep_time = value;
+}
+
+void set_sleep_time()
+{
+//---------------------------------------------------------------
+// Deep sleep settings
+//---------------------------------------------------------------
+#if (ESP_SLEEP)
+  esp_set_deep_sleep_minutes(dataBuffer.settings.sleep_time);
+  log_display("Deep Sleep " + String(dataBuffer.settings.sleep_time) +
+              " min");
+
+#if (USE_BUTTON)
+  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+#endif
+
+#endif
+}
+
 void loadConfiguration()
 {
 

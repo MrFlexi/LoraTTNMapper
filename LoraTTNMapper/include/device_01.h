@@ -51,12 +51,16 @@
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1            // Main switch
-#define AUTO_POWER_SAVE 1      // If battery voltage < 3.5  --> sleep for 120 Minutes
+
 
 #define TIME_TO_SLEEP 5        // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  8 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 5 // after n Lora TX events
 
+
+#define AUTO_POWER_SAVE 1      // If battery voltage < 3.5  --> sleep for 120 Minutes
+#define TIME_TO_SLEEP_BAT_HIGH  6
+#define TIME_TO_SLEEP_BAT_LOW  54
 #define BAT_LOW   35         // 3.5 Volt
 #define BAT_HIGH  41 
 
