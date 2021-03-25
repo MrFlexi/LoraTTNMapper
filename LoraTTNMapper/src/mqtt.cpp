@@ -23,7 +23,7 @@ void doConcat(const char *a, const char *b, const char *c, char *out)
 
 void mqtt_loop()
 {
-  
+
   // MQTT Connection
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -65,58 +65,57 @@ void callback(char *topic, byte *payload, unsigned int length)
   serializeJsonPretty(doc, Serial);
 
   // Check if there is a incomming command
-  
+
   const char *action_in = doc["command"]["action"];
   const char *value = doc["command"]["value"];
 
-  String action = String( action_in );
+  String action = String(action_in);
   ESP_LOGI(TAG, " action: %s  value: %s", action.c_str(), value);
 
-  #if (USE_FASTLED)
-  if ( action == "LED_HeatColor")
-    {
-      ESP_LOGI(TAG, "MQTT: LED Heat Color");
-      LED_HeatColor(atoi(value));
-    }
-
-  if ( action == "LED_on")
-    {
-      ESP_LOGI(TAG, "MQTT: LED on");
-      LED_on(atoi(value));
-    }
-
-  if ( action == "LED_off")
-    {
-      ESP_LOGI(TAG, "MQTT: LED off");
-      LED_off();
-    }
-
-  #endif  
-
-    if (action == "reset_gauge")
-    {
-      ESP_LOGI(TAG, "MQTT: Reset Coulomb Counter");
-#if (HAS_PMU)
-      pmu.ClearCoulombcounter();
-#endif
-    }
-
-
-    if (action == "sleep_time")
-    {
-
-      dataBuffer.settings.sleep_time = atoi(value);
-      ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);      
-      saveConfiguration();
-    }
-
-    if (action == "set_experiment")
-    {
-      dataBuffer.settings.experiment = value;
-      ESP_LOGI(TAG, "MQTT: Experiment", dataBuffer.settings.experiment);      
-      saveConfiguration();
-    }
+#if (USE_FASTLED)
+  if (action == "LED_HeatColor")
+  {
+    ESP_LOGI(TAG, "MQTT: LED Heat Color");
+    LED_HeatColor(atoi(value));
   }
+
+  if (action == "LED_on")
+  {
+    ESP_LOGI(TAG, "MQTT: LED on");
+    LED_on(atoi(value));
+  }
+
+  if (action == "LED_off")
+  {
+    ESP_LOGI(TAG, "MQTT: LED off");
+    LED_off();
+  }
+
+#endif
+
+  if (action == "reset_gauge")
+  {
+    ESP_LOGI(TAG, "MQTT: Reset Coulomb Counter");
+#if (HAS_PMU)
+    pmu.ClearCoulombcounter();
+#endif
+  }
+
+  if (action == "sleep_time")
+  {
+
+    dataBuffer.settings.sleep_time = atoi(value);
+    ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);
+    saveConfiguration();
+  }
+
+  if (action == "set_experiment")
+  {
+    dataBuffer.settings.experiment = value;
+    ESP_LOGI(TAG, "MQTT: Experiment", dataBuffer.settings.experiment);
+    saveConfiguration();
+  }
+}
 
 void reconnect()
 {
@@ -127,27 +126,32 @@ void reconnect()
 
   int i = 0;
 
-  // Loop until we're reconnected
-  while (!MqttClient.connected() && (i < 4 ) )
+  if (WiFi.status() == WL_CONNECTED)
   {
-    ESP_LOGI(TAG, "Attempting MQTT connection...");
-    // Attempt to connect
-    if (MqttClient.connect(DEVICE_NAME))
+    // Loop until we're reconnected
+    while (!MqttClient.connected())
     {
-      ESP_LOGI(TAG, "connected");
-      MqttClient.publish(mqtt_topic, "connected");
-      MqttClient.subscribe(topic_in);
+      ESP_LOGI(TAG, "Attempting MQTT connection...");
+      // Attempt to connect
+      if (MqttClient.connect(DEVICE_NAME))
+      {
+        ESP_LOGI(TAG, "connected");
+        MqttClient.publish(mqtt_topic, "connected");
+        MqttClient.subscribe(topic_in);
+      }
+      else
+      {
+        ESP_LOGE(TAG, "failed, rc=");
+        Serial.print(MqttClient.state());
+        ESP_LOGE(TAG, " try again in 5 seconds");
+        // Wait 5 seconds before retrying
+        delay(500);
+      }
+      i++;
     }
-    else
-    {
-      ESP_LOGE(TAG, "failed, rc=");
-      Serial.print(MqttClient.state());
-      ESP_LOGE(TAG, " try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(1000);
-    }
-    i++;
   }
+  else
+    ESP_LOGE(TAG, "No Wifi connection");
 }
 
 void setup_mqtt()
@@ -163,6 +167,7 @@ void setup_mqtt()
     {
       reconnect();
     }
+    ESP_LOGI(TAG, "MQTT connected");
     log_display("MQTT connected");
     MqttClient.publish(mqtt_topic, "ESP32 is alive...");
   }
@@ -176,48 +181,43 @@ void mqtt_send()
 
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
-  
-if (!MqttClient.connected()) reconnect();
 
   if (MqttClient.connected())
   {
-  doc.clear();
-  doc["device"] = DEVICE_NAME;
-  doc["BootCounter"] = String(dataBuffer.data.bootCounter);
-  doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
-  doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
-  doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
-  doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
-  doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-  doc["bat_max_charge_curr"] = String(dataBuffer.data.bat_max_charge_curr);
-  
-  doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
-  doc["bus_current"] = String( dataBuffer.data.bus_current);   
+    doc.clear();
+    doc["device"] = DEVICE_NAME;
+    doc["BootCounter"] = String(dataBuffer.data.bootCounter);
+    doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
+    doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
+    doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
+    doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
+    doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
+    doc["bat_max_charge_curr"] = String(dataBuffer.data.bat_max_charge_curr);
 
-  Serial.println(dataBuffer.data.panel_voltage);
-  doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
-  doc["panel_current"] = String(dataBuffer.data.panel_current);
+    doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
+    doc["bus_current"] = String(dataBuffer.data.bus_current);
 
-  doc["TXCounter"] = String(dataBuffer.data.txCounter);
-  doc["temperature"] = String(dataBuffer.data.temperature);
-  doc["humidity"] = String(dataBuffer.data.humidity);
-  doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
-  doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
-  doc["experiment"] = String(dataBuffer.settings.experiment);
- 
-  
+    doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
+    doc["panel_current"] = String(dataBuffer.data.panel_current);
 
-  // Add the "location"
-  JsonObject location = doc.createNestedObject("location");
-  location["lat"] = dataBuffer.data.gps.lat();
-  location["lon"] = dataBuffer.data.gps.lng();
+    doc["TXCounter"] = String(dataBuffer.data.txCounter);
+    doc["temperature"] = String(dataBuffer.data.temperature);
+    doc["humidity"] = String(dataBuffer.data.humidity);
+    doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
+    doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+    //doc["experiment"] = String(dataBuffer.settings.experiment);
 
-  char buffer[600];
-  serializeJson(doc, buffer);
-  MqttClient.publish(topic_out, buffer);
-  //serializeJsonPretty(doc, buffer);
-  //ESP_LOGI(TAG, "Payload: %s", buffer);
-  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+    // Add the "location"
+    JsonObject location = doc.createNestedObject("location");
+    location["lat"] = dataBuffer.data.gps.lat();
+    location["lon"] = dataBuffer.data.gps.lng();
+
+    char buffer[600];
+    serializeJson(doc, buffer);
+    MqttClient.publish(topic_out, buffer);
+    //serializeJsonPretty(doc, buffer);
+    //ESP_LOGI(TAG, "Payload: %s", buffer);
+    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
   }
   else
   {
@@ -225,29 +225,28 @@ if (!MqttClient.connected()) reconnect();
   }
 }
 
-
 void mqtt_send_irq()
 {
   const int capacity = JSON_OBJECT_SIZE(10) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
-if (MqttClient.connected())
-{
-  // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
-  doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_irq, topic_out);
-  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+  if (MqttClient.connected())
+  {
+    // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
+    doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_irq, topic_out);
+    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
 
-  doc.clear();
-  doc["device"] = DEVICE_NAME;
-  doc["BootCounter"] = String(dataBuffer.data.bootCounter);
-  doc["irq"] = "IRQ";
-  
-  char buffer[600];
-  serializeJson(doc, buffer);
-  MqttClient.publish(topic_out, buffer);
-  //serializeJsonPretty(doc, buffer);
-  //ESP_LOGI(TAG, "Payload: %s", buffer);
+    doc.clear();
+    doc["device"] = DEVICE_NAME;
+    doc["BootCounter"] = String(dataBuffer.data.bootCounter);
+    doc["irq"] = "IRQ";
+
+    char buffer[600];
+    serializeJson(doc, buffer);
+    MqttClient.publish(topic_out, buffer);
+    //serializeJsonPretty(doc, buffer);
+    //ESP_LOGI(TAG, "Payload: %s", buffer);
   }
   else
   {

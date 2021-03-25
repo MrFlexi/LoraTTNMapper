@@ -3,10 +3,10 @@
 #define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
-
-
+//---------------------------------------------------------
 // Upload data to ESP 32 SPIFFS
-//pio run -t uploadfs
+// pio run -t uploadfs
+//---------------------------------------------------------
 
 #include "globals.h"
 
@@ -17,47 +17,76 @@ AnalogSmooth Poti_A = AnalogSmooth();
 
 static const char TAG[] = __FILE__;
 
-
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
 
+#include <SparkFun_Ublox_Arduino_Library.h> //http://librarymanager/All#SparkFun_Ublox_GPS
+SFE_UBLOX_GPS myGPS;
+int state = 0; // steps through states
+HardwareSerial SerialGPS(1);
+
+void setup_gps_reset()
+{
+
+  SerialGPS.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
+  Serial.println("All comms started");
+  delay(100);
+
+  if (myGPS.begin(SerialGPS))
+  {
+    Serial.println("Connected to GPS");
+    myGPS.setUART1Output(COM_TYPE_NMEA); //Set the UART port to output NMEA only
+    myGPS.saveConfiguration();           //Save the current settings to flash and BBR
+    Serial.println("GPS serial connected, output set to NMEA");
+    myGPS.disableNMEAMessage(UBX_NMEA_GLL, COM_PORT_UART1);
+    myGPS.disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
+    myGPS.disableNMEAMessage(UBX_NMEA_GSV, COM_PORT_UART1);
+    myGPS.disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
+    myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+    myGPS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
+    myGPS.saveConfiguration(); //Save the current settings to flash and BBR
+  }
+  delay(1000);
+}
 
 //--------------------------------------------------------------------------
 // log to spiffs
 //--------------------------------------------------------------------------
 
-
 #if (USE_SPIFF_LOGGING)
 static char log_print_buffer[512];
 
-int vprintf_into_spiffs(const char* szFormat, va_list args) {
-	//write evaluated format string into buffer
-	int ret = vsnprintf (log_print_buffer, sizeof(log_print_buffer), szFormat, args);
+int vprintf_into_spiffs(const char *szFormat, va_list args)
+{
+  //write evaluated format string into buffer
+  int ret = vsnprintf(log_print_buffer, sizeof(log_print_buffer), szFormat, args);
 
   dataBuffer.settings.log_print_buffer = log_print_buffer;
 
-	//output is now in buffer. write to file.
-	if(ret >= 0) {
-    if(!SPIFFS.exists("/LOGS.txt")) {
+  //output is now in buffer. write to file.
+  if (ret >= 0)
+  {
+    if (!SPIFFS.exists("/LOGS.txt"))
+    {
       File writeLog = SPIFFS.open("/LOGS.txt", FILE_WRITE);
-      if(!writeLog) Serial.println("Couldn't open spiffs_log.txt"); 
+      if (!writeLog)
+        Serial.println("Couldn't open spiffs_log.txt");
       delay(50);
       writeLog.close();
     }
-    
-		File spiffsLogFile = SPIFFS.open("/LOGS.txt", FILE_APPEND);
-		//debug output
-		//printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
-		spiffsLogFile.write((uint8_t*) log_print_buffer, (size_t) ret);
-		//to be safe in case of crashes: flush the output
-		spiffsLogFile.flush();
-		spiffsLogFile.close();
-	}
-	return ret;
+
+    File spiffsLogFile = SPIFFS.open("/LOGS.txt", FILE_APPEND);
+    //debug output
+    //printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
+    spiffsLogFile.write((uint8_t *)log_print_buffer, (size_t)ret);
+    //to be safe in case of crashes: flush the output
+    spiffsLogFile.flush();
+    spiffsLogFile.close();
+  }
+  return ret;
 }
 #endif
-
 
 //--------------------------------------------------------------------------
 // OTA Settings
@@ -125,7 +154,14 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
-
+void esp_set_deep_sleep_minutes(uint32_t value)
+{
+  uint64_t s_time_us = value * uS_TO_S_FACTOR * 60;
+  esp_sleep_enable_timer_wakeup(s_time_us);
+  log_display("Set deep sleep to" + String(dataBuffer.settings.sleep_time) +
+              " min");
+  dataBuffer.settings.sleep_time = value;
+}
 
 void setup_filesystem()
 {
@@ -133,7 +169,7 @@ void setup_filesystem()
   // Mounting File System SPIFFS
   //---------------------------------------------------------------
 
-ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
+  ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
   {
@@ -145,12 +181,11 @@ ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
 
   while (file)
   {
-    ESP_LOGI(TAG, "%s",file.name());
+    ESP_LOGI(TAG, "%s", file.name());
     file = root.openNextFile();
   }
   delay(100);
 }
-
 
 //--------------------------------------------------------------------------
 // Cayenne MyDevices Integration
@@ -240,8 +275,6 @@ void touch_callback()
   //placeholder callback function
 }
 
-
-
 //---------------------------------------------------------------------------------
 // Send Messages via Cayenne or MQTT
 //---------------------------------------------------------------------------------
@@ -253,7 +286,6 @@ void t_send_cycle()
   if (WiFi.status() == WL_CONNECTED)
     Cayenne_send();
 #endif
-
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
@@ -268,11 +300,8 @@ void t_cyclicRTOS(void *pvParameters)
 
   while (1)
   {
-
   }
 }
-
-
 
 //---------------------------------------------------------------------------------
 // Get sensor values and update display
@@ -307,9 +336,12 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
     dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
+    ESP_LOGI(TAG, "PMU BusVoltage/BatVoltage %.2fV / %.2fV", dataBuffer.data.bus_voltage, dataBuffer.data.bat_voltage);
 
-    if ( ( dataBuffer.data.bus_voltage > 0 ) || (dataBuffer.data.bat_voltage > 0)  ) dataBuffer.data.pmu_data_available = true;
-    else dataBuffer.data.pmu_data_available = false;
+    if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bat_voltage != 0))
+      dataBuffer.data.pmu_data_available = true;
+    else
+      dataBuffer.data.pmu_data_available = false;
 #else
     dataBuffer.data.bat_voltage = read_voltage() / 1000;
 #endif
@@ -325,7 +357,6 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
     dataBuffer.data.panel_current = ina219.getCurrent_mA();
 #endif
-
 
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
@@ -345,13 +376,12 @@ void t_cyclic() // Intervall: Display Refresh
   // Refresh Display
 
 #if (USE_DISPLAY)
-ESP_LOGV(TAG, "update display");
+  ESP_LOGV(TAG, "update display");
   if (dataBuffer.data.runmode > 0)
     showPage(PageNumber);
 #endif
 
-
-esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -361,9 +391,7 @@ esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temp
   AXP192_showstatus();
 #endif
 #endif
-
 }
-
 
 //---------------------------------------------------------------------------------
 // Check deep sleep conditions
@@ -426,8 +454,6 @@ if (dataBuffer.data.bat_voltage < BAT_LOW )
 #endif
 }
 
-
-
 void setup_wifi()
 {
 
@@ -466,7 +492,6 @@ void setup_wifi()
 #endif
 }
 
-
 void setup()
 {
 
@@ -474,30 +499,28 @@ void setup()
 
   //--------------------------------------------------------------------
   // Load Settings
-  //--------------------------------------------------------------------  
+  //--------------------------------------------------------------------
   setup_filesystem();
   loadConfiguration();
 
-//--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   // Logging
-  //--------------------------------------------------------------------  
-  
-  #if (USE_SPIFF_LOGGING)
+  //--------------------------------------------------------------------
 
-if ( SPIFFS.exists("/LOGS.txt")) {
-SPIFFS.remove("/LOGS.txt");
-}
+#if (USE_SPIFF_LOGGING)
 
+  if (SPIFFS.exists("/LOGS.txt"))
+  {
+    SPIFFS.remove("/LOGS.txt");
+  }
 
-  esp_log_set_vprintf(&vprintf_into_spiffs);  
+  esp_log_set_vprintf(&vprintf_into_spiffs);
   esp_log_level_set(TAG, ESP_LOG_INFO);
   //write into log
   esp_log_write(ESP_LOG_INFO, TAG, "Hello World2\n");
   esp_log_write(ESP_LOG_INFO, TAG, "starting...\n");
-  #endif
+#endif
 
-
-  
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
@@ -519,7 +542,6 @@ SPIFFS.remove("/LOGS.txt");
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
 
-
   ESP_LOGI(TAG, "Starting..");
   Serial.println(F("TTN Mapper"));
   i2c_scan();
@@ -534,8 +556,8 @@ SPIFFS.remove("/LOGS.txt");
   delay(1000);
 #endif
 
-#if (HAS_INA3221 || HAS_INA219 || USE_BME280 )
-setup_i2c_sensors();
+#if (HAS_INA3221 || HAS_INA219 || USE_BME280)
+  setup_i2c_sensors();
 #endif
 
   dataBuffer.data.txCounter = 0;
@@ -543,7 +565,7 @@ setup_i2c_sensors();
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
-  setup_display(); 
+  setup_display();
   setup_wifi();
   calibrate_voltage();
   delay(500);
@@ -585,7 +607,9 @@ setup_i2c_sensors();
 #endif
 
 #if (USE_GPS)
+  //setup_gps_reset(); // Hard reset
   gps.init();
+  //gps.softwareReset();
   gps.wakeup();
   delay(500); // Wait for GPS beeing stable
 #endif
@@ -596,14 +620,12 @@ setup_i2c_sensors();
   delay(500);
 #endif
 
-
 #if (USE_BUTTON)
 #ifdef BUTTON_PIN
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   button_init(BUTTON_PIN);
 #endif
 #endif
-
 
 #if (USE_WEBSERVER)
   setup_webserver();
@@ -628,11 +650,18 @@ setup_i2c_sensors();
   poti_setup_RTOS();
 #endif
 
-
 //---------------------------------------------------------------
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
+  esp_set_deep_sleep_minutes(dataBuffer.settings.sleep_time);
+
+#if (USE_BUTTON)
+  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+#endif
+
+#endif
+
  set_sleep_time();
 #endif
 
@@ -651,11 +680,9 @@ setup_i2c_sensors();
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);
 #endif
 
-
-
- //-------------------------------------------------------------------------------
- // Websocket Task
- //-------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------
+  // Websocket Task
+  //-------------------------------------------------------------------------------
 #if (USE_WEBSERVER)
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -681,8 +708,6 @@ setup_i2c_sensors();
                           1);              // CPU core
 #endif
 
- 
-
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
@@ -690,7 +715,7 @@ setup_i2c_sensors();
   t_cyclic();
 
   //---------------------------------------------------------------
-  // Watchdog 
+  // Watchdog
   //---------------------------------------------------------------
   //esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
   // esp_task_wdt_add(NULL); //add current thread to WDT watch
@@ -700,11 +725,11 @@ setup_i2c_sensors();
 
 void loop()
 {
-// esp_task_wdt_reset(); //reset timer ...feed watchdog
-//feedLoopWDT();
-  
+  // esp_task_wdt_reset(); //reset timer ...feed watchdog
+  //feedLoopWDT();
+
 #if (HAS_LORA)
-os_runloop_once();
+  os_runloop_once();
 #endif
 
 #if (USE_CAYENNE)

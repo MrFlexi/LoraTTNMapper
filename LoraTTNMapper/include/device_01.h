@@ -32,11 +32,11 @@
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL 15             // Transmitt Lora messages
+#define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
 
-#define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  10 // Update Webpage
+#define sendCycleIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall  60 // Update Webpage
 
 
 #define PAYLOAD_ENCODER 3
@@ -51,10 +51,9 @@
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
 #define ESP_SLEEP 1            // Main switch
+#define AUTO_POWER_SAVE 1      // If battery voltage < 3.5  --> sleep for 120 Minutes
 
 #define TIME_TO_SLEEP 5        // sleep for n minute
-#define TIME_TO_SLEEP_BAT_HIGH  10        // sleep for n minute
-#define TIME_TO_SLEEP_BAT_LOW   54        // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 

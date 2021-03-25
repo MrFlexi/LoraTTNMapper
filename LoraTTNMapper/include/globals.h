@@ -6,13 +6,15 @@
 #include <FreeRTOS.h>
 #include "esp_system.h"
 #include "esp_spi_flash.h"
-#include <esp_task_wdt.h>
+// #include <esp_task_wdt.h>
 
 
 #define WDT_TIMEOUT 10          // Watchdog time out x seconds
 #define uS_TO_S_FACTOR 1000000UL  //* Conversion factor for micro seconds to seconds */
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define LORA_DATARATE   DR_SF7
+
+
 
 //--------------------------------------------------------------------------
 // Device Settings
