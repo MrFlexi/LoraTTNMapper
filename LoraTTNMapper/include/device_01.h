@@ -58,7 +58,7 @@
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 3 // after n Lora TX events
 
-#define BAT_LOW   3.5         // sleep for n minute
-#define BAT_HIGH  4.1 
+#define BAT_LOW   35         // 3.5 Volt
+#define BAT_HIGH  41 
 
 
