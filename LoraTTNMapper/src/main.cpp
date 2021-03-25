@@ -641,6 +641,7 @@ void setup()
 // Deep sleep settings
 //---------------------------------------------------------------
 #if (ESP_SLEEP)
+<<<<<<< HEAD
   esp_set_deep_sleep_minutes(dataBuffer.settings.sleep_time);
 
 #if (USE_BUTTON)
@@ -649,6 +650,11 @@ void setup()
 
 #endif
 
+=======
+ set_sleep_time();
+#endif
+
+>>>>>>> b8ee1015c0e8d973abc4426edd71da6084b8f56a
   //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
