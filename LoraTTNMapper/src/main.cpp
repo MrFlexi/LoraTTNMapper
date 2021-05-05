@@ -154,8 +154,6 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
-
-
 void setup_filesystem()
 {
   //---------------------------------------------------------------
@@ -393,32 +391,36 @@ void t_sleep()
 {
   gps.getDistance();
 
-
-// calc sleep time
+  // calc sleep time
 
 #if (ESP_SLEEP)
 #if (TIME_TO_SLEEP_BAT_HIGH)
 #if (BAT_HIGH)
 #if (BAT_LOW)
 
-if (dataBuffer.data.bat_voltage > BAT_HIGH )
-{
-  dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_HIGH;
+  if ((dataBuffer.data.bat_voltage * 10) < BAT_LOW)
+  {
+    dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_LOW;
+  }
+  else
+  {
+
+    if ((dataBuffer.data.bat_voltage * 10) > BAT_HIGH)
+    {
+      dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_HIGH;
+    }
+    else
+    {
+      dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_MID;
+    }
+  }
+
   set_sleep_time();
-}
-
-
-if (dataBuffer.data.bat_voltage < BAT_LOW )
-{
-  dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_LOW;
-  set_sleep_time();
-}
 
 #endif
 #endif
 #endif
 #endif
-
 
 #if (ESP_SLEEP)
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;

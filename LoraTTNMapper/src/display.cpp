@@ -168,17 +168,20 @@ void showPage(int page)
     {
     case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      sprintf(sbuf, "SAP GTT  %.2f", dataBuffer.data.firmware_version);
-      u8g2.drawStr(1, 15, sbuf);
-
-      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setCursor(1, 15);
+      u8g2.printf( "Firmware:  %.2f", dataBuffer.data.firmware_version);
+     
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sleep:%2d/%3d ", dataBuffer.data.MotionCounter, dataBuffer.settings.sleep_time);
-      IP_String = String(dataBuffer.data.ip_address);
-      sprintf(sbuf, "IP: %s", IP_String);
-      u8g2.drawStr(1, 40, sbuf);
-      sprintf(sbuf, "Boot: %2d", dataBuffer.data.bootCounter);
-      u8g2.drawStr(1, 50, sbuf);
+      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter );
+  
+      u8g2.setCursor(1, 45);
+      u8g2.printf("Deep Sleep for: %3d", dataBuffer.settings.sleep_time);
+
+
+      u8g2.setCursor(1, 60);
+      u8g2.printf("BootCnt: %2d", dataBuffer.data.bootCounter);
+
 
       break;
     case PAGE_MODULS:
