@@ -42,7 +42,6 @@ void AXP192_power(pmu_power_t powerlevel)
   }
 }
 
-
 void AXP192_power_gps(bool on)
 {
   if (on)
@@ -74,7 +73,6 @@ void AXP192_showstatus(void)
   else
     ESP_LOGI(TAG, "USB not present");
 
-
   int cur = pmu.getChargeControlCur();
   ESP_LOGI(TAG, "Current charge control current = %d mA \n", cur);
 }
@@ -82,54 +80,53 @@ void AXP192_showstatus(void)
 void AXP192_event_handler(void)
 {
   ESP_LOGI(TAG, "PMU Event");
-if (!I2C_MUTEX_LOCK())
+  if (!I2C_MUTEX_LOCK())
     ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
 
-  pmu.readIRQ();
+    pmu.readIRQ();
 
-  if (pmu.isVbusOverVoltageIRQ())
-    ESP_LOGI(TAG, "USB voltage %.2fV too high.", pmu.getVbusVoltage() / 1000);
-  if (pmu.isVbusPlugInIRQ())
-    ESP_LOGI(TAG, "USB plugged, %.2fV @ %.0mA", pmu.getVbusVoltage() / 1000,
-             pmu.getVbusCurrent());
-  if (pmu.isVbusRemoveIRQ())
-    ESP_LOGI(TAG, "USB unplugged.");
+    if (pmu.isVbusOverVoltageIRQ())
+      ESP_LOGI(TAG, "USB voltage %.2fV too high.", pmu.getVbusVoltage() / 1000);
+    if (pmu.isVbusPlugInIRQ())
+      ESP_LOGI(TAG, "USB plugged, %.2fV @ %.0mA", pmu.getVbusVoltage() / 1000,
+               pmu.getVbusCurrent());
+    if (pmu.isVbusRemoveIRQ())
+      ESP_LOGI(TAG, "USB unplugged.");
 
-  if (pmu.isBattPlugInIRQ())
-    ESP_LOGI(TAG, "Battery is connected.");
-  if (pmu.isBattRemoveIRQ())
-    ESP_LOGI(TAG, "Battery was removed.");
-  if (pmu.isChargingIRQ())
-    ESP_LOGI(TAG, "Battery charging.");
-  if (pmu.isChargingDoneIRQ())
-    ESP_LOGI(TAG, "Battery charging done.");
-  if (pmu.isBattTempLowIRQ())
-    ESP_LOGI(TAG, "Battery high temperature.");
-  if (pmu.isBattTempHighIRQ())
-    ESP_LOGI(TAG, "Battery low temperature.");
+    if (pmu.isBattPlugInIRQ())
+      ESP_LOGI(TAG, "Battery is connected.");
+    if (pmu.isBattRemoveIRQ())
+      ESP_LOGI(TAG, "Battery was removed.");
+    if (pmu.isChargingIRQ())
+      ESP_LOGI(TAG, "Battery charging.");
+    if (pmu.isChargingDoneIRQ())
+      ESP_LOGI(TAG, "Battery charging done.");
+    if (pmu.isBattTempLowIRQ())
+      ESP_LOGI(TAG, "Battery high temperature.");
+    if (pmu.isBattTempHighIRQ())
+      ESP_LOGI(TAG, "Battery low temperature.");
 
-  if (pmu.isPEKShortPressIRQ())
-  {
-    ESP_LOGI(TAG, "Power Button --> Short Pressed");
-    #if (USE_FASTLED)
-    LED_sunset();
-    #endif
+    if (pmu.isPEKShortPressIRQ())
+    {
+      ESP_LOGI(TAG, "Power Button --> Short Pressed");
+#if (USE_FASTLED)
+      LED_sunset();
+#endif
+    }
+
+    // long press -> shutdown power, can be exited by another longpress
+    if (pmu.isPEKLongtPressIRQ())
+    {
+      ESP_LOGI(TAG, "Power Button --> LONG Press");
+      AXP192_power(pmu_power_off); // switch off Lora, GPS, display
+      pmu.shutdown();              // switch off device
+    }
+
+    pmu.clearIRQ();
+    I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
-
-  // long press -> shutdown power, can be exited by another longpress
-  if (pmu.isPEKLongtPressIRQ())
-  {
-    ESP_LOGI(TAG, "Power Button --> LONG Press");
-    AXP192_power(pmu_power_off); // switch off Lora, GPS, display
-    pmu.shutdown();              // switch off device
-  }
-
-  pmu.clearIRQ();
-  I2C_MUTEX_UNLOCK(); // release i2c bus access
-  }
-
 }
 
 void AXP192_init(void)
@@ -152,31 +149,27 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
 
-
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
-    pmu.EnableCoulombcounter();    
+    pmu.EnableCoulombcounter();
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
     pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
     pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
     // switch power rails on
     AXP192_power(pmu_power_on);
-    
-
-
 
 #if (USE_PMU_INTERRUPT)
 #ifdef PMU_INT_PIN
     pinMode(PMU_INT_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(PMU_INT_PIN), PMU_IRQ, FALLING);
     pmu.enableIRQ(AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ |
-                     AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
-                      AXP202_CHARGING_FINISHED_IRQ| AXP202_PEK_LONGPRESS_IRQ| AXP202_PEK_SHORTPRESS_IRQ,
+                      AXP202_BATT_REMOVED_IRQ | AXP202_BATT_CONNECT_IRQ |
+                      AXP202_CHARGING_FINISHED_IRQ | AXP202_PEK_LONGPRESS_IRQ | AXP202_PEK_SHORTPRESS_IRQ,
                   1);
     pmu.clearIRQ();
 #endif // PMU_INT
 #endif
-ESP_LOGI(TAG, "AXP192 PMU initialized");
+    ESP_LOGI(TAG, "AXP192 PMU initialized");
   }
 }
 
@@ -338,9 +331,22 @@ uint16_t read_voltage()
   return voltage;
 }
 
+void esp_set_deep_sleep_minutes(uint32_t value)
+{
+  uint64_t s_time_us = value * uS_TO_S_FACTOR * 60;
+  esp_sleep_enable_timer_wakeup(s_time_us);
+  ESP_LOGI(TAG, "Set deep sleep to %i min", dataBuffer.settings.sleep_time);
+
+}
 
 void ESP32_sleep()
 {
+
+  esp_set_deep_sleep_minutes(dataBuffer.settings.sleep_time);
+
+#if (USE_BUTTON)
+  esp_sleep_enable_ext0_wakeup(BUTTON_PIN, 0); //1 = High, 0 = Low
+#endif
 
 #if (HAS_PMU)
   AXP192_power(pmu_power_sleep);
