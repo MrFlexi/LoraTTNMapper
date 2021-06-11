@@ -178,7 +178,8 @@ void showPage(int page)
 
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("BootCnt: %2d", dataBuffer.data.bootCounter);
+      u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
+      u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
 
 
       break;
