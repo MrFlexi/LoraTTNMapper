@@ -50,7 +50,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
+#define ESP_SLEEP 0            // Main switch
 
 
 #define TIME_TO_SLEEP 5        // sleep for n minute
