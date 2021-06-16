@@ -15,7 +15,6 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-//#define PAGE_COUNT 8
 
 #define PAGE_TBEAM 1
 #define PAGE_LORA 2

@@ -159,8 +159,6 @@ void showPage(int page)
   else
   {
 
-    // u8g2_font_profont15_tr  W7 H15
-    // u8g2_font_ncenB08_tr W12 H13
     u8g2.clearBuffer();
     uint8_t icon = 0;
 
@@ -180,7 +178,8 @@ void showPage(int page)
 
 
       u8g2.setCursor(1, 60);
-      u8g2.printf("BootCnt: %2d", dataBuffer.data.bootCounter);
+      u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
+      u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
 
 
       break;
@@ -380,7 +379,7 @@ void showPage(int page)
       }
 
       u8g2.setCursor(1, 64);
-      u8g2.printf("Sleeping for %3d min", dataBuffer.settings.sleep_time);
+      u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);
 
       drawSymbol(60, 12, SUN);
       break;
@@ -389,13 +388,16 @@ void showPage(int page)
     //---------------------------------
     //----------   Footer   -----------
     //---------------------------------
-    u8g2.setFont(u8g2_font_profont12_tr);
-    u8g2.setCursor(100, 64);
-    u8g2.printf("%2d", dataBuffer.data.MotionCounter);
 
-    u8g2.setCursor(115, 64);
-    if (dataBuffer.data.pictureLoop)
-      u8g2.printf("P");
+    if (page != PAGE_SLEEP)
+    {
+    
+    u8g2.setFont(u8g2_font_profont11_tr);
+    u8g2.setCursor(96, 64);
+    u8g2.printf("%i min", dataBuffer.data.MotionCounter);
+
+    }
+    
 
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access

@@ -194,7 +194,7 @@ else
 void LED_off()
 {
 
-  for (uint8_t heatIndex = 255; heatIndex > 0; heatIndex--)
+  for (uint8_t heatIndex = 255; heatIndex >= 0; heatIndex--)
   {
     // HeatColors_p is a gradient palette built in to FastLED
     // that fades from black to red, orange, yellow, white
@@ -214,7 +214,8 @@ void LED_off()
 void LED_showSleepCounter()
 {
 
-  int val = map(dataBuffer.data.MotionCounter, 0, TIME_TO_NEXT_SLEEP_WITHOUT_MOTION, 0, NUM_LEDS);
+  // int val = map(dataBuffer.data.MotionCounter, 0, TIME_TO_NEXT_SLEEP_WITHOUT_MOTION, 0, NUM_LEDS);
+  int val = dataBuffer.data.MotionCounter;
 
   if (val_old != val)
   {
@@ -266,8 +267,6 @@ void LED_bootcount()
 void LED_deepSleep()
 {
   FastLED.clear();
-  //leds[8] = CRGB::LightSkyBlue;
-  //FastLED.show();
 }
 
 void LED_showDegree(int i)
