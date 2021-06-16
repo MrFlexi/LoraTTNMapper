@@ -11324,7 +11324,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="BME280" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="IC2" library="uln-udn" deviceset="ULN2003A" device="D"/>
 <part name="SERVO_1" library="pinhead" deviceset="PINHD-1X3" device=""/>
-<part name="JP2" library="pinhead" deviceset="PINHD-1X3" device="" value="Servo_2"/>
+<part name="SERVO_2" library="pinhead" deviceset="PINHD-1X3" device="" value="Servo_2"/>
 <part name="LED1" library="led" deviceset="LED" device="SML1206"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R1206"/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="R1206"/>
@@ -11399,7 +11399,7 @@ GPIO32 Servo 2 Signal</text>
 <attribute name="NAME" x="260.35" y="55.245" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="260.35" y="68.58" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="JP2" gate="A" x="254" y="40.64" smashed="yes" rot="R180">
+<instance part="SERVO_2" gate="A" x="254" y="40.64" smashed="yes" rot="R180">
 <attribute name="NAME" x="260.35" y="34.925" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="260.35" y="48.26" size="1.778" layer="96" rot="R180"/>
 </instance>
@@ -11533,7 +11533,7 @@ GPIO32 Servo 2 Signal</text>
 <junction x="233.68" y="76.2"/>
 <junction x="205.74" y="35.56"/>
 <wire x1="248.92" y1="60.96" x2="256.54" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="JP2" gate="A" pin="2"/>
+<pinref part="SERVO_2" gate="A" pin="2"/>
 <wire x1="256.54" y1="40.64" x2="233.68" y2="40.64" width="0.1524" layer="91"/>
 <junction x="233.68" y="40.64"/>
 <junction x="256.54" y="60.96"/>
@@ -11732,7 +11732,7 @@ GPIO32 Servo 2 Signal</text>
 <wire x1="238.76" y1="58.42" x2="205.74" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="205.74" y1="58.42" x2="205.74" y2="53.34" width="0.1524" layer="91"/>
 <junction x="205.74" y="53.34"/>
-<pinref part="JP2" gate="A" pin="1"/>
+<pinref part="SERVO_2" gate="A" pin="1"/>
 <wire x1="256.54" y1="38.1" x2="238.76" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="238.76" y1="38.1" x2="238.76" y2="58.42" width="0.1524" layer="91"/>
 <junction x="238.76" y="58.42"/>
@@ -11760,7 +11760,7 @@ GPIO32 Servo 2 Signal</text>
 </net>
 <net name="GPIO32" class="0">
 <segment>
-<pinref part="JP2" gate="A" pin="3"/>
+<pinref part="SERVO_2" gate="A" pin="3"/>
 <wire x1="256.54" y1="43.18" x2="243.84" y2="43.18" width="0.1524" layer="91"/>
 <label x="241.3" y="43.18" size="1.778" layer="95"/>
 <junction x="256.54" y="43.18"/>

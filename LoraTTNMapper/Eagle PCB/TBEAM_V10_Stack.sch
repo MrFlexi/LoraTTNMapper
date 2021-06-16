@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.5.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -5671,84 +5671,6 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="gy-521">
-<packages>
-<package name="GY-521">
-<pad name="SDA" x="-8.89" y="1.27" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="XDA" x="-8.89" y="-1.27" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="SCL" x="-8.89" y="3.81" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="GND" x="-8.89" y="6.35" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="VCC" x="-8.89" y="8.89" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="XCL" x="-8.89" y="-3.81" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="ADO" x="-8.89" y="-6.35" drill="0.8" diameter="1.778" shape="long"/>
-<pad name="INT" x="-8.89" y="-8.89" drill="0.8" diameter="1.778" shape="long"/>
-<wire x1="-11.43" y1="10.795" x2="4.445" y2="10.795" width="0.127" layer="21"/>
-<wire x1="4.445" y1="10.795" x2="4.445" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="4.445" y1="-10.16" x2="-11.43" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-11.43" y1="-10.16" x2="-11.43" y2="10.795" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-8.89" x2="1.27" y2="-8.89" width="0.127" layer="21"/>
-<wire x1="1.27" y1="-8.89" x2="0.635" y2="-8.255" width="0.127" layer="21"/>
-<wire x1="1.27" y1="-8.89" x2="0.635" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-8.89" x2="-2.54" y2="-5.08" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-5.08" x2="-1.905" y2="-5.715" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-5.08" x2="-3.175" y2="-5.715" width="0.127" layer="21"/>
-<text x="1.905" y="-8.89" size="1.27" layer="21">x</text>
-<text x="-1.27" y="-5.08" size="1.27" layer="21">y</text>
-<text x="3.81" y="-1.27" size="1.27" layer="21" rot="R90">ITG/MPU</text>
-</package>
-</packages>
-<symbols>
-<symbol name="MPU6050">
-<wire x1="-10.16" y1="17.78" x2="-10.16" y2="-22.86" width="0.6096" layer="94"/>
-<wire x1="-10.16" y1="-22.86" x2="17.78" y2="-22.86" width="0.6096" layer="94"/>
-<wire x1="17.78" y1="-22.86" x2="17.78" y2="17.78" width="0.6096" layer="94"/>
-<wire x1="17.78" y1="17.78" x2="-10.16" y2="17.78" width="0.6096" layer="94"/>
-<text x="13.716" y="-9.398" size="1.778" layer="94" rot="R270">GY-521</text>
-<text x="15.24" y="-7.62" size="1.778" layer="94" rot="R90">ITG/MPU</text>
-<pin name="VCC" x="-15.24" y="15.24" length="middle"/>
-<pin name="GND" x="-15.24" y="10.16" length="middle"/>
-<pin name="SCL" x="-15.24" y="5.08" length="middle"/>
-<pin name="SDA" x="-15.24" y="0" length="middle"/>
-<pin name="XDA" x="-15.24" y="-5.08" length="middle"/>
-<pin name="XCL" x="-15.24" y="-10.16" length="middle"/>
-<pin name="ADO" x="-15.24" y="-15.24" length="middle"/>
-<pin name="INT" x="-15.24" y="-20.32" length="middle"/>
-<wire x1="2.54" y1="-20.32" x2="7.62" y2="-20.32" width="0.3048" layer="94"/>
-<wire x1="7.62" y1="-20.32" x2="6.35" y2="-19.05" width="0.3048" layer="94"/>
-<wire x1="7.62" y1="-20.32" x2="6.35" y2="-21.59" width="0.3048" layer="94"/>
-<wire x1="2.54" y1="-20.32" x2="2.54" y2="-15.24" width="0.3048" layer="94"/>
-<wire x1="2.54" y1="-15.24" x2="1.27" y2="-16.51" width="0.3048" layer="94"/>
-<wire x1="2.54" y1="-15.24" x2="3.81" y2="-16.51" width="0.3048" layer="94"/>
-<text x="8.89" y="-21.082" size="1.778" layer="94">x</text>
-<text x="5.08" y="-15.24" size="1.778" layer="94">y</text>
-<text x="-1.524" y="14.732" size="1.778" layer="94">3.3V (or 5v)</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="GY-521" prefix="U">
-<gates>
-<gate name="G$1" symbol="MPU6050" x="-2.54" y="5.08"/>
-</gates>
-<devices>
-<device name="MPU6050" package="GY-521">
-<connects>
-<connect gate="G$1" pin="ADO" pad="ADO"/>
-<connect gate="G$1" pin="GND" pad="GND"/>
-<connect gate="G$1" pin="INT" pad="INT"/>
-<connect gate="G$1" pin="SCL" pad="SCL"/>
-<connect gate="G$1" pin="SDA" pad="SDA"/>
-<connect gate="G$1" pin="VCC" pad="VCC"/>
-<connect gate="G$1" pin="XCL" pad="XCL"/>
-<connect gate="G$1" pin="XDA" pad="XDA"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="st-microelectronics">
 <description>&lt;b&gt;ST Microelectronics Devices&lt;/b&gt;&lt;p&gt;
 Microcontrollers,  I2C components, linear devices&lt;p&gt;
@@ -11324,14 +11246,13 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="BME280" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="IC2" library="uln-udn" deviceset="ULN2003A" device="D"/>
 <part name="SERVO_1" library="pinhead" deviceset="PINHD-1X3" device=""/>
-<part name="SERVO_2" library="pinhead" deviceset="PINHD-1X3" device="" value="Servo_2"/>
-<part name="LED1" library="led" deviceset="LED" device="SML1206"/>
+<part name="SERVO_2/GPIO32" library="pinhead" deviceset="PINHD-1X3" device="" value="Servo_2"/>
+<part name="LED1" library="led" deviceset="LED" device="SML1206" value="Power Rail"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R1206"/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="R1206"/>
 <part name="R3" library="resistor" deviceset="R-EU_" device="R1206"/>
 <part name="LED2" library="led" deviceset="LED" device="SML1206"/>
 <part name="LED3" library="led" deviceset="LED" device="SML1206"/>
-<part name="U1" library="gy-521" deviceset="GY-521" device="MPU6050"/>
 <part name="3V1" library="supply2" deviceset="VDD" device=""/>
 <part name="IC1" library="st-microelectronics" deviceset="L298" device=""/>
 <part name="J1" library="adafruit" deviceset="1X2" device="-3.5MM"/>
@@ -11399,7 +11320,7 @@ GPIO32 Servo 2 Signal</text>
 <attribute name="NAME" x="260.35" y="55.245" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="260.35" y="68.58" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="SERVO_2" gate="A" x="254" y="40.64" smashed="yes" rot="R180">
+<instance part="SERVO_2/GPIO32" gate="A" x="254" y="40.64" smashed="yes" rot="R180">
 <attribute name="NAME" x="260.35" y="34.925" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="260.35" y="48.26" size="1.778" layer="96" rot="R180"/>
 </instance>
@@ -11427,7 +11348,6 @@ GPIO32 Servo 2 Signal</text>
 <attribute name="NAME" x="150.876" y="20.828" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="153.035" y="20.828" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="U1" gate="G$1" x="119.38" y="109.22" smashed="yes"/>
 <instance part="3V1" gate="G$1" x="63.5" y="81.28" smashed="yes"/>
 <instance part="IC1" gate="L298" x="218.44" y="195.58" smashed="yes">
 <attribute name="NAME" x="205.74" y="214.63" size="1.778" layer="95"/>
@@ -11533,17 +11453,12 @@ GPIO32 Servo 2 Signal</text>
 <junction x="233.68" y="76.2"/>
 <junction x="205.74" y="35.56"/>
 <wire x1="248.92" y1="60.96" x2="256.54" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="SERVO_2" gate="A" pin="2"/>
+<pinref part="SERVO_2/GPIO32" gate="A" pin="2"/>
 <wire x1="256.54" y1="40.64" x2="233.68" y2="40.64" width="0.1524" layer="91"/>
 <junction x="233.68" y="40.64"/>
 <junction x="256.54" y="60.96"/>
 <junction x="256.54" y="40.64"/>
 <label x="226.06" y="76.2" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U1" gate="G$1" pin="VCC"/>
-<wire x1="104.14" y1="124.46" x2="96.52" y2="124.46" width="0.1524" layer="91"/>
-<label x="96.52" y="124.46" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -11575,11 +11490,6 @@ GPIO32 Servo 2 Signal</text>
 <wire x1="142.24" y1="20.32" x2="147.32" y2="20.32" width="0.1524" layer="91"/>
 <junction x="142.24" y="20.32"/>
 <label x="139.7" y="17.78" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U1" gate="G$1" pin="GND"/>
-<wire x1="104.14" y1="119.38" x2="96.52" y2="119.38" width="0.1524" layer="91"/>
-<label x="93.98" y="119.38" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="GND2"/>
@@ -11654,11 +11564,6 @@ GPIO32 Servo 2 Signal</text>
 <wire x1="172.72" y1="68.58" x2="160.02" y2="68.58" width="0.1524" layer="91"/>
 <label x="152.4" y="68.58" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="U1" gate="G$1" pin="SCL"/>
-<wire x1="104.14" y1="114.3" x2="96.52" y2="114.3" width="0.1524" layer="91"/>
-<label x="93.98" y="114.3" size="1.778" layer="95"/>
-</segment>
 </net>
 <net name="SDA" class="0">
 <segment>
@@ -11675,11 +11580,6 @@ GPIO32 Servo 2 Signal</text>
 <pinref part="BME280" gate="A" pin="1"/>
 <wire x1="167.64" y1="99.06" x2="182.88" y2="99.06" width="0.1524" layer="91"/>
 <label x="187.96" y="99.06" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U1" gate="G$1" pin="SDA"/>
-<wire x1="104.14" y1="109.22" x2="96.52" y2="109.22" width="0.1524" layer="91"/>
-<label x="93.98" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -11732,7 +11632,7 @@ GPIO32 Servo 2 Signal</text>
 <wire x1="238.76" y1="58.42" x2="205.74" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="205.74" y1="58.42" x2="205.74" y2="53.34" width="0.1524" layer="91"/>
 <junction x="205.74" y="53.34"/>
-<pinref part="SERVO_2" gate="A" pin="1"/>
+<pinref part="SERVO_2/GPIO32" gate="A" pin="1"/>
 <wire x1="256.54" y1="38.1" x2="238.76" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="238.76" y1="38.1" x2="238.76" y2="58.42" width="0.1524" layer="91"/>
 <junction x="238.76" y="58.42"/>
@@ -11760,7 +11660,7 @@ GPIO32 Servo 2 Signal</text>
 </net>
 <net name="GPIO32" class="0">
 <segment>
-<pinref part="SERVO_2" gate="A" pin="3"/>
+<pinref part="SERVO_2/GPIO32" gate="A" pin="3"/>
 <wire x1="256.54" y1="43.18" x2="243.84" y2="43.18" width="0.1524" layer="91"/>
 <label x="241.3" y="43.18" size="1.778" layer="95"/>
 <junction x="256.54" y="43.18"/>
@@ -11808,14 +11708,6 @@ GPIO32 Servo 2 Signal</text>
 <pinref part="BME280" gate="A" pin="4"/>
 <wire x1="167.64" y1="91.44" x2="182.88" y2="91.44" width="0.1524" layer="91"/>
 <label x="187.96" y="91.44" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="INT"/>
-<pinref part="U$1" gate="G$1" pin="GPIO04"/>
-<wire x1="104.14" y1="88.9" x2="55.88" y2="88.9" width="0.1524" layer="91"/>
-<wire x1="55.88" y1="88.9" x2="55.88" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$7" class="0">

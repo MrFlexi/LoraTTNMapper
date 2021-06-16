@@ -5670,6 +5670,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <part name="LED2" library="led" deviceset="LED" device="SML1206"/>
 <part name="LED3" library="led" deviceset="LED" device="SML1206"/>
 <part name="U1" library="gy-521" deviceset="GY-521" device="MPU6050"/>
+<part name="3V1" library="supply2" deviceset="VDD" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -5740,6 +5741,7 @@ GPIO32 Servo 2 Signal</text>
 <attribute name="VALUE" x="153.035" y="20.828" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="U1" gate="G$1" x="119.38" y="109.22" smashed="yes"/>
+<instance part="3V1" gate="G$1" x="63.5" y="81.28" smashed="yes"/>
 </instances>
 <busses>
 </busses>
@@ -5819,6 +5821,11 @@ GPIO32 Servo 2 Signal</text>
 <pinref part="U1" gate="G$1" pin="GND"/>
 <wire x1="104.14" y1="119.38" x2="96.52" y2="119.38" width="0.1524" layer="91"/>
 <label x="93.98" y="119.38" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="GND2"/>
+<wire x1="66.04" y1="73.66" x2="66.04" y2="76.2" width="0.1524" layer="91"/>
+<label x="66.04" y="76.2" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="SCL" class="0">
@@ -5975,6 +5982,14 @@ GPIO32 Servo 2 Signal</text>
 <pinref part="U$1" gate="G$1" pin="GPIO00"/>
 <wire x1="104.14" y1="88.9" x2="58.42" y2="88.9" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="88.9" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VDD_SWITCHABLE" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="DCDC1"/>
+<wire x1="63.5" y1="73.66" x2="63.5" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="3V1" gate="G$1" pin="VDD"/>
+<label x="63.5" y="86.36" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
