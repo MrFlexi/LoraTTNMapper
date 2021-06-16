@@ -41,6 +41,9 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_HUMIDITY 104     // 1 byte, 0.5 % unsigned
 #define LPP_BAROMETER 115    // 2 bytes, hPa unsigned MSB
 
+#define LPP_PMU 201           // 12 bytes PMU values
+
+
 #endif
 
 class PayloadConvert {
@@ -62,6 +65,7 @@ public:
   void addCurrent(uint8_t channel, float value);
   void addTemperature(uint8_t channel, float value);
   void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
+  void addPMU(uint8_t channel,  DataBuffer dataBuffer);
   void addGPS_TTN(TinyGPSPlus tGps);
   void addGPS_LPP(uint8_t channel, TinyGPSPlus tGps); 
   void addButton(uint8_t value);

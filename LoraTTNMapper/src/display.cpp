@@ -165,7 +165,7 @@ void showPage(int page)
     switch (page)
     {
     case PAGE_TBEAM:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 15);
       u8g2.printf( "Firmware:  %.2f", dataBuffer.data.firmware_version);
      
@@ -231,13 +231,8 @@ void showPage(int page)
       if (dataBuffer.data.wlan)
       {
         availableModules = availableModules + "WLAN ";
-      }
-
+      }    
       
-      //sprintf(sbuf, "%s", availableModules);
-      //u8g2.drawStr(1, 20, sbuf);
-      //ESP_LOGI(TAG, "Modules: %s", sbuf);
-
       break;
 
     case PAGE_LORA:
@@ -255,7 +250,6 @@ void showPage(int page)
       break;
 
     case PAGE_GPS:
-
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "GPS");
 
@@ -274,7 +268,7 @@ void showPage(int page)
     case PAGE_SOLAR:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Solar Panel");
-      u8g2.setFont(u8g2_font_profont11_tr);
+      u8g2.setFont(u8g2_font_profont12_tr);
 
 #if (HAS_INA)
       u8g2.setCursor(1, 30);
@@ -294,7 +288,7 @@ void showPage(int page)
     case PAGE_BAT:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Battery");
-      u8g2.setFont(u8g2_font_profont11_tr);
+      u8g2.setFont(u8g2_font_profont12_tr);
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 30);
@@ -326,7 +320,6 @@ void showPage(int page)
       break;
 
     case PAGE_GYRO:
-
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "GYRO");
 
@@ -342,21 +335,19 @@ void showPage(int page)
       break;
 
     case PAGE_CORONA:
-
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Corona Count");
 
       u8g2.setFont(u8g2_font_ncenB24_tr);
       u8g2.setCursor(40, 52);
       u8g2.printf("%i", dataBuffer.data.CoronaDeviceCount);
-
       break;
 
     case PAGE_SLEEP:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sleep");
 
-      u8g2.setFont(u8g2_font_profont11_tr);
+      u8g2.setFont(u8g2_font_profont12_tr);
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 25);
@@ -380,7 +371,6 @@ void showPage(int page)
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);
-
       drawSymbol(60, 12, SUN);
       break;
     }
@@ -390,14 +380,11 @@ void showPage(int page)
     //---------------------------------
 
     if (page != PAGE_SLEEP)
-    {
-    
-    u8g2.setFont(u8g2_font_profont11_tr);
+    {    
+    u8g2.setFont(u8g2_font_profont12_tr);
     u8g2.setCursor(96, 64);
     u8g2.printf("%i min", dataBuffer.data.MotionCounter);
-
-    }
-    
+    }    
 
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access

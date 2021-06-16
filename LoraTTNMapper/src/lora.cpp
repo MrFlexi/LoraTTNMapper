@@ -86,8 +86,12 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     //payload.enqueue_port(2);
   }
 #endif
+payload.enqueue_port(2);
 
 
+// PMU data as one block
+payload.reset();
+payload.addPMU(01, dataBuffer);  //(channel, data)
 payload.enqueue_port(2);
   }
 }
