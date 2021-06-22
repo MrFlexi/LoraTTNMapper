@@ -175,7 +175,7 @@ void setup_mqtt()
 
 void mqtt_send()
 {
-  const int capacity = JSON_OBJECT_SIZE(22) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(23) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
@@ -205,6 +205,8 @@ void mqtt_send()
     doc["humidity"] = String(dataBuffer.data.humidity);
     doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
     doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+    doc["sleep_time"] = String(dataBuffer.settings.sleep_time);
+    
     //doc["experiment"] = String(dataBuffer.settings.experiment);
 
     // Add the "location"

@@ -28,14 +28,14 @@
 
 #define USE_POTI 0
 
-#define displayRefreshIntervall 2       // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL 30             // Transmitt Lora messages
+#define LORA_TX_INTERVAL  15            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
 
-#define sendCycleIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  60 // Update Webpage
 
 
@@ -58,7 +58,7 @@
 #define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
 
 
-#define AUTO_POWER_SAVE 1      // If battery voltage < 3.7  --> sleep for 54 Minutes
+#define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
 #define TIME_TO_SLEEP_BAT_MID 18
 #define TIME_TO_SLEEP_BAT_LOW  54

@@ -301,6 +301,8 @@ void t_cyclicRTOS(void *pvParameters)
 void t_cyclic() // Intervall: Display Refresh
 {
 
+  float temp;
+
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
   //ESP_LOGI(TAG, "ESP free heap: %.2", dataBuffer.data.freeheap);
@@ -312,9 +314,13 @@ void t_cyclic() // Intervall: Display Refresh
   else
   {
 #if (USE_BME280)
-    dataBuffer.data.temperature = smooth_temp.smooth(bme.readTemperature());
+    temp = bme.readTemperature();
+    if (temp < 60)
+    {
+      dataBuffer.data.temperature = smooth_temp.smooth(temp);
+    }
     dataBuffer.data.humidity = bme.readHumidity();
-    ESP_LOGI(TAG, "Temp %.2f Humidity %.2fV", dataBuffer.data.temperature,dataBuffer.data.humidity);
+    ESP_LOGI(TAG, "Temp %.2f Temp smooth %.2f Humidity %.2fV", temp, dataBuffer.data.temperature, dataBuffer.data.humidity);
 #endif
 
 #if (HAS_PMU)
@@ -328,7 +334,7 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
     dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
-    ESP_LOGI(TAG, "PMU BusVoltage %.2fV BatVoltage %.2fV Fuel: %.0f mAh  BatCharge: %.0f mAh", dataBuffer.data.bus_voltage, dataBuffer.data.bat_voltage, dataBuffer.data.bat_DeltamAh, dataBuffer.data.bat_charge_current);
+    //ESP_LOGI(TAG, "PMU BusVoltage %.2fV BatVoltage %.2fV Fuel: %.0f mAh  BatCharge: %.0f mAh", dataBuffer.data.bus_voltage, dataBuffer.data.bat_voltage, dataBuffer.data.bat_DeltamAh, dataBuffer.data.bat_charge_current);
 
     if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bat_voltage != 0))
       dataBuffer.data.pmu_data_available = true;
@@ -402,7 +408,6 @@ void t_sleep()
   if ((dataBuffer.data.bat_voltage * 10) < BAT_LOW)
   {
     dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_LOW;
-
   }
   else
   {

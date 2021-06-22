@@ -92,7 +92,7 @@ payload.enqueue_port(2);
 // PMU data as one block
 payload.reset();
 payload.addPMU(01, dataBuffer);  //(channel, data)
-payload.enqueue_port(2);
+payload.enqueue_port(3);
   }
 }
 
@@ -181,16 +181,14 @@ void dump_queue()
 
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
-  ESP_LOGV(TAG, "Message Dump");
-  Serial.println(" ");
-  Serial.print(" P:");
-  Serial.print(SendBuffer.MessagePort);
-  Serial.print(" S:");
-  Serial.print(SendBuffer.MessageSize);
-  Serial.print(" ** ");
+  char hex_string[5];
+  ESP_LOGI(TAG, "Lora TX Message Port: %d  Size: %d",SendBuffer.MessagePort, SendBuffer.MessageSize);
+
+  Serial.println("Payload:");
   for (int p = 0; p < SendBuffer.MessageSize; p++)
   {
-    Serial.print(SendBuffer.Message[p]);
+    sprintf(hex_string, "0x%02X", SendBuffer.Message[p]);
+    Serial.print(hex_string);
     Serial.print(" ");
   }
   Serial.println();

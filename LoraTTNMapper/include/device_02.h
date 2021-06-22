@@ -2,7 +2,7 @@
 #pragma once
 
 #define DEVICE_NAME "tbeam-02"
-#define USE_OTA 0
+#define USE_OTA 1
 #define USE_BME280 0
 #define HAS_LORA 1
 
@@ -36,7 +36,7 @@
 
 #define USE_POTI 0
 
-#define displayRefreshIntervall 2       // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 7       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
