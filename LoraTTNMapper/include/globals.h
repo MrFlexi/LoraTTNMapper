@@ -19,7 +19,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  1
+#define DEVICE_ID  2
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -141,6 +141,7 @@ typedef struct
   uint8_t sleep_time;
   const char* log_print_buffer;
   const char* experiment;
+  uint8_t bat_max_charge_current;
   
 } deviceSettings_t;
 

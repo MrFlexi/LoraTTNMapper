@@ -334,7 +334,7 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
     dataBuffer.data.bat_max_charge_curr = pmu.getChargeControlCur();
-    //ESP_LOGI(TAG, "PMU BusVoltage %.2fV BatVoltage %.2fV Fuel: %.0f mAh  BatCharge: %.0f mAh", dataBuffer.data.bus_voltage, dataBuffer.data.bat_voltage, dataBuffer.data.bat_DeltamAh, dataBuffer.data.bat_charge_current);
+    ESP_LOGI(TAG, "PMU BusVoltage %.2fV BatVoltage %.2fV Fuel: %.0f mAh  BatCharge: %.0f mAh", dataBuffer.data.bus_voltage, dataBuffer.data.bat_voltage, dataBuffer.data.bat_DeltamAh, dataBuffer.data.bat_charge_current);
 
     if ((dataBuffer.data.bus_voltage != 0) || (dataBuffer.data.bat_voltage != 0))
       dataBuffer.data.pmu_data_available = true;

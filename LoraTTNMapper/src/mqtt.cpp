@@ -103,9 +103,17 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   if (action == "sleep_time")
   {
-
     dataBuffer.settings.sleep_time = atoi(value);
     ESP_LOGI(TAG, "MQTT: sleep time %2d", dataBuffer.settings.sleep_time);
+    saveConfiguration();
+  }
+
+  if (action == "set_bat_max_charge_current")
+  {
+    
+    dataBuffer.settings.bat_max_charge_current = atoi(value);
+    ESP_LOGI(TAG, "MQTT: set max charge current %2d", dataBuffer.settings.bat_max_charge_current);
+    pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
     saveConfiguration();
   }
 
@@ -175,7 +183,7 @@ void setup_mqtt()
 
 void mqtt_send()
 {
-  const int capacity = JSON_OBJECT_SIZE(23) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(24) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   char topic_out[40];
 
@@ -186,13 +194,14 @@ void mqtt_send()
   {
     doc.clear();
     doc["device"] = DEVICE_NAME;
+    doc["ip"] = String(dataBuffer.data.ip_address);
     doc["BootCounter"] = String(dataBuffer.data.bootCounter);
     doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
     doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
     doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
     doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
     doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-    doc["bat_max_charge_curr"] = String(dataBuffer.data.bat_max_charge_curr);
+    doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
 
     doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
     doc["bus_current"] = String(dataBuffer.data.bus_current);
@@ -214,11 +223,11 @@ void mqtt_send()
     location["lat"] = dataBuffer.data.gps.lat();
     location["lon"] = dataBuffer.data.gps.lng();
 
-    char buffer[600];
+    char buffer[700];
     serializeJson(doc, buffer);
     MqttClient.publish(topic_out, buffer);
-    //serializeJsonPretty(doc, buffer);
-    //ESP_LOGI(TAG, "Payload: %s", buffer);
+    serializeJsonPretty(doc, buffer);
+    ESP_LOGI(TAG, "Payload: %s", buffer);
     ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
   }
   else

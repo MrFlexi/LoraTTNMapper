@@ -19,13 +19,13 @@ void AXP192_power(pmu_power_t powerlevel)
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
-    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
-    //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    //pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_4HZ);
     ESP_LOGI(TAG, "AXP power ON");
     break;
 
   case pmu_power_sleep:
-    pmu.setChgLEDMode(AXP20X_LED_OFF);
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
     // we don't cut off DCDC1, because then display blocks i2c bus
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
@@ -153,7 +153,9 @@ void AXP192_init(void)
     pmu.EnableCoulombcounter();
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
-    pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
+    //pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
+    pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
+
     pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
     // switch power rails on
     AXP192_power(pmu_power_on);
