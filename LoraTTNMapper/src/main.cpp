@@ -557,6 +557,7 @@ void setup()
 #endif
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280)
+ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
   setup_i2c_sensors();
 #endif
 

@@ -64,7 +64,7 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
 #endif
 
-#if (HAS_INA)
+#if (HAS_INA3221 || HAS_INA219 )
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif

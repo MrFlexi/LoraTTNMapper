@@ -6,7 +6,8 @@
 #define USE_BME280 1
 
 #define HAS_LORA 1
-#define HAS_INA 0
+#define HAS_INA3221  0
+#define HAS_INA219  1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 

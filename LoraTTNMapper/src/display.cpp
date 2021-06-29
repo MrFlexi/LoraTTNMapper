@@ -24,7 +24,7 @@ void displayRegisterPages()
   page_array[max_page_counter] = PAGE_LORA;
 #endif
 
-#if (HAS_INA)
+#if (HAS_INA3221 || HAS_INA219 )
   max_page_counter++;
   page_array[max_page_counter] = PAGE_SOLAR;
 #endif
@@ -270,14 +270,14 @@ void showPage(int page)
       u8g2.drawStr(1, 15, "Solar Panel");
       u8g2.setFont(u8g2_font_profont12_tr);
 
-#if (HAS_INA)
+#if (HAS_INA3221 || HAS_INA219 )
       u8g2.setCursor(1, 30);
-      u8g2.printf("Sol: %.2fV %.0fmA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
+      u8g2.printf("In: %.2f V  %.0f mA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
 #endif
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bus+: %.2fV %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
+      u8g2.printf("PMU Bus: %.2f V  %.0f mA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -292,10 +292,10 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 30);
-      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+      u8g2.printf("Bat+: %.2f V %.0f mA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
 
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      u8g2.printf("Bat-: %.2f V %.0f mA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 
       u8g2.setCursor(1, 50);
       u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
@@ -351,7 +351,7 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 25);
-      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+      u8g2.printf("Bat: %.2f V", dataBuffer.data.bat_voltage);
       u8g2.setCursor(1, 35);
       u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
 #else

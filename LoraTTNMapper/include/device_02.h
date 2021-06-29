@@ -2,11 +2,9 @@
 #pragma once
 
 #define DEVICE_NAME "tbeam-02"
-#define USE_OTA 1
+#define USE_OTA 0
 #define USE_BME280 0
 #define HAS_LORA 1
-
-#define HAS_INA 0
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1

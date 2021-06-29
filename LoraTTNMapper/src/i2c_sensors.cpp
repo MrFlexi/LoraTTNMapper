@@ -1,7 +1,6 @@
 #include "globals.h"
 #include "i2c_sensors.h"
 
-
 #if (HAS_INA219)
 Adafruit_INA219 ina219;
 
@@ -19,31 +18,39 @@ void print_ina219()
   current_mA = ina219.getCurrent_mA();
   power_mW = ina219.getPower_mW();
   loadvoltage = busvoltage + (shuntvoltage / 1000);
-  
-  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
-  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
-  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
-  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
+
+  Serial.print("Bus Voltage:   ");
+  Serial.print(busvoltage);
+  Serial.println(" V");
+  Serial.print("Shunt Voltage: ");
+  Serial.print(shuntvoltage);
+  Serial.println(" mV");
+  Serial.print("Load Voltage:  ");
+  Serial.print(loadvoltage);
+  Serial.println(" V");
+  Serial.print("Current:       ");
+  Serial.print(current_mA);
+  Serial.println(" mA");
+  Serial.print("Power:         ");
+  Serial.print(power_mW);
+  Serial.println(" mW");
   Serial.println("");
 }
 
 void setup_ina219()
 {
-if (! ina219.begin()) 
-    {
-      Serial.println("Failed to find INA219 chip");
-    }
-else
-{
-  print_ina219();
-}
+  ESP_LOGI(TAG, "Setup INA 219");
+  if (!ina219.begin())
+  {
+    Serial.println("Failed to find INA219 chip");
+  }
+  else
+  {
+    print_ina219();
+  }
 }
 
 #endif
-
-
-
 
 #if (HAS_INA3221)
 SDL_Arduino_INA3221 ina3221;
@@ -76,26 +83,21 @@ void print_ina3221()
   Serial.println("");
 }
 
-
 void setup_ina3221()
 {
-ina3221.begin();
-  Serial.print("Manufact. ID=0x");
-  int MID;
-  MID = ina3221.getManufID();
-  Serial.println(MID, HEX);
+  ESP_LOGI(TAG, "Setup INA 3221, Manufacturer ID: 0x%02X", ina3221.getManufID());
+  ina3221.begin();
   print_ina3221();
 }
 
 #endif
 
-
 #if (USE_BME280)
 
-  Adafruit_BME280 bme;
+Adafruit_BME280 bme;
 
-  void setup_bme280()
-  {
+void setup_bme280()
+{
   ESP_LOGI(TAG, "BME280 Setup...");
   unsigned status;
 
@@ -121,27 +123,21 @@ ina3221.begin();
     Serial.println(" %");
     Serial.println();
   }
-  }
+}
 #endif
-
-
-
-
-
 
 void setup_i2c_sensors()
 {
 
 #if (HAS_INA3221)
-setup_ina3221();
+  setup_ina3221();
 #endif
 
 #if (HAS_INA219)
-setup_ina219();
+  setup_ina219();
 #endif
 
 #if (USE_BME280)
-setup_bme280();
+  setup_bme280();
 #endif
-
 }
