@@ -95,7 +95,7 @@ void PayloadConvert::addPMU(uint8_t channel, DataBuffer dataBuffer)
   buffer[cursor++] = highByte(out);
   buffer[cursor++] = lowByte(out);
 
-out = dataBuffer.data.bat_voltage * 100;
+  out = dataBuffer.data.bat_voltage * 100;
   buffer[cursor++] = highByte(out);
   buffer[cursor++] = lowByte(out);
 
