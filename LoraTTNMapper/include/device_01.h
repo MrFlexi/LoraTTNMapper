@@ -33,11 +33,11 @@
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL  15            // Transmitt Lora messages
-#define LORA_DATARATE DR_SF12
+#define LORA_TX_INTERVAL  30            // Transmitt Lora messages
+#define LORA_DATARATE DR_SF9
 
 #define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  60 // Update Webpage
+#define sendWebsocketIntervall  5 // Update Webpage
 
 
 #define PAYLOAD_ENCODER 3

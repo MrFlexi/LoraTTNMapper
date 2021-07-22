@@ -361,6 +361,7 @@ void ESP32_sleep()
 
   gps.enable_sleep();
   Serial.flush();
+  WiFi.disconnect();
   showPage(PAGE_SLEEP);
   ESP_LOGI(TAG, "Deep Sleep started");
   esp_deep_sleep_start();

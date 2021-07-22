@@ -170,7 +170,6 @@ void showPage(int page)
       u8g2.printf( "Firmware:  %.2f", dataBuffer.data.firmware_version);
      
       u8g2.setCursor(1, 30);
-      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter );
   
       u8g2.setCursor(1, 45);
@@ -277,7 +276,7 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 40);
-      u8g2.printf("PMU Bus: %.2f V  %.0f mA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
+      u8g2.printf("PMU Bus: %.2fV  %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -292,13 +291,13 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 30);
-      u8g2.printf("Bat+: %.2f V %.0f mA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
+      u8g2.printf("Bat+: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_charge_current);
 
       u8g2.setCursor(1, 40);
-      u8g2.printf("Bat-: %.2f V %.0f mA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+      u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
 
       u8g2.setCursor(1, 50);
-      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
+      u8g2.printf("Fuel: %.0fmAh ", dataBuffer.data.bat_DeltamAh);
 #else
       u8g2.setCursor(1, 40);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
@@ -312,7 +311,7 @@ void showPage(int page)
 
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      u8g2.printf("Temp: %.2f C %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
+      u8g2.printf("Temp: %.2fC %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
       u8g2.setCursor(1, 45);
       u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
       u8g2.setCursor(1, 60);
@@ -351,9 +350,9 @@ void showPage(int page)
 
 #if (HAS_PMU)
       u8g2.setCursor(1, 25);
-      u8g2.printf("Bat: %.2f V", dataBuffer.data.bat_voltage);
+      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
       u8g2.setCursor(1, 35);
-      u8g2.printf("Fuel: %.0f mAh ", dataBuffer.data.bat_DeltamAh);
+      u8g2.printf("Fuel: %.0fmAh ", dataBuffer.data.bat_DeltamAh);
 #else
       u8g2.setCursor(1, 25);
       u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);

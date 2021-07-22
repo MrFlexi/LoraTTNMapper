@@ -6,7 +6,7 @@ AsyncWebSocket ws("/ws");
 
 String message_buffer_to_jsonstr(DataBuffer message_buffer)
 {
- StaticJsonDocument<500> ws_json;
+ StaticJsonDocument<600> ws_json;
   
   String JsonStr;
   ws_json.clear();
@@ -17,6 +17,9 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   ws_json["bat_voltage"] = dataBuffer.data.bat_voltage;
   ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
   ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+
+  ws_json["panel_current"] = dataBuffer.data.panel_current;
+  ws_json["panel_voltage"] = dataBuffer.data.panel_voltage;
 
   ws_json["TXCounter"] = String( dataBuffer.data.txCounter );
   ws_json["Temperatur"] = String( dataBuffer.data.temperature );

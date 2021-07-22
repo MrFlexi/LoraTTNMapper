@@ -102,6 +102,21 @@
 									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Panel" subheader="Voltage" press="press">
+								<TileContent unit="V" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/panel_voltage}" valueColor="" indicator="Down" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Panel" subheader="Current" press="press">
+								<TileContent unit="mA" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="" indicator="Down" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+
+
 							</l:HorizontalLayout>
 
 						</ScrollContainer>

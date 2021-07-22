@@ -22,7 +22,7 @@
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   1 
+#define USE_WEBSERVER   0 
 #define sendWebsocketIntervall          10 // every x seconds
 #define USE_CAYENNE     0
 #define USE_MQTT 1
@@ -34,8 +34,8 @@
 
 #define USE_POTI 0
 
-#define displayRefreshIntervall 7       // get sensor values and update display     ---> t_cyclic
-#define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
+#define displayRefreshIntervall 10       // get sensor values and update display     ---> t_cyclic
+#define displayMoveIntervall 20         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
