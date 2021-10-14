@@ -22,7 +22,7 @@
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   0 
+#define USE_WEBSERVER   1
 #define sendWebsocketIntervall          10 // every x seconds
 #define USE_CAYENNE     0
 #define USE_MQTT 1
