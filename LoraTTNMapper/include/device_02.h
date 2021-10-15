@@ -1,16 +1,13 @@
 
 #pragma once
 
-#define DEVICE_NAME "tbeam-02"
+#define DEVICE_NAME "mrflexi-02"
 #define USE_OTA 0
 #define USE_BME280 0
 #define HAS_LORA 1
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
-
-
-#define USE_SPIFF_LOGGING 1
 
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
