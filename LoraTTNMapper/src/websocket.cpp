@@ -10,7 +10,7 @@ String message_buffer_to_jsonstr(DataBuffer message_buffer)
   
   String JsonStr;
   ws_json.clear();
-
+  ws_json["DeviceName"] = DEVICE_NAME;
   ws_json["MotionCounter"] = String( dataBuffer.data.MotionCounter );
   ws_json["BootCounter"] = String( dataBuffer.data.bootCounter );
 

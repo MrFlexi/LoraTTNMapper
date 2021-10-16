@@ -12,6 +12,9 @@
 						<OverflowToolbarLayoutData priority="NeverOverflow"/>
 					</layoutData>
 				</Button>
+				<ToolbarSpacer width="20px"/>
+				<Text text="{dataBuffer>/DeviceName}" wrapping="false" />
+				<ToolbarSpacer width="20px"/>
 
 				<Button id="bt_reboot" text="Reboot" icon="" type="Emphasized" press="reboot">
 					<layoutData>

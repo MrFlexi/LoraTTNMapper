@@ -58,7 +58,6 @@
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
 
-
 #define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
 #define TIME_TO_SLEEP_BAT_MID 18

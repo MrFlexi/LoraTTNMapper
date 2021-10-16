@@ -201,20 +201,18 @@ void mqtt_send()
     doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
     doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
     doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-    doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
-
     doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
     doc["bus_current"] = String(dataBuffer.data.bus_current);
-
     doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
     doc["panel_current"] = String(dataBuffer.data.panel_current);
-
     doc["TXCounter"] = String(dataBuffer.data.txCounter);
     doc["temperature"] = String(dataBuffer.data.temperature);
     doc["humidity"] = String(dataBuffer.data.humidity);
     doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
     doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+
     doc["sleep_time"] = String(dataBuffer.settings.sleep_time);
+    doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
     
     //doc["experiment"] = String(dataBuffer.settings.experiment);
 
