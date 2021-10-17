@@ -66,9 +66,6 @@ void t_broadcast_message(void *parameter)
 }
 
 
-
-
-
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
   if (type == WS_EVT_CONNECT)

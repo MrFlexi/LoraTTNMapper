@@ -26,7 +26,7 @@ void setup_webserver()
     });
 
     server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
-    if(SPIFFS.exists("/LOGS.txt")) {
+    if(SPIFFS.exists("/settings.jsn")) {
       request->send(SPIFFS, "/settings.jsn", "application/json");
     } else {
       request->send(200, "text/plain", "File not found");

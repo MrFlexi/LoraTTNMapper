@@ -329,7 +329,16 @@ void t_cyclic() // Intervall: Display Refresh
 
     dataBuffer.data.bat_voltage = smooth_batvol.smooth(pmu.getBattVoltage() / 1000);
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
-    dataBuffer.data.bat_discharge_current = smooth_discur.smooth(pmu.getBattDischargeCurrent());
+    dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
+
+    // recalculate charge current  
+    if  ( dataBuffer.data.bat_charge_current == 0 )  
+    {
+      if  ( dataBuffer.data.bat_discharge_current > 0 ) 
+      {
+        dataBuffer.data.bat_charge_current = dataBuffer.data.bat_discharge_current * -1;
+      }
+    } 
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
