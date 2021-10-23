@@ -33,6 +33,14 @@ void setup_webserver()
 
     }
     });
+
+    server.on("/settings/max_charge/1", HTTP_GET, [](AsyncWebServerRequest *request){
+      dataBuffer.settings.bat_max_charge_current = 1;
+      ESP_LOGI(TAG, "HTTP: set max charge current %2d", dataBuffer.settings.bat_max_charge_current);
+      pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
+      saveConfiguration();
+      request->send(200, "/settings.jsn", "application/json");
+    });
     
     server.begin();
     server.serveStatic("/", SPIFFS, "/");

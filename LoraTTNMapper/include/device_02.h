@@ -39,7 +39,7 @@
 #define LORA_DATARATE DR_SF9
 
 #define sendCycleIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  60 // Update Webpage
+#define sendWebsocketIntervall  5 // Update Webpage
 
 
 

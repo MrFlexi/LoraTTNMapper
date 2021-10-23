@@ -17,6 +17,7 @@ AnalogSmooth Poti_A = AnalogSmooth();
 
 static const char TAG[] = __FILE__;
 
+
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
@@ -542,6 +543,10 @@ void setup()
   print_wakeup_reason();
   display_chip_info();
 
+  ESP_LOGI(TAG, "#---------------------jojojoj-------------------------------------#");
+  Serial.println(dataBuffer.to_json());
+  Serial.println(dataBuffer.getError());
+
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
@@ -658,7 +663,9 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
 
 #if (USE_POTI)
   poti_setup_RTOS();
-#endif
+#endif^
+
+
 
   //-------------------------------------------------------------------------------
   // Tasks
@@ -706,6 +713,8 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
+ 
+
   // get sensor values once
   t_cyclic();
 

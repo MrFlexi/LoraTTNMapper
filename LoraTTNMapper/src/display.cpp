@@ -407,5 +407,47 @@ void DataBuffer::get()
 {
 }
 
+String DataBuffer::to_json()
+{
+  const int capacity = JSON_OBJECT_SIZE(25) + JSON_OBJECT_SIZE(2);
+  StaticJsonDocument<capacity> doc;
+  String JsonStr;
+
+    doc.clear();
+    doc["device"] = DEVICE_NAME;
+    doc["ip"] = String(dataBuffer.data.ip_address);
+    doc["BootCounter"] = String(dataBuffer.data.bootCounter);
+    doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
+    doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
+    doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
+    doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
+    doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
+    doc["bus_current"] = String(dataBuffer.data.bus_current);
+    doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
+    doc["panel_current"] = String(dataBuffer.data.panel_current);
+    doc["TXCounter"] = String(dataBuffer.data.txCounter);
+    doc["temperature"] = String(dataBuffer.data.temperature);
+    doc["humidity"] = String(dataBuffer.data.humidity);
+    doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
+    doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
+    doc["MotionCounter"] = String(dataBuffer.data.MotionCounter);
+
+    doc["sleep_time"] = String(dataBuffer.settings.sleep_time);
+    doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
+    
+    // Add the "location"
+    JsonObject location = doc.createNestedObject("location");
+    location["lat"] = dataBuffer.data.gps.lat();
+    location["lon"] = dataBuffer.data.gps.lng();
+
+
+    serializeJson(doc, JsonStr);
+  // Serial.println(sizeof(JsonStr));
+  //ESP_LOGI(TAG, "DataBuffer: %s", JsonStr.c_str());
+  // Serial.println("");
+    _error = "Jogi";
+    return JsonStr;
+}
+
 DataBuffer dataBuffer;
 deviceStatus_t sensorValues;

@@ -60,7 +60,7 @@
 
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
 								<TileContent unit="" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/SleepTime}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -80,7 +80,7 @@
 							<l:HorizontalLayout allowWrapping="true">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -97,12 +97,6 @@
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="charge current" press="press">
 								<TileContent unit="mA" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="discharge current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
