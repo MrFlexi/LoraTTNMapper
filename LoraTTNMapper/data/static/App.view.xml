@@ -80,7 +80,23 @@
 							<l:HorizontalLayout allowWrapping="true">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							</l:HorizontalLayout>
+
+							<l:HorizontalLayout allowWrapping="true">
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Voltage" press="press">
+								<TileContent unit="Volt" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bus_voltage}" valueColor="" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Current" press="press">
+								<TileContent unit="mA" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bus_current}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -97,6 +113,12 @@
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="charge current" press="press">
 								<TileContent unit="mA" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="FuelGauge" press="press">
+								<TileContent unit="mAh" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bat_fuel_gauge}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
