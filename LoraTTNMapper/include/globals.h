@@ -19,7 +19,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  1
+#define DEVICE_ID  2
 
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
@@ -134,6 +134,7 @@ typedef struct
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;
   double gps_distance;
+  char gps_datetime[32];
 } deviceStatus_t;
 
 

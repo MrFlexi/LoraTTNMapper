@@ -439,12 +439,9 @@ String DataBuffer::to_json()
     JsonObject location = doc.createNestedObject("location");
     location["lat"] = dataBuffer.data.gps.lat();
     location["lon"] = dataBuffer.data.gps.lng();
-
+  
 
     serializeJson(doc, JsonStr);
-  // Serial.println(sizeof(JsonStr));
-  //ESP_LOGI(TAG, "DataBuffer: %s", JsonStr.c_str());
-  // Serial.println("");
     _error = "Jogi";
     return JsonStr;
 }
