@@ -155,6 +155,58 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
+//--------------------------------------------------------------------------
+// Servos
+//--------------------------------------------------------------------------
+
+#if (USE_SERVO)
+void setup_servo() {
+
+  Servo servo1;
+  Servo servo2;
+  int minUs = 1000;
+  int maxUs = 2000;
+
+	// Allow allocation of all timers
+	ESP32PWM::allocateTimer(0);
+	ESP32PWM::allocateTimer(1);
+	ESP32PWM::allocateTimer(2);
+	ESP32PWM::allocateTimer(3);
+	servo1.setPeriodHertz(50);      // Standard 50hz servo
+	servo2.setPeriodHertz(50);      // Standard 50hz servo
+
+  servo1.attach(SERVO1_PIN, 1000, 2000);
+  servo2.attach(SERVO2_PIN, 1000, 2000);
+
+  pinMode(POWER_RAIL_PIN, OUTPUT); // Set GPIO15 as digital output pin
+  digitalWrite(POWER_RAIL_PIN, HIGH);
+
+  pinMode(SERVO2_PIN, OUTPUT); // Set GPIO35 as digital output pin
+  
+  digitalWrite(SERVO2_PIN, HIGH);
+  Serial.println("High");
+  delay(2000);
+  for (int pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+		// in steps of 1 degree
+  servo1.write(pos); 
+	servo2.write(pos);    // tell servo to go to position in variable 'pos'
+	delay(15);             // waits 15ms for the servo to reach the position
+	}
+	for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+		servo1.write(pos);    // tell servo to go to position in variable 'pos'
+    servo2.write(pos); 
+		delay(15);             // waits 15ms for the servo to reach the position
+	}
+
+digitalWrite(SERVO2_PIN, LOW);
+delay(2000);
+Serial.println("Servo2 low");
+digitalWrite(POWER_RAIL_PIN, LOW);
+Serial.println("Power Low");
+}
+#endif
+
+
 void setup_filesystem()
 {
   //---------------------------------------------------------------
@@ -663,7 +715,11 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
 
 #if (USE_POTI)
   poti_setup_RTOS();
-#endif^
+#endif
+
+#if (USE_SERVO)
+setup_servo();
+#endif
 
 
 

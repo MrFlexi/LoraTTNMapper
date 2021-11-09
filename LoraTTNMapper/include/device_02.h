@@ -15,6 +15,10 @@
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
 
+#define USE_SERVO 1
+
+
+
 #define USE_BLE 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0

@@ -15,6 +15,13 @@
 #define LORA_DATARATE   DR_SF7
 
 
+//--------------------------------------------------------------------------
+// GPIO
+//--------------------------------------------------------------------------
+// 5,18,19,23,26,27,s 33, 32    --> LORA
+// 35                           --> PMU Interrupt
+// 12,34                        --> GPS
+
 
 //--------------------------------------------------------------------------
 // Device Settings
@@ -58,6 +65,21 @@
 extern WiFiClient wifiClient;
 #endif
 
+#if (USE_SERVO)
+#include <ESP32Servo.h>
+// Published values for SG90 servos; adjust if needed
+extern int minUs;
+extern int maxUs;
+
+#ifdef SERVO1_PIN
+extern Servo servo1;
+#endif
+
+#ifdef SERVO2_PIN
+extern Servo servo2;
+#endif
+
+#endif
 
 #if (USE_WEBSERVER)
 #include "ESPAsyncWebServer.h"
