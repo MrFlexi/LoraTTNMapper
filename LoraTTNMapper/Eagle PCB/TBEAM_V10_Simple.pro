@@ -2,26 +2,24 @@ EAGLE AutoRouter Statistics:
 
 Job           : C:/Users/TTv060/Desktop/Projects/LoraTTNMapper/LoraTTNMapper/Eagle PCB/TBEAM_V10_Simple.brd
 
-Start at      : 19:02:47 (01.07.2021)
-End at        : 19:03:05 (01.07.2021)
-Elapsed time  : 00:00:16
+Start at      : 16:12:22 (14.10.2021)
+End at        : 16:12:25 (14.10.2021)
+Elapsed time  : 00:00:01
 
-Signals       :    20   RoutingGrid: 6 mil  Layers: 2
-Connections   :    44   predefined:  0 ( 0 Vias )
+Signals       :    29   RoutingGrid: 25 mil  Layers: 2
+Connections   :    77   predefined:  18 ( 0 Vias )
 
-Router memory :   1444864
+Router memory :   88976
 
-Job has been interrupted!
+Passname          :    Busses     Route Optimize1 Optimize2 Optimize3 Optimize4
 
-Passname          : TopRouter     Route Optimize1 Optimize2 Optimize3 Optimize4
-
-Time per pass     :  00:00:04  00:00:01  00:00:03  00:00:02  00:00:03  00:00:03
+Time per pass     :  00:00:00  00:00:00  00:00:00  00:00:01  00:00:00  00:00:00
 Number of Ripups  :         0         0         0         0         0         0
 max. Level        :         0         0         0         0         0         0
 max. Total        :         0         0         0         0         0         0
 
-Routed            :        32        44        44        44        44        44
-Vias              :         0         1         1         0         0         0
-Resolution        :    72.7 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
+Routed            :         7        59        59        59        59        59
+Vias              :         0        40        15         7         8         7
+Resolution        :    32.5 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
 Final             : 100.0% beendet
