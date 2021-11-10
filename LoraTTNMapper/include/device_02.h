@@ -1,28 +1,30 @@
 
 #pragma once
 
-#define DEVICE_NAME "tbeam-02"
+#define DEVICE_NAME "mrflexi-02"
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
-
-#define USE_SPIFF_LOGGING 1
-
 #define HAS_PMU 1
+#define HAS_INA219  1
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
+
+#define USE_SERVO 1
+
+
 
 #define USE_BLE 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   0 
+#define USE_WEBSERVER   1
 #define sendWebsocketIntervall          10 // every x seconds
 #define USE_CAYENNE     0
 #define USE_MQTT 1
@@ -35,14 +37,14 @@
 #define USE_POTI 0
 
 #define displayRefreshIntervall 10       // get sensor values and update display     ---> t_cyclic
-#define displayMoveIntervall 20         // shift to next display page               ---> t_moveDisplay
+#define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 #define LORA_DATARATE DR_SF9
 
 #define sendCycleIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  60 // Update Webpage
+#define sendWebsocketIntervall  5 // Update Webpage
 
 
 
@@ -60,7 +62,18 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1              // Main switch
-#define TIME_TO_SLEEP 10        // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  5 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
+#define ESP_SLEEP 1            // Main switch
+
+
+#define TIME_TO_SLEEP 10       // sleep for n minute
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
+
+#define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
+#define TIME_TO_SLEEP_BAT_HIGH  6
+#define TIME_TO_SLEEP_BAT_MID 18
+#define TIME_TO_SLEEP_BAT_LOW  54
+#define BAT_LOW   37         // 3.7 Volt
+#define BAT_HIGH  40 
+
+

@@ -25,10 +25,14 @@
 #include <stdint.h>
 
 #define FASTLED_DATA_PIN        GPIO_NUM_2
-#define GYRO_INT_PIN            GPIO_NUM_4      // Gyroskop Movement Detection
+
 #define POTI_PIN                GPIO_NUM_32
 #define PMU_INT_PIN             GPIO_NUM_35     // AXP192 interrupt
 #define BUTTON_PIN              GPIO_NUM_38     // middle on board button
+
+#define POWER_RAIL_PIN          GPIO_NUM_15     // Power Rail
+#define SERVO1_PIN              GPIO_NUM_13
+#define SERVO2_PIN              GPIO_NUM_4
 
 #define GPS_TX                  GPIO_NUM_34
 #define GPS_RX                  GPIO_NUM_12

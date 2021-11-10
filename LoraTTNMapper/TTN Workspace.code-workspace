@@ -17,7 +17,26 @@
 			"system_error": "cpp",
 			"functional": "cpp",
 			"bitset": "cpp",
-			"random": "cpp"
+			"random": "cpp",
+			"array": "cpp",
+			"*.tcc": "cpp",
+			"string": "cpp",
+			"vector": "cpp",
+			"exception": "cpp",
+			"iomanip": "cpp",
+			"istream": "cpp",
+			"limits": "cpp",
+			"ostream": "cpp",
+			"sstream": "cpp",
+			"streambuf": "cpp",
+			"regex": "cpp",
+			"unordered_map": "cpp",
+			"algorithm": "cpp",
+			"tuple": "cpp",
+			"type_traits": "cpp",
+			"cmath": "cpp",
+			"fstream": "cpp",
+			"utility": "cpp"
 		}
 	}
 }

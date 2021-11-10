@@ -15,11 +15,19 @@
 #define LORA_DATARATE   DR_SF7
 
 
+//--------------------------------------------------------------------------
+// GPIO
+//--------------------------------------------------------------------------
+// 5,18,19,23,26,27,s 33, 32    --> LORA
+// 35                           --> PMU Interrupt
+// 12,34                        --> GPS
+
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
 #define DEVICE_ID  2
+
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -57,6 +65,21 @@
 extern WiFiClient wifiClient;
 #endif
 
+#if (USE_SERVO)
+#include <ESP32Servo.h>
+// Published values for SG90 servos; adjust if needed
+extern int minUs;
+extern int maxUs;
+
+#ifdef SERVO1_PIN
+extern Servo servo1;
+#endif
+
+#ifdef SERVO2_PIN
+extern Servo servo2;
+#endif
+
+#endif
 
 #if (USE_WEBSERVER)
 #include "ESPAsyncWebServer.h"
@@ -133,6 +156,7 @@ typedef struct
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;
   double gps_distance;
+  char gps_datetime[32];
 } deviceStatus_t;
 
 

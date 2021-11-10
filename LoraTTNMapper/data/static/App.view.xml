@@ -12,6 +12,9 @@
 						<OverflowToolbarLayoutData priority="NeverOverflow"/>
 					</layoutData>
 				</Button>
+				<ToolbarSpacer width="20px"/>
+				<Text text="{dataBuffer>/DeviceName}" wrapping="false" />
+				<ToolbarSpacer width="20px"/>
 
 				<Button id="bt_reboot" text="Reboot" icon="" type="Emphasized" press="reboot">
 					<layoutData>
@@ -57,7 +60,7 @@
 
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
 								<TileContent unit="" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/SleepTime}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -77,7 +80,23 @@
 							<l:HorizontalLayout allowWrapping="true">
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
+									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							</l:HorizontalLayout>
+
+							<l:HorizontalLayout allowWrapping="true">
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Voltage" press="press">
+								<TileContent unit="Volt" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bus_voltage}" valueColor="" indicator="Up" withMargin="false" />
+								</TileContent>
+							</GenericTile>
+
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Current" press="press">
+								<TileContent unit="mA" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bus_current}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
@@ -97,9 +116,9 @@
 								</TileContent>
 							</GenericTile>
 
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="discharge current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
+							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="FuelGauge" press="press">
+								<TileContent unit="mAh" footer="">
+									<NumericContent scale="M" value="{dataBuffer>/bat_fuel_gauge}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 

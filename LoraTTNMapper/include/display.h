@@ -59,9 +59,16 @@ class DataBuffer
   public:
     DataBuffer();
     void set( deviceStatus_t input );
-    void get();  
+    void get();
+    String to_json();
     deviceStatus_t data ;
     deviceSettings_t settings;
+    
+    const char* getError() const { return _error; }
+
+  private:
+    char* _error;
+   
 };
 
 extern DataBuffer dataBuffer;

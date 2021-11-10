@@ -1,13 +1,12 @@
 
 #pragma once
 
-#define DEVICE_NAME "tbeam-01"
+#define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 0
-#define USE_BME280 1
-
+#define USE_BME280 0
 #define HAS_LORA 1
 #define HAS_INA3221  0
-#define HAS_INA219  1
+#define HAS_INA219  0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -16,13 +15,14 @@
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 0
 
+#define USE_SPIFF_LOGGING 1
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   1 
 #define USE_CAYENNE 0
 #define USE_MQTT 1
 
-#define USE_FASTLED 1
+#define USE_FASTLED 0
 #define USE_FASTLED_RTOS 0
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
@@ -34,7 +34,7 @@
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL  30            // Transmitt Lora messages
-#define LORA_DATARATE DR_SF9
+#define LORA_DATARATE DR_SF12
 
 #define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  5 // Update Webpage
@@ -54,10 +54,9 @@
 #define ESP_SLEEP 1            // Main switch
 
 
-#define TIME_TO_SLEEP 5        // sleep for n minute
+#define TIME_TO_SLEEP 10       // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
-
 
 #define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
