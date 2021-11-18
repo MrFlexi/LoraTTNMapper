@@ -319,7 +319,7 @@ void showPage(int page)
       u8g2.setCursor(1, 45);
       u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
       u8g2.setCursor(1, 60);
-      u8g2.printf("ADC: %d", dataBuffer.data.potentiometer_a);
+      
       break;
 
     case PAGE_GYRO:
@@ -337,13 +337,13 @@ void showPage(int page)
       u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
       break;
 
-    case PAGE_CORONA:
+    case PAGE_POTI:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Corona Count");
+      u8g2.drawStr(1, 15, "ADC");
 
       u8g2.setFont(u8g2_font_ncenB24_tr);
-      u8g2.setCursor(40, 52);
-      u8g2.printf("%i", dataBuffer.data.CoronaDeviceCount);
+      u8g2.setCursor(1, 30);
+      u8g2.printf("GPIO36: %d", dataBuffer.data.potentiometer_a);
       break;
 
     case PAGE_SLEEP:

@@ -12,7 +12,7 @@
 
 // Defaults to window size 10
 #if (USE_POTI)
-AnalogSmooth Poti_A = AnalogSmooth();
+// AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
 static const char TAG[] = __FILE__;
@@ -334,14 +334,13 @@ void t_send_cycle()
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
     mqtt_send();
+    mqtt_send_lok(1,dataBuffer.data.potentiometer_a,1);
 #endif
 }
 
 void t_cyclicRTOS(void *pvParameters)
 {
-
   DataBuffer foo;
-
   while (1)
   {
   }
@@ -353,7 +352,6 @@ void t_cyclicRTOS(void *pvParameters)
 
 void t_cyclic() // Intervall: Display Refresh
 {
-
   float temp;
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();

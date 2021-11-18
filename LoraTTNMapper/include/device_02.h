@@ -34,7 +34,7 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
-#define USE_POTI 0
+#define USE_POTI 1
 
 #define displayRefreshIntervall 10       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay

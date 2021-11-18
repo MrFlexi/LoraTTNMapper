@@ -23,7 +23,7 @@
 #define PAGE_BAT 5
 #define PAGE_SENSORS 6
 #define PAGE_GYRO 7
-#define PAGE_CORONA 8
+#define PAGE_POTI 8
 #define PAGE_MODULS 9
 
 #define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop

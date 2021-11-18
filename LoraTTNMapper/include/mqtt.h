@@ -17,5 +17,6 @@ void reconnect();
 void mqtt_send();
 void setup_mqtt();
 void mqtt_send_irq();
+void mqtt_send_lok(int id, uint16_t speed, int dir);
 
 #endif

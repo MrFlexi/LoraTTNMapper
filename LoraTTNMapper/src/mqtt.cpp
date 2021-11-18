@@ -10,6 +10,7 @@ const char *mqtt_topic = "mrflexi/device/";
 const char *mqtt_topic_mosi = "/mosi";
 const char *mqtt_topic_miso = "/miso";
 const char *mqtt_topic_irq = "/miso/irq";
+const char *mqtt_topic_traincontroll = "/TrainControll/";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
@@ -195,6 +196,34 @@ void mqtt_send()
     ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
     ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
     
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
+}
+
+void mqtt_send_lok(int id, uint16_t speed, int dir)
+{
+  char topic_out[40];
+  const int capacity = JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(2);
+  StaticJsonDocument<capacity> doc;
+  String JsonStr;
+
+  // build MQTT topic e.g.  
+  doConcat(mqtt_topic, "Lok", "", topic_out);
+  doc.clear();
+  doc["command"] = "Lok";
+  doc["id"] = id;
+  doc["speed"] = speed;
+  doc["dir"] = dir;
+  serializeJson(doc, JsonStr);
+
+  if (MqttClient.connected())
+  {
+    MqttClient.publish(topic_out, JsonStr.c_str());
+    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+    ESP_LOGI(TAG, "Payload: %s", JsonStr);  
   }
   else
   {
