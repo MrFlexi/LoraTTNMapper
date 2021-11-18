@@ -37,8 +37,6 @@
 #define GPS_TX                  GPIO_NUM_34
 #define GPS_RX                  GPIO_NUM_12
 
-
-
 #define HAS_LORA                1               // comment out if device shall not send data via LoRa
 #define CFG_sx1276_radio        1               // HPD13A LoRa SoC
 #define BOARD_HAS_PSRAM         1               // use extra 4MB external RAM
@@ -51,24 +49,5 @@
 
 // GPS settings
 #define HAS_GPS         1                       // use on board GPS
-
-
-// enable only if device has these sensors, otherwise comment these lines
-// BME680 sensor on I2C bus
-//#define HAS_BME 1 // Enable BME sensors in general
-//#define HAS_BME680 SDA, SCL
-//#define BME680_ADDR BME680_I2C_ADDR_PRIMARY // !! connect SDIO of BME680 to GND !!
-
-// display (if connected)
-//#define HAS_DISPLAY U8X8_SSD1306_128X64_NONAME_HW_I2C
-//#define MY_OLED_SDA SDA
-//#define MY_OLED_SCL SCL
-//#define MY_OLED_RST U8X8_PIN_NONE
-//#define DISPLAY_FLIP  1 // use if display is rotated
-
-// user defined sensors (if connected)
-//#define HAS_SENSORS 1 // comment out if device has user defined sensors
-
-//#define DISABLE_BROWNOUT 1 // comment out if you want to keep brownout feature
 
 #endif
