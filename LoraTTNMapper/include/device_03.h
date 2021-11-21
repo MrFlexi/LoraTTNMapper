@@ -18,8 +18,11 @@
 #define USE_PMU_INTERRUPT 0
 #define USE_BUTTON 0
 
-#define USE_WIFI 1
 #define USE_MQTT 1
+#define USE_MQTT_SENSORS 1
+#define USE_MQTT_TRAIN 0
+
+#define USE_WIFI 1
 #define USE_WEBSERVER   1 
 #define USE_CAYENNE 0
 #define HAS_LORA 0
@@ -38,7 +41,7 @@
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 
-#define sendCycleIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendMqttIntervall       60 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  10 // Update Webpage
 
 #define PAYLOAD_ENCODER 3

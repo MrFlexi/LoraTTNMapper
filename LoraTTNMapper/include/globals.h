@@ -26,7 +26,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  4
 
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
@@ -41,6 +41,11 @@
 
 #if DEVICE_ID == 3                 // 
 #include "device_03.h"
+#include "../src/hal/ttgobeam10.h"
+#endif
+
+#if DEVICE_ID == 4                 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_04.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
 
@@ -130,6 +135,7 @@ typedef struct
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a;   //
+  bool potentiometer_a_changed;
   uint32_t bat_ChargeCoulomb = 0;
   uint32_t bat_DischargeCoulomb = 0;
   float    bat_DeltamAh = 0;

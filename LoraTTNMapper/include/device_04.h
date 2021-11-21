@@ -3,33 +3,31 @@
 
 #define DEVICE_NAME "mrflexi-02"
 #define USE_OTA 0
-#define USE_BME280 1
-#define HAS_LORA 1
+#define USE_BME280 0
+#define HAS_LORA 0
 #define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
 #define HAS_PMU 1
-#define HAS_INA219  1
+#define HAS_INA219  0
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
 
-#define USE_SERVO 1
-
-
-
+#define USE_SERVO 0
 #define USE_BLE 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 
 #define USE_WIFI 1
-#define USE_WEBSERVER   1
+#define USE_WEBSERVER   0
 #define sendWebsocketIntervall          10 // every x seconds
 #define USE_CAYENNE     0
+
 #define USE_MQTT 1
-#define USE_MQTT_SENSORS 1
-#define USE_MQTT_TRAIN 0
+#define USE_MQTT_SENSORS 0
+#define USE_MQTT_TRAIN 1
 
 #define USE_FASTLED 0
 #define USE_FASTLED_RTOS 0
@@ -45,10 +43,8 @@
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 #define LORA_DATARATE DR_SF9
 
-#define sendMqttIntervall l      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendMqttIntervall       1 // Cayenne mqtt send intervall                   ---> t_mqtt_cycle
 #define sendWebsocketIntervall  5 // Update Webpage
-
-
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 60
@@ -64,8 +60,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
-
+#define ESP_SLEEP 0            // Main switch
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or

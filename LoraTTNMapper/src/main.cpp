@@ -323,7 +323,7 @@ void touch_callback()
 // Send Messages via Cayenne or MQTT
 //---------------------------------------------------------------------------------
 
-void t_send_cycle()
+void t_mqtt_cycle()
 {
 
 #if (USE_CAYENNE)
@@ -333,9 +333,18 @@ void t_send_cycle()
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
+
+  #if (USE_MQTT_SENSORS)
     mqtt_send();
-    mqtt_send_lok(1,dataBuffer.data.potentiometer_a,1);
-#endif
+  #endif
+  #if (USE_MQTT_TRAIN)
+    if ( dataBuffer.data.potentiometer_a_changed )
+        {
+           mqtt_send_lok(1,dataBuffer.data.potentiometer_a,1);
+           dataBuffer.data.potentiometer_a_changed = false;
+        }
+    #endif
+  #endif
 }
 
 void t_cyclicRTOS(void *pvParameters)
@@ -720,7 +729,6 @@ setup_servo();
 #endif
 
 
-
   //-------------------------------------------------------------------------------
   // Tasks
   //-------------------------------------------------------------------------------
@@ -730,7 +738,7 @@ setup_servo();
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
-  sendCycleTicker.attach(sendCycleIntervall, t_send_cycle);
+  sendCycleTicker.attach(sendMqttIntervall, t_mqtt_cycle);
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);

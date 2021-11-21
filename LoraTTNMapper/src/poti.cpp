@@ -4,24 +4,21 @@
 #include "globals.h"
 
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
-#define DEFAULT_VREF 1100 
-#define NO_OF_SAMPLES 64  // we do some multisampling to get better values
+#define DEFAULT_VREF 1100
+#define NO_OF_SAMPLES 200 // we do some multisampling to get better values
 
 esp_adc_cal_characteristics_t *adc_characs =
     (esp_adc_cal_characteristics_t *)calloc(
         1, sizeof(esp_adc_cal_characteristics_t));
 
-
 static const adc1_channel_t adc_channel = ADC1_GPIO36_CHANNEL;
 static const adc_atten_t atten = ADC_ATTEN_DB_11;
 static const adc_unit_t unit = ADC_UNIT_1;
 
-
-
 void Poti_calibrate_voltage(void)
 {
 
-// configure ADC
+  // configure ADC
   ESP_ERROR_CHECK(adc1_config_width(ADC_WIDTH_BIT_12));
   ESP_ERROR_CHECK(adc1_config_channel_atten(adc_channel, atten));
 
@@ -31,19 +28,17 @@ void Poti_calibrate_voltage(void)
   // show ADC characterization base
   if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP)
   {
-      Serial.println( "ADC characterization based on Two Point values stored in eFuse");
+    Serial.println("ADC characterization based on Two Point values stored in eFuse");
   }
   else if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF)
   {
-   Serial.println( "ADC characterization based on reference voltage stored in eFuse");
+    Serial.println("ADC characterization based on reference voltage stored in eFuse");
   }
   else
   {
-    Serial.println(  "ADC characterization based on default reference voltage");
+    Serial.println("ADC characterization based on default reference voltage");
   }
-
 }
-
 
 uint16_t ADC_read_ticks(adc1_channel_t channel)
 {
@@ -58,15 +53,11 @@ uint16_t ADC_read_ticks(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-  
-  uint16_t ticks = map(voltage, 0, 3.3, 0, 4096);
 
-  //Serial.print("ADC Ticks  ");Serial.println(ticks);
-
+  uint16_t ticks = map(voltage, 142, 3145, 0, 1000);
+  //Serial.print("ADC Ticks/Voltage  ");Serial.println(ticks);Serial.println(voltage);
   return ticks;
 }
-
-
 
 float ADC_read_voltage(adc1_channel_t channel)
 {
@@ -77,54 +68,50 @@ float ADC_read_voltage(adc1_channel_t channel)
   {
     adc_reading += adc1_get_raw(channel);
   }
-
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
-  voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);   
-  return voltage / (float) 1000;
+  voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
+  return voltage / (float)1000;
 }
 
-
-void globalIntTask( void * parameter ){
- 
-    Serial.print("globalIntTask: ");
-    Serial.println(*((int*)parameter));            
- 
-    vTaskDelete( NULL );
- 
+void globalIntTask(void *parameter)
+{
+  Serial.print("globalIntTask: ");
+  Serial.println(*((int *)parameter));
+  vTaskDelete(NULL);
 }
 
-void t_getADCValues( void * parameter ){
-    DataBuffer *locdataBuffer;
-    
-    locdataBuffer = (DataBuffer *) parameter; 
- 
-    //Continuously sample ADC1
-    while (1) {
-    //Serial.print("globalClassTask: ");
-    //Serial.println( locdataBuffer->data.potentiometer_a );
-    locdataBuffer->data.potentiometer_a = ADC_read_ticks(adc_channel);
-    //Serial.print(xPortGetCoreID());
- 
-    vTaskDelay(1000);
+void t_getADCValues(void *parameter)
+{
+  DataBuffer *locdataBuffer;
+  uint16_t ticks_old;
+  uint16_t ticks;
+  locdataBuffer = (DataBuffer *)parameter;
+
+  //Continuously sample ADC1
+  while (1)
+  {
+    ticks = ADC_read_ticks(adc_channel);
+    if (ticks != ticks_old)
+    {
+      ticks_old = ticks;
+      locdataBuffer->data.potentiometer_a = ticks;
+      locdataBuffer->data.potentiometer_a_changed = true;
+      Serial.print("ADC Ticks:");Serial.println( locdataBuffer->data.potentiometer_a );
     }
- 
-} 
- 
-void poti_setup_RTOS() {  
-
-  Poti_calibrate_voltage();  
-
-  xTaskCreatePinnedToCore(
-                    t_getADCValues,             /* Task function. */
-                    "globalClassTask",           /* String with name of task. */
-                    10000,                     /* Stack size in words. */
-                    (void*)&dataBuffer,      /* Parameter passed as input of the task */
-                    1,                         /* Priority of the task. */
-                    NULL,
-                    0);                     /* Task handle. */
- 
- 
+    vTaskDelay(300);
+  }
 }
 
- 
+void poti_setup_RTOS()
+{
+  Poti_calibrate_voltage();
+  xTaskCreatePinnedToCore(
+      t_getADCValues,      /* Task function. */
+      "globalClassTask",   /* String with name of task. */
+      10000,               /* Stack size in words. */
+      (void *)&dataBuffer, /* Parameter passed as input of the task */
+      1,                   /* Priority of the task. */
+      NULL,
+      0); /* Task handle. */
+}
