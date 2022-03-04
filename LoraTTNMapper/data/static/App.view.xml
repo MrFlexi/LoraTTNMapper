@@ -5,7 +5,6 @@
 	xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
 	<App>
 		<Page>
-
 			<customHeader>
 					<f:ShellBar title="" homeIcon="sap-icon://home" />
 			</customHeader>
