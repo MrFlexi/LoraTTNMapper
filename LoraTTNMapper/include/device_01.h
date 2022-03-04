@@ -6,7 +6,7 @@
 #define USE_BME280 0
 #define HAS_LORA 1
 #define HAS_INA3221  0
-#define HAS_INA219  0
+#define HAS_INA219  1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -53,7 +53,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
+#define ESP_SLEEP 0            // Main switch
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute

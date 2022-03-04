@@ -1,70 +1,22 @@
-<core:View xmlns:core="sap.ui.core" 
-	xmlns="sap.m" 
-	xmlns:l="sap.ui.layout" 
-	xmlns:tnt="sap.tnt" 
-	xmlns:html="http://www.w3.org/1999/xhtml" height="100%" controllerName="view.App">
+<mvc:View 
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"   
+	xmlns:f="sap.f"
+	xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
+	<App>
+		<Page>
+			<customHeader>
+					<f:ShellBar title="Multimeter" homeIcon="" />
+			</customHeader>
 
-	<tnt:ToolPage id="toolPage">
-		<tnt:header>
-			<tnt:ToolHeader>
-				<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press="onSideNavButtonPress">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
-					</layoutData>
-				</Button>
-				<ToolbarSpacer width="20px"/>
-				<Text text="{dataBuffer>/DeviceName}" wrapping="false" />
-				<ToolbarSpacer width="20px"/>
-
-				<Button id="bt_reboot" text="Reboot" icon="" type="Emphasized" press="reboot">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
-					</layoutData>
-				</Button>
-				<ToolbarSpacer width="20px"/>
-				<Button id="bt_sleep" text="Sleep" type="Transparent" press="sleep">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
-				<ToolbarSpacer>
-					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
-					</layoutData>
-				</ToolbarSpacer>
-			</tnt:ToolHeader>
-		</tnt:header>
-		<tnt:sideContent>
-			<tnt:SideNavigation expanded="true" itemSelect="onItemSelect">
-				<tnt:NavigationList items="{path: '/navigation'}">
-					<tnt:NavigationListItem text="{title}" icon="{icon}" enabled="{enabled}" expanded="{expanded}" items="{items}" key="{key}">
-						<tnt:NavigationListItem text="{title}" key="{key}" enabled="{enabled}">
-						</tnt:NavigationListItem>
-					</tnt:NavigationListItem>
-				</tnt:NavigationList>
-				<tnt:fixedItem>
-					<tnt:NavigationList items="{path: '/fixedNavigation'}">
-						<tnt:NavigationListItem text="{title}" icon="{icon}">
-						</tnt:NavigationListItem>
-					</tnt:NavigationList>
-				</tnt:fixedItem>
-			</tnt:SideNavigation>
-		</tnt:sideContent>
-		<tnt:mainContents>
-			<l:VerticalLayout width="100%" id="layout1">
-				<NavContainer id="pageContainer">
-					<pages>
-						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
-
-							<l:HorizontalLayout allowWrapping="true">
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
-								<TileContent unit="" footer="">
+			<content>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+						<TileContent unit="" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
+						</TileContent>
+					</GenericTile>
 
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
 								<TileContent unit="" footer="sinc last reset">
 									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
@@ -75,18 +27,13 @@
 									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-							</l:HorizontalLayout>
 
-							<l:HorizontalLayout allowWrapping="true">
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
 
-							</l:HorizontalLayout>
-
-							<l:HorizontalLayout allowWrapping="true">
 
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Voltage" press="press">
 								<TileContent unit="Volt" footer="">
@@ -99,10 +46,6 @@
 									<NumericContent scale="M" value="{dataBuffer>/bus_current}" valueColor="" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-
-							</l:HorizontalLayout>
-
-							<l:HorizontalLayout allowWrapping="true">
 
 							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
 								<TileContent unit="Volt" footer="">
@@ -133,36 +76,7 @@
 									<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-
-
-
-							</l:HorizontalLayout>
-
-						</ScrollContainer>
-
-						<ScrollContainer id="ESPLog" horizontal="false" vertical="true" height="100%">
-							<l:VerticalLayout class="sapUiContentPadding" width="100%">
-								<l:content>
-								<VBox class="sapUiSmallMargin">
-								<Text 
-								renderWhitespace="false"
-								wrapping="true"
-								text="{dataBuffer>/ESPLog}"/>
-								</VBox>
-							</l:content>
-							</l:VerticalLayout>
-							</ScrollContainer>
-
-						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
-							<Text text="This is the root page of the second element"/>
-							<List headerText="Messages" items="{path: 'dataBuffer>/text_table'}">
-										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
-										</NotificationListItem>
-								</List>
-						</ScrollContainer>
-					</pages>
-				</NavContainer>
-			</l:VerticalLayout>
-		</tnt:mainContents>
-	</tnt:ToolPage>
-</core:View>
+				</content>
+			</Page>
+		</App>
+</mvc:View>
