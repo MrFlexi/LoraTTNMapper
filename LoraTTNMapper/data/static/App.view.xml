@@ -5,29 +5,34 @@
 	xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
 	<App>
 		<Page>
+
 			<customHeader>
-					<f:ShellBar title="Multimeter" homeIcon="" />
+					<f:ShellBar title="" homeIcon="sap-icon://home" />
 			</customHeader>
 
 			<content>
-					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
-						<TileContent unit="" footer="">
+				<Panel expandable="true" expanded="true" width="auto" class="sapUiResponsiveMargin" headerText="ESP">
+					<content>
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+							<TileContent unit="" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
-						</TileContent>
-					</GenericTile>
-
-					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
+							</TileContent>
+						</GenericTile>
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
 								<TileContent unit="" footer="sinc last reset">
 									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
-							</GenericTile>
-						
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
+						</GenericTile>
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
 								<TileContent unit="" footer="count down">
 									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-
+					</content>
+				</Panel>
+					
+				<Panel expandable="true" expanded="true" width="auto" class="sapUiResponsiveMargin" headerText="Solar Panel">
+					<content>
 						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
@@ -76,7 +81,23 @@
 									<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
+					</content>
+				</Panel>
 				</content>
+
+				<footer>
+					<OverflowToolbar visible="true">
+						<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
+							<items>
+								<SegmentedButtonItem text="All" key="all"/>
+								<SegmentedButtonItem text="Active" key="active"/>
+								<SegmentedButtonItem text="Completed" key="completed"/>
+							</items>
+						</SegmentedButton>
+						<ToolbarSpacer />
+						<Button id="clearCompleted-footer" enabled="true" icon="sap-icon://delete" text="Hallo" press=".clearCompleted"/>
+					</OverflowToolbar>
+				</footer>
 			</Page>
 		</App>
 </mvc:View>
