@@ -1,13 +1,50 @@
 <mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f" xmlns:cards="sap.f.cards"
 	xmlns:l="sap.ui.layout" controllerName="view.App">
-	<App>
-		<Page showHeader="true" enableScrolling="true">
-			<customHeader>
-				<f:ShellBar title="ESP32 Monitor" secondTitle="Gewächshaus-Flo1" homeIcon="./resources/sap/ui/documentation/sdk/images/logo_ui5.png"
-					showCopilot="false" showSearch="false" showNotifications="true" showProductSwitcher="true" notificationsNumber="2"/>
-			</customHeader>
-			<content>
-				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<tnt:ToolHeader>
+				<Button
+					id="sideNavigationToggleButton"
+					icon="sap-icon://menu2"
+					type="Transparent"
+					press=".onSideNavButtonPress">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow" />
+					</layoutData>
+				</Button>
+				<Image height="1.5rem"
+					   class="sapUiSmallMarginBegin"
+					   src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg" />
+				<Title level="H1" text="ESP32 Monitor">
+					<layoutData>
+						<OverflowToolbarLayoutData shrinkable="true" />
+					</layoutData>
+				</Title>
+				
+				<ToolbarSpacer width="20px" />
+				<Button text="Tools" type="Transparent">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low" />
+					</layoutData>
+				</Button>
+				<tnt:ToolHeaderUtilitySeparator />
+				<ToolbarSpacer>
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px" />
+					</layoutData>
+				</ToolbarSpacer>
+			</tnt:ToolHeader>
+		</tnt:header>
+		
+		<tnt:mainContents>
+			<NavContainer id="pageContainer" initialPage="root1">
+				<pages>
+					<ScrollContainer
+						id="root1"
+						horizontal="false"
+						vertical="true"
+						height="100%">
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
 					<TileContent unit="" footer="">
 						<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false"/>
 					</TileContent>
@@ -62,21 +99,24 @@
 						<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="Good" indicator="Down" withMargin="false"/>
 					</TileContent>
 				</GenericTile>
-			</content>
-			<footer>
-				<OverflowToolbar visible="true">
-					<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
-						<items>
-							<SegmentedButtonItem text="All" key="all"/>
-							<SegmentedButtonItem text="Active" key="active"/>
-							<SegmentedButtonItem text="Completed" key="completed"/>
-						</items>
-					</SegmentedButton>
-					<ToolbarSpacer/>
-					<Button id="clearCompleted-footer" enabled="true" icon="sap-icon://delete" text="Hallo" press=".clearCompleted"/>
-				</OverflowToolbar>
-			</footer>
-			<content/>
-		</Page>
-	</App>
+			
+					</ScrollContainer>
+					<ScrollContainer
+						id="page1"
+						horizontal="false"
+						vertical="true"
+						height="100%">
+						<Text text="This is the first page" />
+					</ScrollContainer>
+					<ScrollContainer
+						id="root2"
+						horizontal="false"
+						vertical="true"
+						height="100%">
+						<Text text="This is the root page of the second element" />
+					</ScrollContainer>
+				</pages>
+			</NavContainer>
+		</tnt:mainContents>
+	</tnt:ToolPage>
 </mvc:View>
