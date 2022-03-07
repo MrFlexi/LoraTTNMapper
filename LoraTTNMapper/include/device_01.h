@@ -38,7 +38,7 @@
 #define LORA_TX_INTERVAL  30            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
 
-#define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendMqttIntervall      15 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  5 // Update Webpage
 
 

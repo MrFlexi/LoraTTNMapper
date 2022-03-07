@@ -4,34 +4,37 @@
 	xmlns:f="sap.f"
 	xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
 	<App>
-		<Page>
+		<Page showHeader="false" enableScrolling="false" >
 			<customHeader>
 					<f:ShellBar title="" homeIcon="sap-icon://home" />
 			</customHeader>
 
+			<Carousel class="sapUiContentPadding" loop="true">
+			<customLayout>
+				<CarouselLayout visiblePagesCount="2" />
+			</customLayout>
+				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+					<TileContent unit="" footer="">
+						<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
+					</TileContent>
+				</GenericTile>
+				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
+					<TileContent unit="" footer="sinc last reset">
+						<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+					</TileContent>
+				</GenericTile>
+				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
+					<TileContent unit="" footer="count down">
+						<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+					</TileContent>
+				</GenericTile>
+			</Carousel>
+
 			<content>
-				<Panel expandable="true" expanded="true" width="auto" class="sapUiResponsiveMargin" headerText="ESP">
-					<content>
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
-							<TileContent unit="" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
-							</TileContent>
-						</GenericTile>
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
-								<TileContent unit="" footer="sinc last reset">
-									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-						</GenericTile>
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
-								<TileContent unit="" footer="count down">
-									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-					</content>
-				</Panel>
+						
+			
 					
-				<Panel expandable="true" expanded="true" width="auto" class="sapUiResponsiveMargin" headerText="Solar Panel">
-					<content>
+			
 						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
 								<TileContent unit="Celsius" footer="">
 									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
@@ -80,8 +83,6 @@
 									<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="" indicator="Down" withMargin="false" />
 								</TileContent>
 							</GenericTile>
-					</content>
-				</Panel>
 				</content>
 
 				<footer>
