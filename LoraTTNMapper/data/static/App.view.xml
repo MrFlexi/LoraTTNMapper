@@ -1,103 +1,89 @@
-<mvc:View 
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"   
-	xmlns:f="sap.f"
-	xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
+<View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f" xmlns:cards="sap.f.cards"
+	xmlns:l="sap.ui.layout" xmlns:html="http://www.w3.org/1999/xhtml" controllerName="view.App">
 	<App>
-		<Page showHeader="false" enableScrolling="false" >
-			<customHeader>
-					<f:ShellBar title="" homeIcon="sap-icon://home" />
-			</customHeader>
-
-			<Carousel class="sapUiContentPadding" loop="true">
-			<customLayout>
-				<CarouselLayout visiblePagesCount="2" />
-			</customLayout>
-				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
-					<TileContent unit="" footer="">
-						<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
-					</TileContent>
-				</GenericTile>
-				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
-					<TileContent unit="" footer="sinc last reset">
-						<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-					</TileContent>
-				</GenericTile>
-				<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
-					<TileContent unit="" footer="count down">
-						<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-					</TileContent>
-				</GenericTile>
-			</Carousel>
-
-			<content>
-						
-			
-					
-			
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
-								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Voltage" press="press">
-								<TileContent unit="Volt" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bus_voltage}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Bus" subheader="Current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bus_current}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
-								<TileContent unit="Volt" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_voltage}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="charge current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="FuelGauge" press="press">
-								<TileContent unit="mAh" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_fuel_gauge}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Panel" subheader="Voltage" press="press">
-								<TileContent unit="V" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/panel_voltage}" valueColor="" indicator="Down" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Panel" subheader="Current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="" indicator="Down" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-				</content>
-
-				<footer>
-					<OverflowToolbar visible="true">
-						<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
-							<items>
-								<SegmentedButtonItem text="All" key="all"/>
-								<SegmentedButtonItem text="Active" key="active"/>
-								<SegmentedButtonItem text="Completed" key="completed"/>
-							</items>
-						</SegmentedButton>
-						<ToolbarSpacer />
-						<Button id="clearCompleted-footer" enabled="true" icon="sap-icon://delete" text="Hallo" press=".clearCompleted"/>
-					</OverflowToolbar>
-				</footer>
-			</Page>
-		</App>
-</mvc:View>
+		<Page showHeader="false" enableScrolling="false">			
+			<VerticalLayout class="sapUiContentPadding">
+				<Carousel class="sapUiContentPadding" loop="true">
+					<customLayout>
+						<CarouselLayout visiblePagesCount="{settings>/pagesCount}" />
+					</customLayout>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="SleepTimer" subheader="Minutes" press="press">
+						<TileContent unit="" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/sleep_time}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
+						<TileContent unit="" footer="sinc last reset">
+							<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
+						<TileContent unit="" footer="count down">
+							<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
+						<TileContent unit="Celsius" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/temperature}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+				</Carousel>
+			</VerticalLayout>
+			<VerticalLayout class="sapUiContentPadding">
+				<Carousel class="sapUiContentPadding" loop="true">
+					<customLayout>
+						<CarouselLayout visiblePagesCount="{settings>/pagesCount}" />
+					</customLayout>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Bus" subheader="Voltage" press="press">
+						<TileContent unit="Volt" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/bus_voltage}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Bus" subheader="Current" press="press">
+						<TileContent unit="mA" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/bus_current}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Battery" subheader="Voltage" press="press">
+						<TileContent unit="Volt" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/bat_voltage}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Battery" subheader="charge current" press="press">
+						<TileContent unit="mA" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Battery" subheader="FuelGauge" press="press">
+						<TileContent unit="mAh" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/bat_fuel_gauge}" valueColor="Good" indicator="Up" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Panel" subheader="Voltage" press="press">
+						<TileContent unit="V" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/panel_voltage}" valueColor="Good" indicator="Down" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+					<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Panel" subheader="Current" press="press">
+						<TileContent unit="mA" footer="">
+							<NumericContent scale="M" value="{dataBuffer>/panel_current}" valueColor="Good" indicator="Down" withMargin="false" />
+						</TileContent>
+					</GenericTile>
+				</Carousel>
+			</VerticalLayout>
+			<footer>
+				<OverflowToolbar visible="true">
+					<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
+						<items>
+							<SegmentedButtonItem text="All" key="all" />
+							<SegmentedButtonItem text="Active" key="active" />
+							<SegmentedButtonItem text="Completed" key="completed" />
+						</items>
+					</SegmentedButton>
+					<ToolbarSpacer />
+					<Button id="clearCompleted-footer" enabled="true" icon="sap-icon://delete" text="Hallo" press=".clearCompleted" />
+				</OverflowToolbar>
+			</footer>
+		</Page>
+	</App>
+</View>
