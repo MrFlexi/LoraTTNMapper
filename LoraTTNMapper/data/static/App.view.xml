@@ -1,5 +1,5 @@
 <mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f" xmlns:cards="sap.f.cards"
-	xmlns:l="sap.ui.layout" controllerName="view.App">
+	xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" controllerName="view.App">
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
 			<tnt:ToolHeader>

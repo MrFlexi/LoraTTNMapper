@@ -24,12 +24,8 @@ sap.ui.define([
 
 			// Determine visible tiles in carousel
 			var visibleTiles = 1;
-			if (Device.system.desktop) {
-				visibleTiles = 8;
-			} else if (Device.system.tablet) {
-				visibleTiles = 2;
-			}
-			var oSettingsModel = new JSONModel({ pagesCount: iPagesCount });
+			
+			var oSettingsModel = new JSONModel({ pagesCount: visibleTiles });
 			this.getView().setModel(oSettingsModel, "settings");
 
 			// Dynamisches Menü						
