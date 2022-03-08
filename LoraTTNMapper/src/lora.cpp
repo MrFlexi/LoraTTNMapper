@@ -29,14 +29,11 @@ void t_enqueue_LORA_messages()
   }
   else
   {
-
  // -----------------------------------------------------------------------------
  //   Port 1: TTN Mapper
 // -----------------------------------------------------------------------------
-
 #if (USE_GPS)
-    if (gps.checkGpsFix())
-    {
+    if (gps.checkGpsFix()) {
       if ( gps.tGps.location.lat() > 0 )
        {
         payload.reset();
@@ -46,13 +43,11 @@ void t_enqueue_LORA_messages()
     }
 #endif
 
-
  // -----------------------------------------------------------------------------
  //   Port 2: Cayenne My Devices
 // -----------------------------------------------------------------------------
 
 payload.reset();
-
 payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
 payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
@@ -72,9 +67,12 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
+#if (USE_SOIL_MOISTURE)
+payload.addFloat(LPP_SOIL_CHANNEL1, dataBuffer.data.soil_moisture);
+#endif
+
 
 payload.enqueue_port(2); // send data
-
 
 //Next Message-Block Port    ---> now send via port 3
 //#if (HAS_PMU)

@@ -18,6 +18,7 @@
 #define USE_SPIFF_LOGGING 1
 
 #define USE_WIFI 1
+#define USE_WIFI_MANAGER 0
 #define USE_WEBSERVER   1 
 #define USE_CAYENNE 0
 #define USE_MQTT 1
@@ -29,7 +30,8 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
-#define USE_POTI 0
+#define USE_POTI 1
+#define USE_SOIL_MOISTURE 1
 
 #define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay

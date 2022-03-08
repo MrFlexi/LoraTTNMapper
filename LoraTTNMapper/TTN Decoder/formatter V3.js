@@ -5,6 +5,7 @@ function lppDecode(bytes) {
         113: { 'size': 6, 'name': 'accelerometer', 'signed': true, 'divisor': 1000 },        
         136: { 'size': 9, 'name': 'gps', 'signed': true, 'divisor': [10000, 10000, 100] },
         201: { 'size': 12, 'name': 'pmu', 'signed': true, 'divisor': 100 },
+        202: { 'size': 2, 'name': 'soil_moisture', 'signed': true, 'divisor': 100 },
     };
 
     function arrToDec(stream, is_signed, divisor) {
@@ -54,8 +55,8 @@ function lppDecode(bytes) {
                     'bat_charge_current': arrToDec(bytes.slice(i + 6, i + 8), type.signed, type.divisor),
                     'bat_discharge_current': arrToDec(bytes.slice(i + 8, i + 10), type.signed, type.divisor),
                     'bat_DeltamAh': arrToDec(bytes.slice(i + 10, i + 12), type.signed, type.divisor),
-                };
-               break;
+                };                
+               break;             
 
             default:   
                 s_value = arrToDec(bytes.slice(i, i + type.size), type.signed, type.divisor);
@@ -115,7 +116,7 @@ function decodeUplink(input) {
 
 // ab hier code um die Funktion zu testen
 
-let buffer = new Uint8Array([0x10, 0xC9, 0x00, 0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01]);
+let buffer = new Uint8Array([0x10, 0xC9, 0x00, 0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0xca,0x63,0x9d]);
 console.log( buffer );
 
 var ttn = { bytes:buffer,

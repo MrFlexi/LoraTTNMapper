@@ -339,11 +339,14 @@ void showPage(int page)
 
     case PAGE_POTI:
       u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "ADC");
+      u8g2.drawStr(1, 15, "Soil Moisture");
 
       u8g2.setFont(u8g2_font_ncenB24_tr);
       u8g2.setCursor(1, 30);
       u8g2.printf("GPIO36: %d", dataBuffer.data.potentiometer_a);
+
+      u8g2.setCursor(1, 45);
+      u8g2.printf("Soil: %.0f", dataBuffer.data.soil_moisture);      
       break;
 
     case PAGE_SLEEP:
@@ -431,9 +434,11 @@ String DataBuffer::to_json()
     doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
     doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
     doc["MotionCounter"] = String(dataBuffer.data.MotionCounter);
+    doc["soil_moisture"] = String(dataBuffer.data.soil_moisture);
 
     doc["sleep_time"] = String(dataBuffer.settings.sleep_time);
     doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
+    
     
     // Add the "location"
     JsonObject location = doc.createNestedObject("location");

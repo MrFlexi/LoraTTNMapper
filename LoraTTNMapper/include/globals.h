@@ -8,12 +8,10 @@
 #include "esp_spi_flash.h"
 // #include <esp_task_wdt.h>
 
-
 #define WDT_TIMEOUT 10          // Watchdog time out x seconds
 #define uS_TO_S_FACTOR 1000000UL  //* Conversion factor for micro seconds to seconds */
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define LORA_DATARATE   DR_SF7
-
 
 //--------------------------------------------------------------------------
 // GPIO
@@ -21,13 +19,15 @@
 // 5,18,19,23,26,27,s 33, 32    --> LORA
 // 35                           --> PMU Interrupt
 // 12,34                        --> GPS
+// 36                           --> ADC Channel 0 --> Poti, Soil Moist Sensor
+//
+//--------------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
 #define DEVICE_ID  1
-
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -153,6 +153,7 @@ typedef struct
   float bat_voltage = 0;
   float bat_charge_current = 0;
   float bat_discharge_current = 0;
+  float soil_moisture = 0;
   double yaw = 0;
   double pitch = 0;
   double roll = 0;
@@ -171,8 +172,7 @@ typedef struct
   uint8_t sleep_time;
   const char* log_print_buffer;
   const char* experiment;
-  uint8_t bat_max_charge_current;
-  
+  uint8_t bat_max_charge_current;  
 } deviceSettings_t;
 
 
@@ -203,7 +203,6 @@ extern QueueHandle_t LoraSendQueue;
 #include "i2c_sensors.h"
 #endif
 
-
 #if (USE_MQTT)
 #include "mqtt.h"
 #endif
@@ -220,13 +219,11 @@ extern QueueHandle_t LoraSendQueue;
 #include "SecureOTA.h"
 #endif
 
-
 #if (USE_FASTLED)
 #include <Led.h>
 #endif
 
-#if (USE_POTI)
-
+#if (USE_POTI || USE_SOIL_MOISTURE)
 #include "poti.h"
 #endif
 
