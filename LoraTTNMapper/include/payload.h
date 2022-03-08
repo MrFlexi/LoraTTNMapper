@@ -27,6 +27,7 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_AIR_CHANNEL 31
 #define LPP_BOOTCOUNT_CHANNEL 40
 #define LPP_FIRMWARE_CHANNEL 99
+#define LPP_SOIL_CHANNEL1    101
 
 
 // MyDevices CayenneLPP 2.0 types for Packed Sensor Payload, not using channels,
@@ -42,6 +43,7 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_BAROMETER 115    // 2 bytes, hPa unsigned MSB
 
 #define LPP_PMU 201           // 12 bytes PMU values
+#define LPP_SOIL_MOISTURE 202
 
 
 #endif

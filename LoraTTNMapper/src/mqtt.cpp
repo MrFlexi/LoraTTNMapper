@@ -194,8 +194,7 @@ void mqtt_send()
   {
     MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
     ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-    ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
-    
+    ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());    
   }
   else
   {
@@ -232,7 +231,5 @@ void mqtt_send_lok(int id, uint16_t speed, int dir)
 }
 
 void mqtt_send_irq()
-{
-  
-}
+{}
 #endif

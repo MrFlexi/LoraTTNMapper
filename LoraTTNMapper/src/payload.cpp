@@ -16,7 +16,6 @@ uint8_t *PayloadConvert::getBuffer(void) { return buffer; }
 /* ---------------- plain format without special encoding ---------- */
 
 #if (PAYLOAD_ENCODER == 3)
-
 #define LPP_DIGITAL_INPUT 0 // 1 byte
 
 void PayloadConvert::addCount(uint8_t channel, uint16_t value)

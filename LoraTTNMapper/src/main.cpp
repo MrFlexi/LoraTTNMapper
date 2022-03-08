@@ -429,7 +429,6 @@ void t_cyclic() // Intervall: Display Refresh
   }
 
 #if (HAS_LORA)
-
   if (LoraSendQueue != 0)
   {
     dataBuffer.data.LoraQueueCounter = uxQueueMessagesWaiting(LoraSendQueue);
@@ -440,8 +439,15 @@ void t_cyclic() // Intervall: Display Refresh
   }
 #endif
 
-  // Refresh Display
 
+// Calculate Soil Moisture
+#if (USE_SOIL_MOISTURE)
+    if ( dataBuffer.data.potentiometer_a_changed )
+        {          
+        }    
+#endif
+
+// Refresh Display
 #if (USE_DISPLAY)
   ESP_LOGV(TAG, "update display");
   if (dataBuffer.data.runmode > 0)
@@ -473,14 +479,12 @@ void t_sleep()
 #if (TIME_TO_SLEEP_BAT_HIGH)
 #if (BAT_HIGH)
 #if (BAT_LOW)
-
   if ((dataBuffer.data.bat_voltage * 10) < BAT_LOW)
   {
     dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_LOW;
   }
   else
   {
-
     if ((dataBuffer.data.bat_voltage * 10) > BAT_HIGH)
     {
       dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_HIGH;
@@ -490,7 +494,6 @@ void t_sleep()
       dataBuffer.settings.sleep_time = TIME_TO_SLEEP_BAT_MID;
     }
   }
-
 #endif
 #endif
 #endif
@@ -523,9 +526,10 @@ void t_sleep()
 #endif
 }
 
+
+
 void setup_wifi()
 {
-
 #if (USE_WIFI)
   IPAddress ip;
   // WIFI Setup
@@ -540,7 +544,6 @@ void setup_wifi()
     i++;
     Serial.print('.');
   }
-
   if (WiFi.status() == WL_CONNECTED)
   {
     wifi_connected = true;
@@ -551,19 +554,16 @@ void setup_wifi()
   }
   else
   {
-
     //Turn off WiFi if no connection was made
     log_display("WIFI OFF");
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
-
-#endif
+  #endif  
 }
 
 void setup()
 {
-
   Serial.begin(115200);
 
   //--------------------------------------------------------------------
@@ -582,7 +582,6 @@ void setup()
   {
     SPIFFS.remove("/LOGS.txt");
   }
-
   esp_log_set_vprintf(&vprintf_into_spiffs);
   esp_log_level_set(TAG, ESP_LOG_INFO);
   //write into log
@@ -604,7 +603,7 @@ void setup()
 
   ESP_LOGI(TAG, "#---------------------jojojoj-------------------------------------#");
   Serial.println(dataBuffer.to_json());
-  Serial.println(dataBuffer.getError());
+  Serial.println(dataBuffer.getError());  
 
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
@@ -655,19 +654,9 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
   setup_mqtt();
 #endif
 
-#if (USE_CAYENNE)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    Cayenne.begin(username, password, clientID, ssid, wifiPassword);
-    log_display("Cayenne connected...");
-    delay(500);
-  }
-#endif
-
-  //---------------------------------------------------------------
-  // OTA Update
-  //---------------------------------------------------------------
-
+//---------------------------------------------------------------
+// OTA Update
+//---------------------------------------------------------------
 #if (USE_OTA)
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -675,6 +664,7 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
     checkFirmwareUpdates();
   }
 #endif
+
 
 #if (USE_GYRO)
   setup_gyro();
@@ -796,13 +786,6 @@ void loop()
 
 #if (HAS_LORA)
   os_runloop_once();
-#endif
-
-#if (USE_CAYENNE)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    Cayenne.loop();
-  }
 #endif
 
 #if (USE_MQTT)
