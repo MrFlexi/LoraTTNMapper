@@ -10,14 +10,12 @@
 #define USE_DISPLAY 1
 
 #define HAS_PMU 1
-#define HAS_INA219  1
+#define HAS_INA219  0
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
 
-#define USE_SERVO 1
-
-
+#define USE_SERVO 0
 
 #define USE_BLE 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
@@ -36,7 +34,7 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
-#define USE_POTI 1
+#define USE_POTI 0
 
 #define displayRefreshIntervall 10       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
@@ -45,9 +43,8 @@
 #define LORA_TX_INTERVAL 30             // Transmitt Lora messages
 #define LORA_DATARATE DR_SF9
 
-#define sendMqttIntervall l      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  5 // Update Webpage
-
 
 
 #define PAYLOAD_ENCODER 3

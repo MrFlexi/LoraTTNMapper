@@ -21,15 +21,26 @@ void setup_webserver()
     if(SPIFFS.exists("/LOGS.txt")) {
       request->send(SPIFFS, "/LOGS.txt", "text/plain");
     } else {
-      request->send(200, "text/plain", "LOGS not found");
+      request->send(404, "text/plain", "LOGS not found");
     }
     });
+
+
+    server.on("/ionic", HTTP_GET, [](AsyncWebServerRequest *request){
+    if(SPIFFS.exists("/index2.html")) {
+      request->send(SPIFFS, "/index2.html", "text/plain");
+    } else {
+      request->send(404, "text/plain", "index2.html not found");
+    }
+    });
+
+
 
     server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
     if(SPIFFS.exists("/settings.jsn")) {
       request->send(SPIFFS, "/settings.jsn", "application/json");
     } else {
-      request->send(200, "text/plain", "File not found");
+      request->send(404, "text/plain", "File not found /settings.jsn");
 
     }
     });

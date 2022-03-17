@@ -11,6 +11,25 @@ void loadConfiguration()
 
   DynamicJsonDocument doc(2048);
 
+
+    unsigned int totalBytes = SPIFFS.totalBytes();
+    unsigned int usedBytes = SPIFFS.usedBytes();
+    float freeKBytes = 0;
+
+    freeKBytes = ( totalBytes - usedBytes ) / 1024 ;
+ 
+    Serial.println("SPIFF File sistem info.");
+ 
+    Serial.print("Total space: ");
+    Serial.print(totalBytes/1024);
+    Serial.println(" KBytes");
+ 
+    Serial.print("Free space: ");
+    Serial.print(freeKBytes);
+    Serial.println(" kBytes"); 
+    Serial.println();
+
+
   // Open file for reading
   File file = SPIFFS.open(filename);
 
