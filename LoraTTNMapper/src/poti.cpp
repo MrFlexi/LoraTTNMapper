@@ -55,7 +55,7 @@ uint16_t ADC_read_ticks(adc1_channel_t channel)
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
 
   uint16_t ticks = map(voltage, 142, 3145, 0, 1000);
-  //Serial.print("ADC Ticks/Voltage  ");Serial.println(ticks);Serial.println(voltage);
+  Serial.print("ADC Voltage/Ticks ");Serial.print(voltage);Serial.println(ticks);
   return ticks;
 }
 
@@ -97,7 +97,7 @@ void t_getADCValues(void *parameter)
       ticks_old = ticks;
       locdataBuffer->data.potentiometer_a = ticks;
       locdataBuffer->data.potentiometer_a_changed = true;
-      Serial.print("ADC Ticks:");Serial.println( locdataBuffer->data.potentiometer_a );
+      //Serial.print("ADC Ticks:");Serial.println( locdataBuffer->data.potentiometer_a );
     }
     vTaskDelay(300);
   }
