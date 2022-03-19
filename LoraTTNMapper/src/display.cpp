@@ -370,10 +370,12 @@ void showPage(int page)
         u8g2.drawStr(1, 55, "Inactivity");
       }
 
+      #ifdef SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
       if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
       {
         u8g2.drawStr(1, 55, "TX ");
       }
+      #endif
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);

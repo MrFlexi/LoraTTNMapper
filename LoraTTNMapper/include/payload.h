@@ -1,5 +1,4 @@
-#ifndef _PAYLOAD_H_
-#define _PAYLOAD_H_
+#pragma once
 
 #include "globals.h"
 #include "gps.h"
@@ -7,11 +6,6 @@
 extern void SendPayload(uint8_t port);
 extern void lora_queue_init(void);
 void AXP192_powerevent_IRQ(void);
-
-
-// MyDevices CayenneLPP 1.0 channels for Synamic sensor payload format
-// all payload goes out on LoRa FPort 1
-#if (PAYLOAD_ENCODER == 3)
 
 #define LPP_GPS_CHANNEL 20
 #define LPP_COUNT_WIFI_CHANNEL 21
@@ -46,8 +40,6 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_SOIL_MOISTURE 202
 
 
-#endif
-
 class PayloadConvert {
 
 public:
@@ -74,18 +66,10 @@ public:
   void addSensor(uint8_t[]);
   void addTime(time_t value);
 
-#if (PAYLOAD_ENCODER == 3) // format plain
-
 private:
   uint8_t *buffer;
   uint8_t maxsize;
   uint8_t cursor;
-
-#else
-#error No valid payload converter defined!
-#endif
 };
 
 extern PayloadConvert payload;
-
-#endif // _PAYLOAD_H_

@@ -109,14 +109,15 @@ void callback(char *topic, byte *payload, unsigned int length)
     saveConfiguration();
   }
 
+  #if (HAS_PMU)
   if (action == "set_bat_max_charge_current")
   {
-    
     dataBuffer.settings.bat_max_charge_current = atoi(value);
     ESP_LOGI(TAG, "MQTT: set max charge current %2d", dataBuffer.settings.bat_max_charge_current);
     pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
     saveConfiguration();
   }
+  #endif
 
   if (action == "set_experiment")
   {

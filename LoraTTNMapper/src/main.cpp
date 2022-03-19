@@ -17,7 +17,6 @@
 
 static const char TAG[] = __FILE__;
 
-
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
@@ -37,8 +36,8 @@ void setup_gps_reset()
   if (myGPS.begin(SerialGPS))
   {
     Serial.println("Connected to GPS");
-    myGPS.setUART1Output(COM_TYPE_NMEA); //Set the UART port to output NMEA only
-    myGPS.saveConfiguration();           //Save the current settings to flash and BBR
+    myGPS.setUART1Output(COM_TYPE_NMEA); // Set the UART port to output NMEA only
+    myGPS.saveConfiguration();           // Save the current settings to flash and BBR
     Serial.println("GPS serial connected, output set to NMEA");
     myGPS.disableNMEAMessage(UBX_NMEA_GLL, COM_PORT_UART1);
     myGPS.disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
@@ -46,7 +45,7 @@ void setup_gps_reset()
     myGPS.disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
     myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
     myGPS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
-    myGPS.saveConfiguration(); //Save the current settings to flash and BBR
+    myGPS.saveConfiguration(); // Save the current settings to flash and BBR
   }
   delay(1000);
 }
@@ -60,12 +59,12 @@ static char log_print_buffer[512];
 
 int vprintf_into_spiffs(const char *szFormat, va_list args)
 {
-  //write evaluated format string into buffer
+  // write evaluated format string into buffer
   int ret = vsnprintf(log_print_buffer, sizeof(log_print_buffer), szFormat, args);
 
   dataBuffer.settings.log_print_buffer = log_print_buffer;
 
-  //output is now in buffer. write to file.
+  // output is now in buffer. write to file.
   if (ret >= 0)
   {
     if (!SPIFFS.exists("/LOGS.txt"))
@@ -78,10 +77,10 @@ int vprintf_into_spiffs(const char *szFormat, va_list args)
     }
 
     File spiffsLogFile = SPIFFS.open("/LOGS.txt", FILE_APPEND);
-    //debug output
-    //printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
+    // debug output
+    // printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
     spiffsLogFile.write((uint8_t *)log_print_buffer, (size_t)ret);
-    //to be safe in case of crashes: flush the output
+    // to be safe in case of crashes: flush the output
     spiffsLogFile.flush();
     spiffsLogFile.close();
   }
@@ -160,20 +159,21 @@ Ticker LORAsendMessageTicker;
 //--------------------------------------------------------------------------
 
 #if (USE_SERVO)
-void setup_servo() {
+void setup_servo()
+{
 
   Servo servo1;
   Servo servo2;
   int minUs = 1000;
   int maxUs = 2000;
 
-	// Allow allocation of all timers
-	ESP32PWM::allocateTimer(0);
-	ESP32PWM::allocateTimer(1);
-	ESP32PWM::allocateTimer(2);
-	ESP32PWM::allocateTimer(3);
-	servo1.setPeriodHertz(50);      // Standard 50hz servo
-	servo2.setPeriodHertz(50);      // Standard 50hz servo
+  // Allow allocation of all timers
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  servo1.setPeriodHertz(50); // Standard 50hz servo
+  servo2.setPeriodHertz(50); // Standard 50hz servo
 
   servo1.attach(SERVO1_PIN, 1000, 2000);
   servo2.attach(SERVO2_PIN, 1000, 2000);
@@ -182,30 +182,31 @@ void setup_servo() {
   digitalWrite(POWER_RAIL_PIN, HIGH);
 
   pinMode(SERVO2_PIN, OUTPUT); // Set GPIO35 as digital output pin
-  
+
   digitalWrite(SERVO2_PIN, HIGH);
   Serial.println("High");
   delay(2000);
-  for (int pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-		// in steps of 1 degree
-  servo1.write(pos); 
-	servo2.write(pos);    // tell servo to go to position in variable 'pos'
-	delay(15);             // waits 15ms for the servo to reach the position
-	}
-	for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-		servo1.write(pos);    // tell servo to go to position in variable 'pos'
-    servo2.write(pos); 
-		delay(15);             // waits 15ms for the servo to reach the position
-	}
+  for (int pos = 0; pos <= 180; pos += 1)
+  { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    servo1.write(pos);
+    servo2.write(pos); // tell servo to go to position in variable 'pos'
+    delay(15);         // waits 15ms for the servo to reach the position
+  }
+  for (int pos = 180; pos >= 0; pos -= 1)
+  {                    // goes from 180 degrees to 0 degrees
+    servo1.write(pos); // tell servo to go to position in variable 'pos'
+    servo2.write(pos);
+    delay(15); // waits 15ms for the servo to reach the position
+  }
 
-digitalWrite(SERVO2_PIN, LOW);
-delay(2000);
-Serial.println("Servo2 low");
-digitalWrite(POWER_RAIL_PIN, LOW);
-Serial.println("Power Low");
+  digitalWrite(SERVO2_PIN, LOW);
+  delay(2000);
+  Serial.println("Servo2 low");
+  digitalWrite(POWER_RAIL_PIN, LOW);
+  Serial.println("Power Low");
 }
 #endif
-
 
 void setup_filesystem()
 {
@@ -277,7 +278,7 @@ void Cayenne_send(void)
   log_display("Cayenne send");
 
   Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
-  //Cayenne.virtualWrite(11, dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(),dataBuffer.data.gps.tGps.altitude.meters(),"gps","m");
+  // Cayenne.virtualWrite(11, dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(),dataBuffer.data.gps.tGps.altitude.meters(),"gps","m");
   Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
 
   Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
@@ -300,7 +301,7 @@ CAYENNE_IN_DEFAULT()
 {
   log_display("Cayenne data received");
   CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
-  //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+  // Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
   switch (request.channel)
   {
   case 1:
@@ -316,7 +317,7 @@ String stringOne = "";
 
 void touch_callback()
 {
-  //placeholder callback function
+  // placeholder callback function
 }
 
 //---------------------------------------------------------------------------------
@@ -334,17 +335,17 @@ void t_mqtt_cycle()
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
 
-  #if (USE_MQTT_SENSORS)
+#if (USE_MQTT_SENSORS)
     mqtt_send();
-  #endif
-  #if (USE_MQTT_TRAIN)
-    if ( dataBuffer.data.potentiometer_a_changed )
-        {
-           mqtt_send_lok(1,dataBuffer.data.potentiometer_a,1);
-           dataBuffer.data.potentiometer_a_changed = false;
-        }
-    #endif
-  #endif
+#endif
+#if (USE_MQTT_TRAIN)
+  if (dataBuffer.data.potentiometer_a_changed)
+  {
+    mqtt_send_lok(1, dataBuffer.data.potentiometer_a, 1);
+    dataBuffer.data.potentiometer_a_changed = false;
+  }
+#endif
+#endif
 }
 
 void t_cyclicRTOS(void *pvParameters)
@@ -365,7 +366,7 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
-  //ESP_LOGI(TAG, "ESP free heap: %.2", dataBuffer.data.freeheap);
+  // ESP_LOGI(TAG, "ESP free heap: %.2", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
   //   I2C opperations
@@ -391,14 +392,14 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
 
-    // recalculate charge current  
-    if  ( dataBuffer.data.bat_charge_current == 0 )  
+    // recalculate charge current
+    if (dataBuffer.data.bat_charge_current == 0)
     {
-      if  ( dataBuffer.data.bat_discharge_current > 0 ) 
+      if (dataBuffer.data.bat_discharge_current > 0)
       {
         dataBuffer.data.bat_charge_current = dataBuffer.data.bat_discharge_current * -1;
       }
-    } 
+    }
     dataBuffer.data.bat_ChargeCoulomb = pmu.getBattChargeCoulomb() / 3.6;
     dataBuffer.data.bat_DischargeCoulomb = pmu.getBattDischargeCoulomb() / 3.6;
     dataBuffer.data.bat_DeltamAh = pmu.getCoulombData();
@@ -439,12 +440,11 @@ void t_cyclic() // Intervall: Display Refresh
   }
 #endif
 
-
 // Calculate Soil Moisture
 #if (USE_SOIL_MOISTURE)
-    if ( dataBuffer.data.potentiometer_a_changed )
-        {          
-        }    
+  if (dataBuffer.data.potentiometer_a_changed)
+  {
+  }
 #endif
 
 // Refresh Display
@@ -526,8 +526,6 @@ void t_sleep()
 #endif
 }
 
-
-
 void setup_wifi()
 {
 #if (USE_WIFI)
@@ -554,12 +552,12 @@ void setup_wifi()
   }
   else
   {
-    //Turn off WiFi if no connection was made
+    // Turn off WiFi if no connection was made
     log_display("WIFI OFF");
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
-  #endif  
+#endif
 }
 
 void setup()
@@ -584,7 +582,7 @@ void setup()
   }
   esp_log_set_vprintf(&vprintf_into_spiffs);
   esp_log_level_set(TAG, ESP_LOG_INFO);
-  //write into log
+  // write into log
   esp_log_write(ESP_LOG_INFO, TAG, "Hello World2\n");
   esp_log_write(ESP_LOG_INFO, TAG, "starting...\n");
 #endif
@@ -592,7 +590,7 @@ void setup()
   dataBuffer.data.runmode = 0;
   Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
-  //Increment boot number and print it every reboot
+  // Increment boot number and print it every reboot
   ++bootCount;
   dataBuffer.data.bootCounter = bootCount;
 
@@ -603,7 +601,7 @@ void setup()
 
   ESP_LOGI(TAG, "#---------------------jojojoj-------------------------------------#");
   Serial.println(dataBuffer.to_json());
-  Serial.println(dataBuffer.getError());  
+  Serial.println(dataBuffer.getError());
 
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
@@ -619,6 +617,10 @@ void setup()
   i2c_scan();
   delay(100);
 
+#if (HAS_IP5306)
+  setupPowerIP5306();
+#endif
+
 #if (HAS_PMU)
   AXP192_init();
   delay(100);
@@ -629,7 +631,7 @@ void setup()
 #endif
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280)
-ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
+  ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
   setup_i2c_sensors();
 #endif
 
@@ -645,7 +647,7 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
 
 #if (USE_SERIAL_BT || USE_BLE_SCANNER)
 #else
-  //Turn off Bluetooth
+  // Turn off Bluetooth
   log_display("Bluethooth off");
   btStop();
 #endif
@@ -665,15 +667,14 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
   }
 #endif
 
-
 #if (USE_GYRO)
   setup_gyro();
 #endif
 
 #if (USE_GPS)
-  //setup_gps_reset(); // Hard reset
+  // setup_gps_reset(); // Hard reset
   gps.init();
-  //gps.softwareReset();
+  // gps.softwareReset();
   gps.wakeup();
   delay(500); // Wait for GPS beeing stable
 #endif
@@ -715,9 +716,12 @@ ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
 #endif
 
 #if (USE_SERVO)
-setup_servo();
+  setup_servo();
 #endif
 
+#if (USE_CAMERA)
+  setupCam();
+#endif
 
   //-------------------------------------------------------------------------------
   // Tasks
@@ -765,7 +769,6 @@ setup_servo();
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
- 
 
   // get sensor values once
   t_cyclic();
@@ -773,16 +776,19 @@ setup_servo();
   //---------------------------------------------------------------
   // Watchdog
   //---------------------------------------------------------------
-  //esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  // esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
   // esp_task_wdt_add(NULL); //add current thread to WDT watch
-  //enableLoopWDT();
-  //ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
+  // enableLoopWDT();
+  // ESP_LOGI(TAG, "Watchdog timeout %d seconds", WDT_TIMEOUT);
 }
 
+//---------------------------------------------------------------
+// MAIN LOOP
+//---------------------------------------------------------------
 void loop()
 {
   // esp_task_wdt_reset(); //reset timer ...feed watchdog
-  //feedLoopWDT();
+  // feedLoopWDT();
 
 #if (HAS_LORA)
   os_runloop_once();

@@ -55,9 +55,8 @@ void loadConfiguration()
     }
 
     
-    
+    #if (HAS_PMU)
     dataBuffer.settings.bat_max_charge_current = doc["settings"]["bat_max_charge_current"];
-
     if (dataBuffer.settings.bat_max_charge_current > 0)
     {
     }
@@ -65,6 +64,7 @@ void loadConfiguration()
     {
       dataBuffer.settings.bat_max_charge_current = AXP1XX_CHARGE_CUR_450MA;
     }
+    #endif
 
     ESP_LOGI(TAG, "Sleeptime: %2d", dataBuffer.settings.sleep_time);
   }

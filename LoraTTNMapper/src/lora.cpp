@@ -21,6 +21,7 @@ void os_getDevKey(u1_t *buf) {}
 
 void t_enqueue_LORA_messages()
 {
+#if (HAS_LORA)
   String stringOne;
 
   if (LoraSendQueue == 0)
@@ -96,6 +97,7 @@ payload.reset();
 payload.addPMU(01, dataBuffer);  //(channel, data)
 payload.enqueue_port(3); // send data
   }
+#endif
 }
 
 void do_send(osjob_t *j)

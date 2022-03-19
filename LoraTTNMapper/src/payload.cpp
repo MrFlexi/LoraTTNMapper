@@ -208,6 +208,7 @@ void PayloadConvert::enqueue_port(uint8_t port)
 
 void lora_queue_init(void)
 {
+  #if (HAS_LORA)
   assert(SEND_QUEUE_SIZE);
   LoraSendQueue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(MessageBuffer_t));
   if (LoraSendQueue == 0)
@@ -216,4 +217,5 @@ void lora_queue_init(void)
   }
   ESP_LOGI(TAG, "LORA send queue created, size %d Bytes",
            SEND_QUEUE_SIZE * sizeof(MessageBuffer_t));
+  #endif
 }

@@ -18,6 +18,9 @@ void calibrate_voltage(void);
 bool batt_sufficient(void);
 void ESP32_sleep();
 
+#if(HAS_IP5306)
+bool setupPowerIP5306();
+#endif
 
 #if (HAS_PMU)
 #include <axp20x.h>

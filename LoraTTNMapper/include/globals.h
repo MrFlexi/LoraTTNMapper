@@ -27,7 +27,7 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
+#define DEVICE_ID  camera_01
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -47,6 +47,11 @@
 #if DEVICE_ID == 4                 // TBEAM-02 Device EU ID = DE00000000000011
 #include "device_04.h"
 #include "../src/hal/ttgobeam10.h"
+#endif
+
+#if DEVICE_ID == camera_01                 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_cam_01.h"
+#include "../src/hal/ttgoCameraPlus.h"
 #endif
 
 #define I2CMUTEXREFRES_MS 40
@@ -199,6 +204,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "irqhandler.h"
 #include "payload.h"
 
+
+
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280 )
 #include "i2c_sensors.h"
 #endif
@@ -212,7 +219,9 @@ extern QueueHandle_t LoraSendQueue;
 #endif
 
 #if (HAS_LORA)
+#include <lmic.h>
 #include "lora.h"
+#include "payload.h"
 #endif
 
 #if (USE_OTA)
@@ -225,6 +234,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_POTI || USE_SOIL_MOISTURE)
 #include "poti.h"
+#endif
+
+#if (USE_CAMERA)
+#include <camera.h>
 #endif
 
 #endif

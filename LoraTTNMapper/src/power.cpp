@@ -5,6 +5,26 @@
 // Local logging tag
 static const char TAG[] = __FILE__;
 
+#if (HAS_IP5306)
+bool setupPowerIP5306()
+{
+
+#define IP5306_ADDR 0X75
+#define IP5306_REG_SYS_CTL0 0x00
+    bool en = true;
+    Wire.beginTransmission(IP5306_ADDR);
+    Wire.write(IP5306_REG_SYS_CTL0);
+    if (en)
+        Wire.write(0x37); // Set bit1: 1 enable 0 disable boost keep on
+    else
+        Wire.write(0x35); // 0x37 is default reg value
+    return Wire.endTransmission() == 0;
+
+    return true;
+}
+#endif
+
+
 #if (HAS_PMU)
 
 AXP20X_Class pmu;
