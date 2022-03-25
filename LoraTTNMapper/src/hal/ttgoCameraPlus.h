@@ -1,28 +1,21 @@
-// clang-format off
-// upload_speed 921600
-// board ttgo-t-beam
-
 // TTGO Camera  has on board power management by IPS 5306 PMU chip:
-//
-
-// IO22(SCL)   9       SCL
-// IO21(SDA)   10      SDA
-
 
 #pragma once
-
 #include <stdint.h>
 
 #define FASTLED_DATA_PIN        GPIO_NUM_2
 
 #define POTI_PIN                GPIO_NUM_32
 #define BUTTON_PIN              GPIO_NUM_38     // middle on board button
+#define GPS_TX                  GPIO_NUM_34
+#define GPS_RX                  GPIO_NUM_12
 
 #define HAS_LORA                0               // comment out if device shall not send data via LoRa
 #define BOARD_HAS_PSRAM         1               // use extra 4MB external RAM
 #define HAS_IP5306              1
 #define ENABLE_IP5306
 #define ENABLE_TFT
+#define HAS_TFT_DISPLAY
 
 #define PWDN_GPIO_NUM       -1
 #define RESET_GPIO_NUM      -1

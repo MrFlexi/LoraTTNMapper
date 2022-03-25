@@ -13,7 +13,6 @@
 
 #define DEFAULT_MEASUR_MILLIS 3000 /* Get sensor time by default (ms)*/
 
-
 /***************************************
  *  Netcup Server
  **************************************/
@@ -28,7 +27,6 @@ String ipAddress = "";
 
 TFT_eSPI tft = TFT_eSPI();
 
-
 String sendPhoto()
 {
     String getAll;
@@ -40,114 +38,119 @@ String sendPhoto()
     if (!fb)
     {
         Serial.println("Camera capture failed");
-        delay(1000);
-        ESP.restart();
     }
 
-    Serial.println("Connecting to server: " + serverName);
-
-    if (wifiClient.connect(serverName.c_str(), serverPort))
+    if (WiFi.status() == WL_CONNECTED)
     {
-        Serial.println("Connection successful!");
-        String head = "--MrFlexi\r\nContent-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
-        String tail = "\r\n--MrFlexi--\r\n";
+        Serial.println("Connecting to server: " + serverName);
 
-        uint16_t imageLen = fb->len;
-        uint16_t extraLen = head.length() + tail.length();
-        uint16_t totalLen = imageLen + extraLen;
-
-        wifiClient.println("POST " + serverPath + " HTTP/1.1");
-        wifiClient.println("Host: " + serverName);
-        wifiClient.println("Content-Length: " + String(totalLen));
-        wifiClient.println("Content-Type: multipart/form-data; boundary=MrFlexi");
-        wifiClient.println();
-        wifiClient.print(head);
-
-        uint8_t *fbBuf = fb->buf;
-        size_t fbLen = fb->len;
-        Serial.println("Start transfer");
-        for (size_t n = 0; n < fbLen; n = n + 1024)
+        if (wifiClient.connect(serverName.c_str(), serverPort))
         {
-            if (n + 1024 < fbLen)
-            {
-                wifiClient.write(fbBuf, 1024);
-                fbBuf += 1024;
-            }
-            else if (fbLen % 1024 > 0)
-            {
-                size_t remainder = fbLen % 1024;
-                wifiClient.write(fbBuf, remainder);
-            }
-        }
-        Serial.println("Tail");
-        wifiClient.print(tail);
+            Serial.println("Connection successful!");
+            String head = "--MrFlexi\r\nContent-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+            String tail = "\r\n--MrFlexi--\r\n";
 
-        esp_camera_fb_return(fb);
+            uint16_t imageLen = fb->len;
+            uint16_t extraLen = head.length() + tail.length();
+            uint16_t totalLen = imageLen + extraLen;
 
-        int timoutTimer = 10000;
-        long startTimer = millis();
-        boolean state = false;
+            wifiClient.println("POST " + serverPath + " HTTP/1.1");
+            wifiClient.println("Host: " + serverName);
+            wifiClient.println("Content-Length: " + String(totalLen));
+            wifiClient.println("Content-Type: multipart/form-data; boundary=MrFlexi");
+            wifiClient.println();
+            wifiClient.print(head);
 
-        Serial.println("Second");
-        while ((startTimer + timoutTimer) > millis())
-        {
-            Serial.print(".");
-            delay(50);
-            while (wifiClient.available())
+            uint8_t *fbBuf = fb->buf;
+            size_t fbLen = fb->len;
+            Serial.println("Start transfer");
+            for (size_t n = 0; n < fbLen; n = n + 1024)
             {
-                char c = wifiClient.read();
-                if (c == '\n')
+                if (n + 1024 < fbLen)
                 {
-                    if (getAll.length() == 0)
+                    wifiClient.write(fbBuf, 1024);
+                    fbBuf += 1024;
+                }
+                else if (fbLen % 1024 > 0)
+                {
+                    size_t remainder = fbLen % 1024;
+                    wifiClient.write(fbBuf, remainder);
+                }
+            }
+            Serial.println("Tail");
+            wifiClient.print(tail);
+
+            esp_camera_fb_return(fb);
+
+            int timoutTimer = 10000;
+            long startTimer = millis();
+            boolean state = false;
+
+            Serial.println("Second");
+            while ((startTimer + timoutTimer) > millis())
+            {
+                Serial.print(".");
+                delay(50);
+                while (wifiClient.available())
+                {
+                    char c = wifiClient.read();
+                    if (c == '\n')
                     {
-                        state = true;
+                        if (getAll.length() == 0)
+                        {
+                            state = true;
+                        }
+                        getAll = "";
                     }
-                    getAll = "";
+                    else if (c != '\r')
+                    {
+                        getAll += String(c);
+                    }
+                    if (state == true)
+                    {
+                        getBody += String(c);
+                    }
+                    startTimer = millis();
                 }
-                else if (c != '\r')
+                if (getBody.length() > 0)
                 {
-                    getAll += String(c);
+                    break;
                 }
-                if (state == true)
-                {
-                    getBody += String(c);
-                }
-                startTimer = millis();
             }
-            if (getBody.length() > 0)
-            {
-                break;
-            }
+            Serial.println();
+            wifiClient.stop();
+            Serial.println("Client Stop");
+            Serial.println(getBody);
         }
-        Serial.println();
-        wifiClient.stop();
-        Serial.println("Client Stop");
-        Serial.println(getBody);
+        else
+        {
+            getBody = "Connection to " + serverName + " failed.";
+            Serial.println(getBody);
+        }
     }
     else
-    {
-        getBody = "Connection to " + serverName + " failed.";
-        Serial.println(getBody);
-    }
+        {
+            Serial.println("No Wifi ");
+        }
     return getBody;
 }
-
-
-
-bool setupDisplay()
+#if (HAS_TFT_DISPLAY)
+bool setupTFTDisplay()
 {
+    ESP_LOGI(TAG, "Setup TFT Display");
     tft.init();
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextSize(2);
     tft.setTextDatum(MC_DATUM);
-    tft.drawString("TFT_eSPI", tft.width() / 2, tft.height() / 2);
+    tft.drawString("MrFlexi PlantServ", 20,10) ;
     tft.drawString("LilyGo Camera Plus", tft.width() / 2, tft.height() / 2 + 20);
     tft.drawString("Push Foto to Netcup", tft.width() / 2, tft.height() / 2 + 30);
     pinMode(TFT_BL_PIN, OUTPUT);
     digitalWrite(TFT_BL_PIN, HIGH);
     return true;
 }
+#endif
 
 void loopDisplay()
 {
@@ -160,8 +163,6 @@ void loopDisplay()
 
 #endif
 }
-
-
 
 #if defined(SDCARD_CS_PIN)
 #include <SD.h>
@@ -266,17 +267,20 @@ void setupNetwork()
 {
 
     ipAddress = WiFi.localIP().toString();
+    #if (HAS_TFT_DISPLAY)
     tft.drawString("ipAddress:", tft.width() / 2, tft.height() / 2 + 50);
     tft.drawString(ipAddress, tft.width() / 2, tft.height() / 2 + 72);
+    #endif
 }
 
 void setupCam()
 {
 
     bool status;
-    status = setupDisplay();
+    #if (HAS_TFT_DISPLAY)
+    status = setupTFTDisplay();
     Serial.print("setupDisplay status ");
-    Serial.println(status);
+    #endif
 
     //status = setupSDCard();
     //Serial.print("setupSDCard status ");
@@ -287,7 +291,6 @@ void setupCam()
     Serial.println(status);
 
     setupNetwork();
-
     //startCameraServer();
 
     Serial.print("Camera Ready! Use 'http://");

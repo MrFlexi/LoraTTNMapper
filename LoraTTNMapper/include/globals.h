@@ -27,7 +27,8 @@
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  camera_01
+
+#define DEVICE_ID 1
 
 #if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -97,8 +98,8 @@ extern Servo servo2;
 #include "websocket.h"
 #endif
 
-
 #include "gps.h"
+
 #include "esp_log.h"
 
 //--------------------------------------------------------------------------
@@ -191,11 +192,9 @@ typedef struct
 } MessageBuffer_t;
 
 extern SemaphoreHandle_t I2Caccess;
-
 extern TaskHandle_t irqHandlerTask;
 extern TaskHandle_t moveDisplayHandlerTask;
 extern TaskHandle_t t_cyclic_HandlerTask;
-
 extern QueueHandle_t LoraSendQueue;
 
 #include "power.h"
@@ -203,8 +202,6 @@ extern QueueHandle_t LoraSendQueue;
 #include "display.h"
 #include "irqhandler.h"
 #include "payload.h"
-
-
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280 )
 #include "i2c_sensors.h"

@@ -63,15 +63,11 @@ class DataBuffer
     String to_json();
     deviceStatus_t data ;
     deviceSettings_t settings;
-    
     const char* getError() const { return _error; }
-
   private:
-    char* _error;
-   
+    char* _error;   
 };
 
 extern DataBuffer dataBuffer;
-
 
 #endif

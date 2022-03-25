@@ -116,7 +116,6 @@ void do_send(osjob_t *j)
       gps.buildPacket(txBuffer);
       LMIC_setTxData2(1, txBuffer, sizeof(txBuffer), 0);
       ESP_LOGI(TAG, "Send Lora ");
-      digitalWrite(BUILTIN_LED, HIGH);
     }
     else
       ESP_LOGV(TAG, "GPS no fix");
@@ -275,8 +274,6 @@ void onEvent(ev_t ev)
   case EV_TXCOMPLETE:
     log_display("EV_TXCOMPLETE");
     dataBuffer.data.txCounter++;
-
-    digitalWrite(BUILTIN_LED, LOW);
     if (LMIC.txrxFlags & TXRX_ACK)
     {
       log_display("Received Ack");

@@ -12,6 +12,7 @@
 #define MCP_24AA02E64_PRIMARY_ADDRESS (0x50)
 #define QUECTEL_GPS_PRIMARY_ADDRESS (0x10)
 #define ADXL345 (0x53)
+#define IP5306_ADDR (0X75)
 
 
 int i2c_scan(void) {
@@ -19,20 +20,15 @@ int i2c_scan(void) {
   int i2c_ret, addr;
   int devices = 0;
 
-  Serial.println( "Scanning I2C");
   ESP_LOGI(TAG, "Starting I2C bus scan...");
 
   for (addr = 8; addr <= 119; addr++) {
-
     // scan i2c bus with no more to 100KHz
-    Wire.begin(SDA, SCL, 100000);
     Wire.beginTransmission(addr);
     Wire.write(addr);
     i2c_ret = Wire.endTransmission();
-
     if (i2c_ret == 0) {
       devices++;
-
       switch (addr) {
       case INA3221_ADDRESS:
       ESP_LOGI(TAG, "0x%X: INA 3221 Voltage+Current detector", addr);
@@ -63,6 +59,10 @@ int i2c_scan(void) {
 
       case ADXL345:
         ESP_LOGI(TAG, "0x%X: ADXL345 3 Axis Accel", addr);
+        break;
+      
+      case IP5306_ADDR:
+        ESP_LOGI(TAG, "0x%X: IP5306 power management", addr);
         break;
 
       default:

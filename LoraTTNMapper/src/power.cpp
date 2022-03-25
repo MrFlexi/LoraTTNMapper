@@ -8,7 +8,7 @@ static const char TAG[] = __FILE__;
 #if (HAS_IP5306)
 bool setupPowerIP5306()
 {
-
+ESP_LOGI(TAG, "Power Up IP5306");
 #define IP5306_ADDR 0X75
 #define IP5306_REG_SYS_CTL0 0x00
     bool en = true;

@@ -444,6 +444,9 @@ void t_cyclic() // Intervall: Display Refresh
 #if (USE_SOIL_MOISTURE)
   if (dataBuffer.data.potentiometer_a_changed)
   {
+    dataBuffer.data.soil_moisture = dataBuffer.data.potentiometer_a;
+    dataBuffer.data.potentiometer_a_changed = false;
+
   }
 #endif
 
@@ -594,28 +597,27 @@ void setup()
   ++bootCount;
   dataBuffer.data.bootCounter = bootCount;
 
-  Serial.println("Boot number: " + String(bootCount));
-
+  // Aditional Info
   print_wakeup_reason();
   display_chip_info();
-
-  ESP_LOGI(TAG, "#---------------------jojojoj-------------------------------------#");
   Serial.println(dataBuffer.to_json());
   Serial.println(dataBuffer.getError());
-
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
 
-  // create some semaphores for syncing / mutexing tasks
-  I2Caccess = xSemaphoreCreateMutex(); // for access management of i2c bus
+  // I2c access management for RTOS bus access
+  I2Caccess = xSemaphoreCreateMutex(); //
   assert(I2Caccess != NULL);
   I2C_MUTEX_UNLOCK();
 
-  ESP_LOGI(TAG, "Starting..");
-  Serial.println(F("TTN Mapper"));
+// Setup I2C Communication
+#if (I2C_SDA)
+  Wire.begin(I2C_SDA, I2C_SCL, 100000);
+#else
+  Wire.begin(SDA, SCL, 100000);
+#endif
   i2c_scan();
-  delay(100);
 
 #if (HAS_IP5306)
   setupPowerIP5306();
