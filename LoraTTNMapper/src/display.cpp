@@ -414,40 +414,47 @@ void DataBuffer::get()
 
 String DataBuffer::to_json()
 {
-  const int capacity = JSON_OBJECT_SIZE(25) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(40) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
 
     doc.clear();
-    doc["device"] = DEVICE_NAME;
-    doc["ip"] = String(dataBuffer.data.ip_address);
-    doc["BootCounter"] = String(dataBuffer.data.bootCounter);
-    doc["bat_voltage"] = String(dataBuffer.data.bat_voltage);
-    doc["bat_charge_current"] = String(dataBuffer.data.bat_charge_current);
-    doc["bat_discharge_current"] = String(dataBuffer.data.bat_discharge_current);
-    doc["bat_fuel_gauge"] = String(dataBuffer.data.bat_DeltamAh);
-    doc["bus_voltage"] = String(dataBuffer.data.bus_voltage);
-    doc["bus_current"] = String(dataBuffer.data.bus_current);
-    doc["panel_voltage"] = String(dataBuffer.data.panel_voltage);
-    doc["panel_current"] = String(dataBuffer.data.panel_current);
-    doc["TXCounter"] = String(dataBuffer.data.txCounter);
-    doc["temperature"] = String(dataBuffer.data.temperature);
-    doc["humidity"] = String(dataBuffer.data.humidity);
-    doc["cpu_temperature"] = String(dataBuffer.data.cpu_temperature);
-    doc["cpu_free_heap"] = String(dataBuffer.data.freeheap);
-    doc["MotionCounter"] = String(dataBuffer.data.MotionCounter);
-    doc["soil_moisture"] = String(dataBuffer.data.soil_moisture);
 
-    doc["sleep_time"] = String(dataBuffer.settings.sleep_time);
-    doc["bat_max_charge_curr"] = String(dataBuffer.settings.bat_max_charge_current);
-    
-    
+    JsonObject tags = doc.createNestedObject("tags");
+    tags["device"] = DEVICE_NAME;
+    tags["ip"] = String(dataBuffer.data.ip_address);
+
+    JsonObject measurement = doc.createNestedObject("measurement");
+
+    // Battery Management
+    measurement["bat_voltage"] =        dataBuffer.data.bat_voltage;
+    measurement["bat_charge_current"] = dataBuffer.data.bat_charge_current;
+    measurement["bat_voltage"] =        dataBuffer.data.bat_voltage;
+    measurement["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
+    measurement["bat_fuel_gauge"] =     dataBuffer.data.bat_DeltamAh;
+    measurement["bus_voltage"] =        dataBuffer.data.bus_voltage;
+    measurement["bus_current"] =        dataBuffer.data.bus_current;
+
+    #if (HAS_INA219)
+    measurement["panel_voltage"] =      dataBuffer.data.panel_voltage;
+    measurement["panel_current"] =      dataBuffer.data.panel_current;
+    #endif
+
+    // Device
+    measurement["sleep_time"] = dataBuffer.settings.sleep_time;
+    measurement["bat_max_charge_curr"] = dataBuffer.settings.bat_max_charge_current;
+    measurement["BootCounter"] = dataBuffer.data.bootCounter;
+
+    // BME280
+    measurement["temperature"] = dataBuffer.data.temperature;
+    measurement["humidity"] = dataBuffer.data.humidity;
+    measurement["soil_moisture"] = dataBuffer.data.soil_moisture;
+   
     // Add the "location"
     JsonObject location = doc.createNestedObject("location");
     location["lat"] = dataBuffer.data.gps.lat();
     location["lon"] = dataBuffer.data.gps.lng();
   
-
     serializeJson(doc, JsonStr);
     _error = "Jogi";
     return JsonStr;

@@ -444,7 +444,7 @@ void t_cyclic() // Intervall: Display Refresh
 #if (USE_SOIL_MOISTURE)
   if (dataBuffer.data.potentiometer_a_changed)
   {
-    dataBuffer.data.soil_moisture = dataBuffer.data.potentiometer_a;
+    dataBuffer.data.soil_moisture = (float) dataBuffer.data.potentiometer_a / 1000;
     dataBuffer.data.potentiometer_a_changed = false;
 
   }

@@ -141,6 +141,7 @@ typedef struct
   uint32_t freeheap;        // free memory
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a;   //
+  uint16_t adc0;              // Voltage in mVolt
   bool potentiometer_a_changed;
   uint32_t bat_ChargeCoulomb = 0;
   uint32_t bat_DischargeCoulomb = 0;

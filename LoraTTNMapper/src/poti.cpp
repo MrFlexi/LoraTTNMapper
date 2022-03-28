@@ -55,11 +55,11 @@ uint16_t ADC_read_ticks(adc1_channel_t channel)
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
 
   uint16_t ticks = map(voltage, 142, 3145, 0, 1000);
-  Serial.print("ADC Voltage/Ticks ");Serial.print(voltage);Serial.println(ticks);
+  ESP_LOGI(TAG, "Ticks  %d", ticks );
   return ticks;
 }
 
-float ADC_read_voltage(adc1_channel_t channel)
+uint16_t ADC_read_voltage(adc1_channel_t channel)
 {
   uint16_t voltage = 0;
   uint32_t adc_reading = 0;
@@ -71,7 +71,8 @@ float ADC_read_voltage(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-  return voltage / (float)1000;
+  ESP_LOGI(TAG, "ADC Voltage %d mV", voltage );
+  return voltage;
 }
 
 void globalIntTask(void *parameter)
@@ -84,18 +85,18 @@ void globalIntTask(void *parameter)
 void t_getADCValues(void *parameter)
 {
   DataBuffer *locdataBuffer;
-  uint16_t ticks_old;
-  uint16_t ticks;
+  uint16_t voltage_old;
+  uint16_t voltage;
   locdataBuffer = (DataBuffer *)parameter;
 
   //Continuously sample ADC1
   while (1)
   {
-    ticks = ADC_read_ticks(adc_channel);
-    if (ticks != ticks_old)
+    voltage = ADC_read_voltage(adc_channel);
+    if (voltage != voltage_old)
     {
-      ticks_old = ticks;
-      locdataBuffer->data.potentiometer_a = ticks;
+      voltage_old = voltage;
+      locdataBuffer->data.potentiometer_a = voltage;
       locdataBuffer->data.potentiometer_a_changed = true;
       //Serial.print("ADC Ticks:");Serial.println( locdataBuffer->data.potentiometer_a );
     }
