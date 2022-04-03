@@ -717,6 +717,10 @@ void setup()
   poti_setup_RTOS();
 #endif
 
+#if (USE_HCSR04)
+setup_hcsr04_rtos();
+#endif
+
 #if (USE_SERVO)
   setup_servo();
 #endif

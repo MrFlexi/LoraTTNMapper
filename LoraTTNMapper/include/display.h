@@ -2,10 +2,10 @@
 // U8G2 Display Setup  Definition
 //--------------------------------------------------------------------------
 
-#ifndef _DISPLAY_H
-#define _DISPLAY_H
+#pragma once
 
 #include "globals.h"
+#include "databuffer.h"
 
 #define SUN	0
 #define SUN_CLOUD  1
@@ -52,22 +52,3 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
 
 void showPage(int page);
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol);
-
-
-class DataBuffer
-{
-  public:
-    DataBuffer();
-    void set( deviceStatus_t input );
-    void get();
-    String to_json();
-    deviceStatus_t data ;
-    deviceSettings_t settings;
-    const char* getError() const { return _error; }
-  private:
-    char* _error;   
-};
-
-extern DataBuffer dataBuffer;
-
-#endif

@@ -54,11 +54,11 @@ void log_display(String s)
   SerialBT.println(s);
 #endif
 
-  if (dataBuffer.data.runmode < 1)
-  {
-    u8g2log.print(s);
-    u8g2log.print("\n");
-  }
+  //if (dataBuffer.data.runmode < 1)
+  //{
+  //  u8g2log.print(s);
+  //  u8g2log.print("\n");
+  //}
 }
 
 void t_moveDisplayRTOS(void *pvParameters)
@@ -398,67 +398,3 @@ void showPage(int page)
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
 }
-
-DataBuffer::DataBuffer()
-{
-}
-
-void DataBuffer::set(deviceStatus_t input)
-{
-  data = input;
-}
-
-void DataBuffer::get()
-{
-}
-
-String DataBuffer::to_json()
-{
-  const int capacity = JSON_OBJECT_SIZE(40) + JSON_OBJECT_SIZE(2);
-  StaticJsonDocument<capacity> doc;
-  String JsonStr;
-
-    doc.clear();
-
-    JsonObject tags = doc.createNestedObject("tags");
-    tags["device"] = DEVICE_NAME;
-    tags["ip"] = String(dataBuffer.data.ip_address);
-
-    JsonObject measurement = doc.createNestedObject("measurement");
-
-    // Battery Management
-    measurement["bat_voltage"] =        dataBuffer.data.bat_voltage;
-    measurement["bat_charge_current"] = dataBuffer.data.bat_charge_current;
-    measurement["bat_voltage"] =        dataBuffer.data.bat_voltage;
-    measurement["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
-    measurement["bat_fuel_gauge"] =     dataBuffer.data.bat_DeltamAh;
-    measurement["bus_voltage"] =        dataBuffer.data.bus_voltage;
-    measurement["bus_current"] =        dataBuffer.data.bus_current;
-
-    #if (HAS_INA219)
-    measurement["panel_voltage"] =      dataBuffer.data.panel_voltage;
-    measurement["panel_current"] =      dataBuffer.data.panel_current;
-    #endif
-
-    // Device
-    measurement["sleep_time"] = dataBuffer.settings.sleep_time;
-    measurement["bat_max_charge_curr"] = dataBuffer.settings.bat_max_charge_current;
-    measurement["BootCounter"] = dataBuffer.data.bootCounter;
-
-    // BME280
-    measurement["temperature"] = dataBuffer.data.temperature;
-    measurement["humidity"] = dataBuffer.data.humidity;
-    measurement["soil_moisture"] = dataBuffer.data.soil_moisture;
-   
-    // Add the "location"
-    JsonObject location = doc.createNestedObject("location");
-    location["lat"] = dataBuffer.data.gps.lat();
-    location["lon"] = dataBuffer.data.gps.lng();
-  
-    serializeJson(doc, JsonStr);
-    _error = "Jogi";
-    return JsonStr;
-}
-
-DataBuffer dataBuffer;
-deviceStatus_t sensorValues;

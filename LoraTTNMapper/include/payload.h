@@ -1,6 +1,7 @@
 #pragma once
 
 #include "globals.h"
+#include "databuffer.h"
 #include "gps.h"
 
 extern void SendPayload(uint8_t port);
@@ -58,8 +59,8 @@ public:
   void addVoltage(uint8_t channel, float value);
   void addCurrent(uint8_t channel, float value);
   void addTemperature(uint8_t channel, float value);
-  void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
-  void addPMU(uint8_t channel,  DataBuffer dataBuffer);
+  void addBMETemp(uint8_t channel);
+  void addPMU(uint8_t channel);
   void addGPS_TTN(TinyGPSPlus tGps);
   void addGPS_LPP(uint8_t channel, TinyGPSPlus tGps); 
   void addButton(uint8_t value);

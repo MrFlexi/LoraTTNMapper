@@ -60,7 +60,7 @@ payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 #endif
 
 #if (USE_BME280)
-    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
+    payload.addBMETemp(2); // Cayenne format will be generated in TTN Payload converter
 #endif
 
 #if (HAS_INA3221 || HAS_INA219 )
@@ -94,7 +94,7 @@ payload.enqueue_port(2); // send data
 
 // PMU data as one block
 payload.reset();
-payload.addPMU(01, dataBuffer);  //(channel, data)
+payload.addPMU(01);  //(channel, data)
 payload.enqueue_port(3); // send data
   }
 #endif

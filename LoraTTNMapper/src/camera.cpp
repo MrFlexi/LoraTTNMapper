@@ -129,11 +129,12 @@ String sendPhoto()
         }
     }
     else
-        {
-            Serial.println("No Wifi ");
-        }
+    {
+        Serial.println("No Wifi ");
+    }
     return getBody;
-}
+};
+
 #if (HAS_TFT_DISPLAY)
 bool setupTFTDisplay()
 {
@@ -143,7 +144,7 @@ bool setupTFTDisplay()
     tft.fillScreen(TFT_BLACK);
     tft.setTextSize(2);
     tft.setTextDatum(MC_DATUM);
-    tft.drawString("MrFlexi PlantServ", 20,10) ;
+    tft.drawString("MrFlexi PlantServ", 20, 10);
     tft.drawString("LilyGo Camera Plus", tft.width() / 2, tft.height() / 2 + 20);
     tft.drawString("Push Foto to Netcup", tft.width() / 2, tft.height() / 2 + 30);
     pinMode(TFT_BL_PIN, OUTPUT);
@@ -267,20 +268,20 @@ void setupNetwork()
 {
 
     ipAddress = WiFi.localIP().toString();
-    #if (HAS_TFT_DISPLAY)
+#if (HAS_TFT_DISPLAY)
     tft.drawString("ipAddress:", tft.width() / 2, tft.height() / 2 + 50);
     tft.drawString(ipAddress, tft.width() / 2, tft.height() / 2 + 72);
-    #endif
+#endif
 }
 
 void setupCam()
 {
 
     bool status;
-    #if (HAS_TFT_DISPLAY)
+#if (HAS_TFT_DISPLAY)
     status = setupTFTDisplay();
     Serial.print("setupDisplay status ");
-    #endif
+#endif
 
     //status = setupSDCard();
     //Serial.print("setupSDCard status ");

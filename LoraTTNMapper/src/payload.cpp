@@ -63,7 +63,7 @@ void PayloadConvert::addTemperature(uint8_t channel, float value)
   buffer[cursor++] = lowByte(val);
 }
 
-void PayloadConvert::addBMETemp(uint8_t channel, DataBuffer dataBuffer)
+void PayloadConvert::addBMETemp(uint8_t channel)
 {
 #if (USE_BME280)
   int16_t temperature = (int16_t)(dataBuffer.data.temperature * 100); // float -> int
@@ -80,7 +80,7 @@ void PayloadConvert::addBMETemp(uint8_t channel, DataBuffer dataBuffer)
 #endif
 }
 
-void PayloadConvert::addPMU(uint8_t channel, DataBuffer dataBuffer)
+void PayloadConvert::addPMU(uint8_t channel)
 {
 
   buffer[cursor++] = channel;
