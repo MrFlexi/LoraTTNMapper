@@ -179,7 +179,7 @@ extern QueueHandle_t LoraSendQueue;
 #endif
 
 #if (USE_HCSR04)        // Ultrasonic distance sensor
-#include <sensor_hcsr04.h>
+#include "sensor_hcsr04.h"
 #endif
 
 #endif
