@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "globals.h"
+#if (USE_HCSR04)
 
 HCSR04 ultrasonicSensor(HCSR04_trigger_pin,HCSR04_echo_pin, 20, 300);
 
@@ -39,3 +40,4 @@ void setup_hcsr04_rtos()
       NULL,
       0); /* Task handle. */
 }
+#endif

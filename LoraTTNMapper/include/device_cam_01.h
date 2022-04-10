@@ -23,7 +23,7 @@
 
 #define USE_WIFI 1
 #define USE_WIFI_MANAGER 0
-#define USE_WEBSERVER   1 
+#define USE_WEBSERVER   0 
 #define USE_CAYENNE 0
 #define USE_MQTT 1
 #define USE_MQTT_SENSORS 1
@@ -37,14 +37,19 @@
 #define USE_POTI 0
 #define USE_SOIL_MOISTURE 0
 
-#define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL  30            // Transmitt Lora messages
+
+#if (HAS_I2C_MICROPHONE)
+#define USE_I2C_MICROPHONE 0
+#endif
+
+#define LORAenqueueMessagesIntervall 120 // Queue Lora messages
+#define LORA_TX_INTERVAL  120            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
-#define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
-#define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
+#define displayRefreshIntervall 120      // get sensor values and update display     ---> t_cyclic
+#define displayMoveIntervall 120          // shift to next display page               ---> t_moveDisplay
 
 #define sendMqttIntervall      15 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  5 // Update Webpage
+#define sendWebsocketIntervall  120 // Update Webpage
 
 #define PAYLOAD_BUFFER_SIZE 0
 

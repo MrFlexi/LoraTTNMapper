@@ -15,7 +15,7 @@
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 0
 
-#define USE_HCSR04 1       // Ultrasonic distance sensor
+#define USE_HCSR04 0       // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_32
 #define HCSR04_echo_pin     GPIO_NUM_33
 

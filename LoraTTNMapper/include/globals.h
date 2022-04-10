@@ -29,8 +29,13 @@
 
 // Choose Application
 // #define DEVICE_ID 1
-// #define DEVICE_ID CAMERA_01
-#define DEVICE_ID SOIL_SENSOR
+#define DEVICE_CAMERA_01   10 
+#define DEVICE_SOIL_SENSOR 11
+
+
+#define DEVICE_ID DEVICE_CAMERA_01
+//#define DEVICE_ID DEVICE_SOIL_SENSOR
+
 
 #if DEVICE_ID == 1 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
@@ -52,12 +57,12 @@
 #include "../src/hal/ttgobeam10.h"
 #endif
 
-//#if DEVICE_ID == CAMERA_01 // TBEAM-02 Device EU ID = DE00000000000011
-//#include "device_cam_01.h"
-//#include "../src/hal/ttgoCameraPlus.h"
-//#endif
+#if DEVICE_ID == DEVICE_CAMERA_01 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_cam_01.h"
+#include "../src/hal/ttgoCameraPlus.h"
+#endif
 
-#if DEVICE_ID == SOIL_SENSOR // TBEAM-01 Device EU ID = DE00000000000010
+#if DEVICE_ID == DEVICE_SOIL_SENSOR  // TBEAM-01 Device EU ID = DE00000000000010
 #include "soil_sensor.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
@@ -180,6 +185,11 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_HCSR04)        // Ultrasonic distance sensor
 #include "sensor_hcsr04.h"
+#endif
+
+
+#if (USE_I2C_MICROPHONE)
+#include "sensor_sound.h"
 #endif
 
 #endif

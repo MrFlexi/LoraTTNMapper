@@ -16,7 +16,7 @@ void DataBuffer::get()
 
 String DataBuffer::to_json()
 {
-  const int capacity = JSON_OBJECT_SIZE(40) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(100) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
 
@@ -55,6 +55,13 @@ String DataBuffer::to_json()
 
     // HC-SR04 Sonic distance sensor
     measurement["HCSR04_Distance"] = data.distance;
+
+
+    // Camera
+    #if (USE_CAMERA)
+    measurement["image_url"] = data.image_url;
+    measurement["image"] = String(data.buf);
+    #endif
 
     // Add the "location"
     JsonObject location = doc.createNestedObject("location");

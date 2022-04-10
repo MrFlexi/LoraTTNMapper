@@ -17,6 +17,7 @@
  *  Netcup Server
  **************************************/
 String serverName = "api.szaroletta.de";
+// String serverPath = "/add";
 String serverPath = "/add";
 const int serverPort = 5000;
 
@@ -27,112 +28,185 @@ String ipAddress = "";
 
 TFT_eSPI tft = TFT_eSPI();
 
-String sendPhoto()
+//  Camera functions
+camera_fb_t *capture()
 {
-    String getAll;
-    String getBody;
+    camera_fb_t *fb = NULL;
+    esp_err_t res = ESP_OK;
+    fb = esp_camera_fb_get();
+    return fb;
+}
 
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
+{
+    // Stop further decoding as image is running off bottom of screen
+    if (y >= tft.height())
+        return 0;
+
+    // This function will clip the image block rendering automatically at the TFT boundaries
+    tft.pushImage(x, y, w, h, bitmap);
+
+    // This might work instead if you adapt the sketch to use the Adafruit_GFX library
+    // tft.drawRGBBitmap(x, y, bitmap, w, h);
+
+    // Return 1 to decode next block
+    return 1;
+}
+
+void showImage()
+{
+    camera_fb_t *fb = capture();
+    if (!fb || fb->format != PIXFORMAT_JPEG)
+    {
+        Serial.println("Camera capture failed");
+        esp_camera_fb_return(fb);
+        return;
+    }
+    else
+    {
+        TJpgDec.drawJpg(0, 0, (const uint8_t *)fb->buf, fb->len);
+        esp_camera_fb_return(fb);
+    }
+}
+
+camera_fb_t *captureImage()
+{
     Serial.println("Smile.....");
     camera_fb_t *fb = NULL;
     fb = esp_camera_fb_get();
+    //dataBuffer.data.buf = (const char*) fb->buf;
     if (!fb)
     {
         Serial.println("Camera capture failed");
     }
 
-    if (WiFi.status() == WL_CONNECTED)
+    uint16_t imageLen = fb->len;
+    Serial.print("ImageSize:");
+    Serial.println(imageLen);
+
+    return fb;
+    esp_camera_fb_return(fb);
+};
+
+String sendPhoto()
+{
+
+    showImage();
+
+    String getAll;
+    String getBody;
+
+    delay(1000);
+    Serial.println();
+    ESP_LOGI(TAG, "Smile.....");
+    camera_fb_t *fb = NULL;
+    fb = esp_camera_fb_get();
+    //dataBuffer.data.buf = (const char*) fb->buf;
+    if (!fb)
     {
-        Serial.println("Connecting to server: " + serverName);
+        ESP_LOGE(TAG, "Camera capture failed");
+    }
 
-        if (wifiClient.connect(serverName.c_str(), serverPort))
+    uint16_t imageLen = fb->len;
+    ESP_LOGI(TAG, "ImageSize: %d", imageLen);
+    if (imageLen > 100)
+    {
+        if (WiFi.status() == WL_CONNECTED)
         {
-            Serial.println("Connection successful!");
-            String head = "--MrFlexi\r\nContent-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
-            String tail = "\r\n--MrFlexi--\r\n";
+            Serial.println("Connecting to server: " + serverName);
 
-            uint16_t imageLen = fb->len;
-            uint16_t extraLen = head.length() + tail.length();
-            uint16_t totalLen = imageLen + extraLen;
-
-            wifiClient.println("POST " + serverPath + " HTTP/1.1");
-            wifiClient.println("Host: " + serverName);
-            wifiClient.println("Content-Length: " + String(totalLen));
-            wifiClient.println("Content-Type: multipart/form-data; boundary=MrFlexi");
-            wifiClient.println();
-            wifiClient.print(head);
-
-            uint8_t *fbBuf = fb->buf;
-            size_t fbLen = fb->len;
-            Serial.println("Start transfer");
-            for (size_t n = 0; n < fbLen; n = n + 1024)
+            if (wifiClient.connect(serverName.c_str(), serverPort))
             {
-                if (n + 1024 < fbLen)
-                {
-                    wifiClient.write(fbBuf, 1024);
-                    fbBuf += 1024;
-                }
-                else if (fbLen % 1024 > 0)
-                {
-                    size_t remainder = fbLen % 1024;
-                    wifiClient.write(fbBuf, remainder);
-                }
-            }
-            Serial.println("Tail");
-            wifiClient.print(tail);
+                Serial.println("Connection successful!");
+                String head = "--MrFlexi\r\nContent-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+                String tail = "\r\n--MrFlexi--\r\n";
 
-            esp_camera_fb_return(fb);
+                uint16_t extraLen = head.length() + tail.length();
+                uint16_t totalLen = imageLen + extraLen;
 
-            int timoutTimer = 10000;
-            long startTimer = millis();
-            boolean state = false;
+                wifiClient.println("POST " + serverPath + " HTTP/1.1");
+                wifiClient.println("Host: " + serverName);
+                wifiClient.println("Content-Length: " + String(totalLen));
+                wifiClient.println("Content-Type: multipart/form-data; boundary=MrFlexi");
+                wifiClient.println();
+                wifiClient.print(head);
 
-            Serial.println("Second");
-            while ((startTimer + timoutTimer) > millis())
-            {
-                Serial.print(".");
-                delay(50);
-                while (wifiClient.available())
+                uint8_t *fbBuf = fb->buf;
+                size_t fbLen = fb->len;
+                ESP_LOGI(TAG, "HTTP POST");
+                for (size_t n = 0; n < fbLen; n = n + 1024)
                 {
-                    char c = wifiClient.read();
-                    if (c == '\n')
+                    if (n + 1024 < fbLen)
                     {
-                        if (getAll.length() == 0)
+                        wifiClient.write(fbBuf, 1024);
+                        fbBuf += 1024;
+                    }
+                    else if (fbLen % 1024 > 0)
+                    {
+                        size_t remainder = fbLen % 1024;
+                        wifiClient.write(fbBuf, remainder);
+                    }
+                }
+                ESP_LOGI(TAG, "POST completed");
+                wifiClient.print(tail);
+
+                int timoutTimer = 1000;
+                long startTimer = millis();
+                boolean state = false;
+
+                ESP_LOGI(TAG, "GetServerResponse");
+                while ((startTimer + timoutTimer) > millis())
+                {
+                    Serial.print(".");
+                    delay(50);
+                    while (wifiClient.available())
+                    {
+                        char c = wifiClient.read();
+                        if (c == '\n')
                         {
-                            state = true;
+                            if (getAll.length() == 0)
+                            {
+                                state = true;
+                            }
+                            getAll = "";
                         }
-                        getAll = "";
+                        else if (c != '\r')
+                        {
+                            getAll += String(c);
+                        }
+                        if (state == true)
+                        {
+                            getBody += String(c);
+                        }
+                        startTimer = millis();
                     }
-                    else if (c != '\r')
+                    if (getBody.length() > 0)
                     {
-                        getAll += String(c);
+                        break;
                     }
-                    if (state == true)
-                    {
-                        getBody += String(c);
-                    }
-                    startTimer = millis();
                 }
-                if (getBody.length() > 0)
-                {
-                    break;
-                }
+
+                Serial.println((millis() - startTimer));
+                ESP_LOGI(TAG, "HTTP Response");
+                Serial.println(getBody);
             }
-            Serial.println();
-            wifiClient.stop();
-            Serial.println("Client Stop");
-            Serial.println(getBody);
+            else
+            {
+                ESP_LOGE(TAG, "Connection to %s failed", serverName);
+            }
         }
         else
         {
-            getBody = "Connection to " + serverName + " failed.";
-            Serial.println(getBody);
+            ESP_LOGE(TAG, "No Wifi ");
         }
     }
     else
     {
-        Serial.println("No Wifi ");
+        ESP_LOGE(TAG, "Image Size is 0");
     }
-    return getBody;
+    esp_camera_fb_return(fb);
+    wifiClient.stop();
+    ESP_LOGI(TAG, "WifiClient Stop");
 };
 
 #if (HAS_TFT_DISPLAY)
@@ -149,6 +223,10 @@ bool setupTFTDisplay()
     tft.drawString("Push Foto to Netcup", tft.width() / 2, tft.height() / 2 + 30);
     pinMode(TFT_BL_PIN, OUTPUT);
     digitalWrite(TFT_BL_PIN, HIGH);
+
+    TJpgDec.setJpgScale(1);
+    TJpgDec.setSwapBytes(true);
+    TJpgDec.setCallback(tft_output);
     return true;
 }
 #endif
@@ -228,15 +306,15 @@ bool setupCamera()
     // init with high specs to pre-allocate larger buffers
     if (psramFound())
     {
-        Serial.printf("psram found");
-        config.frame_size = FRAMESIZE_SXGA;
+        Serial.printf("Psram found");
+        config.frame_size = FRAMESIZE_240X240;
         config.jpeg_quality = 10;
         config.fb_count = 2;
     }
     else
     {
         Serial.printf("NO psram found");
-        config.frame_size = FRAMESIZE_VGA;
+        config.frame_size = FRAMESIZE_240X240;;
         config.jpeg_quality = 12;
         config.fb_count = 1;
     }
@@ -254,9 +332,9 @@ bool setupCamera()
     // initial sensors are flipped vertically and colors are a bit saturated
     if (s->id.PID == OV3660_PID)
     {
-        s->set_vflip(s, 1);       // flip it back
-        s->set_brightness(s, 1);  // up the blightness just a bit
-        s->set_saturation(s, -2); // lower the saturation
+        //s->set_vflip(s, 1);       // flip it back
+        //s->set_brightness(s, 1);  // up the blightness just a bit
+        //s->set_saturation(s, -2); // lower the saturation
     }
     // drop down frame size for higher initial frame rate
     // s->set_framesize(s, FRAMESIZE_QVGA);
@@ -297,5 +375,5 @@ void setupCam()
     Serial.print("Camera Ready! Use 'http://");
     Serial.print(ipAddress);
     Serial.println("' to connect");
-    sendPhoto();
+    //sendPhoto();
 }

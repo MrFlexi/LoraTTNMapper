@@ -55,6 +55,7 @@ typedef struct
   double pitch = 0;
   double roll = 0;
   String ip_address;
+  String image_url = "/get_last_detected";
   uint8_t operation_mode = 0;
   esp_sleep_wakeup_cause_t wakeup_reason;
   float distance = 0;
@@ -63,6 +64,9 @@ typedef struct
   TinyGPSLocation gps_old;
   double gps_distance;
   char gps_datetime[32];
+#if (USE_CAMERA)
+  const char * buf;
+#endif
 } deviceStatus_t;
 
 

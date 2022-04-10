@@ -109,7 +109,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     saveConfiguration();
   }
 
-  #if (HAS_PMU)
+#if (HAS_PMU)
   if (action == "set_bat_max_charge_current")
   {
     dataBuffer.settings.bat_max_charge_current = atoi(value);
@@ -117,7 +117,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
     saveConfiguration();
   }
-  #endif
+#endif
 
   if (action == "set_experiment")
   {
@@ -183,24 +183,31 @@ void setup_mqtt()
   }
 }
 
-
 void mqtt_send()
 {
-  char topic_out[40];
+  char topic_out[50];
+  Serial.println();
+  ESP_LOGI(TAG, "MQTT send");
+
+#if (USE_CAMERA)
+sendPhoto();
+  //dataBuffer.data.buf = (const char*) captureImage()->buf;
+  //Serial.println(strlen(dataBuffer.data.buf));
+#endif
 
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
 
-  if (MqttClient.connected())
-  {
-    MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
-    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-    ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());    
-  }
-  else
-  {
-    ESP_LOGE(TAG, "Mqtt not connected");
-  }
+  //if (MqttClient.connected())
+  //{
+  //  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+  //  ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
+  //  MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
+  //}
+  //else
+  //{
+  //  ESP_LOGE(TAG, "Mqtt not connected");
+  //}
 }
 
 void mqtt_send_lok(int id, uint16_t speed, int dir)
@@ -210,7 +217,7 @@ void mqtt_send_lok(int id, uint16_t speed, int dir)
   StaticJsonDocument<capacity> doc;
   String JsonStr;
 
-  // build MQTT topic e.g.  
+  // build MQTT topic e.g.
   doConcat(mqtt_topic, "Lok", "", topic_out);
   doc.clear();
   doc["command"] = "Lok";
@@ -223,7 +230,7 @@ void mqtt_send_lok(int id, uint16_t speed, int dir)
   {
     MqttClient.publish(topic_out, JsonStr.c_str());
     ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-    ESP_LOGI(TAG, "Payload: %s", JsonStr);  
+    ESP_LOGI(TAG, "Payload: %s", JsonStr);
   }
   else
   {
@@ -232,5 +239,6 @@ void mqtt_send_lok(int id, uint16_t speed, int dir)
 }
 
 void mqtt_send_irq()
-{}
+{
+}
 #endif

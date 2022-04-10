@@ -7,7 +7,6 @@
 // Upload data to ESP 32 SPIFFS
 // pio run -t uploadfs
 //---------------------------------------------------------
-
 #include "globals.h"
 
 // Defaults to window size 10
@@ -426,6 +425,7 @@ void t_cyclic() // Intervall: Display Refresh
     dataBuffer.data.panel_current = ina219.getCurrent_mA();
 #endif
 
+
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
 
@@ -474,8 +474,10 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
-  gps.getDistance();
 
+#if (USE_GPS_MOTION)
+  gps.getDistance();
+#endif
   // calc sleep time
 
 #if (ESP_SLEEP)
@@ -725,9 +727,15 @@ setup_hcsr04_rtos();
   setup_servo();
 #endif
 
+#if (USE_I2C_MICROPHONE)
+  setup_sound_rtos();
+#endif
+
 #if (USE_CAMERA)
   setupCam();
 #endif
+
+
 
   //-------------------------------------------------------------------------------
   // Tasks
@@ -801,7 +809,7 @@ void loop()
 #endif
 
 #if (USE_MQTT)
-  mqtt_loop();
+  //mqtt_loop();
 #endif
 
 #if (USE_BUTTON)

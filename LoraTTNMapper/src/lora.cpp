@@ -199,6 +199,7 @@ void dump_single_message(MessageBuffer_t SendBuffer)
 
 void setup_lora()
 {
+#if ( HAS_LORA )
   log_display("Setup LORA");
   // LMIC init
   os_init();
@@ -234,7 +235,7 @@ void setup_lora()
            ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
            ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
            ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
-
+#endif
 }
 
 void onEvent(ev_t ev)

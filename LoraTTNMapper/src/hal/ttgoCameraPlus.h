@@ -13,9 +13,9 @@
 #define HAS_LORA                0               // comment out if device shall not send data via LoRa
 #define BOARD_HAS_PSRAM         1               // use extra 4MB external RAM
 #define HAS_IP5306              1
-#define ENABLE_IP5306
-#define ENABLE_TFT
-#define HAS_TFT_DISPLAY
+#define ENABLE_IP5306           1
+#define ENABLE_TFT              1
+#define HAS_TFT_DISPLAY         1
 
 #define PWDN_GPIO_NUM       -1
 #define RESET_GPIO_NUM      -1
@@ -38,6 +38,7 @@
 #define I2C_SDA             18
 #define I2C_SCL             23
 
+#define HAS_I2C_MICROPHONE  1
 #define IIS_SCK             14
 #define IIS_WS              32
 #define IIS_DOUT            33
