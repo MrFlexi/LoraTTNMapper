@@ -307,6 +307,7 @@ bool setupCamera()
     if (psramFound())
     {
         Serial.printf("Psram found");
+        config.frame_size = FRAMESIZE_VGA;
         config.frame_size = FRAMESIZE_240X240;
         config.jpeg_quality = 10;
         config.fb_count = 2;
