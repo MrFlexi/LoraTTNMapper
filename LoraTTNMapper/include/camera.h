@@ -15,5 +15,5 @@
 #include <TJpg_Decoder.h>
 
 String sendPhoto(void);
-camera_fb_t * captureImage();
 void setupCam(void);
+void showCameraImageTFT(void);

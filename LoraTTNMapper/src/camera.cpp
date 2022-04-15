@@ -1,5 +1,6 @@
 #include "globals.h"
 #include "camera.h"
+#include <base64.h>
 
 /***************************************
  *  Board select
@@ -17,7 +18,7 @@
  *  Netcup Server
  **************************************/
 String serverName = "api.szaroletta.de";
-// String serverPath = "/add";
+//String serverPath = "/upload_and_detect";
 String serverPath = "/add";
 const int serverPort = 5000;
 
@@ -25,7 +26,8 @@ String macAddress = "";
 String ipAddress = "";
 
 // Depend TFT_eSPI library ,See  https://github.com/Bodmer/TFT_eSPI
-
+// goto pio->libsdeps-->usb-->TFT_eSPI-->User_Setup_Select.h and comment line 22
+//                                                               uncomment line 72
 TFT_eSPI tft = TFT_eSPI();
 
 //  Camera functions
@@ -53,46 +55,28 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
     return 1;
 }
 
-void showImage()
+void showCameraImageTFT()
 {
-    camera_fb_t *fb = capture();
+    camera_fb_t *fb = NULL;
+    fb = esp_camera_fb_get();
     if (!fb || fb->format != PIXFORMAT_JPEG)
     {
-        Serial.println("Camera capture failed");
+        ESP_LOGE(TAG, "Camera capture failed");
         esp_camera_fb_return(fb);
         return;
     }
     else
     {
+        ESP_LOGI(TAG, "Camera captured, size: %d",fb->len);
         TJpgDec.drawJpg(0, 0, (const uint8_t *)fb->buf, fb->len);
         esp_camera_fb_return(fb);
+        tft.drawString("MrFlexi PlantServ", 20, 10);
     }
 }
 
-camera_fb_t *captureImage()
-{
-    Serial.println("Smile.....");
-    camera_fb_t *fb = NULL;
-    fb = esp_camera_fb_get();
-    //dataBuffer.data.buf = (const char*) fb->buf;
-    if (!fb)
-    {
-        Serial.println("Camera capture failed");
-    }
-
-    uint16_t imageLen = fb->len;
-    Serial.print("ImageSize:");
-    Serial.println(imageLen);
-
-    return fb;
-    esp_camera_fb_return(fb);
-};
 
 String sendPhoto()
 {
-
-    showImage();
-
     String getAll;
     String getBody;
 
@@ -101,7 +85,7 @@ String sendPhoto()
     ESP_LOGI(TAG, "Smile.....");
     camera_fb_t *fb = NULL;
     fb = esp_camera_fb_get();
-    //dataBuffer.data.buf = (const char*) fb->buf;
+    //dataBuffer.data.image_buffer = base64::encode(fb->buf,fb->len);;
     if (!fb)
     {
         ESP_LOGE(TAG, "Camera capture failed");
@@ -227,21 +211,11 @@ bool setupTFTDisplay()
     TJpgDec.setJpgScale(1);
     TJpgDec.setSwapBytes(true);
     TJpgDec.setCallback(tft_output);
+    delay(1000);
     return true;
 }
 #endif
 
-void loopDisplay()
-{
-
-#if defined(BUTTON_1)
-    button.tick();
-#endif /*BUTTON_1*/
-
-#if defined(ENABLE_TFT)
-
-#endif
-}
 
 #if defined(SDCARD_CS_PIN)
 #include <SD.h>
@@ -308,7 +282,7 @@ bool setupCamera()
     {
         Serial.printf("Psram found");
         config.frame_size = FRAMESIZE_VGA;
-        config.frame_size = FRAMESIZE_240X240;
+        //config.frame_size = FRAMESIZE_240X240;
         config.jpeg_quality = 10;
         config.fb_count = 2;
     }
@@ -356,25 +330,15 @@ void setupNetwork()
 void setupCam()
 {
 
-    bool status;
 #if (HAS_TFT_DISPLAY)
-    status = setupTFTDisplay();
-    Serial.print("setupDisplay status ");
+    setupTFTDisplay();
 #endif
 
     //status = setupSDCard();
     //Serial.print("setupSDCard status ");
     //Serial.println(status);
 
-    status = setupCamera();
-    Serial.print("setupCamera status ");
-    Serial.println(status);
-
+    setupCamera();
     setupNetwork();
     //startCameraServer();
-
-    Serial.print("Camera Ready! Use 'http://");
-    Serial.print(ipAddress);
-    Serial.println("' to connect");
-    //sendPhoto();
 }

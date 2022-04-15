@@ -365,7 +365,7 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
-  // ESP_LOGI(TAG, "ESP free heap: %.2", dataBuffer.data.freeheap);
+  ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
   //   I2C opperations
@@ -423,6 +423,10 @@ void t_cyclic() // Intervall: Display Refresh
     print_ina219();
     dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
     dataBuffer.data.panel_current = ina219.getCurrent_mA();
+#endif
+
+#if (USE_CAMERA)
+showCameraImageTFT();
 #endif
 
 

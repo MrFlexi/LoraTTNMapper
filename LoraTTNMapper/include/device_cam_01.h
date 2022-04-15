@@ -45,7 +45,7 @@
 #define LORAenqueueMessagesIntervall 120 // Queue Lora messages
 #define LORA_TX_INTERVAL  120            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
-#define displayRefreshIntervall 120      // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 5         // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 120          // shift to next display page               ---> t_moveDisplay
 
 #define sendMqttIntervall      15 // Cayenne mqtt send intervall                   ---> t_send_cycle

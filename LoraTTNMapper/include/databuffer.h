@@ -65,7 +65,7 @@ typedef struct
   double gps_distance;
   char gps_datetime[32];
 #if (USE_CAMERA)
-  const char * buf;
+  String image_buffer = "";
 #endif
 } deviceStatus_t;
 

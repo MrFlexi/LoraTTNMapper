@@ -1,6 +1,7 @@
 #include "globals.h"
 #include "databuffer.h"
 
+
 DataBuffer::DataBuffer()
 {
 }
@@ -59,8 +60,10 @@ String DataBuffer::to_json()
 
     // Camera
     #if (USE_CAMERA)
+    //ESP_LOGI(TAG, "ImageSize base64: %d", data.image_buffer.length);
     measurement["image_url"] = data.image_url;
-    measurement["image"] = String(data.buf);
+    measurement["image"] = String(data.image_buffer);
+    
     #endif
 
     // Add the "location"
