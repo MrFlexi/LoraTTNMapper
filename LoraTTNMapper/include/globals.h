@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <FreeRTOS.h>
+#include "freertos/ringbuf.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 // #include <esp_task_wdt.h>
@@ -33,8 +34,8 @@
 #define DEVICE_SOIL_SENSOR 11
 
 
-#define DEVICE_ID DEVICE_CAMERA_01
-//#define DEVICE_ID DEVICE_SOIL_SENSOR
+//#define DEVICE_ID DEVICE_CAMERA_01
+#define DEVICE_ID DEVICE_SOIL_SENSOR
 
 
 #if DEVICE_ID == 1 // TBEAM-01 Device EU ID = DE00000000000010
@@ -187,9 +188,12 @@ extern QueueHandle_t LoraSendQueue;
 #include "sensor_hcsr04.h"
 #endif
 
-
 #if (USE_I2C_MICROPHONE)
 #include "sensor_sound.h"
+#endif
+
+#if (USE_PWM_SERVO)
+#include "servo.h"
 #endif
 
 #endif

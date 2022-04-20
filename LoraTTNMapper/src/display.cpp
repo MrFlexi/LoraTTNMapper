@@ -10,6 +10,30 @@ uint8_t page_array[10];
 uint8_t max_page_counter;
 uint8_t page_counter = 0;
 
+#if (HAS_TFT_DISPLAY)
+// Depend TFT_eSPI library ,See  https://github.com/Bodmer/TFT_eSPI
+// goto pio->libsdeps-->usb-->TFT_eSPI-->User_Setup_Select.h and comment line 22
+//                                                               uncomment line 72
+TFT_eSPI tft = TFT_eSPI();
+// The scrolling area must be a integral multiple of TEXT_HEIGHT
+#define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
+#define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
+#define TOP_FIXED_AREA 16 // Number of lines in top fixed area (lines counted from top of screen)
+#define YMAX 320 // Bottom of screen area
+
+// The initial y coordinate of the top of the scrolling area
+uint16_t yStart = TOP_FIXED_AREA;
+// yArea must be a integral multiple of TEXT_HEIGHT
+uint16_t yArea = YMAX-TOP_FIXED_AREA-BOT_FIXED_AREA;
+// The initial y coordinate of the top of the bottom text line
+uint16_t yDraw = YMAX - BOT_FIXED_AREA - TEXT_HEIGHT;
+
+// Keep track of the drawing x coordinate
+uint16_t xPos = 0;
+
+
+#endif
+
 void displayRegisterPages()
 {
 
@@ -59,6 +83,10 @@ void log_display(String s)
   //  u8g2log.print(s);
   //  u8g2log.print("\n");
   //}
+
+#if (HAS_TFT_DISPLAY)
+tft.println(s);
+#endif
 }
 
 void t_moveDisplayRTOS(void *pvParameters)
@@ -93,8 +121,63 @@ void t_moveDisplay(void)
 #endif
 }
 
+
+
+#if (HAS_TFT_DISPLAY)
+
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
+{
+    // Stop further decoding as image is running off bottom of screen
+    if (y >= tft.height())
+        return 0;
+
+    // This function will clip the image block rendering automatically at the TFT boundaries
+    tft.pushImage(x, y, w, h, bitmap);
+
+    // This might work instead if you adapt the sketch to use the Adafruit_GFX library
+    // tft.drawRGBBitmap(x, y, bitmap, w, h);
+
+    // Return 1 to decode next block
+    return 1;
+}
+
+bool setupTFTDisplay()
+{
+    ESP_LOGI(TAG, "Setup TFT Display");
+    tft.init();
+    tft.setRotation(0);
+    tft.fillScreen(TFT_BLUE);
+   
+    //tft.setTextDatum(MC_DATUM);
+    //tft.drawString("MrFlexi PlantServ", 20, 10);
+    pinMode(TFT_BL_PIN, OUTPUT);
+    digitalWrite(TFT_BL_PIN, HIGH);
+
+  tft.setTextColor(TFT_WHITE, TFT_BLUE);
+   tft.setTextSize(1);
+  tft.setCursor(0, 0, 1);
+  tft.println("Plantserve");
+  tft.println("Wifi... enabled");
+  tft.println("MQTT... enabled");
+  tft.println("Pushing foto to Netcup");
+ 
+
+ 
+
+  // Setup scroll area
+    TJpgDec.setJpgScale(1);
+    TJpgDec.setSwapBytes(true);
+    TJpgDec.setCallback(tft_output);
+    delay(3000);
+    return true;
+}
+#endif
+
 void setup_display(void)
 {
+  #if (HAS_TFT_DISPLAY)
+  setupTFTDisplay();
+  #else
   u8g2.begin();
   u8g2.setFont(u8g2_font_profont11_mf); // set the font for the terminal window
   u8g2.setContrast(255);
@@ -102,10 +185,14 @@ void setup_display(void)
   u8g2log.setLineHeightOffset(0);                               // set extra space between lines in pixel, this can be negative
   u8g2log.setRedrawMode(0);                                     // 0: Update screen with newline, 1: Update screen for every char
   u8g2.enableUTF8Print();
+  #endif
+
   log_display("SAP GTT");
   log_display("TTN-ABP-Mapper");
   displayRegisterPages();
+
 }
+
 
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
 {

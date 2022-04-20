@@ -2,6 +2,8 @@
 #include "camera.h"
 #include <base64.h>
 
+#if (USE_CAMERA)
+
 /***************************************
  *  Board select
  **************************************/
@@ -25,10 +27,8 @@ const int serverPort = 5000;
 String macAddress = "";
 String ipAddress = "";
 
-// Depend TFT_eSPI library ,See  https://github.com/Bodmer/TFT_eSPI
-// goto pio->libsdeps-->usb-->TFT_eSPI-->User_Setup_Select.h and comment line 22
-//                                                               uncomment line 72
-TFT_eSPI tft = TFT_eSPI();
+
+
 
 //  Camera functions
 camera_fb_t *capture()
@@ -39,21 +39,7 @@ camera_fb_t *capture()
     return fb;
 }
 
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
-{
-    // Stop further decoding as image is running off bottom of screen
-    if (y >= tft.height())
-        return 0;
 
-    // This function will clip the image block rendering automatically at the TFT boundaries
-    tft.pushImage(x, y, w, h, bitmap);
-
-    // This might work instead if you adapt the sketch to use the Adafruit_GFX library
-    // tft.drawRGBBitmap(x, y, bitmap, w, h);
-
-    // Return 1 to decode next block
-    return 1;
-}
 
 void showCameraImageTFT()
 {
@@ -193,28 +179,6 @@ String sendPhoto()
     ESP_LOGI(TAG, "WifiClient Stop");
 };
 
-#if (HAS_TFT_DISPLAY)
-bool setupTFTDisplay()
-{
-    ESP_LOGI(TAG, "Setup TFT Display");
-    tft.init();
-    tft.setRotation(0);
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextSize(2);
-    tft.setTextDatum(MC_DATUM);
-    tft.drawString("MrFlexi PlantServ", 20, 10);
-    tft.drawString("LilyGo Camera Plus", tft.width() / 2, tft.height() / 2 + 20);
-    tft.drawString("Push Foto to Netcup", tft.width() / 2, tft.height() / 2 + 30);
-    pinMode(TFT_BL_PIN, OUTPUT);
-    digitalWrite(TFT_BL_PIN, HIGH);
-
-    TJpgDec.setJpgScale(1);
-    TJpgDec.setSwapBytes(true);
-    TJpgDec.setCallback(tft_output);
-    delay(1000);
-    return true;
-}
-#endif
 
 
 #if defined(SDCARD_CS_PIN)
@@ -329,11 +293,12 @@ void setupNetwork()
 
 void setupCam()
 {
-
-#if (HAS_TFT_DISPLAY)
-    setupTFTDisplay();
-#endif
-
+//Create ring buffer
+    RingbufHandle_t buf_handle;
+    buf_handle = xRingbufferCreate(1028, RINGBUF_TYPE_NOSPLIT);
+    if (buf_handle == NULL) {
+        printf("Failed to create ring buffer\n");
+    }
     //status = setupSDCard();
     //Serial.print("setupSDCard status ");
     //Serial.println(status);
@@ -342,3 +307,5 @@ void setupCam()
     setupNetwork();
     //startCameraServer();
 }
+
+#endif

@@ -739,6 +739,11 @@ setup_hcsr04_rtos();
   setupCam();
 #endif
 
+#if (USE_PWM_SERVO)
+setup_servo_pwm();
+servo_pwm_test();
+#endif
+
 
 
   //-------------------------------------------------------------------------------

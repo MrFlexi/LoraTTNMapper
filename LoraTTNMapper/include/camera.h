@@ -11,8 +11,6 @@
 #include "SPIFFS.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
-#include <TFT_eSPI.h>
-#include <TJpg_Decoder.h>
 
 String sendPhoto(void);
 void setupCam(void);

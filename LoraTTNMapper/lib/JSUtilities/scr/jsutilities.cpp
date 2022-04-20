@@ -6,6 +6,7 @@
 
 #define SSD1306_PRIMARY_ADDRESS (0x3D)
 #define SSD1306_SECONDARY_ADDRESS (0x3C)
+#define PCA9685_PRIMARY_ADDRESS (0x40)
 #define BME_PRIMARY_ADDRESS (0x77)
 #define BME_SECONDARY_ADDRESS (0x76)
 #define AXP192_PRIMARY_ADDRESS (0x34)
@@ -30,8 +31,12 @@ int i2c_scan(void) {
     if (i2c_ret == 0) {
       devices++;
       switch (addr) {
-      case INA3221_ADDRESS:
-      ESP_LOGI(TAG, "0x%X: INA 3221 Voltage+Current detector", addr);
+      //case INA3221_ADDRESS:
+      //ESP_LOGI(TAG, "0x%X: INA 3221 Voltage+Current detector", addr);
+      //  break;
+
+      case PCA9685_PRIMARY_ADDRESS:
+      ESP_LOGI(TAG, "0x%X: PCA9685 PWM Servo driver", addr);
         break;
 
       case SSD1306_PRIMARY_ADDRESS:

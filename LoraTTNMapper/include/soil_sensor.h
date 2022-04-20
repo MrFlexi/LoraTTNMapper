@@ -20,6 +20,7 @@
 #define HCSR04_echo_pin     GPIO_NUM_33
 
 #define USE_SPIFF_LOGGING 1
+#define USE_PWM_SERVO 1
 
 #define USE_WIFI 1
 #define USE_WIFI_MANAGER 0

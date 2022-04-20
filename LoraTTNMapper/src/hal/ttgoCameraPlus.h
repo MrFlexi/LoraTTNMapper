@@ -12,9 +12,7 @@
 
 #define HAS_LORA                0               // comment out if device shall not send data via LoRa
 #define BOARD_HAS_PSRAM         1               // use extra 4MB external RAM
-#define HAS_IP5306              1
-#define ENABLE_IP5306           1
-#define ENABLE_TFT              1
+#define HAS_IP5306              1               // Power Managment chip, very simple
 #define HAS_TFT_DISPLAY         1
 
 #define PWDN_GPIO_NUM       -1

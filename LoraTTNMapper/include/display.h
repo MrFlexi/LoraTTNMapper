@@ -52,3 +52,11 @@ void dp_printf(uint16_t x, uint16_t y, uint8_t font, uint8_t inv,
 
 void showPage(int page);
 void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol);
+
+#if (HAS_TFT_DISPLAY)
+
+#include <TFT_eSPI.h>
+#include <TJpg_Decoder.h>
+extern TFT_eSPI tft;
+
+#endif
