@@ -28,6 +28,9 @@ void printLocalTime()
     Serial.println("Failed to obtain time");
     return;
   }
+  dataBuffer.data.timeinfo = timeinfo;
+  dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
+  dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   //Serial.print("Day of week: ");
   //Serial.println(&timeinfo, "%A");
@@ -54,6 +57,30 @@ void printLocalTime()
   //strftime(timeWeekDay, 10, "%A", &timeinfo);
   //Serial.println(timeWeekDay);
   //Serial.println();
+
+
+//--------------------------------------------------------------------------
+// Sun Elevation Calculation
+//--------------------------------------------------------------------------
+Helios helios;
+
+double dAzimuth;
+double dElevation;
+
+//----------------------------------------
+  // Calc Sun Position München
+  //----------------------------------------
+  Serial.println();
+  Serial.println();
+  Serial.println("Sun Azimuth and Elevation Munich");
+  
+  helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 2, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
+  helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
+  Serial.printf("Azimuth: %f3\n", helios.dAzimuth);
+  Serial.printf("Elevation: %f3\n", helios.dElevation);
+
+  dataBuffer.data.sun_azimuth = helios.dAzimuth;
+  dataBuffer.data.sun_elevation = helios.dElevation;
 }
 
 

@@ -66,6 +66,7 @@ typedef struct
   TinyGPSLocation gps_old;
   double gps_distance;
   char gps_datetime[32];
+  tm timeinfo;
 #if (USE_CAMERA)
   String image_buffer = "";
 #endif
