@@ -479,6 +479,16 @@ showCameraImageTFT();
 void t_sleep()
 {
 
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    ESP_LOGI(TAG,"Failed to obtain time");
+    return;
+  }
+
+  //ESP_LOGI(TAG, "Time: %A, %B %d %Y %H:%M:%S",&timeinfo );
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+
 #if (USE_GPS_MOTION)
   gps.getDistance();
 #endif

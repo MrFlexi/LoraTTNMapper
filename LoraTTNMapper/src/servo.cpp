@@ -26,22 +26,21 @@ Servo2.startEaseTo(dataBuffer.data.servo1, 30);
 
 void servo_pwm_test() {
 
+  int speed = 20;
+
   ESP_LOGI(TAG, "Turning Servos");
-  Servo1.startEaseTo(40, 20);
-   while (Servo1.isMoving()) {
-            Serial.print(Servo1.getCurrentAngle());
-        }
+  Servo1.startEaseTo(40, speed);
   delay(1000);
-  Servo1.startEaseTo(20, 40);
+  Servo1.startEaseTo(20, speed);
   delay(1000);
-  Servo1.startEaseTo(180,40);
+  Servo1.startEaseTo(180,speed);
   
 
-  Servo2.startEaseTo(20, 40);
+  Servo2.startEaseTo(20, speed);
   delay(2000);
-  Servo2.startEaseTo(90, 40);
+  Servo2.startEaseTo(90, speed);
   delay(2000);
-  Servo2.startEaseTo(120, 40);
+  Servo2.startEaseTo(120, speed);
   delay(2000);
   ESP_LOGI(TAG, "End");
 }
