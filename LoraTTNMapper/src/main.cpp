@@ -818,7 +818,7 @@ void loop()
 #endif
 
 #if (USE_MQTT)
-  //mqtt_loop();
+  mqtt_loop();
 #endif
 
 #if (USE_BUTTON)

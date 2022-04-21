@@ -41,6 +41,8 @@ typedef struct
   bool  pictureLoop = true;
   float firmware_version;
   uint8_t bytesReceived;
+  uint8_t servo1;
+  uint8_t servo2;
   lmic_t lmic;
   bool pmu_data_available;
   float panel_voltage = 0;

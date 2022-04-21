@@ -109,6 +109,15 @@ void callback(char *topic, byte *payload, unsigned int length)
     saveConfiguration();
   }
 
+#if (USE_PWM_SERVO)
+    if (action == "servo1")
+  {
+    dataBuffer.data.servo1 = atoi(value);
+    ESP_LOGI(TAG, "MQTT: move servo 1 to %3d degree", dataBuffer.data.servo1);
+    servo_move_to();
+  }
+#endif
+
 #if (HAS_PMU)
   if (action == "set_bat_max_charge_current")
   {
@@ -131,7 +140,7 @@ void reconnect()
 {
 
   char topic_in[40];
-  // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
+  // build MQTT topic e.g.  mrflexi/device/soil_moisture-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_mosi, topic_in);
 
   int i = 0;
@@ -145,9 +154,10 @@ void reconnect()
       // Attempt to connect
       if (MqttClient.connect(DEVICE_NAME))
       {
-        ESP_LOGI(TAG, "connected");
+        
         MqttClient.publish(mqtt_topic, "connected");
         MqttClient.subscribe(topic_in);
+        ESP_LOGI(TAG, "Subscribed to topic %s", topic_in);
       }
       else
       {
@@ -198,16 +208,16 @@ sendPhoto();
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_miso, topic_out);
 
-  //if (MqttClient.connected())
-  //{
-  //  ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-  //  ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
-  //  MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
-  //}
-  //else
-  //{
-  //  ESP_LOGE(TAG, "Mqtt not connected");
-  //}
+  if (MqttClient.connected())
+  {
+    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+    ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
+    MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
 }
 
 void mqtt_send_lok(int id, uint16_t speed, int dir)

@@ -71,7 +71,7 @@ uint16_t ADC_read_voltage(adc1_channel_t channel)
   adc_reading /= NO_OF_SAMPLES;
   // Convert ADC reading to voltage in mV
   voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_characs);
-  ESP_LOGI(TAG, "ADC Voltage %d mV", voltage );
+  //ESP_LOGI(TAG, "ADC Voltage %d mV", voltage );
   return voltage;
 }
 
