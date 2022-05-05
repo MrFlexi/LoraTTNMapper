@@ -5,8 +5,11 @@
 #include <Wire.h>
 
 #define USE_PCA9685_SERVO_EXPANDER 
+//#define TRACE 
 
 void setup_servo_pwm();
 void servo_pwm_test();
-void servo_move_to();
+void servo_move_to( uint8_t servo_number, uint8_t servo_position );
+void servo_move_to_sun();
+void servo_move_to_last_position();
 

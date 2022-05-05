@@ -3,7 +3,6 @@
 
 // eSPIFFS fileSystem;
 String message;
-
 const char *filename = "/settings.jsn";
 
 void loadConfiguration()

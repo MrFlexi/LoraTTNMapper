@@ -153,59 +153,6 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
-//--------------------------------------------------------------------------
-// Servos
-//--------------------------------------------------------------------------
-
-#if (USE_SERVO)
-void setup_servo()
-{
-
-  Servo servo1;
-  Servo servo2;
-  int minUs = 1000;
-  int maxUs = 2000;
-
-  // Allow allocation of all timers
-  ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
-  servo1.setPeriodHertz(50); // Standard 50hz servo
-  servo2.setPeriodHertz(50); // Standard 50hz servo
-
-  servo1.attach(SERVO1_PIN, 1000, 2000);
-  servo2.attach(SERVO2_PIN, 1000, 2000);
-
-  pinMode(POWER_RAIL_PIN, OUTPUT); // Set GPIO15 as digital output pin
-  digitalWrite(POWER_RAIL_PIN, HIGH);
-
-  pinMode(SERVO2_PIN, OUTPUT); // Set GPIO35 as digital output pin
-
-  digitalWrite(SERVO2_PIN, HIGH);
-  Serial.println("High");
-  delay(2000);
-  for (int pos = 0; pos <= 180; pos += 1)
-  { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    servo1.write(pos);
-    servo2.write(pos); // tell servo to go to position in variable 'pos'
-    delay(15);         // waits 15ms for the servo to reach the position
-  }
-  for (int pos = 180; pos >= 0; pos -= 1)
-  {                    // goes from 180 degrees to 0 degrees
-    servo1.write(pos); // tell servo to go to position in variable 'pos'
-    servo2.write(pos);
-    delay(15); // waits 15ms for the servo to reach the position
-  }
-
-  digitalWrite(SERVO2_PIN, LOW);
-  delay(2000);
-  Serial.println("Servo2 low");
-  digitalWrite(POWER_RAIL_PIN, LOW);
-  Serial.println("Power Low");
-}
-#endif
 
 void setup_filesystem()
 {
@@ -363,6 +310,12 @@ void t_cyclic() // Intervall: Display Refresh
 {
   float temp;
 
+  set_time_from_gps();
+
+  #if (USE_SUN_POSITION)
+  servo_move_to_sun();
+  #endif
+  
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
   ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
@@ -737,10 +690,6 @@ void setup()
 setup_hcsr04_rtos();
 #endif
 
-#if (USE_SERVO)
-  setup_servo();
-#endif
-
 #if (USE_I2C_MICROPHONE)
   setup_sound_rtos();
 #endif
@@ -749,11 +698,12 @@ setup_hcsr04_rtos();
   setupCam();
 #endif
 
-#if (USE_PWM_SERVO)
-setup_servo_pwm();
-servo_pwm_test();
-#endif
+// Get date/time from Internet or GPS
+setup_time();
 
+#if (USE_PWM_SERVO)
+servo_move_to_last_position();
+#endif
 
 
   //-------------------------------------------------------------------------------

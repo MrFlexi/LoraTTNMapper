@@ -43,6 +43,8 @@ typedef struct
   uint8_t bytesReceived;
   uint8_t servo1;
   uint8_t servo2;
+  double sun_azimuth;
+  double sun_elevation;
   lmic_t lmic;
   bool pmu_data_available;
   float panel_voltage = 0;
@@ -88,6 +90,7 @@ class DataBuffer
     void set( deviceStatus_t input );
     void get();
     String to_json();
+    String to_json_web();
     deviceStatus_t data ;
     deviceSettings_t settings;
     const char* getError() const { return _error; }

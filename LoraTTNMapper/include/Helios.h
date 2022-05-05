@@ -23,7 +23,6 @@
 #define Helios_h
 
 #include "Arduino.h"
-
 #include <math.h>
 
 // Declaration of some constants 

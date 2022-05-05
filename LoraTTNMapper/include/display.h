@@ -15,7 +15,7 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 
-
+#define PAGE_MODULS 0
 #define PAGE_TBEAM 1
 #define PAGE_LORA 2
 #define PAGE_GPS 3
@@ -24,9 +24,9 @@
 #define PAGE_SENSORS 6
 #define PAGE_GYRO 7
 #define PAGE_POTI 8
-#define PAGE_MODULS 9
+#define PAGE_SUN 9
 
-#define PAGE_SLEEP 10         // Pages > 10 are not in the picture loop
+#define PAGE_SLEEP 20         // Pages > 20 are not in the picture loop
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32

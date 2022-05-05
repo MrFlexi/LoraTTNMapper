@@ -1,6 +1,5 @@
 #include "globals.h"
 #include "mqtt.h"
-#include "time.h"
 
 #if (USE_MQTT)
 PubSubClient MqttClient(wifiClient);
@@ -15,73 +14,6 @@ const char *mqtt_topic_traincontroll = "/TrainControll/";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
-
-const char *ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 3600;
-
-void printLocalTime()
-{
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo))
-  {
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  dataBuffer.data.timeinfo = timeinfo;
-  dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
-  dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  //Serial.print("Day of week: ");
-  //Serial.println(&timeinfo, "%A");
-  //Serial.print("Month: ");
-  //Serial.println(&timeinfo, "%B");
-  //Serial.print("Day of Month: ");
-  //Serial.println(&timeinfo, "%d");
-  //Serial.print("Year: ");
-  //Serial.println(&timeinfo, "%Y");
-  //Serial.print("Hour: ");
-  //Serial.println(&timeinfo, "%H");
-  //Serial.print("Hour (12 hour format): ");
-  //Serial.println(&timeinfo, "%I");
-  //Serial.print("Minute: ");
-  //Serial.println(&timeinfo, "%M");
-  //Serial.print("Second: ");
-  //Serial.println(&timeinfo, "%S");
-
-  //Serial.println("Time variables");
-  //char timeHour[3];
-  //strftime(timeHour, 3, "%H", &timeinfo);
-  //Serial.println(timeHour);
-  //char timeWeekDay[10];
-  //strftime(timeWeekDay, 10, "%A", &timeinfo);
-  //Serial.println(timeWeekDay);
-  //Serial.println();
-
-
-//--------------------------------------------------------------------------
-// Sun Elevation Calculation
-//--------------------------------------------------------------------------
-Helios helios;
-
-double dAzimuth;
-double dElevation;
-
-//----------------------------------------
-  // Calc Sun Position München
-  //----------------------------------------
-  Serial.println();
-  Serial.println();
-  Serial.println("Sun Azimuth and Elevation Munich");
-  
-  helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 2, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
-  helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
-  Serial.printf("Azimuth: %f3\n", helios.dAzimuth);
-  Serial.printf("Elevation: %f3\n", helios.dElevation);
-
-  dataBuffer.data.sun_azimuth = helios.dAzimuth;
-  dataBuffer.data.sun_elevation = helios.dElevation;
-}
 
 
 void doConcat(const char *a, const char *b, const char *c, char *out)
@@ -179,12 +111,16 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
 
 #if (USE_PWM_SERVO)
-    if (action == "servo1")
+    if (action == "servo")
   {
-    dataBuffer.data.servo1 = atoi(value);
-    ESP_LOGI(TAG, "MQTT: move servo 1 to %3d degree", dataBuffer.data.servo1);
-    servo_move_to();
-  }
+    const char *number = doc["command"]["number"];
+    const char *position = doc["command"]["position"];
+    
+    uint8_t servo_number = atoi(number);
+    uint8_t servo_position = atoi(position);
+    ESP_LOGI(TAG, "MQTT: move servo &d to %3d degree", servo_number , servo_position);
+    servo_move_to( servo_number , servo_position);
+  }  
 #endif
 
 #if (HAS_PMU)
@@ -260,10 +196,6 @@ void setup_mqtt()
     log_display("MQTT connected");
     MqttClient.publish(mqtt_topic, "ESP32 is alive...");
 
-  // Init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-
-  printLocalTime();
   }
 
 

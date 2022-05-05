@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <FreeRTOS.h>
 #include "time.h"
+#include "mytime.h"
 #include "freertos/ringbuf.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
@@ -90,20 +91,6 @@
 extern WiFiClient wifiClient;
 #endif
 
-#if (USE_SERVO)
-#include <ESP32Servo.h>
-// Published values for SG90 servos; adjust if needed
-extern int minUs;
-extern int maxUs;
-
-#ifdef SERVO1_PIN
-extern Servo servo1;
-#endif
-
-#ifdef SERVO2_PIN
-extern Servo servo2;
-#endif
-#endif
 
 #if (USE_WEBSERVER)
 #include "ESPAsyncWebServer.h"
@@ -195,6 +182,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_PWM_SERVO)
 #include "servo.h"
+#endif
+
+#if (USE_SUN_POSITION)
+#include "Helios.h"
 #endif
 
 #endif
