@@ -10,13 +10,12 @@ void t_broadcast_message(void *parameter)
   bool sendMessage = false;
 
   for (;;)
-  {    
-        ESP_LOGI(TAG, "WebSocket broadcast");
-        ws.textAll(dataBuffer.to_json_web());      
-        vTaskDelay(sendWebsocketIntervall * 1000 );
+  {
+    ESP_LOGI(TAG, "WebSocket broadcast");
+    //ws.textAll(dataBuffer.to_json_web());
+    vTaskDelay(sendWebsocketIntervall * 1000);
   }
 }
-
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {

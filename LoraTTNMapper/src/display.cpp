@@ -425,11 +425,11 @@ void showPage(int page)
     case PAGE_SUN:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Sun Position");
-      u8g2.setFont(u8g2_font_ncenB24_tr);
+      u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 30);
-      u8g2.printf("Azimuth: %5.2g", dataBuffer.data.sun_azimuth);
+      u8g2.printf("Azi: %.2g", dataBuffer.data.sun_azimuth);
       u8g2.setCursor(1, 45);
-      u8g2.printf("Elevation: %5.2g", dataBuffer.data.sun_elevation);
+      u8g2.printf("Ele: %.2g", dataBuffer.data.sun_elevation);
       u8g2.setCursor(1, 60);
       u8g2.printf("Servo: %d  %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
       break;

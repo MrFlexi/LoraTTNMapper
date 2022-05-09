@@ -153,7 +153,6 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 
-
 void setup_filesystem()
 {
   //---------------------------------------------------------------
@@ -312,10 +311,17 @@ void t_cyclic() // Intervall: Display Refresh
 
   set_time_from_gps();
 
-  #if (USE_SUN_POSITION)
+#if (USE_SUN_POSITION)
+#if (USE_PWM_SERVO)
   servo_move_to_sun();
-  #endif
-  
+#endif  
+#endif
+
+#if (USE_BLE_SERVER)
+    ble_send();
+#endif
+
+
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
   ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
@@ -379,9 +385,8 @@ void t_cyclic() // Intervall: Display Refresh
 #endif
 
 #if (USE_CAMERA)
-showCameraImageTFT();
+    showCameraImageTFT();
 #endif
-
 
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
@@ -401,9 +406,8 @@ showCameraImageTFT();
 #if (USE_SOIL_MOISTURE)
   if (dataBuffer.data.potentiometer_a_changed)
   {
-    dataBuffer.data.soil_moisture = (float) dataBuffer.data.potentiometer_a / 1000;
+    dataBuffer.data.soil_moisture = (float)dataBuffer.data.potentiometer_a / 1000;
     dataBuffer.data.potentiometer_a_changed = false;
-
   }
 #endif
 
@@ -435,7 +439,7 @@ void t_sleep()
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo))
   {
-    ESP_LOGI(TAG,"Failed to obtain time");
+    ESP_LOGI(TAG, "Failed to obtain time");
     return;
   }
 
@@ -616,7 +620,7 @@ void setup()
   calibrate_voltage();
   delay(500);
 
-#if (USE_SERIAL_BT || USE_BLE_SCANNER)
+#if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
   // Turn off Bluetooth
   log_display("Bluethooth off");
@@ -687,7 +691,7 @@ void setup()
 #endif
 
 #if (USE_HCSR04)
-setup_hcsr04_rtos();
+  setup_hcsr04_rtos();
 #endif
 
 #if (USE_I2C_MICROPHONE)
@@ -698,13 +702,16 @@ setup_hcsr04_rtos();
   setupCam();
 #endif
 
-// Get date/time from Internet or GPS
-setup_time();
+  // Get date/time from Internet or GPS
+  setup_time();
 
 #if (USE_PWM_SERVO)
-servo_move_to_last_position();
+  servo_move_to_last_position();
 #endif
 
+#if (USE_BLE_SERVER)
+  setup_ble();
+#endif
 
   //-------------------------------------------------------------------------------
   // Tasks

@@ -23,6 +23,8 @@
 #define USE_PWM_SERVO 1
 #define USE_SUN_POSITION 1
 
+#define USE_BLE_SERVER 1
+
 #define USE_WIFI 1
 #define USE_WIFI_MANAGER 0
 #define USE_WEBSERVER   1 
@@ -39,7 +41,7 @@
 #define USE_POTI 1
 #define USE_SOIL_MOISTURE 1
 
-#define displayRefreshIntervall 30      // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 10     // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
@@ -47,7 +49,7 @@
 #define LORA_DATARATE DR_SF12
 
 #define sendMqttIntervall      120 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall 60 // Update Webpage
+#define sendWebsocketIntervall 15 // Update Webpage
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 51
@@ -60,7 +62,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1          // Main switch
+#define ESP_SLEEP 0         // Main switch
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute

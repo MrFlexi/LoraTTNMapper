@@ -1,20 +1,16 @@
 #include <Arduino.h>
 #include "globals.h"
-
-
 #include "ServoEasing.hpp"
 #include <Preferences.h>
-
-
-#if (USE_SUN_POSITION)
-#include "Helios.h"
-#endif
-
 
 Preferences prefs;
 
 #define servo1_pin 0
 #define servo2_pin 1
+
+Helios helios;
+double dAzimuth;
+double dElevation;
 
 #if (USE_PWM_SERVO)
 
@@ -64,9 +60,7 @@ void get_servo_position_from_flash(uint8_t *servo1_pos, uint8_t *servo2_pos)
 // Sun Elevation Calculation
 //--------------------------------------------------------------------------
 #if (USE_SUN_POSITION)
-Helios helios;
-double dAzimuth;
-double dElevation;
+
 
 void calc_sun()
 {
@@ -79,8 +73,8 @@ void calc_sun()
 
   helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 2, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   //helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
-  ESP_LOGI(TAG, "Azimuth: %f3\n", helios.dAzimuth);
-  ESP_LOGI(TAG, "Elevation: %f3\n", helios.dElevation);
+  ESP_LOGI(TAG, "Azimuth: %g.2\n", helios.dAzimuth);
+  ESP_LOGI(TAG, "Elevation: %g.2\n", helios.dElevation);
 
   dataBuffer.data.sun_azimuth = helios.dAzimuth;
   dataBuffer.data.sun_elevation = helios.dElevation;

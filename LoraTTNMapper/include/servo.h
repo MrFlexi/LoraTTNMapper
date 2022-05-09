@@ -4,6 +4,10 @@
 #include "globals.h"
 #include <Wire.h>
 
+#if (USE_SUN_POSITION)
+#include "Helios.h"
+#endif
+
 #define USE_PCA9685_SERVO_EXPANDER 
 //#define TRACE 
 

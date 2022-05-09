@@ -188,4 +188,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "Helios.h"
 #endif
 
+#if (USE_BLE_SERVER)
+#include "ble_server.h"
+#endif
+
 #endif
