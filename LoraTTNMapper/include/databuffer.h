@@ -78,6 +78,7 @@ typedef struct
 typedef struct
 {
   uint8_t sleep_time;
+  bool sunTrackerPositionAdjusted = false;
   const char* log_print_buffer;
   const char* experiment;
   uint8_t bat_max_charge_current;  

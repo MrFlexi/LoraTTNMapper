@@ -22,6 +22,7 @@
 #ifndef Helios_h
 #define Helios_h
 
+#if (USE_SUN_POSITION)
 #include "Arduino.h"
 #include <math.h>
 
@@ -74,5 +75,5 @@ class Helios
 
 
 
-
+#endif
 #endif

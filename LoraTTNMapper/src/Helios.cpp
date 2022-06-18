@@ -23,6 +23,7 @@
   
 */
 
+#if (USE_SUN_POSITION)
 #include "Arduino.h"
 #include <math.h>
 #include "globals.h"
@@ -147,3 +148,4 @@ void Helios::calcSunPos(
 		dElevation=90-dZenithAngle;
 	}	
 }
+#endif

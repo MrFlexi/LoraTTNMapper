@@ -5,4 +5,5 @@
 
 void set_time_from_gps();
 void setup_time();
+void printLocalTime();
 

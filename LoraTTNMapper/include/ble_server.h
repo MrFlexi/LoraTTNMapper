@@ -6,7 +6,7 @@
 #include <Arduino.h>
 #include "globals.h"
 
-
+#if (USE_BLE_SERVER)
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -19,3 +19,4 @@
 
 void setup_ble();
 void ble_send();
+#endif

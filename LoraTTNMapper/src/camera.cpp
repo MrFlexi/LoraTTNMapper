@@ -1,19 +1,19 @@
+#pragma once
+
+#if (USE_CAMERA)
+
 #include "globals.h"
 #include "camera.h"
 #include <base64.h>
 
-#if (USE_CAMERA)
-
 /***************************************
  *  Board select
  **************************************/
-
 #define T_Camera_PLUS_VERSION
 
 /***************************************
  *  Function
  **************************************/
-
 #define DEFAULT_MEASUR_MILLIS 3000 /* Get sensor time by default (ms)*/
 
 /***************************************
@@ -27,9 +27,6 @@ const int serverPort = 5000;
 String macAddress = "";
 String ipAddress = "";
 
-
-
-
 //  Camera functions
 camera_fb_t *capture()
 {
@@ -38,8 +35,6 @@ camera_fb_t *capture()
     fb = esp_camera_fb_get();
     return fb;
 }
-
-
 
 void showCameraImageTFT()
 {

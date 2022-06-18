@@ -54,8 +54,6 @@ void set_time_from_gps()
 
   if (!getLocalTime(&timeinfo))
   {
-    Serial.println("Trying to get time from GPS");
-
     if (gps.checkGpsFix())
     {
       t.tm_year = gps.tGps.date.year() - 1900; // Year - 1900
@@ -71,12 +69,12 @@ void set_time_from_gps()
       tv.tv_sec = t_of_day; // epoch time (seconds)
       tv.tv_usec = 0;       // microseconds
       settimeofday(&tv, 0);
-
+      ESP_LOGI(TAG, "Received GPS Time");
       printLocalTime();
     }
     else
     {
-      Serial.println("NO GPS Time");
+      ESP_LOGI(TAG, "NO GPS Time");
     }
   }
 }

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "globals.h"
 
+#if (USE_BLE_SERVER)
+
 bool deviceConnected = false;
 #define envService BLEUUID((uint16_t)0x181A)
 #define BatteryService BLEUUID((uint16_t)0x180F)
@@ -49,7 +51,7 @@ void setup_ble()
 {
   Serial.println("BLE init...");
 
-  BLEDevice::init(bleServerName);
+  BLEDevice::init(DEVICE_NAME);
 
   // Create the BLE Server
   BLEServer *pServer = BLEDevice::createServer();
@@ -97,9 +99,7 @@ void setup_ble()
   pBattery->addCharacteristic(&BatteryChargeCharacteristic);
   BatteryChargeDescriptor.setValue("Charge/Discharge in mA");
   BatteryChargeCharacteristic.addDescriptor(&BatteryChargeDescriptor);
-  BatteryChargeCharacteristic.addDescriptor(new BLE2902());
-
- 
+  BatteryChargeCharacteristic.addDescriptor(new BLE2902()); 
 
   pServer->getAdvertising()->addServiceUUID(BatteryService);
   pBattery->start();
@@ -141,12 +141,20 @@ void ble_send()
     SunAzimuthCharacteristic.setValue(dataBuffer.data.sun_azimuth);
     SunAzimuthCharacteristic.notify();
 
-    SunElevationCharacteristic.setValue(dataBuffer.data.sun_elevation);
-    SunElevationCharacteristic.notify();
+    //SunElevationCharacteristic.setValue(dataBuffer.data.sun_elevation);
+    //SunElevationCharacteristic.notify();
     n++;
+    //uint8_t data[30] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
+    //SunElevationCharacteristic.setValue(data,30);
+    //SunElevationCharacteristic.notify();
+
+    SunElevationCharacteristic.setValue(dataBuffer.to_json().c_str());
+    SunElevationCharacteristic.notify();
   }
   else
   {
     ESP_LOGI(TAG, "BLE no device connected");
   }
 }
+
+#endif

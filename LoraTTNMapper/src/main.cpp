@@ -63,6 +63,9 @@ int vprintf_into_spiffs(const char *szFormat, va_list args)
 
   dataBuffer.settings.log_print_buffer = log_print_buffer;
 
+  Serial.print("via link");
+  Serial.println(log_print_buffer);
+
   // output is now in buffer. write to file.
   if (ret >= 0)
   {
@@ -145,6 +148,7 @@ TaskHandle_t irqHandlerTask = NULL;
 TaskHandle_t task_broadcast_message = NULL;
 TaskHandle_t moveDisplayHandlerTask = NULL;
 TaskHandle_t t_cyclic_HandlerTask = NULL;
+TaskHandle_t t_sunTracker_HandlerTask = NULL;
 
 Ticker sleepTicker;
 Ticker displayTicker;
@@ -152,6 +156,7 @@ Ticker displayMoveTicker;
 Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
+Ticker sunTicker;
 
 void setup_filesystem()
 {
@@ -304,27 +309,31 @@ void t_cyclicRTOS(void *pvParameters)
 //---------------------------------------------------------------------------------
 // Get sensor values and update display
 //---------------------------------------------------------------------------------
+void t_sunTracker() // Intervall: Display Refresh
+{
+ESP_LOGI(TAG, "Sun Tracker");
+#if (USE_SUN_POSITION)
+#if (USE_PWM_SERVO)
+  servo_move_to_sun();
+#endif
+#endif
+}
 
 void t_cyclic() // Intervall: Display Refresh
 {
   float temp;
 
+#if (USE_GPS)
   set_time_from_gps();
-
-#if (USE_SUN_POSITION)
-#if (USE_PWM_SERVO)
-  servo_move_to_sun();
-#endif  
 #endif
 
 #if (USE_BLE_SERVER)
-    ble_send();
+  ble_send();
 #endif
-
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
-  ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
+  //ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
   //   I2C opperations
@@ -418,7 +427,7 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
-  esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -440,7 +449,6 @@ void t_sleep()
   if (!getLocalTime(&timeinfo))
   {
     ESP_LOGI(TAG, "Failed to obtain time");
-    return;
   }
 
   //ESP_LOGI(TAG, "Time: %A, %B %d %Y %H:%M:%S",&timeinfo );
@@ -452,6 +460,7 @@ void t_sleep()
   // calc sleep time
 
 #if (ESP_SLEEP)
+#if (AUTO_POWER_SAVE)
 #if (TIME_TO_SLEEP_BAT_HIGH)
 #if (BAT_HIGH)
 #if (BAT_LOW)
@@ -473,6 +482,9 @@ void t_sleep()
 #endif
 #endif
 #endif
+#else
+dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
+#endif
 #endif
 
 #if (ESP_SLEEP)
@@ -485,8 +497,10 @@ void t_sleep()
   }
 #endif
 
-  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
-  {
+#if (USE_SUN_POSITION)
+  if ( dataBuffer.settings.sunTrackerPositionAdjusted )
+    dataBuffer.data.MotionCounter = 0;
+#endif
 
 #if (USE_GPS_MOTION)
     if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
@@ -496,6 +510,9 @@ void t_sleep()
     }
 #endif
 
+
+  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
+  {
     if (dataBuffer.data.MotionCounter <= 0)
       ESP32_sleep();
   }
@@ -572,6 +589,7 @@ void setup()
 
   // Aditional Info
   print_wakeup_reason();
+  printLocalTime();
   display_chip_info();
   Serial.println(dataBuffer.to_json());
   Serial.println(dataBuffer.getError());
@@ -717,12 +735,18 @@ void setup()
   // Tasks
   //-------------------------------------------------------------------------------
   log_display("Starting Tasks");
-  delay(10);
 
   sleepTicker.attach(60, t_sleep);
   displayTicker.attach(displayRefreshIntervall, t_cyclic);
   displayMoveTicker.attach(displayMoveIntervall, t_moveDisplay);
+
+#if (USE_MQTT)
   sendCycleTicker.attach(sendMqttIntervall, t_mqtt_cycle);
+#endif
+
+#if (USE_SUN_POSITION)
+  sunTicker.attach(sunTrackerRefreshIntervall, t_sunTracker);
+#endif
 
 #if (HAS_LORA)
   sendMessageTicker.attach(LORAenqueueMessagesIntervall, t_enqueue_LORA_messages);

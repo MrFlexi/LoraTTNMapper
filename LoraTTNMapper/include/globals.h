@@ -30,14 +30,14 @@
 // Device Settings
 //--------------------------------------------------------------------------
 
-// Choose Application
-// #define DEVICE_ID 1
+// Define Applications
 #define DEVICE_CAMERA_01   10 
 #define DEVICE_SOIL_SENSOR 11
 
-
+// Choose Application
+#define DEVICE_ID 2
 //#define DEVICE_ID DEVICE_CAMERA_01
-#define DEVICE_ID DEVICE_SOIL_SENSOR
+//#define DEVICE_ID DEVICE_SOIL_SENSOR
 
 
 #if DEVICE_ID == 1 // TBEAM-01 Device EU ID = DE00000000000010

@@ -8,12 +8,13 @@ Preferences prefs;
 #define servo1_pin 0
 #define servo2_pin 1
 
+#if (USE_SUN_POSITION)
 Helios helios;
 double dAzimuth;
 double dElevation;
+#endif
 
 #if (USE_PWM_SERVO)
-
 ServoEasing Servo1(PCA9685_DEFAULT_ADDRESS, &Wire);
 ServoEasing Servo2(PCA9685_DEFAULT_ADDRESS, &Wire);
 
@@ -22,17 +23,16 @@ void save_servo_position_to_flash(uint8_t servo1_pos, uint8_t servo2_pos)
   if (prefs.begin("SERVO", false)) // Read/Write
   {
     prefs.clear();
-    ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
+    //ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
     if (prefs.putUChar("servo1_pos", servo1_pos) == 0)
       ESP_LOGE(TAG, "Error writing Servo 1 pos");
 
     if (prefs.putUChar("servo2_pos", servo2_pos) == 0)
       ESP_LOGE(TAG, "Error writing Servo 2 pos");
 
-    ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
+    //ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
     prefs.end();
   }
-
   else
   {
     ESP_LOGE(TAG, "Fehler beim Öffnen des NVS-Namespace");
@@ -43,11 +43,10 @@ void get_servo_position_from_flash(uint8_t *servo1_pos, uint8_t *servo2_pos)
 {
   if (prefs.begin("SERVO", true)) // open read only
   {
-    ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
+    //ESP_LOGI(TAG, "FLASH free entries: %d\n", prefs.freeEntries());
     *servo1_pos = prefs.getUChar("servo1_pos", false);
     *servo2_pos = prefs.getUChar("servo2_pos", false);
-
-    ESP_LOGI(TAG, "FlashServoPosition:   %d %d", *servo1_pos, *servo2_pos);
+    ESP_LOGI(TAG, "Getting servo position from flash: %d %d", *servo1_pos, *servo2_pos);
     prefs.end();
   }
   else
@@ -73,9 +72,8 @@ void calc_sun()
 
   helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 2, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   //helios.calcSunPos(2022, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
-  ESP_LOGI(TAG, "Azimuth: %g.2\n", helios.dAzimuth);
-  ESP_LOGI(TAG, "Elevation: %g.2\n", helios.dElevation);
-
+  ESP_LOGI(TAG, "Azimuth: %lf5.1 Elevation: %lf5.1", helios.dAzimuth, helios.dElevation);
+  
   dataBuffer.data.sun_azimuth = helios.dAzimuth;
   dataBuffer.data.sun_elevation = helios.dElevation;
 }
@@ -114,12 +112,9 @@ void readRegisters()
 
 void setup_servo_pwm()
 {
-
   uint8_t servo1_pos;
   uint8_t servo2_pos;
-
   //Servo1.I2CWriteByte(PCA9685_MODE1_REGISTER, _BV(PCA9685_MODE_1_SLEEP)); // go to sleep 
-
   struct tm timeinfo;
   int speed = 30;
 
@@ -133,19 +128,16 @@ void setup_servo_pwm()
 
 void servo_move_to( uint8_t servo_number , uint8_t servo_position )
 {
-  
   setup_servo_pwm();
   ESP_LOGI(TAG, "Turning Servo %d to %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
   ServoEasing::ServoEasingArray[servo_number]->easeTo(servo_position, 30); 
-  delay(2000);  
-    
+  delay(2000);    
 }
 
 
 #if (USE_SUN_POSITION)
 void servo_move_to_sun()
 {
-
   uint8_t servo1_pos;
   uint8_t servo2_pos;
   struct tm timeinfo;
@@ -157,12 +149,10 @@ void servo_move_to_sun()
 
     uint8_t servo1_pos = (uint8_t) dataBuffer.data.sun_azimuth - 79; // 90-11 Grad Servoanpassung
     uint8_t servo2_pos = (uint8_t) dataBuffer.data.sun_elevation;
-
-    ESP_LOGI(TAG, "Sun azimut/elevation: %05.2g %05.2g", dataBuffer.data.sun_azimuth, dataBuffer.data.sun_elevation);    
+   
     save_servo_position_to_flash(servo1_pos, servo2_pos);
-    
-    ESP_LOGI(TAG, "Attaching Servos");
     ESP_LOGI(TAG, "Turning servos to   : %d  %d", servo1_pos, servo2_pos);
+    dataBuffer.settings.sunTrackerPositionAdjusted = true;
 
     Servo1.setEasingType(EASE_CUBIC_IN_OUT);
     if ((servo1_pos >= 0) && (servo1_pos <= 180))
@@ -176,15 +166,13 @@ void servo_move_to_sun()
     //  Servo1.startEaseTo(servo1_pos, speed);
     //if (servo2_pos >= 0)
     //  Servo2.startEaseTo(servo2_pos, speed);
-
-    delay(5000);
+    delay(2000);
     // readRegisters();    
     ESP_LOGI(TAG, "Servos detached");
 
     Servo2.detach();
     Servo1.detach();
     // readRegisters();
- 
   }
   else
   {
@@ -195,7 +183,6 @@ void servo_move_to_sun()
 
 void servo_move_to_last_position()
 {
-
   uint8_t servo1_pos;
   uint8_t servo2_pos;
   struct tm timeinfo;
@@ -216,7 +203,7 @@ void servo_move_to_last_position()
 
   Servo1.detach();
   Servo2.detach();
-  ESP_LOGI(TAG, "Servos detached");
+  //ESP_LOGI(TAG, "Servos detached");
 }
 
 #endif

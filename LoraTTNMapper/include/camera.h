@@ -4,6 +4,8 @@
 
 #pragma once
 
+#if (USE_CAMERA)
+
 #include <Arduino.h>
 #include "globals.h"
 
@@ -15,3 +17,5 @@
 String sendPhoto(void);
 void setupCam(void);
 void showCameraImageTFT(void);
+
+#endif

@@ -16,6 +16,7 @@
 #define USE_BUTTON 1
 
 #define USE_BLE 0
+#define USE_BLE_SERVER 1
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 
@@ -38,11 +39,11 @@
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL 30             // Transmitt Lora messages
+#define LORA_TX_INTERVAL 60            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF9
 
-#define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  5 // Update Webpage
+#define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall  10 // Update Webpage
 
 
 #define PAYLOAD_ENCODER 3
@@ -63,13 +64,13 @@
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
-#define TIME_TO_SLEEP_BAT_MID 18
-#define TIME_TO_SLEEP_BAT_LOW  54
+#define TIME_TO_SLEEP_BAT_MID 54
+#define TIME_TO_SLEEP_BAT_LOW  294
 #define BAT_LOW   37         // 3.7 Volt
 #define BAT_HIGH  40 
 
