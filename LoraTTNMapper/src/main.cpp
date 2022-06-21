@@ -457,8 +457,10 @@ void t_sleep()
 #if (USE_GPS_MOTION)
   gps.getDistance();
 #endif
-  // calc sleep time
 
+//------------------------------------------------------------
+// Calc deep sleep time
+//------------------------------------------------------------
 #if (ESP_SLEEP)
 #if (AUTO_POWER_SAVE)
 #if (TIME_TO_SLEEP_BAT_HIGH)
@@ -483,10 +485,14 @@ void t_sleep()
 #endif
 #endif
 #else
+// Use default deep sleep time
 dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
 #endif
 #endif
 
+//-----------------------------------------------------------------------------
+// Determin if device should go to DeepSleep
+//-----------------------------------------------------------------------------
 #if (ESP_SLEEP)
   dataBuffer.data.MotionCounter = dataBuffer.data.MotionCounter - 1;
 
@@ -497,11 +503,17 @@ dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
   }
 #endif
 
+
+// Check if if solar panel is adjusted
 #if (USE_SUN_POSITION)
   if ( dataBuffer.settings.sunTrackerPositionAdjusted )
     dataBuffer.data.MotionCounter = 0;
 #endif
 
+ // Check if number of Lora-TX events has been reached
+if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT ) dataBuffer.data.MotionCounter = 0;
+
+// Check if GPS position has been changed. If so stay alive
 #if (USE_GPS_MOTION)
     if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
     {
@@ -510,13 +522,20 @@ dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
     }
 #endif
 
-
-  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT || dataBuffer.data.MotionCounter <= 0)
-  {
-    if (dataBuffer.data.MotionCounter <= 0)
-      ESP32_sleep();
-  }
+#if (USE_BLE_SERVER)
 #endif
+
+
+ 
+
+
+// Goto Deep Sleep
+  if (dataBuffer.data.MotionCounter <= 0)
+  {
+    ESP32_sleep();
+  }
+     
+  #endif
 }
 
 void setup_wifi()

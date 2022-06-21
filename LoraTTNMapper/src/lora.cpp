@@ -27,16 +27,17 @@ void t_enqueue_LORA_messages()
   if (LoraSendQueue == 0)
   {
     ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
+    return;
   }
-  else
-  {
- // -----------------------------------------------------------------------------
- //   Port 1: TTN Mapper
-// -----------------------------------------------------------------------------
+  
+    // -----------------------------------------------------------------------------
+    //   Port 1: TTN Mapper
+    // -----------------------------------------------------------------------------
 #if (USE_GPS)
-    if (gps.checkGpsFix()) {
-      if ( gps.tGps.location.lat() > 0 )
-       {
+    if (gps.checkGpsFix())
+    {
+      if (gps.tGps.location.lat() > 0)
+      {
         payload.reset();
         payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
         payload.enqueue_port(1);
@@ -44,59 +45,45 @@ void t_enqueue_LORA_messages()
     }
 #endif
 
- // -----------------------------------------------------------------------------
- //   Port 2: Cayenne My Devices
-// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    //   Port 2: Cayenne My Devices
+    // -----------------------------------------------------------------------------
 
-payload.reset();
-payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
-payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+    payload.reset();
+    payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
-     //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+      //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
     }
 #endif
 
-#if (USE_BME280)
-    payload.addBMETemp(2); // Cayenne format will be generated in TTN Payload converter
-#endif
 
-#if (HAS_INA3221 || HAS_INA219 )
+
+#if (HAS_INA3221 || HAS_INA219)
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
 #if (USE_SOIL_MOISTURE)
-payload.addFloat(LPP_SOIL_CHANNEL1, dataBuffer.data.soil_moisture);
+    payload.addFloat(LPP_SOIL_CHANNEL1, dataBuffer.data.soil_moisture);
 #endif
+   payload.enqueue_port(2); // send data
 
+     // -----------------------------------------------------------------------------
+    //   Port 3: Device --> TTN, no payload concerter --> NodeRed --> Influxdb
+    //   Payload will be converted to Json-InfluxDB format in NodeRed
+    // -----------------------------------------------------------------------------
+    payload.reset();
+    payload.addPMU(01);      //(channel, 12 bytes)
 
-payload.enqueue_port(2); // send data
+    #if (USE_BME280)
+    payload.addBMETemp(01); // (channel, 4 bytes)
+    #endif
 
-//Next Message-Block Port    ---> now send via port 3
-//#if (HAS_PMU)
-//  if ( dataBuffer.data.pmu_data_available )
-//  {
-//    //payload.reset();
-//    payload.addVoltage(20, dataBuffer.data.bus_voltage);
-//    payload.addVoltage(21, dataBuffer.data.bus_current);
-//    payload.addVoltage(30, dataBuffer.data.bat_voltage);
-//    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-//    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-//    payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
-//    //payload.enqueue_port(2);
-//  }
-//#endif
-//payload.enqueue_port(2);
-
-
-// PMU data as one block
-payload.reset();
-payload.addPMU(01);  //(channel, data)
-payload.enqueue_port(3); // send data
-  }
+    payload.enqueue_port(3); // send data
 #endif
 }
 
@@ -160,7 +147,6 @@ void t_LORA_send_from_queue(osjob_t *j)
   }
 }
 
-
 void dump_queue()
 {
   MessageBuffer_t SendBuffer;
@@ -185,7 +171,7 @@ void dump_queue()
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
   char hex_string[5];
-  ESP_LOGI(TAG, "Lora TX Message Port: %d  Size: %d",SendBuffer.MessagePort, SendBuffer.MessageSize);
+  ESP_LOGI(TAG, "Lora TX Message Port: %d  Size: %d", SendBuffer.MessagePort, SendBuffer.MessageSize);
 
   Serial.println("Payload:");
   for (int p = 0; p < SendBuffer.MessageSize; p++)
@@ -199,7 +185,7 @@ void dump_single_message(MessageBuffer_t SendBuffer)
 
 void setup_lora()
 {
-#if ( HAS_LORA )
+#if (HAS_LORA)
   log_display("Setup LORA");
   // LMIC init
   os_init();
@@ -226,7 +212,6 @@ void setup_lora()
   LMIC_setDrTxpow(LORA_DATARATE, 14);
 
   t_LORA_send_from_queue(&sendjob);
-
 
   ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
            LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
@@ -297,28 +282,24 @@ void onEvent(ev_t ev)
         }
       }
 
-
-      switch ( LMIC.frame[LMIC.dataBeg + 1] )
+      switch (LMIC.frame[LMIC.dataBeg + 1])
       {
-        case TTN_COMMAND_RESET_COULOMB:
-          Serial.println(F("TTN Command: Reset Coulomb Counter"));
-          #if (HAS_PMU)
-          pmu.ClearCoulombcounter();    
-          #endif       
-          break;  
-
-        case TTN_COMMAND_SLEEP:
-           Serial.println(F("TTN Command: Sleep"));
-           ESP32_sleep();
+      case TTN_COMMAND_RESET_COULOMB:
+        Serial.println(F("TTN Command: Reset Coulomb Counter"));
+#if (HAS_PMU)
+        pmu.ClearCoulombcounter();
+#endif
         break;
-        
-        default:
-         Serial.println(F("TTN Command unknown"));
+
+      case TTN_COMMAND_SLEEP:
+        Serial.println(F("TTN Command: Sleep"));
+        ESP32_sleep();
+        break;
+
+      default:
+        Serial.println(F("TTN Command unknown"));
         break;
       }
-
-
-
     }
     // Schedule next transmission
     log_display("Next TX started");

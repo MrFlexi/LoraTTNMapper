@@ -70,12 +70,11 @@ void PayloadConvert::addBMETemp(uint8_t channel)
   uint16_t humidity = (uint16_t)(dataBuffer.data.humidity * 100);     // float -> int
 
   buffer[cursor++] = channel;
-  buffer[cursor++] = LPP_TEMPERATURE;
+  buffer[cursor++] = LPP_BME;
   buffer[cursor++] = highByte(temperature);
   buffer[cursor++] = lowByte(temperature);
-
-  //buffer[cursor++] = highByte(humidity);
-  //buffer[cursor++] = lowByte(humidity);
+  buffer[cursor++] = highByte(humidity);
+  buffer[cursor++] = lowByte(humidity);
 
 #endif
 }
@@ -100,13 +99,9 @@ void PayloadConvert::addPMU(uint8_t channel)
 
   out = dataBuffer.data.bat_charge_current * 100;
   buffer[cursor++] = highByte(out);
-  buffer[cursor++] = lowByte(out);
+  buffer[cursor++] = lowByte(out);  
 
-  out = dataBuffer.data.bat_discharge_current * 100;
-  buffer[cursor++] = highByte(out);
-  buffer[cursor++] = lowByte(out);
-
-   out = dataBuffer.data.bat_DeltamAh * 100;
+  out = dataBuffer.data.bat_DeltamAh;
   buffer[cursor++] = highByte(out);
   buffer[cursor++] = lowByte(out);
 }

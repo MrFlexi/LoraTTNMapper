@@ -262,58 +262,30 @@ void showPage(int page)
       u8g2.setCursor(1, 60);
       u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
       u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
+    break;
 
-      break;
+
     case PAGE_MODULS:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       sprintf(sbuf, "Moduls");
       u8g2.drawStr(1, 15, sbuf);
 
       u8g2.setFont(u8g2_font_profont12_tr);
+
+      // WLAN
       u8g2.setCursor(1, 30);
       if (dataBuffer.data.wlan)
-        u8g2.setDrawColor(0);
-      else
-        u8g2.setDrawColor(1);
-      u8g2.printf("WLAN");
+        u8g2.printf("WLAN");
+
+      // BLE
+      u8g2.setCursor(48, 30);
+       u8g2.printf("BLE");
+      if (dataBuffer.data.ble_device_connected)
+        u8g2.printf("BLE");
 
       u8g2.setDrawColor(1);
       u8g2.setCursor(64, 30);
       u8g2.printf("LORA");
-      //u8g2.setCursor(1, 45);
-      //u8g2.printf("Exp: %s", dataBuffer.settings.experiment);
-      //u8g2.setCursor(1, 60);
-      //u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
-
-#if (USE_OTA)
-      availableModules = availableModules + "OTA ";
-#endif
-
-#if (USE_BLE_SCANNER)
-      availableModules = availableModules + "BLE ";
-#endif
-
-#if (USE_MQTT)
-      availableModules = availableModules + "MQTT ";
-#endif
-
-#if (USE_CAYENNE)
-      availableModules = availableModules + "CAY ";
-#endif
-
-#if (USE_GYRO)
-      availableModules = availableModules + "GYRO ";
-#endif
-
-#if (USE_WEBSERVER)
-      availableModules = availableModules + "WEB ";
-#endif
-
-      if (dataBuffer.data.wlan)
-      {
-        availableModules = availableModules + "WLAN ";
-      }
-
       break;
 
     case PAGE_LORA:

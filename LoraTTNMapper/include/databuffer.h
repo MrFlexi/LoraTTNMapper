@@ -69,6 +69,7 @@ typedef struct
   double gps_distance;
   char gps_datetime[32];
   tm timeinfo;
+  bool ble_device_connected = false;
 #if (USE_CAMERA)
   String image_buffer = "";
 #endif

@@ -104,9 +104,7 @@ String DataBuffer::to_json()
 
   // Battery Management
   measurement["bat_voltage"] = data.bat_voltage;
-  measurement["bat_charge_current"] = data.bat_charge_current;
-  measurement["bat_voltage"] = data.bat_voltage;
-  measurement["bat_discharge_current"] = data.bat_discharge_current;
+  measurement["bat_charge_current"] = data.bat_charge_current;    
   measurement["bat_fuel_gauge"] = data.bat_DeltamAh;
   measurement["bus_voltage"] = data.bus_voltage;
   measurement["bus_current"] = data.bus_current;

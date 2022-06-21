@@ -39,6 +39,7 @@ void AXP192_powerevent_IRQ(void);
 
 #define LPP_PMU 201           // 12 bytes PMU values
 #define LPP_SOIL_MOISTURE 202
+#define LPP_BME 203           // 4 bytes
 
 
 class PayloadConvert {

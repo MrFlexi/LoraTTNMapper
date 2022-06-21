@@ -3,7 +3,6 @@
 
 #if (USE_BLE_SERVER)
 
-bool deviceConnected = false;
 #define envService BLEUUID((uint16_t)0x181A)
 #define BatteryService BLEUUID((uint16_t)0x180F)
 
@@ -35,12 +34,12 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
-    deviceConnected = true;
+    dataBuffer.data.ble_device_connected = true;
     ESP_LOGI(TAG, "BLE device connected");
   };
   void onDisconnect(BLEServer *pServer)
   {
-    deviceConnected = false;
+    dataBuffer.data.ble_device_connected = false;
     pServer->startAdvertising();
     ESP_LOGI(TAG, "BLE device disconnected");
   }
@@ -119,7 +118,7 @@ void setup_ble()
 
 void ble_send()
 {
-  if (deviceConnected)
+  if (dataBuffer.data.ble_device_connected)
   {
     ESP_LOGI(TAG, "BLE notify start");
 
