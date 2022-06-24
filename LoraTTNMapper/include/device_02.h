@@ -20,6 +20,8 @@
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 
+#define USE_SOIL_MOISTURE 1 
+
 #define USE_WIFI 1
 #define USE_WEBSERVER   1
 #define sendWebsocketIntervall          10 // every x seconds
@@ -39,8 +41,8 @@
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
-#define LORA_TX_INTERVAL 60            // Transmitt Lora messages
-#define LORA_DATARATE DR_SF9
+#define LORA_TX_INTERVAL 30           // Transmitt Lora messages
+#define LORA_DATARATE DR_SF10
 
 #define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  10 // Update Webpage
@@ -60,17 +62,17 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1            // Main switch
+#define ESP_SLEEP 1          // Main switch
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
-#define SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  10 // // sleep after n minutes without movement or
+#define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
-#define TIME_TO_SLEEP_BAT_HIGH  6
-#define TIME_TO_SLEEP_BAT_MID 54
-#define TIME_TO_SLEEP_BAT_LOW  294
+#define TIME_TO_SLEEP_BAT_HIGH  5
+#define TIME_TO_SLEEP_BAT_MID 20
+#define TIME_TO_SLEEP_BAT_LOW  120
 #define BAT_LOW   37         // 3.7 Volt
 #define BAT_HIGH  40 
 

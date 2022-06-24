@@ -278,8 +278,7 @@ void showPage(int page)
         u8g2.printf("WLAN");
 
       // BLE
-      u8g2.setCursor(48, 30);
-       u8g2.printf("BLE");
+      u8g2.setCursor(40, 30);       
       if (dataBuffer.data.ble_device_connected)
         u8g2.printf("BLE");
 

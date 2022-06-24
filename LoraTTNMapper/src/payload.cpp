@@ -36,6 +36,15 @@ void PayloadConvert::addFloat(uint8_t channel, float value)
   buffer[cursor++] = lowByte(volt);
 }
 
+void PayloadConvert::addFloatN(uint8_t channel, uint8_t sensor, float value)
+{
+  uint16_t volt = value * 100;
+  buffer[cursor++] = channel;
+  buffer[cursor++] = sensor;
+  buffer[cursor++] = highByte(volt);
+  buffer[cursor++] = lowByte(volt);
+}
+
 void PayloadConvert::addVoltage(uint8_t channel, float value)
 {
   uint16_t volt = value * 100;
@@ -67,7 +76,7 @@ void PayloadConvert::addBMETemp(uint8_t channel)
 {
 #if (USE_BME280)
   int16_t temperature = (int16_t)(dataBuffer.data.temperature * 100); // float -> int
-  uint16_t humidity = (uint16_t)(dataBuffer.data.humidity * 100);     // float -> int
+  uint16_t humidity = (uint16_t)(dataBuffer.data.humidity * 100 );     // float -> int
 
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_BME;
@@ -99,7 +108,7 @@ void PayloadConvert::addPMU(uint8_t channel)
 
   out = dataBuffer.data.bat_charge_current * 100;
   buffer[cursor++] = highByte(out);
-  buffer[cursor++] = lowByte(out);  
+  buffer[cursor++] = lowByte(out);
 
   out = dataBuffer.data.bat_DeltamAh;
   buffer[cursor++] = highByte(out);
@@ -165,45 +174,49 @@ void PayloadConvert::addGPS_LPP(uint8_t channel, TinyGPSPlus tGps)
 
 void PayloadConvert::enqueue_port(uint8_t port)
 {
+  #if (HAS_LORA)
   int ret;
   MessageBuffer_t SendBuffer;
 
-  SendBuffer.MessageSize = payload.getSize();
-  SendBuffer.MessagePrio = 1;
-  SendBuffer.MessagePort = port;
-
-  int n = uxQueueMessagesWaiting(LoraSendQueue);
-
-  // Clear first entry in queue if no space available
-  if (uxQueueSpacesAvailable(LoraSendQueue) == 0)
+  if (dataBuffer.data.aliveCounter > 0)
   {
-    if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE) // delete one element
+
+    SendBuffer.MessageSize = payload.getSize();
+    SendBuffer.MessagePrio = 1;
+    SendBuffer.MessagePort = port;
+
+    int n = uxQueueMessagesWaiting(LoraSendQueue);
+    ESP_LOGI(TAG, "Lora queue size: %d", n);
+
+    // Clear first entry in queue if no space available
+    if (uxQueueSpacesAvailable(LoraSendQueue) == 0)
     {
-      ESP_LOGI(TAG, "Lora send queue element deleted:");
-#if (HAS_LORA)
-      dump_single_message(SendBuffer);
-#endif
+      if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE) // delete one element
+      {
+        ESP_LOGI(TAG, "Queue aging: First element deleted:");
+        dump_single_message(SendBuffer);
+      }
+      //int p = uxQueueMessagesWaiting(LoraSendQueue);
+      //ESP_LOGI(TAG, "Queue aging waiting bevore: %d, after: %d", n, p);
     }
 
-    int p = uxQueueMessagesWaiting(LoraSendQueue);
-    ESP_LOGI(TAG, "Queue aging waiting bevore: %d, after: %d", n, p);
+    // Insert new element at end of queue
+    ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
+    memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
+    ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
+    if (ret != 1)
+    {
+      ESP_LOGI(TAG, "LORA sendqueue is full");
+    }
   }
-
-  // Insert new element at end of queue
-  ESP_LOGI(TAG, "Enqueue new message, size: %d port: %d", SendBuffer.MessageSize, SendBuffer.MessagePort);
-  memcpy(SendBuffer.Message, payload.getBuffer(), SendBuffer.MessageSize);
-  ret = xQueueSendToBack(LoraSendQueue, &SendBuffer, 0);
-  if (ret != 1)
-  {
-    ESP_LOGI(TAG, "LORA sendqueue is full");
-  }
+#endif
 }
 
 #endif
 
 void lora_queue_init(void)
 {
-  #if (HAS_LORA)
+#if (HAS_LORA)
   assert(SEND_QUEUE_SIZE);
   LoraSendQueue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(MessageBuffer_t));
   if (LoraSendQueue == 0)
@@ -212,5 +225,5 @@ void lora_queue_init(void)
   }
   ESP_LOGI(TAG, "LORA send queue created, size %d Bytes",
            SEND_QUEUE_SIZE * sizeof(MessageBuffer_t));
-  #endif
+#endif
 }

@@ -6,7 +6,7 @@ function lppDecode(bytes) {
         136: { 'size': 9, 'name': 'gps', 'signed': true, 'divisor': [10000, 10000, 100] },
         0xc9: { 'size': 10, 'name': 'pmu', 'signed': true, 'divisor': 100 },
         0xca: { 'size': 2, 'name': 'soil_moisture', 'signed': true, 'divisor': 100 },
-        0xcb: { 'size': 4, 'name': 'bme280', 'signed': true, 'divisor': [100, 1] }
+        0xcb: { 'size': 4, 'name': 'bme280', 'signed': true, 'divisor': [100, 100] }
     };
 
     function isObject(item) {
@@ -137,7 +137,7 @@ function decodeUplink(input) {
 
         });
         return {
-            data: response,
+            data :response,
             warnings: warnings
         };
     }
@@ -161,7 +161,7 @@ function decodeUplink(input) {
 
 //let buffer = new Uint8Array([0x01, 0xc9, 0x00,0xff,0x00,0xff,0x01, 0xca, 0x00,0xff,0x03,0xe8]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8
 
-let buffer = new Uint8Array([0x01, 0xc9, 0x00, 0xff, 0x00, 0xff, 0x01, 0xca, 0x00, 0xff, 0x03, 0xe8, 0x01, 0xca, 0x00, 0xff]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8 01 ca 00 ff
+let buffer = new Uint8Array([0x01, 0xc9, 0x00, 0xff, 0x00, 0xff, 0x01, 0xca, 0x00, 0xff, 0x03, 0xe8, 0x01, 0xca, 0x00, 0xff, 0x01, 0xcb, 0x00, 0x10, 0x00, 0x20]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8 01 ca 00 ff
 
 console.log(buffer);
 var ttn = {
@@ -172,3 +172,4 @@ console.log(ttn);
 
 var a = decodeUplink(ttn);
 console.log(a);
+

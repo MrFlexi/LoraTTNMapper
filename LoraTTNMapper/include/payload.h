@@ -53,6 +53,7 @@ public:
   uint8_t getSize(void);
   uint8_t *getBuffer(void);  
   void addFloat(uint8_t channel, float value);
+  void addFloatN(uint8_t channel, uint8_t sensor, float value);
   void addCount(uint8_t channel, uint16_t value);
   void addStatus(uint16_t voltage, uint64_t uptime, float cputemp, uint32_t mem,
                  uint8_t reset1, uint8_t reset2);

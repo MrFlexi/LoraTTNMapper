@@ -49,9 +49,9 @@ void t_enqueue_LORA_messages()
     //   Port 2: Cayenne My Devices
     // -----------------------------------------------------------------------------
 
-    payload.reset();
-    payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
-    payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+    //payload.reset();
+    //payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+    //payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
 #if (USE_GPS)
     if (gps.checkGpsFix())
@@ -67,22 +67,28 @@ void t_enqueue_LORA_messages()
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
-#if (USE_SOIL_MOISTURE)
-    payload.addFloat(LPP_SOIL_CHANNEL1, dataBuffer.data.soil_moisture);
-#endif
-   payload.enqueue_port(2); // send data
+
+   //payload.enqueue_port(2); // send data
 
      // -----------------------------------------------------------------------------
     //   Port 3: Device --> TTN, no payload concerter --> NodeRed --> Influxdb
     //   Payload will be converted to Json-InfluxDB format in NodeRed
     // -----------------------------------------------------------------------------
     payload.reset();
-    payload.addPMU(01);      //(channel, 12 bytes)
+    payload.addPMU(01);      //(channel, 10 bytes)
+
+    #if (USE_SOIL_MOISTURE)
+    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+    #endif
 
     #if (USE_BME280)
     payload.addBMETemp(01); // (channel, 4 bytes)
     #endif
+    payload.enqueue_port(2); // send data
+    
 
+    payload.reset();
+    payload.addPMU(01);      //(channel, 10 bytes)
     payload.enqueue_port(3); // send data
 #endif
 }
@@ -130,6 +136,7 @@ void t_LORA_send_from_queue(osjob_t *j)
 
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
+        ESP_LOGV(TAG, "Lora trying to send:");
         dump_single_message(SendBuffer);
         LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
