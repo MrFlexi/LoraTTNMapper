@@ -35,7 +35,7 @@
 #define DEVICE_SOIL_SENSOR 11
 
 // Choose Application
-#define DEVICE_ID 2
+#define DEVICE_ID 1
 //#define DEVICE_ID DEVICE_CAMERA_01
 //#define DEVICE_ID DEVICE_SOIL_SENSOR
 
@@ -172,7 +172,7 @@ extern QueueHandle_t LoraSendQueue;
 #include <camera.h>
 #endif
 
-#if (USE_HCSR04)        // Ultrasonic distance sensor
+#if (USE_DISTANCE_SENSOR_HCSR04)        // Ultrasonic distance sensor
 #include "sensor_hcsr04.h"
 #endif
 
@@ -180,12 +180,12 @@ extern QueueHandle_t LoraSendQueue;
 #include "sensor_sound.h"
 #endif
 
-#if (USE_PWM_SERVO)
-#include "servo.h"
-#endif
-
 #if (USE_SUN_POSITION)
 #include "Helios.h"
+#endif
+
+#if (USE_PWM_SERVO)
+#include "servo.h"
 #endif
 
 #if (USE_BLE_SERVER)

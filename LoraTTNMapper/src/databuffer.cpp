@@ -124,9 +124,10 @@ String DataBuffer::to_json()
   measurement["humidity"] = data.humidity;
   measurement["soil_moisture"] = data.soil_moisture;
 
+#if (USE_DISTANCE_SENSOR_HCSR04)
   // HC-SR04 Sonic distance sensor
   measurement["HCSR04_Distance"] = data.distance;
-
+#endif
 
 // Camera
 #if (USE_CAMERA)

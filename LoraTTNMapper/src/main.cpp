@@ -417,7 +417,9 @@ void t_cyclic() // Intervall: Display Refresh
   {
     dataBuffer.data.soil_moisture = (float)dataBuffer.data.potentiometer_a / 1000;
     dataBuffer.data.potentiometer_a_changed = false;
+    ESP_LOGI(TAG, "Soil moisture changed %.2f ", dataBuffer.data.soil_moisture );
   }
+  ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture );
 #endif
 
 // Refresh Display
@@ -523,9 +525,12 @@ if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT ) dataBuffer.data.Motion
 #endif
 
 #if (USE_BLE_SERVER)
+  if (dataBuffer.data.ble_device_connected)
+  {
+    ESP_LOGI(TAG, "No Deep Sleep, BLE still connected");
+    dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+  }
 #endif
-
-
  
 
 
@@ -727,7 +732,7 @@ void setup()
   poti_setup_RTOS();
 #endif
 
-#if (USE_HCSR04)
+#if (USE_DISTANCE_SENSOR_HCSR04)
   setup_hcsr04_rtos();
 #endif
 

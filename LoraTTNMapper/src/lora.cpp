@@ -87,9 +87,9 @@ void t_enqueue_LORA_messages()
     payload.enqueue_port(2); // send data
     
 
-    payload.reset();
-    payload.addPMU(01);      //(channel, 10 bytes)
-    payload.enqueue_port(3); // send data
+    //payload.reset();
+    //payload.addPMU(01);      //(channel, 10 bytes)
+    //payload.enqueue_port(3); // send data
 #endif
 }
 

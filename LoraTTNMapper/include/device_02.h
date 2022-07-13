@@ -19,6 +19,7 @@
 #define USE_BLE_SERVER 1
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
+#define USE_SUN_POSITION 1
 
 #define USE_SOIL_MOISTURE 1 
 
@@ -46,7 +47,7 @@
 
 #define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  10 // Update Webpage
-
+#define sunTrackerRefreshIntervall 120
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 60

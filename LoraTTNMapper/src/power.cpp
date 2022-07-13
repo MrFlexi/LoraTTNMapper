@@ -341,8 +341,8 @@ void AXP192_init(void)
     pmu.EnableCoulombcounter();
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
-    //pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
-    pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
+    pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
+    //pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
 
     pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
     // switch power rails on

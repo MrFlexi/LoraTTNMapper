@@ -28,7 +28,7 @@ void irqHandler(void *pvParameters)
                     portMAX_DELAY);   // wait forever
 
 #if (USE_INTERRUPTS)
-mqtt_send_irq();
+//mqtt_send_irq();
       
 // button pressed?
 #if (USE_BUTTON)
@@ -82,8 +82,8 @@ void IRAM_ATTR PMU_IRQ()
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   InterruptStatusRegister |= PMU_IRQ_BIT;
 
-  xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
-                     &xHigherPriorityTaskWoken);
+  //xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
+  //                   &xHigherPriorityTaskWoken);
 
   if (xHigherPriorityTaskWoken)
     portYIELD_FROM_ISR();

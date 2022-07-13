@@ -205,8 +205,6 @@ void setup_mqtt()
 void mqtt_send()
 {
   char topic_out[50];
-  Serial.println();
-  ESP_LOGI(TAG, "MQTT send");
 
 #if (USE_CAMERA)
 sendPhoto();

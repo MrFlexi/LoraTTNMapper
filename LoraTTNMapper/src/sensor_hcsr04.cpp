@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "globals.h"
 
-#if (USE_HCSR04)
+#if (USE_DISTANCE_SENSOR_HCSR04)
 
 
 HCSR04 ultrasonicSensor(HCSR04_trigger_pin,HCSR04_echo_pin, 20, 300);
@@ -13,7 +13,7 @@ void t_getHcsr04Values(void *parameter)
   float distance_old;
   locdataBuffer = (DataBuffer *)parameter;
 
-  //Continuously sample ADC1
+  //Continuously sample 
   while (1)
   {
     distance = ultrasonicSensor.getMedianFilterDistance();
@@ -22,9 +22,9 @@ void t_getHcsr04Values(void *parameter)
       distance_old = distance;
       locdataBuffer->data.distance = distance;
       locdataBuffer->data.distance_changed = true;
-      Serial.print("HC-SR04 Distance:");Serial.println( locdataBuffer->data.distance );
+      ESP_LOGI(TAG, "HC-SR04 Distance: %.2f", locdataBuffer->data.distance );
     }
-    vTaskDelay(500);
+    vTaskDelay(2000);
   }
 }
 
