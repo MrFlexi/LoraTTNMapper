@@ -2,7 +2,7 @@
 #include "jsutilities.h"
 
 // Local logging tag
-//static const char TAG[] = __FILE__;
+static const char TAG[] = __FILE__;
 
 #define SSD1306_PRIMARY_ADDRESS (0x3D)
 #define SSD1306_SECONDARY_ADDRESS (0x3C)

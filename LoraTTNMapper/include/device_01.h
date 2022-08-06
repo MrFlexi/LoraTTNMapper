@@ -2,6 +2,7 @@
 //----------------------------------------------------------------
 // GPIO 02   Output Distance Sensor Trigger
 // GPIO 13   Input  Distance Sensor Echo
+// GPIO 35   APX    PMU Interrupt Pin
 // GPIO 36   ADC1   Soil Moisture
 //----------------------------------------------------------------
 

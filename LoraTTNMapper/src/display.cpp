@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "display.h"
 
+static const char TAG[] = __FILE__;
+
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];

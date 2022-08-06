@@ -67,6 +67,7 @@ void irqHandler(void *pvParameters)
 void IRAM_ATTR ButtonIRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  ESP_LOGI(TAG, "Button IRQ");
 
   xTaskNotifyFromISR(irqHandlerTask, BUTTON_IRQ, eSetBits,
                      &xHigherPriorityTaskWoken);
@@ -81,9 +82,10 @@ void IRAM_ATTR PMU_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   InterruptStatusRegister |= PMU_IRQ_BIT;
+  ESP_LOGI(TAG, "PMU IRQ");
 
-  //xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
-  //                   &xHigherPriorityTaskWoken);
+  xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
+                     &xHigherPriorityTaskWoken);
 
   if (xHigherPriorityTaskWoken)
     portYIELD_FROM_ISR();

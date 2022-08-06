@@ -4,6 +4,7 @@
 #include <Preferences.h>
 
 Preferences prefs;
+static const char TAG[] = __FILE__;
 
 #define servo1_pin 0
 #define servo2_pin 1

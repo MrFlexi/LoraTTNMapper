@@ -16,10 +16,10 @@ void DataBuffer::get()
 
 String DataBuffer::to_json_web()
 {
-  const int capacity = JSON_OBJECT_SIZE(40) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(100) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
-  char s[10];
+  char s[20];
 
   doc.clear();
   JsonArray sensors = doc.createNestedArray("sensors");
@@ -69,18 +69,26 @@ String DataBuffer::to_json_web()
 
 #if (USE_PWM_SERVO)
   JsonObject sensors_6 = sensors.createNestedObject();
-  sensors_5["name"] = "Servo 1";
-  sensors_5["subheader"] = "position";
-  sensors_5["value"] = data.servo1;
-  sensors_5["unit"] = "degree"; 
+  sensors_6["name"] = "Servo 1";
+  sensors_6["subheader"] = "position";
+  sensors_6["value"] = data.servo1;
+  sensors_6["unit"] = "degree"; 
 
  JsonObject sensors_7 = sensors.createNestedObject();
-  sensors_5["name"] = "Servo 2";
-  sensors_5["subheader"] = "position";
-  sensors_5["value"] = data.servo2;
-  sensors_5["unit"] = "degree";
+  sensors_7["name"] = "Servo 2";
+  sensors_7["subheader"] = "position";
+  sensors_7["value"] = data.servo2;
+  sensors_7["unit"] = "degree";
 #endif
 
+JsonObject sensors_8 = sensors.createNestedObject();
+  strftime(s, sizeof(s), "%H:%M:%S", &dataBuffer.data.timeinfo);
+  sensors_8["name"] = "Time";
+  sensors_8["subheader"] = s;
+  sensors_8["value"] = s;
+  sensors_8["unit"] = "";
+  Serial.println("make it json for websocket");
+  Serial.println(&dataBuffer.data.timeinfo, "%A, %B %d %Y %H:%M:%S");
 
   serializeJson(doc, JsonStr);
   return JsonStr;

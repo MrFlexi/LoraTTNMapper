@@ -1,6 +1,4 @@
 // T-Beam specific hardware
-#undef BUILTIN_LED
-#define BUILTIN_LED 14
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 
 //---------------------------------------------------------
@@ -101,7 +99,6 @@ bool wifi_connected = false;
 //--------------------------------------------------------------------------
 // Wifi Settings
 //--------------------------------------------------------------------------
-
 #if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
 WiFiClient wifiClient;
 #endif
@@ -311,7 +308,7 @@ void t_cyclicRTOS(void *pvParameters)
 //---------------------------------------------------------------------------------
 void t_sunTracker() // Intervall: Display Refresh
 {
-ESP_LOGI(TAG, "Sun Tracker");
+  ESP_LOGI(TAG, "Sun Tracker");
 #if (USE_SUN_POSITION)
 #if (USE_PWM_SERVO)
   servo_move_to_sun();
@@ -321,11 +318,12 @@ ESP_LOGI(TAG, "Sun Tracker");
 
 void t_cyclic() // Intervall: Display Refresh
 {
-  float temp;
 
-#if (USE_GPS)
-  set_time_from_gps();
-#endif
+  Serial.println();
+  Serial.println();
+  Serial.println();
+
+  handle_time(); //get time and write to dataBuffer
 
 #if (USE_BLE_SERVER)
   ble_send();
@@ -417,9 +415,9 @@ void t_cyclic() // Intervall: Display Refresh
   {
     dataBuffer.data.soil_moisture = (float)dataBuffer.data.potentiometer_a / 1000;
     dataBuffer.data.potentiometer_a_changed = false;
-    ESP_LOGI(TAG, "Soil moisture changed %.2f ", dataBuffer.data.soil_moisture );
+    ESP_LOGI(TAG, "Soil moisture changed %.2f ", dataBuffer.data.soil_moisture);
   }
-  ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture );
+  ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture);
 #endif
 
 // Refresh Display
@@ -429,7 +427,7 @@ void t_cyclic() // Intervall: Display Refresh
     showPage(PageNumber);
 #endif
 
-  //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
+    //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -487,8 +485,8 @@ void t_sleep()
 #endif
 #endif
 #else
-// Use default deep sleep time
-dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
+  // Use default deep sleep time
+  dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
 #endif
 #endif
 
@@ -505,23 +503,23 @@ dataBuffer.settings.sleep_time = TIME_TO_SLEEP;
   }
 #endif
 
-
 // Check if if solar panel is adjusted
 #if (USE_SUN_POSITION)
-  if ( dataBuffer.settings.sunTrackerPositionAdjusted )
+  if (dataBuffer.settings.sunTrackerPositionAdjusted)
     dataBuffer.data.MotionCounter = 0;
 #endif
 
- // Check if number of Lora-TX events has been reached
-if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT ) dataBuffer.data.MotionCounter = 0;
+  // Check if number of Lora-TX events has been reached
+  if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
+    dataBuffer.data.MotionCounter = 0;
 
 // Check if GPS position has been changed. If so stay alive
 #if (USE_GPS_MOTION)
-    if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
-    {
-      dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
-      gps.resetDistance();
-    }
+  if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
+  {
+    dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
+    gps.resetDistance();
+  }
 #endif
 
 #if (USE_BLE_SERVER)
@@ -531,16 +529,14 @@ if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT ) dataBuffer.data.Motion
     dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
   }
 #endif
- 
 
-
-// Goto Deep Sleep
+  // Goto Deep Sleep
   if (dataBuffer.data.MotionCounter <= 0)
   {
     ESP32_sleep();
   }
-     
-  #endif
+
+#endif
 }
 
 void setup_wifi()
@@ -580,6 +576,17 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
+  
+// LED Sunrise
+#ifdef HAS_LED
+  ledcSetup(0, 10000, 8);
+  ledcAttachPin(HAS_LED, 0);
+  for (int dutyCycle = 0; dutyCycle <= 255; dutyCycle++)
+  {
+    ledcWrite(0, dutyCycle);
+    delay(5);
+  }
+#endif
 
   //--------------------------------------------------------------------
   // Load Settings
@@ -590,7 +597,6 @@ void setup()
   //--------------------------------------------------------------------
   // Logging
   //--------------------------------------------------------------------
-
 #if (USE_SPIFF_LOGGING)
 
   if (SPIFFS.exists("/LOGS.txt"))
@@ -755,7 +761,7 @@ void setup()
   setup_ble();
 #endif
 
-// get sensor values once
+  // get sensor values once
   t_cyclic();
 
   //-------------------------------------------------------------------------------
@@ -810,8 +816,6 @@ void setup()
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
   ESP_LOGI(TAG, "#----------------------------------------------------------#");
-
-  
 
   //---------------------------------------------------------------
   // Watchdog

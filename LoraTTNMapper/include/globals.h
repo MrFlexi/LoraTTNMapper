@@ -3,7 +3,7 @@
 #define _GLOBALS_H
 
 #include <Arduino.h>
-#include <FreeRTOS.h>
+#include <freertos/FreeRTOS.h>
 #include "time.h"
 #include "mytime.h"
 #include "freertos/ringbuf.h"
@@ -15,6 +15,7 @@
 #define uS_TO_S_FACTOR 1000000UL //* Conversion factor for micro seconds to seconds */
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define LORA_DATARATE DR_SF7
+
 
 //--------------------------------------------------------------------------
 // GPIO

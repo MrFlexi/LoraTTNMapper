@@ -31,8 +31,7 @@
 #define BUTTON_PIN              GPIO_NUM_38     // middle on board button
 
 #define POWER_RAIL_PIN          GPIO_NUM_15     // Power Rail
-#define SERVO1_PIN              GPIO_NUM_13
-#define SERVO2_PIN              GPIO_NUM_4
+
 
 #define GPS_TX                  GPIO_NUM_34
 #define GPS_RX                  GPIO_NUM_12
@@ -45,7 +44,7 @@
 #define PMU_CHG_CURRENT         AXP1XX_CHARGE_CUR_550MA // battery charge current possible values (mA): 100/190/280/360/450/550/630/700/780/880/960/1000/1080/1160/1240/1320
 #define PMU_CHG_CUTOFF          AXP202_TARGET_VOL_4_2V  // battery charge cutoff possible values (V): 4_1/4_15/4_2/4_36
 
-#define HAS_LED NOT_A_PIN
+#define HAS_LED                 GPIO_NUM_4      // onboard red LED
 
 // GPS settings
 #define HAS_GPS         1                       // use on board GPS

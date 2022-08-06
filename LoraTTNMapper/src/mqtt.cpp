@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "mqtt.h"
 
+static const char TAG[] = __FILE__;
+
 #if (USE_MQTT)
 PubSubClient MqttClient(wifiClient);
 

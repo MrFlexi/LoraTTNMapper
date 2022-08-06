@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "payload.h"
 
+static const char TAG[] = __FILE__;
+
 PayloadConvert::PayloadConvert(uint8_t size)
 {
   buffer = (uint8_t *)malloc(size);

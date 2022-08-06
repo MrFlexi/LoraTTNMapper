@@ -3,15 +3,17 @@
 #include <esp_adc_cal.h>
 #include "globals.h"
 
+static const char TAG[] = __FILE__;
+
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 100k/100k on board
 #define DEFAULT_VREF 1100
-#define NO_OF_SAMPLES 200 // we do some multisampling to get better values
+#define NO_OF_SAMPLES 100 // we do some multisampling to get better values
 
 esp_adc_cal_characteristics_t *adc_characs =
     (esp_adc_cal_characteristics_t *)calloc(
         1, sizeof(esp_adc_cal_characteristics_t));
 
-static const adc1_channel_t adc_channel = ADC1_GPIO36_CHANNEL;   // Tbeam GPIO36  PIN VP
+static const adc1_channel_t adc_channel = ADC1_CHANNEL_0;   // Tbeam GPIO36  PIN VP
 static const adc_atten_t atten = ADC_ATTEN_DB_11;
 static const adc_unit_t unit = ADC_UNIT_1;
 

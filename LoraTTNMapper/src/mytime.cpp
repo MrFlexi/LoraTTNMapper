@@ -3,6 +3,8 @@
 #include "time.h"
 #include <sys/time.h>
 
+static const char TAG[] = __FILE__;
+
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
@@ -89,4 +91,19 @@ void setup_time()
 #endif
 
   printLocalTime();
+}
+
+void handle_time()
+{
+  struct tm timeinfo;
+#if (USE_GPS)
+  set_time_from_gps();
+#endif
+
+  if (getLocalTime(&timeinfo))
+  {
+    dataBuffer.data.timeinfo = timeinfo;
+    dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
+    dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
+  }
 }

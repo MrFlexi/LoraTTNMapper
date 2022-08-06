@@ -7,6 +7,7 @@
 #define BatteryService BLEUUID((uint16_t)0x180F)
 
 // Temperature Characteristic and Descriptor
+static const char TAG[] = __FILE__;
 
 BLECharacteristic bmeTemperatureCharacteristics(BLEUUID((uint16_t)0x2A6E), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
 BLEDescriptor bmeTemperatureDescriptor(BLEUUID((uint16_t)0x2902));

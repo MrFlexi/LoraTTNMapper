@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "globals.h"
 
+static const char TAG[] = __FILE__;
+
 #if (USE_DISTANCE_SENSOR_HCSR04)
-
-
 HCSR04 ultrasonicSensor(HCSR04_trigger_pin,HCSR04_echo_pin, 20, 300);
 
 void t_getHcsr04Values(void *parameter)

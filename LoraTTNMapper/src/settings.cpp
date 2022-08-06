@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "settings.h"
 
+static const char TAG[] = __FILE__;
+
 // eSPIFFS fileSystem;
 String message;
 const char *filename = "/settings.jsn";
