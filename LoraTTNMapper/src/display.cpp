@@ -8,7 +8,7 @@ U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
 int PageNumber = 0;
 char sbuf[32];
-uint8_t page_array[10];
+uint8_t page_array[13];
 uint8_t max_page_counter;
 uint8_t page_counter = 0;
 
@@ -108,24 +108,7 @@ void t_moveDisplayRTOS(void *pvParameters)
 #endif
 }
 
-void t_moveDisplay(void)
-{
-#if (USE_DISPLAY)
 
-  if (dataBuffer.data.pictureLoop)
-  {
-    if (page_counter < max_page_counter)
-    {
-      page_counter++;
-    }
-    else
-    {
-      page_counter = 0;
-    }
-    PageNumber = page_array[page_counter];
-  }
-#endif
-}
 
 #if (HAS_TFT_DISPLAY)
 
@@ -203,7 +186,7 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
   switch (symbol)
   {
   case SUN:
-    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
+    u8g2.setFont(u8g2_font_open_iconic_weather_8x_t);
     u8g2.drawGlyph(x, y, 69);
     break;
   case SUN_CLOUD:
@@ -230,6 +213,10 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
     u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
     u8g2.drawGlyph(x, y, 225);
     break;
+  case ICON_SMILE:
+    u8g2.setFont(u8g2_font_emoticons21_tr);
+    u8g2.drawGlyph(x, y, 17);
+    break;  
   }
 }
 
@@ -246,14 +233,25 @@ void showPage(int page)
   {
 
     u8g2.clearBuffer();
+    u8g2.clearDisplay();
     uint8_t icon = 0;
+
+    //ESP_LOGI(TAG, "Display page: %d", page);
 
     switch (page)
     {
+
+case PAGE_BOOT:      
+      drawSymbol(30, 40, SUN);      
+      //drawSymbol(30, 40, ICON_SMILE);      
+      u8g2.setFont(u8g2_font_ncenB12_tr);      
+      u8g2.drawStr(1, 60, "booting...");
+      break;
+
     case PAGE_TBEAM:
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(1, 15);
-      u8g2.printf("Firmware:  %.2f", dataBuffer.data.firmware_version);
+      u8g2.printf("Mr Flexi TTN %.2f", dataBuffer.data.firmware_version);
 
       u8g2.setCursor(1, 30);
       u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter);
@@ -436,15 +434,15 @@ void showPage(int page)
 
       u8g2.setCursor(1, 64);
       u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);
-      drawSymbol(60, 12, SUN);
+      drawSymbol(60, 12, THUNDER);
+
       break;
     }
-
     //---------------------------------
     //----------   Footer   -----------
     //---------------------------------
 
-    if (page != PAGE_SLEEP)
+    if (page < 20)
     {
       u8g2.setFont(u8g2_font_profont12_tr);
       u8g2.setCursor(96, 64);
@@ -454,4 +452,29 @@ void showPage(int page)
     u8g2.sendBuffer();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
+}
+
+void t_moveDisplay(void)
+{
+#if (USE_DISPLAY)
+
+  if (dataBuffer.data.pictureLoop)
+  {
+    if (page_counter < max_page_counter)
+    {
+      page_counter++;
+      //ESP_LOGI(TAG, "P counter: %d", page_counter);
+    }
+    else
+    {
+      page_counter = 0;
+      ESP_LOGI(TAG, "P counter set to 0");
+    }
+    PageNumber = page_array[page_counter];
+
+    // Refresh Display
+  showPage(PageNumber);
+
+  }
+#endif
 }

@@ -21,12 +21,11 @@
 #define USE_SERIAL_BT 0
 #define USE_SUN_POSITION 1
 
-#define USE_SOIL_MOISTURE 1 
+#define USE_SOIL_MOISTURE 0 
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   1
 #define sendWebsocketIntervall          10 // every x seconds
-#define USE_CAYENNE     0
 #define USE_MQTT 1
 #define USE_MQTT_SENSORS 1
 #define USE_MQTT_TRAIN 0
@@ -71,8 +70,8 @@
 #define SLEEP_AFTER_N_TX_COUNT 10               // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1     // If battery voltage < 3.7  --> sleep for 54 Minutes
-#define TIME_TO_SLEEP_BAT_HIGH  14
-#define TIME_TO_SLEEP_BAT_MID 54
+#define TIME_TO_SLEEP_BAT_HIGH  6
+#define TIME_TO_SLEEP_BAT_MID 14
 #define TIME_TO_SLEEP_BAT_LOW  114
 #define BAT_LOW   37         // 3.7 Volt
 #define BAT_HIGH  40 

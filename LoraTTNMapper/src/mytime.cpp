@@ -105,5 +105,6 @@ void handle_time()
     dataBuffer.data.timeinfo = timeinfo;
     dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
     dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
+    Serial.println(&dataBuffer.data.timeinfo, "%A, %B %d %Y %H:%M:%S");
   }
 }

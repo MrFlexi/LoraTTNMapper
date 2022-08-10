@@ -340,7 +340,7 @@ void t_cyclic() // Intervall: Display Refresh
   else
   {
 #if (USE_BME280)
-    temp = bme.readTemperature();
+    float temp = bme.readTemperature();
     if (temp < 60)
     {
       dataBuffer.data.temperature = smooth_temp.smooth(temp);
@@ -352,7 +352,6 @@ void t_cyclic() // Intervall: Display Refresh
 #if (HAS_PMU)
     dataBuffer.data.bus_voltage = pmu.getVbusVoltage() / 1000;
     dataBuffer.data.bus_current = pmu.getVbusCurrent();
-
     dataBuffer.data.bat_voltage = smooth_batvol.smooth(pmu.getBattVoltage() / 1000);
     dataBuffer.data.bat_charge_current = pmu.getBattChargeCurrent();
     dataBuffer.data.bat_discharge_current = pmu.getBattDischargeCurrent();
@@ -420,14 +419,7 @@ void t_cyclic() // Intervall: Display Refresh
   ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture);
 #endif
 
-// Refresh Display
-#if (USE_DISPLAY)
-  ESP_LOGV(TAG, "update display");
-  if (dataBuffer.data.runmode > 0)
-    showPage(PageNumber);
-#endif
-
-    //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -576,7 +568,7 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
-  
+
 // LED Sunrise
 #ifdef HAS_LED
   ledcSetup(0, 10000, 8);
@@ -663,7 +655,11 @@ void setup()
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
+#if (USE_DISPLAY)
   setup_display();
+  showPage(PAGE_BOOT);
+#endif
+
   setup_wifi();
   calibrate_voltage();
   delay(500);

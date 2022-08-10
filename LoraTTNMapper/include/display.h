@@ -14,9 +14,11 @@
 #define THUNDER 4
 #define SLEEP 10
 #define ICON_NOTES 11
+#define ICON_SMILE 12
 
-#define PAGE_MODULS 0
-#define PAGE_TBEAM 1
+
+#define PAGE_TBEAM 0
+#define PAGE_MODULS 1
 #define PAGE_LORA 2
 #define PAGE_GPS 3
 #define PAGE_SOLAR 4
@@ -27,6 +29,7 @@
 #define PAGE_SUN 9
 
 #define PAGE_SLEEP 20         // Pages > 20 are not in the picture loop
+#define PAGE_BOOT 21
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32

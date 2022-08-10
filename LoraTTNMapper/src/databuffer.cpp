@@ -87,9 +87,6 @@ JsonObject sensors_8 = sensors.createNestedObject();
   sensors_8["subheader"] = s;
   sensors_8["value"] = s;
   sensors_8["unit"] = "";
-  Serial.println("make it json for websocket");
-  Serial.println(&dataBuffer.data.timeinfo, "%A, %B %d %Y %H:%M:%S");
-
   serializeJson(doc, JsonStr);
   return JsonStr;
 }

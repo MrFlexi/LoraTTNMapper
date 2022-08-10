@@ -53,12 +53,12 @@ void t_enqueue_LORA_messages()
     //payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
     //payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
-#if (USE_GPS)
-    if (gps.checkGpsFix())
-    {
-      //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-    }
-#endif
+//#if (USE_GPS)
+//    if (gps.checkGpsFix())
+//    {
+//      //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+//    }
+//#endif
 
 
 
@@ -84,12 +84,9 @@ void t_enqueue_LORA_messages()
     #if (USE_BME280)
     payload.addBMETemp(01); // (channel, 4 bytes)
     #endif
-    payload.enqueue_port(2); // send data
-    
 
-    //payload.reset();
-    //payload.addPMU(01);      //(channel, 10 bytes)
-    //payload.enqueue_port(3); // send data
+    payload.enqueue_port(2); // send data    
+    
 #endif
 }
 
