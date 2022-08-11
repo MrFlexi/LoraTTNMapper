@@ -19,6 +19,7 @@ void Neo6m::encode()
     while (GPSSerial.available())
     {
       char data = GPSSerial.read();
+      //Serial.print(data);
       tGps.encode(data);
     }
   }
@@ -190,10 +191,7 @@ void Neo6m::resetDistance()
   }
   else dataBuffer.data.gps_distance = 0;
   ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
-
-
   }
-
   
 }
 Neo6m gps;

@@ -81,10 +81,22 @@ void t_enqueue_LORA_messages()
     payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
     #endif
 
+    #if (USE_SOIL_MOISTURE)
+    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+    #endif
+
+    #if (USE_DISTANCE_SENSOR_HCSR04)
+  // HC-SR04 Sonic distance sensor
+  payload.addFloatN(0x01, LPP_HCSR04_DISTANCE, dataBuffer.data.hcsr04_distance);
+  //measurement["HCSR04_Distance"] = data.hcsr04_distance;
+#endif
+
+
     #if (USE_BME280)
     payload.addBMETemp(01); // (channel, 4 bytes)
     #endif
 
+    payload.addDeviceData(0); // (channel, 4 bytes)
     payload.enqueue_port(2); // send data    
     
 #endif
@@ -133,7 +145,7 @@ void t_LORA_send_from_queue(osjob_t *j)
 
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
-        ESP_LOGV(TAG, "Lora trying to send:");
+        ESP_LOGI(TAG, "Lora trying to send from queue:");
         dump_single_message(SendBuffer);
         LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
@@ -146,7 +158,7 @@ void t_LORA_send_from_queue(osjob_t *j)
     {
       ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
     }
-    ESP_LOGV(TAG, "New callback scheduled...");
+    ESP_LOGI(TAG, "New callback scheduled...");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
@@ -306,7 +318,7 @@ void onEvent(ev_t ev)
       }
     }
     // Schedule next transmission
-    log_display("Next TX started");
+    ESP_LOGI(TAG, "Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
     break;

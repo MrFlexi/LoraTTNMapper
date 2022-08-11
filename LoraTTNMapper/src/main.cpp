@@ -27,21 +27,28 @@ void setup_gps_reset()
 {
 
   SerialGPS.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
-  Serial.println("All comms started");
+  ESP_LOGI(TAG, "Configure GPS Module");
   delay(100);
 
+  // http://aprs.gids.nl/nmea/#vtg    NEMA Message overview
   if (myGPS.begin(SerialGPS))
   {
     Serial.println("Connected to GPS");
     myGPS.setUART1Output(COM_TYPE_NMEA); // Set the UART port to output NMEA only
-    myGPS.saveConfiguration();           // Save the current settings to flash and BBR
+
     Serial.println("GPS serial connected, output set to NMEA");
     myGPS.disableNMEAMessage(UBX_NMEA_GLL, COM_PORT_UART1);
-    myGPS.disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
+    // myGPS.disableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
     myGPS.disableNMEAMessage(UBX_NMEA_GSV, COM_PORT_UART1);
     myGPS.disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
-    myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+
+    //myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+    myGPS.enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+
     myGPS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
+
+    myGPS.disableNMEAMessage(UBX_NMEA_ZDA, COM_PORT_UART1);
+    //myGPS.enableNMEAMessage(UBX_NMEA_ZDA, COM_PORT_UART1);
     myGPS.saveConfiguration(); // Save the current settings to flash and BBR
   }
   delay(1000);
@@ -437,14 +444,7 @@ void t_cyclic() // Intervall: Display Refresh
 void t_sleep()
 {
 
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo))
-  {
-    ESP_LOGI(TAG, "Failed to obtain time");
-  }
-
-  //ESP_LOGI(TAG, "Time: %A, %B %d %Y %H:%M:%S",&timeinfo );
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  printLocalTime();
 
 #if (USE_GPS_MOTION)
   gps.getDistance();
@@ -691,7 +691,7 @@ void setup()
 #endif
 
 #if (USE_GPS)
-  // setup_gps_reset(); // Hard reset
+  setup_gps_reset(); // Hard reset
   gps.init();
   // gps.softwareReset();
   gps.wakeup();

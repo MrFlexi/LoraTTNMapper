@@ -9,20 +9,20 @@ HCSR04 ultrasonicSensor(HCSR04_trigger_pin,HCSR04_echo_pin, 20, 300);
 void t_getHcsr04Values(void *parameter)
 {
   DataBuffer *locdataBuffer;
-  float distance;
-  float distance_old;
+  uint16_t distance;
+  uint16_t distance_old;
   locdataBuffer = (DataBuffer *)parameter;
 
   //Continuously sample 
   while (1)
   {
-    distance = ultrasonicSensor.getMedianFilterDistance();
+    distance = (uint16_t)ultrasonicSensor.getMedianFilterDistance();
     if (distance != distance_old)
     {
       distance_old = distance;
-      locdataBuffer->data.distance = distance;
+      locdataBuffer->data.hcsr04_distance = distance;
       locdataBuffer->data.distance_changed = true;
-      ESP_LOGI(TAG, "HC-SR04 Distance: %.2f", locdataBuffer->data.distance );
+      ESP_LOGI(TAG, "HC-SR04 Distance: %d", locdataBuffer->data.hcsr04_distance );
     }
     vTaskDelay(2000);
   }

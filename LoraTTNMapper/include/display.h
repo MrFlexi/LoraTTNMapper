@@ -15,6 +15,7 @@
 #define SLEEP 10
 #define ICON_NOTES 11
 #define ICON_SMILE 12
+#define ICON_BOOT  13
 
 
 #define PAGE_TBEAM 0

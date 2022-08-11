@@ -3,6 +3,9 @@
 
 static const char TAG[] = __FILE__;
 
+//-------------------------------------------------------------------------------
+// 128*64 Pixel --> Center = 64*32
+//-------------------------------------------------------------------------------
 HAS_DISPLAY u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL, /* data=*/SDA); // ESP32 Thing, HW I2C with pin remapping
 U8G2LOG u8g2log;
 uint8_t u8log_buffer[U8LOG_WIDTH * U8LOG_HEIGHT];
@@ -210,9 +213,13 @@ void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
     u8g2.drawGlyph(x, y, 72);
     break;
   case ICON_NOTES:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
+    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);   // 32x32 Pixel 
     u8g2.drawGlyph(x, y, 225);
     break;
+  case ICON_BOOT:
+    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);   // 32x32 Pixel 
+    u8g2.drawGlyph(x, y, 145);
+    break;  
   case ICON_SMILE:
     u8g2.setFont(u8g2_font_emoticons21_tr);
     u8g2.drawGlyph(x, y, 17);
@@ -242,8 +249,10 @@ void showPage(int page)
     {
 
 case PAGE_BOOT:      
-      drawSymbol(30, 40, SUN);      
-      //drawSymbol(30, 40, ICON_SMILE);      
+      //drawSymbol(30, 40, SUN);      
+      //drawSymbol(30, 40, ICON_SMILE);   
+      drawSymbol(48, 32, ICON_BOOT);   // place in the center of display
+      
       u8g2.setFont(u8g2_font_ncenB12_tr);      
       u8g2.drawStr(1, 60, "booting...");
       break;

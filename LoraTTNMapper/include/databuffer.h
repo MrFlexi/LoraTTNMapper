@@ -62,7 +62,7 @@ typedef struct
   String image_url = "/get_last_detected";
   uint8_t operation_mode = 0;
   esp_sleep_wakeup_cause_t wakeup_reason;
-  float distance = 0;
+  uint16_t hcsr04_distance = 0;     // in cm
   bool distance_changed;
   TinyGPSLocation gps;
   TinyGPSLocation gps_old;

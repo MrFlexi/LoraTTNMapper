@@ -6,7 +6,9 @@ function lppDecode(bytes) {
         136: { 'size': 9, 'name': 'gps', 'signed': true, 'divisor': [10000, 10000, 100] },
         0xc9: { 'size': 10, 'name': 'pmu', 'signed': true, 'divisor': 100 },
         0xca: { 'size': 2, 'name': 'soil_moisture', 'signed': true, 'divisor': 100 },
-        0xcb: { 'size': 4, 'name': 'bme280', 'signed': true, 'divisor': [100, 100] }
+        0xcb: { 'size': 4, 'name': 'bme280', 'signed': true, 'divisor': [100, 100] },
+        0xcc: { 'size': 4, 'name': 'device', 'signed': false, 'divisor': [1, 1, 1] },
+        0xcd: { 'size': 2, 'name': 'hcsr04_distance', 'signed': false, 'divisor': [1] }
     };
 
     function isObject(item) {
@@ -66,6 +68,13 @@ function lppDecode(bytes) {
                 s_value = {
                     'temperature': arrToDec(bytes.slice(i + 0, i + 2), true, type.divisor[0]),
                     'humidity': arrToDec(bytes.slice(i + 2, i + 4), false, type.divisor[1]),
+                };
+                break;
+
+            case 0xcc: // 204 Device Info 
+                s_value = {
+                    'dev_boot_counter': arrToDec(bytes.slice(i + 0, i + 2), false, type.divisor[0]),
+                    'dev_sleep_time': arrToDec(bytes.slice(i + 2, i + 4), false, type.divisor[1]),
                 };
                 break;
             default:
@@ -158,10 +167,11 @@ function decodeUplink(input) {
 
 //let buffer = new Uint8Array([0x01, 0xcb, 0x00,0xff,0x00,0xff]);     // 0xcb = BME280
 //let buffer = new Uint8Array([0x01, 0xca, 0x00,0xff]);               // 0xca = SOIL Moisture
-
+//let buffer = new Uint8Array([0x01, 0xcc, 0x00,0x01,0x00,0x01]);     // 0xcc = Device Info
+  let buffer = new Uint8Array([0x01, 0xcd, 0x00,0x01]);     // 0xcc = Device Info
 //let buffer = new Uint8Array([0x01, 0xc9, 0x00,0xff,0x00,0xff,0x01, 0xca, 0x00,0xff,0x03,0xe8]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8
 
-let buffer = new Uint8Array([0x01, 0xc9, 0x00, 0xff, 0x00, 0xff, 0x01, 0xca, 0x00, 0xff, 0x03, 0xe8, 0x01, 0xca, 0x00, 0xff, 0x01, 0xcb, 0x00, 0x10, 0x00, 0x20]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8 01 ca 00 ff
+//let buffer = new Uint8Array([0x01, 0xc9, 0x00, 0xff, 0x00, 0xff, 0x01, 0xca, 0x00, 0xff, 0x03, 0xe8, 0x01, 0xca, 0x00, 0xff, 0x01, 0xcb, 0x00, 0x10, 0x00, 0x20]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8 01 ca 00 ff
 
 console.log(buffer);
 var ttn = {

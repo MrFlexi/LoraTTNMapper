@@ -36,7 +36,8 @@
 			"type_traits": "cpp",
 			"cmath": "cpp",
 			"fstream": "cpp",
-			"utility": "cpp"
+			"utility": "cpp",
+			"iterator": "cpp"
 		}
 	}
 }

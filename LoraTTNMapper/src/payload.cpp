@@ -90,6 +90,18 @@ void PayloadConvert::addBMETemp(uint8_t channel)
 #endif
 }
 
+void PayloadConvert::addDeviceData(uint8_t channel){
+ 
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_DEVICE;
+  buffer[cursor++] = highByte(dataBuffer.data.bootCounter);
+  buffer[cursor++] = lowByte(dataBuffer.data.bootCounter);
+  buffer[cursor++] = highByte(dataBuffer.settings.sleep_time);
+  buffer[cursor++] = lowByte(dataBuffer.settings.sleep_time); 
+#endif
+}
+
+
 void PayloadConvert::addPMU(uint8_t channel)
 {
 
@@ -214,7 +226,6 @@ void PayloadConvert::enqueue_port(uint8_t port)
 #endif
 }
 
-#endif
 
 void lora_queue_init(void)
 {

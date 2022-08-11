@@ -113,6 +113,7 @@ String DataBuffer::to_json()
   measurement["bat_fuel_gauge"] = data.bat_DeltamAh;
   measurement["bus_voltage"] = data.bus_voltage;
   measurement["bus_current"] = data.bus_current;
+  measurement["bat_max_charge_curr"] = settings.bat_max_charge_current;
 
 #if (HAS_INA219)
   measurement["panel_voltage"] = data.panel_voltage;
@@ -120,9 +121,8 @@ String DataBuffer::to_json()
 #endif
 
   // Device
-  measurement["sleep_time"] = settings.sleep_time;
-  measurement["bat_max_charge_curr"] = settings.bat_max_charge_current;
-  measurement["BootCounter"] = data.bootCounter;
+  measurement["dev_sleep_time"] = settings.sleep_time;  
+  measurement["dev_boot_counter"] = data.bootCounter;
 
   // BME280
   measurement["temperature"] = data.temperature;
@@ -131,7 +131,7 @@ String DataBuffer::to_json()
 
 #if (USE_DISTANCE_SENSOR_HCSR04)
   // HC-SR04 Sonic distance sensor
-  measurement["HCSR04_Distance"] = data.distance;
+  measurement["hcsr04_distance"] = data.hcsr04_distance;
 #endif
 
 // Camera
