@@ -1,4 +1,8 @@
 
+//--------------------------------------------------------------------------
+// Device ID
+//--------------------------------------------------------------------------
+// 01    --> T-Beam   W-Lan and BLE defect
 //----------------------------------------------------------------
 // GPIO 02   Output Distance Sensor Trigger
 // GPIO 13   Input  Distance Sensor Echo
@@ -15,7 +19,7 @@
 #define HAS_INA3221  0
 #define HAS_INA219  0
 #define USE_GPS 1
-#define USE_DISPLAY 1
+#define USE_DISPLAY 0
 
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
@@ -24,12 +28,12 @@
 
 #define USE_SPIFF_LOGGING 0
 
-#define USE_WIFI 1
+#define USE_WIFI 0
 #define USE_WIFI_MANAGER 0
-#define USE_WEBSERVER   1 
+#define USE_WEBSERVER   0
 #define USE_CAYENNE 0
-#define USE_MQTT 1
-#define USE_MQTT_SENSORS 1
+#define USE_MQTT 0
+#define USE_MQTT_SENSORS 0
 #define USE_MQTT_TRAIN 0
 
 #define USE_FASTLED 0
@@ -37,7 +41,7 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
-#define USE_BLE_SERVER 1
+#define USE_BLE_SERVER 0
 #define USE_POTI 1
 #define USE_SOIL_MOISTURE 1
 
