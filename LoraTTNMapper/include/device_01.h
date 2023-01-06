@@ -14,12 +14,12 @@
 
 #define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 #define HAS_INA3221  0
 #define HAS_INA219  0
 #define USE_GPS 1
-#define USE_DISPLAY 0
+#define USE_DISPLAY 1
 
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
@@ -42,8 +42,8 @@
 #define FASTLED_SHOW_POTI 0
 
 #define USE_BLE_SERVER 0
-#define USE_POTI 1
-#define USE_SOIL_MOISTURE 1
+#define USE_POTI 0
+#define USE_SOIL_MOISTURE 0
 
 #define USE_DISTANCE_SENSOR_HCSR04 1       // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_2
@@ -81,7 +81,7 @@
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  10 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
-#define AUTO_POWER_SAVE 1    // If battery voltage < 3.7  --> sleep for 54 Minutes
+#define AUTO_POWER_SAVE 0    // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
 #define TIME_TO_SLEEP_BAT_MID 18
 #define TIME_TO_SLEEP_BAT_LOW  54

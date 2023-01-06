@@ -48,8 +48,8 @@
 #define LORA_TX_INTERVAL 30           // Transmitt Lora messages
 #define LORA_DATARATE DR_SF10
 
-#define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  10 // Update Webpage
+#define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall  30 // Update Webpage
 #define sunTrackerRefreshIntervall 120
 
 #define PAYLOAD_ENCODER 3

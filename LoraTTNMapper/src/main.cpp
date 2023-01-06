@@ -691,7 +691,7 @@ void setup()
 #endif
 
 #if (USE_GPS)
-  setup_gps_reset(); // Hard reset
+  // setup_gps_reset(); // Hard reset
   gps.init();
   // gps.softwareReset();
   gps.wakeup();
