@@ -45,7 +45,7 @@
 #define USE_POTI 0
 #define USE_SOIL_MOISTURE 0
 
-#define USE_DISTANCE_SENSOR_HCSR04 1       // Ultrasonic distance sensor
+#define USE_DISTANCE_SENSOR_HCSR04 0       // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_2
 #define HCSR04_echo_pin     GPIO_NUM_13
 

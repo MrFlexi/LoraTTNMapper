@@ -71,7 +71,7 @@ void calc_sun()
   //Serial.println();
   Serial.println("Sun Azimuth and Elevation Munich");
 
-  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 0, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
+  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour + 1 , dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   //helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   ESP_LOGI(TAG, "Azimuth: %lf5.1 Elevation: %lf5.1", helios.dAzimuth, helios.dElevation);
   
@@ -152,6 +152,7 @@ void servo_move_to_sun()
     uint8_t servo2_pos = (uint8_t) dataBuffer.data.sun_elevation;
    
     save_servo_position_to_flash(servo1_pos, servo2_pos);
+    printLocalTime();
     ESP_LOGI(TAG, "Turning servos to   : %d  %d", servo1_pos, servo2_pos);
     dataBuffer.settings.sunTrackerPositionAdjusted = true;
 
