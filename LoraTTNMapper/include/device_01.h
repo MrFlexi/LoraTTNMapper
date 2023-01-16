@@ -14,7 +14,7 @@
 
 #define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 0
-#define USE_BME280 1
+#define USE_BME280 0
 #define HAS_LORA 1
 #define HAS_INA3221  0
 #define HAS_INA219  0
@@ -64,7 +64,7 @@
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3
-#define PAYLOAD_BUFFER_SIZE 51
+#define PAYLOAD_BUFFER_SIZE 60
 #define SEND_QUEUE_SIZE 10
 #define PAD_TRESHOLD 40
 
@@ -78,10 +78,10 @@
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  10 // // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
-#define AUTO_POWER_SAVE 0    // If battery voltage < 3.7  --> sleep for 54 Minutes
+#define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6
 #define TIME_TO_SLEEP_BAT_MID 18
 #define TIME_TO_SLEEP_BAT_LOW  54

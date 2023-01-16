@@ -38,6 +38,45 @@ uint16_t xPos = 0;
 
 #endif
 
+#if (DEVICE_ID == SUN_TRACKER)
+void displayRegisterPagesSunTracker()
+{
+
+  max_page_counter = 0;
+  page_array[max_page_counter] = PAGE_TBEAM;
+
+#if (HAS_LORA)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_LORA;
+#endif
+
+#if (HAS_INA3221 || HAS_INA219)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SOLAR;
+#endif
+
+#if (HAS_PMU)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_BAT;
+#endif
+
+#if (USE_GPS)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_GPS;
+#endif
+
+#if (USE_BME280)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SENSORS;
+#endif
+
+#if (USE_SUN_POSITION)
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SUN;
+#endif
+}
+#endif
+
 void displayRegisterPages()
 {
 
@@ -81,17 +120,17 @@ void displayRegisterPages()
 void log_display(String s)
 {
   Serial.println(s);
-  //Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
+  // Serial.print("Runmode:");Serial.println(dataBuffer.data.runmode);
 
 #if (USE_SERIAL_BT)
   SerialBT.println(s);
 #endif
 
-  //if (dataBuffer.data.runmode < 1)
+  // if (dataBuffer.data.runmode < 1)
   //{
-  //  u8g2log.print(s);
-  //  u8g2log.print("\n");
-  //}
+  //   u8g2log.print(s);
+  //   u8g2log.print("\n");
+  // }
 
 #if (HAS_TFT_DISPLAY)
   tft.println(s);
@@ -110,8 +149,6 @@ void t_moveDisplayRTOS(void *pvParameters)
   }
 #endif
 }
-
-
 
 #if (HAS_TFT_DISPLAY)
 
@@ -138,8 +175,8 @@ bool setupTFTDisplay()
   tft.setRotation(0);
   tft.fillScreen(TFT_BLUE);
 
-  //tft.setTextDatum(MC_DATUM);
-  //tft.drawString("MrFlexi PlantServ", 20, 10);
+  // tft.setTextDatum(MC_DATUM);
+  // tft.drawString("MrFlexi PlantServ", 20, 10);
   pinMode(TFT_BL_PIN, OUTPUT);
   digitalWrite(TFT_BL_PIN, HIGH);
 
@@ -174,316 +211,319 @@ void setup_display(void)
   u8g2.enableUTF8Print();
 #endif
 
-  log_display("SAP GTT");
-  log_display("TTN-ABP-Mapper");
-  displayRegisterPages();
-}
-
-void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
-{
-  // fonts used:
-  // u8g2_font_open_iconic_embedded_6x_t
-  // u8g2_font_open_iconic_weather_6x_t
-  // encoding values, see: https://github.com/olikraus/u8g2/wiki/fntgrpiconic
-
-  switch (symbol)
+  switch (DEVICE_ID)
   {
-  case SUN:
-    u8g2.setFont(u8g2_font_open_iconic_weather_8x_t);
-    u8g2.drawGlyph(x, y, 69);
+  case SUN_TRACKER:
+    displayRegisterPagesSunTracker();
     break;
-  case SUN_CLOUD:
-    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
-    u8g2.drawGlyph(x, y, 65);
-    break;
-  case CLOUD:
-    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
-    u8g2.drawGlyph(x, y, 64);
-    break;
-  case RAIN:
-    u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
-    u8g2.drawGlyph(x, y, 67);
-    break;
-  case THUNDER:
-    u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
-    u8g2.drawGlyph(x, y, 67);
-    break;
-  case SLEEP:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-    u8g2.drawGlyph(x, y, 72);
-    break;
-  case ICON_NOTES:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);   // 32x32 Pixel 
-    u8g2.drawGlyph(x, y, 225);
-    break;
-  case ICON_BOOT:
-    u8g2.setFont(u8g2_font_open_iconic_all_4x_t);   // 32x32 Pixel 
-    u8g2.drawGlyph(x, y, 145);
-    break;  
-  case ICON_SMILE:
-    u8g2.setFont(u8g2_font_emoticons21_tr);
-    u8g2.drawGlyph(x, y, 17);
-    break;  
+  default:
+    displayRegisterPages();
   }
 }
 
-void showPage(int page)
-{
-
-  String IP_String = "";
-  String availableModules = "";
-
-  // block i2c bus access
-  if (!I2C_MUTEX_LOCK())
-    ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
-  else
+  void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
   {
+    // fonts used:
+    // u8g2_font_open_iconic_embedded_6x_t
+    // u8g2_font_open_iconic_weather_6x_t
+    // encoding values, see: https://github.com/olikraus/u8g2/wiki/fntgrpiconic
 
-    u8g2.clearBuffer();
-    u8g2.clearDisplay();
-    uint8_t icon = 0;
-
-    //ESP_LOGI(TAG, "Display page: %d", page);
-
-    switch (page)
+    switch (symbol)
     {
-
-case PAGE_BOOT:      
-      //drawSymbol(30, 40, SUN);      
-      //drawSymbol(30, 40, ICON_SMILE);   
-      drawSymbol(48, 32, ICON_BOOT);   // place in the center of display
-      
-      u8g2.setFont(u8g2_font_ncenB12_tr);      
-      u8g2.drawStr(1, 60, "booting...");
+    case SUN:
+      u8g2.setFont(u8g2_font_open_iconic_weather_8x_t);
+      u8g2.drawGlyph(x, y, 69);
       break;
-
-    case PAGE_TBEAM:
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 15);
-      u8g2.printf("Mr Flexi TTN %.2f", dataBuffer.data.firmware_version);
-
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter);
-
-      u8g2.setCursor(1, 45);
-      u8g2.printf("Deep Sleep for: %3d", dataBuffer.settings.sleep_time);
-
-      u8g2.setCursor(1, 60);
-      u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
-      u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
-    break;
-
-
-    case PAGE_MODULS:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      sprintf(sbuf, "Moduls");
-      u8g2.drawStr(1, 15, sbuf);
-
-      u8g2.setFont(u8g2_font_profont12_tr);
-
-      // WLAN
-      u8g2.setCursor(1, 30);
-      if (dataBuffer.data.wlan)
-        u8g2.printf("WLAN");
-
-      // BLE
-      u8g2.setCursor(40, 30);       
-      if (dataBuffer.data.ble_device_connected)
-        u8g2.printf("BLE");
-
-      u8g2.setDrawColor(1);
-      u8g2.setCursor(64, 30);
-      u8g2.printf("LORA");
+    case SUN_CLOUD:
+      u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
+      u8g2.drawGlyph(x, y, 65);
       break;
-
-    case PAGE_LORA:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "LORA TX/RX");
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
-      u8g2.setCursor(64, 30);
-      u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
-      u8g2.setCursor(1, 45);
-      u8g2.printf("RX %.3d Len:%.2d", dataBuffer.data.rxCounter, dataBuffer.data.lmic.dataLen);
-      u8g2.setCursor(1, 60);
-      u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
+    case CLOUD:
+      u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
+      u8g2.drawGlyph(x, y, 64);
       break;
-
-    case PAGE_GPS:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "GPS");
-
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
-      u8g2.setCursor(64, 30);
-      u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
-
-      u8g2.setCursor(1, 40);
-      u8g2.printf("Alt:%.4g m", gps.tGps.altitude.meters());
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
+    case RAIN:
+      u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
+      u8g2.drawGlyph(x, y, 67);
       break;
-
-    case PAGE_SOLAR:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Solar Panel");
-      u8g2.setFont(u8g2_font_profont12_tr);
-
-#if (HAS_INA3221 || HAS_INA219)
-      u8g2.setCursor(1, 30);
-      u8g2.printf("In: %.2f V  %.0f mA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
-#endif
-
-#if (HAS_PMU)
-      u8g2.setCursor(1, 40);
-      u8g2.printf("PMU Bus: %.2fV  %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
-#else
-      u8g2.setCursor(1, 40);
-      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
-#endif
+    case THUNDER:
+      u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
+      u8g2.drawGlyph(x, y, 67);
       break;
-
-    case PAGE_BAT:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Battery");
-      u8g2.setFont(u8g2_font_profont12_tr);
-
-#if (HAS_PMU)
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Volt:   %.2fV", dataBuffer.data.bat_voltage);
-
-      //u8g2.setCursor(1, 40);
-      //u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
-
-      u8g2.setCursor(1, 45);
-      u8g2.printf("Charge: %.0fmA ", dataBuffer.data.bat_charge_current);
-
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Fuel:   %.0fmAh ", dataBuffer.data.bat_DeltamAh);
-#else
-      u8g2.setCursor(1, 40);
-      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
-#endif
-
+    case SLEEP:
+      u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
+      u8g2.drawGlyph(x, y, 72);
       break;
-
-    case PAGE_SENSORS:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Sensors");
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Temp: %.2fC %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
-      u8g2.setCursor(1, 45);
-      u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
-      u8g2.setCursor(1, 60);
+    case ICON_NOTES:
+      u8g2.setFont(u8g2_font_open_iconic_all_4x_t); // 32x32 Pixel
+      u8g2.drawGlyph(x, y, 225);
       break;
-
-    case PAGE_GYRO:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "GYRO");
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Yaw  :%.2f", dataBuffer.data.yaw);
-      u8g2.setCursor(1, 45);
-      u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
+    case ICON_BOOT:
+      u8g2.setFont(u8g2_font_open_iconic_all_4x_t); // 32x32 Pixel
+      u8g2.drawGlyph(x, y, 145);
       break;
-
-    case PAGE_POTI:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Soil Moisture");
-      u8g2.setFont(u8g2_font_ncenB24_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("GPIO36: %d", dataBuffer.data.potentiometer_a);
-      u8g2.setCursor(1, 45);
-      u8g2.printf("Soil: %.0f", dataBuffer.data.soil_moisture);
-      break;
-
-    case PAGE_SUN:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Sun Position");
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(1, 30);
-      u8g2.printf("Azi: %.2f", dataBuffer.data.sun_azimuth);
-      u8g2.setCursor(1, 45);
-      u8g2.printf("Ele: %.2f", dataBuffer.data.sun_elevation);
-      u8g2.setCursor(1, 60);
-      u8g2.printf("Servo: %d  %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
-      break;
-
-    case PAGE_SLEEP:
-      u8g2.setFont(u8g2_font_ncenB12_tr);
-      u8g2.drawStr(1, 15, "Sleep");
-      u8g2.setFont(u8g2_font_profont12_tr);
-
-#if (HAS_PMU)
-      u8g2.setCursor(1, 25);
-      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
-      u8g2.setCursor(1, 35);
-      u8g2.printf("Fuel: %.0fmAh ", dataBuffer.data.bat_DeltamAh);
-#else
-      u8g2.setCursor(1, 25);
-      u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
-#endif
-
-      if (dataBuffer.data.MotionCounter <= 0)
-      {
-        u8g2.drawStr(1, 55, "Inactivity");
-      }
-
-#ifdef SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
-      if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
-      {
-        u8g2.drawStr(1, 55, "TX ");
-      }
-#endif
-
-      u8g2.setCursor(1, 64);
-      u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);
-      drawSymbol(60, 12, THUNDER);
-
+    case ICON_SMILE:
+      u8g2.setFont(u8g2_font_emoticons21_tr);
+      u8g2.drawGlyph(x, y, 17);
       break;
     }
-    //---------------------------------
-    //----------   Footer   -----------
-    //---------------------------------
-
-    if (page < 20)
-    {
-      u8g2.setFont(u8g2_font_profont12_tr);
-      u8g2.setCursor(96, 64);
-      u8g2.printf("%i min", dataBuffer.data.MotionCounter);
-    }
-
-    u8g2.sendBuffer();
-    I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
-}
 
-void t_moveDisplay(void)
-{
-#if (USE_DISPLAY)
-
-  if (dataBuffer.data.pictureLoop)
+  void showPage(int page)
   {
-    if (page_counter < max_page_counter)
-    {
-      page_counter++;
-      //ESP_LOGI(TAG, "P counter: %d", page_counter);
-    }
+
+    String IP_String = "";
+    String availableModules = "";
+
+    // block i2c bus access
+    if (!I2C_MUTEX_LOCK())
+      ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
     else
     {
-      page_counter = 0;
-      ESP_LOGI(TAG, "P counter set to 0");
-    }
-    PageNumber = page_array[page_counter];
 
-    // Refresh Display
-  showPage(PageNumber);
+      u8g2.clearBuffer();
+      u8g2.clearDisplay();
+      uint8_t icon = 0;
 
-  }
+      // ESP_LOGI(TAG, "Display page: %d", page);
+
+      switch (page)
+      {
+
+      case PAGE_BOOT:
+        // drawSymbol(30, 40, SUN);
+        // drawSymbol(30, 40, ICON_SMILE);
+        drawSymbol(48, 32, ICON_BOOT); // place in the center of display
+
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 60, "booting...");
+        break;
+
+      case PAGE_TBEAM:
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 15);
+        u8g2.printf("Mr Flexi TTN %.2f", dataBuffer.data.firmware_version);
+
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter);
+
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Deep Sleep for: %3d", dataBuffer.settings.sleep_time);
+
+        u8g2.setCursor(1, 60);
+        u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
+        u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
+        break;
+
+      case PAGE_MODULS:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        sprintf(sbuf, "Moduls");
+        u8g2.drawStr(1, 15, sbuf);
+
+        u8g2.setFont(u8g2_font_profont12_tr);
+
+        // WLAN
+        u8g2.setCursor(1, 30);
+        if (dataBuffer.data.wlan)
+          u8g2.printf("WLAN");
+
+        // BLE
+        u8g2.setCursor(40, 30);
+        if (dataBuffer.data.ble_device_connected)
+          u8g2.printf("BLE");
+
+        u8g2.setDrawColor(1);
+        u8g2.setCursor(64, 30);
+        u8g2.printf("LORA");
+        break;
+
+      case PAGE_LORA:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "LORA TX/RX");
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("TX:%.3d", dataBuffer.data.txCounter);
+        u8g2.setCursor(64, 30);
+        u8g2.printf("TX Que:%.2d", dataBuffer.data.LoraQueueCounter);
+        u8g2.setCursor(1, 45);
+        u8g2.printf("RX %.3d Len:%.2d", dataBuffer.data.rxCounter, dataBuffer.data.lmic.dataLen);
+        u8g2.setCursor(1, 60);
+        u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
+        break;
+
+      case PAGE_GPS:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "GPS");
+
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
+        u8g2.setCursor(64, 30);
+        u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
+
+        u8g2.setCursor(1, 40);
+        u8g2.printf("Alt:%.4g m", gps.tGps.altitude.meters());
+        u8g2.setCursor(1, 60);
+        u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
+        break;
+
+      case PAGE_SOLAR:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Solar Panel");
+        u8g2.setFont(u8g2_font_profont12_tr);
+
+#if (HAS_INA3221 || HAS_INA219)
+        u8g2.setCursor(1, 30);
+        u8g2.printf("In: %.2f V  %.0f mA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
 #endif
-}
+
+#if (HAS_PMU)
+        u8g2.setCursor(1, 40);
+        u8g2.printf("PMU Bus: %.2fV  %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
+#else
+        u8g2.setCursor(1, 40);
+        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
+        break;
+
+      case PAGE_BAT:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Battery");
+        u8g2.setFont(u8g2_font_profont12_tr);
+
+#if (HAS_PMU)
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Volt:   %.2fV", dataBuffer.data.bat_voltage);
+
+        // u8g2.setCursor(1, 40);
+        // u8g2.printf("Bat-: %.2fV %.0fmA ", dataBuffer.data.bat_voltage, dataBuffer.data.bat_discharge_current);
+
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Charge: %.0fmA ", dataBuffer.data.bat_charge_current);
+
+        u8g2.setCursor(1, 60);
+        u8g2.printf("Fuel:   %.0fmAh ", dataBuffer.data.bat_DeltamAh);
+#else
+        u8g2.setCursor(1, 40);
+        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
+
+        break;
+
+      case PAGE_SENSORS:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Sensors");
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Temp: %.2fC %.0f hum ", dataBuffer.data.temperature, dataBuffer.data.humidity);
+        u8g2.setCursor(1, 45);
+        u8g2.printf("CPU Temp: %.2f C ", dataBuffer.data.cpu_temperature);
+        u8g2.setCursor(1, 60);
+        break;
+
+      case PAGE_GYRO:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "GYRO");
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Yaw  :%.2f", dataBuffer.data.yaw);
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Pitch:%.2f", dataBuffer.data.pitch);
+        u8g2.setCursor(1, 60);
+        u8g2.printf("Roll  :%.2f", dataBuffer.data.roll);
+        break;
+
+      case PAGE_POTI:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Soil Moisture");
+        u8g2.setFont(u8g2_font_ncenB24_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("GPIO36: %d", dataBuffer.data.potentiometer_a);
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Soil: %.0f", dataBuffer.data.soil_moisture);
+        break;
+
+      case PAGE_SUN:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Sun Position");
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Azi: %.2f", dataBuffer.data.sun_azimuth);
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Ele: %.2f", dataBuffer.data.sun_elevation);
+        u8g2.setCursor(1, 60);
+        u8g2.printf("Servo: %d  %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
+        break;
+
+      case PAGE_SLEEP:
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Sleep");
+        u8g2.setFont(u8g2_font_profont12_tr);
+
+#if (HAS_PMU)
+        u8g2.setCursor(1, 25);
+        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+        u8g2.setCursor(1, 35);
+        u8g2.printf("Fuel: %.0fmAh ", dataBuffer.data.bat_DeltamAh);
+#else
+        u8g2.setCursor(1, 25);
+        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+#endif
+
+        if (dataBuffer.data.MotionCounter <= 0)
+        {
+          u8g2.drawStr(1, 55, "Inactivity");
+        }
+
+#ifdef SLEEP_AFTER_N_TX_COUNT 4 // after n Lora TX events
+        if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
+        {
+          u8g2.drawStr(1, 55, "TX ");
+        }
+#endif
+
+        u8g2.setCursor(1, 64);
+        u8g2.printf("Sleeping for %i min", dataBuffer.settings.sleep_time);
+        drawSymbol(60, 12, THUNDER);
+
+        break;
+      }
+      //---------------------------------
+      //----------   Footer   -----------
+      //---------------------------------
+
+      if (page < 20)
+      {
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(96, 64);
+        u8g2.printf("%i min", dataBuffer.data.MotionCounter);
+      }
+
+      u8g2.sendBuffer();
+      I2C_MUTEX_UNLOCK(); // release i2c bus access
+    }
+  }
+
+  void t_moveDisplay(void)
+  {
+#if (USE_DISPLAY)
+
+    if (dataBuffer.data.pictureLoop)
+    {
+      if (page_counter < max_page_counter)
+      {
+        page_counter++;
+        // ESP_LOGI(TAG, "P counter: %d", page_counter);
+      }
+      else
+      {
+        page_counter = 0;
+        ESP_LOGI(TAG, "P counter set to 0");
+      }
+      PageNumber = page_array[page_counter];
+
+      // Refresh Display
+      showPage(PageNumber);
+    }
+#endif
+  }

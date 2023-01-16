@@ -71,7 +71,7 @@ void calc_sun()
   //Serial.println();
   Serial.println("Sun Azimuth and Elevation Munich");
 
-  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 2, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
+  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour - 0, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   //helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   ESP_LOGI(TAG, "Azimuth: %lf5.1 Elevation: %lf5.1", helios.dAzimuth, helios.dElevation);
   
