@@ -315,7 +315,11 @@ void t_cyclicRTOS(void *pvParameters)
 //---------------------------------------------------------------------------------
 void t_sunTracker() // Intervall: Display Refresh
 {
+  ESP_LOGI(TAG, "");
+  ESP_LOGI(TAG, "------------------------------------------------");
   ESP_LOGI(TAG, "Sun Tracker");
+  ESP_LOGI(TAG, "------------------------------------------------");
+
 #if (USE_SUN_POSITION)
 #if (USE_PWM_SERVO)
   servo_move_to_sun();

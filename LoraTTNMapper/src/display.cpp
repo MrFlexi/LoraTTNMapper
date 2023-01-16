@@ -43,12 +43,12 @@ void displayRegisterPagesSunTracker()
 {
 
   max_page_counter = 0;
-  page_array[max_page_counter] = PAGE_TBEAM;
+// page_array[max_page_counter] = PAGE_TBEAM;
 
-#if (HAS_LORA)
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_LORA;
-#endif
+//#if (HAS_LORA)
+//  max_page_counter++;
+//  page_array[max_page_counter] = PAGE_LORA;
+//#endif
 
 #if (HAS_INA3221 || HAS_INA219)
   max_page_counter++;
@@ -298,6 +298,7 @@ void setup_display(void)
         u8g2.setFont(u8g2_font_ncenB12_tr);
         u8g2.drawStr(1, 60, "booting...");
         break;
+        
 
       case PAGE_TBEAM:
         u8g2.setFont(u8g2_font_profont12_tr);
@@ -366,6 +367,10 @@ void setup_display(void)
         u8g2.setCursor(1, 60);
         u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
         break;
+
+
+
+      
 
       case PAGE_SOLAR:
         u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -444,13 +449,18 @@ void setup_display(void)
         break;
 
       case PAGE_SUN:
+
         u8g2.setFont(u8g2_font_ncenB12_tr);
-        u8g2.drawStr(1, 15, "Sun Position");
+        u8g2.drawStr(1, 15, "SunTracker");
+
         u8g2.setFont(u8g2_font_profont12_tr);
         u8g2.setCursor(1, 30);
-        u8g2.printf("Azi: %.2f", dataBuffer.data.sun_azimuth);
-        u8g2.setCursor(1, 45);
-        u8g2.printf("Ele: %.2f", dataBuffer.data.sun_elevation);
+        u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
+        u8g2.setCursor(64, 30);
+        u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
+
+        u8g2.setCursor(1, 40);
+        u8g2.printf("Sun: %.1f %.1f", dataBuffer.data.sun_azimuth, dataBuffer.data.sun_elevation);
         u8g2.setCursor(1, 60);
         u8g2.printf("Servo: %d  %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
         break;
