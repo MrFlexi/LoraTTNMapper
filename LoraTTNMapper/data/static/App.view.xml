@@ -1,125 +1,91 @@
-<core:View xmlns:core="sap.ui.core" 
-	xmlns="sap.m" 
-	xmlns:l="sap.ui.layout" 
-	xmlns:tnt="sap.tnt" 
-	xmlns:html="http://www.w3.org/1999/xhtml" height="100%" controllerName="view.App">
-
+<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f" xmlns:cards="sap.f.cards"
+	xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" controllerName="view.App">
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
 			<tnt:ToolHeader>
-				<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press="onSideNavButtonPress">
+				<Button
+					id="sideNavigationToggleButton"
+					icon="sap-icon://menu2"
+					type="Transparent"
+					press=".onSideNavButtonPress">
 					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+						<OverflowToolbarLayoutData priority="NeverOverflow" />
 					</layoutData>
 				</Button>
-
-				<Button id="bt_reboot" text="Reboot" icon="" type="Emphasized" press="reboot">
+				<Image height="1.5rem"
+					   class="sapUiSmallMarginBegin"
+					   src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg" />
+				<Title level="H1" text="ESP32 Monitor">
 					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow"/>
+						<OverflowToolbarLayoutData shrinkable="true" />
+					</layoutData>
+				</Title>
+				
+				<ToolbarSpacer width="20px" />
+				<Button text="Tools" type="Transparent">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low" />
 					</layoutData>
 				</Button>
-				<ToolbarSpacer width="20px"/>
-				<Button id="bt_sleep" text="Sleep" type="Transparent" press="sleep">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Low"/>
-					</layoutData>
-				</Button>
+				<tnt:ToolHeaderUtilitySeparator />
 				<ToolbarSpacer>
 					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
+						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px" />
 					</layoutData>
 				</ToolbarSpacer>
 			</tnt:ToolHeader>
 		</tnt:header>
-		<tnt:sideContent>
-			<tnt:SideNavigation expanded="true" itemSelect="onItemSelect">
-				<tnt:NavigationList items="{path: '/navigation'}">
-					<tnt:NavigationListItem text="{title}" icon="{icon}" enabled="{enabled}" expanded="{expanded}" items="{items}" key="{key}">
-						<tnt:NavigationListItem text="{title}" key="{key}" enabled="{enabled}">
-						</tnt:NavigationListItem>
-					</tnt:NavigationListItem>
-				</tnt:NavigationList>
-				<tnt:fixedItem>
-					<tnt:NavigationList items="{path: '/fixedNavigation'}">
-						<tnt:NavigationListItem text="{title}" icon="{icon}">
-						</tnt:NavigationListItem>
-					</tnt:NavigationList>
-				</tnt:fixedItem>
-			</tnt:SideNavigation>
-		</tnt:sideContent>
+		
 		<tnt:mainContents>
-			<l:VerticalLayout width="100%" id="layout1">
-				<NavContainer id="pageContainer">
-					<pages>
-						<ScrollContainer id="Home" horizontal="false" vertical="true" height="100%">
-
-							<l:HorizontalLayout allowWrapping="true">
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="CPU " subheader="Boot counter" press="press">
-								<TileContent unit="" footer="sinc last reset">
-									<NumericContent scale="M" value="{dataBuffer>/BootCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
+			<NavContainer id="pageContainer" initialPage="root1">
+				<pages>
+					<ScrollContainer
+						id="root1"
+						horizontal="false"
+						vertical="true"
+						height="100%">
 						
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Deep Sleep" subheader="minutes" press="press">
-								<TileContent unit="" footer="count down">
-									<NumericContent scale="M" value="{dataBuffer>/MotionCounter}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-							</l:HorizontalLayout>
+				<l:Grid containerQuery="true" defaultSpan="XL12 L12 M12 S12" width="100%">
+					<l:VerticalLayout width="100%" class="gridWrapper">
+						<FlexBox alignItems="Center" 
+								 alignContent="Center" direction="Row" renderType="Bare" wrap="Wrap" 
+								 width="100%" displayInline="true" fitContainer="true" 
+						items="{dataBuffer>/sensors}">
+							<items>
+								<GenericTile header="{dataBuffer>name}" 
+											 subheader="{dataBuffer>subheader}" press="onTilePress"
+											 class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+									<TileContent unit="{dataBuffer>unit}" footer="">
+										<NumericContent scale="M" 
+														value="{dataBuffer>value}" 
+														valueColor="{dataBuffer>valueColor}"
+														indicator="{dataBuffer>indicator}"
+														withMargin="false"/>
+									</TileContent>
+								</GenericTile>
+							</items>
+						</FlexBox>
+					</l:VerticalLayout>
+				</l:Grid>
 
-							<l:HorizontalLayout allowWrapping="true">
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Ext. Temp" subheader="" press="press">
-								<TileContent unit="Celsius" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/Temperatur}" valueColor="Good" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							</l:HorizontalLayout>
-
-							<l:HorizontalLayout allowWrapping="true">
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="Voltage" press="press">
-								<TileContent unit="Volt" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_voltage}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="charge current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_charge_current}" valueColor="" indicator="Up" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-
-							<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" size="L" header="Battery" subheader="discharge current" press="press">
-								<TileContent unit="mA" footer="">
-									<NumericContent scale="M" value="{dataBuffer>/bat_discharge_current}" valueColor="" indicator="Down" withMargin="false" />
-								</TileContent>
-							</GenericTile>
-							</l:HorizontalLayout>
-
-						</ScrollContainer>
-
-						<ScrollContainer id="Terminal" horizontal="false" vertical="true" height="100%">
-							<l:VerticalLayout class="sapUiContentPadding" width="100%">
-								<l:content>
-									<List headerText="Serial Monitor" items="{path: 'dataBuffer>/text_table'}">
-										<NotificationListItem priority="{dataBuffer>priority}" datetime="{dataBuffer>date}" title="{dataBuffer>title}" description="{dataBuffer>description}">
-										</NotificationListItem>
-									</List>
-								</l:content>
-
-							</l:VerticalLayout>
-							
-							
-
-						</ScrollContainer>
-
-						<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
-							<Text text="This is the root page of the second element"/>
-						</ScrollContainer>
-					</pages>
-				</NavContainer>
-			</l:VerticalLayout>
+			
+				</ScrollContainer>
+					<ScrollContainer
+						id="page1"
+						horizontal="false"
+						vertical="true"
+						height="100%">
+						<Text text="This is the first page" />
+					</ScrollContainer>
+					<ScrollContainer
+						id="root2"
+						horizontal="false"
+						vertical="true"
+						height="100%">
+						<Text text="This is the root page of the second element" />
+					</ScrollContainer>
+				</pages>
+			</NavContainer>
 		</tnt:mainContents>
 	</tnt:ToolPage>
-</core:View>
+</mvc:View>

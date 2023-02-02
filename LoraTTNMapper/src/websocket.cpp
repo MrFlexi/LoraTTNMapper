@@ -1,69 +1,23 @@
 #include "globals.h"
 #include "websocket.h"
 
+static const char TAG[] = __FILE__;
+
 #if (USE_WEBSERVER)
 AsyncWebSocket ws("/ws");
-
-String message_buffer_to_jsonstr(DataBuffer message_buffer)
-{
- StaticJsonDocument<500> ws_json;
-  
-  String JsonStr;
-  ws_json.clear();
-
-  ws_json["MotionCounter"] = String( dataBuffer.data.MotionCounter );
-  ws_json["BootCounter"] = String( dataBuffer.data.bootCounter );
-
-  ws_json["bat_voltage"] = dataBuffer.data.bat_voltage;
-  ws_json["bat_charge_current"] = dataBuffer.data.bat_charge_current;
-  ws_json["bat_discharge_current"] = dataBuffer.data.bat_discharge_current;
-
-  ws_json["TXCounter"] = String( dataBuffer.data.txCounter );;
-  ws_json["Temperatur"] = String( dataBuffer.data.temperature );;
-  ws_json["text"] = "Hallo Welt";
-  ws_json["text_time"] = "SA 8:22:01";
-
-  // Add the "feeds" array
-  JsonArray feeds = ws_json.createNestedArray("text_table");
-  
-
-  //for (int i = 0; i < message_buffer.error_msg_count; i++)
-  //{
-   JsonObject msg = feeds.createNestedObject();
-    msg["title"] = "CPU Temp";
-    msg["description"] = "400m Schwimmen in 4 Minuten";
-    msg["value"] = "22.8";    
-    feeds.add(msg);    
-
-    msg["title"] = "TX Counter";    
-    msg["description"] = "15";    
-    feeds.add(msg);    
-
-  //}  
-
-  serializeJson(ws_json, JsonStr);
-  //serializeJsonPretty(ws_json, Serial);
-  return JsonStr;
-}
 
 void t_broadcast_message(void *parameter)
 {
   // Task bound to core 0, Prio 0 =  very low
-
-  String JsonStr;
   bool sendMessage = false;
 
   for (;;)
-  {    
-        JsonStr = message_buffer_to_jsonstr(dataBuffer);
-        ws.textAll(JsonStr);        
-    vTaskDelay(sendWebsocketIntervall * 1000 );
+  {
+    ESP_LOGI(TAG, "WebSocket broadcast");
+    ws.textAll(dataBuffer.to_json_web());
+    vTaskDelay(sendWebsocketIntervall * 1000);
   }
 }
-
-
-
-
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {

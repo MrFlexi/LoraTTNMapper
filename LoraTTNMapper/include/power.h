@@ -1,5 +1,4 @@
-#ifndef _POWER_H
-#define _POWER_H
+#pragma once
 
 #include <Arduino.h>
 #include <driver/adc.h>
@@ -18,6 +17,9 @@ void calibrate_voltage(void);
 bool batt_sufficient(void);
 void ESP32_sleep();
 
+#if(HAS_IP5306)
+bool setupPowerIP5306();
+#endif
 
 #if (HAS_PMU)
 #include <axp20x.h>
@@ -32,7 +34,6 @@ uint8_t i2c_readBytes(uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len);
 extern AXP20X_Class pmu;
 #endif // HAS_PMU
 
-#endif
 
 
 

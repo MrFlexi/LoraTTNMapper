@@ -21,74 +21,85 @@ void os_getDevKey(u1_t *buf) {}
 
 void t_enqueue_LORA_messages()
 {
+#if (HAS_LORA)
   String stringOne;
 
   if (LoraSendQueue == 0)
   {
     ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
+    return;
   }
-  else
-  {
-
- // -----------------------------------------------------------------------------
- //   Port 1: TTN Mapper
-// -----------------------------------------------------------------------------
-
+  
+    // -----------------------------------------------------------------------------
+    //   Port 1: TTN Mapper
+    // -----------------------------------------------------------------------------
 #if (USE_GPS)
     if (gps.checkGpsFix())
     {
-      payload.reset();
-      payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
-      payload.enqueue_port(1);
+      if (gps.tGps.location.lat() > 0)
+      {
+        payload.reset();
+        payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
+        payload.enqueue_port(1);
+      }
     }
 #endif
 
+    // -----------------------------------------------------------------------------
+    //   Port 2: Cayenne My Devices
+    // -----------------------------------------------------------------------------
 
- // -----------------------------------------------------------------------------
- //   Port 2: Cayenne My Devices
-// -----------------------------------------------------------------------------
+    //payload.reset();
+    //payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+    //payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
-payload.reset();
+//#if (USE_GPS)
+//    if (gps.checkGpsFix())
+//    {
+//      //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+//    }
+//#endif
 
-payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
-payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
-#if (USE_GPS)
-    if (gps.checkGpsFix())
-    {
-     payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-    }
-#endif
 
-#if (USE_BME280)
-    payload.addBMETemp(2, dataBuffer); // Cayenne format will be generated in TTN Payload converter
-#endif
-
-#if (HAS_INA)
+#if (HAS_INA3221 || HAS_INA219)
     payload.addVoltage(10, dataBuffer.data.panel_voltage);
     payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
-//payload.enqueue_port(2);
 
+   //payload.enqueue_port(2); // send data
 
-//Next Message-Block Port
-#if (HAS_PMU)
-    //payload.reset();
-    payload.addVoltage(20, dataBuffer.data.bus_voltage);
-    payload.addVoltage(21, dataBuffer.data.bus_current);
-    payload.addVoltage(30, dataBuffer.data.bat_voltage);
-    payload.addVoltage(31, dataBuffer.data.bat_charge_current);
-    payload.addVoltage(32, dataBuffer.data.bat_discharge_current);
-    payload.addVoltage(33, dataBuffer.data.bat_DeltamAh);
- 
+     // -----------------------------------------------------------------------------
+    //   Port 3: Device --> TTN, no payload concerter --> NodeRed --> Influxdb
+    //   Payload will be converted to Json-InfluxDB format in NodeRed
+    // -----------------------------------------------------------------------------
+    payload.reset();
+    payload.addPMU(01);      //(channel, 10 bytes)
 
-    //payload.enqueue_port(2);
+    #if (USE_SOIL_MOISTURE)
+    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+    #endif
+
+    #if (USE_SOIL_MOISTURE)
+    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+    #endif
+
+    #if (USE_DISTANCE_SENSOR_HCSR04)
+  // HC-SR04 Sonic distance sensor
+  payload.addFloatN(0x01, LPP_HCSR04_DISTANCE, dataBuffer.data.hcsr04_distance);
+  //measurement["HCSR04_Distance"] = data.hcsr04_distance;
 #endif
 
 
-payload.enqueue_port(2);
-  }
+    #if (USE_BME280)
+    payload.addBMETemp(01); // (channel, 4 bytes)
+    #endif
+
+    payload.addDeviceData(0); // (channel, 4 bytes)
+    payload.enqueue_port(2); // send data    
+    
+#endif
 }
 
 void do_send(osjob_t *j)
@@ -107,7 +118,6 @@ void do_send(osjob_t *j)
       gps.buildPacket(txBuffer);
       LMIC_setTxData2(1, txBuffer, sizeof(txBuffer), 0);
       ESP_LOGI(TAG, "Send Lora ");
-      digitalWrite(BUILTIN_LED, HIGH);
     }
     else
       ESP_LOGV(TAG, "GPS no fix");
@@ -135,6 +145,7 @@ void t_LORA_send_from_queue(osjob_t *j)
 
       if (xQueueReceive(LoraSendQueue, &SendBuffer, portMAX_DELAY) == pdTRUE)
       {
+        ESP_LOGI(TAG, "Lora trying to send from queue:");
         dump_single_message(SendBuffer);
         LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       }
@@ -147,11 +158,10 @@ void t_LORA_send_from_queue(osjob_t *j)
     {
       ESP_LOGV(TAG, "LORA send queue not initalized. Aborting.");
     }
-    ESP_LOGV(TAG, "New callback scheduled...");
+    ESP_LOGI(TAG, "New callback scheduled...");
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
   }
 }
-
 
 void dump_queue()
 {
@@ -176,16 +186,14 @@ void dump_queue()
 
 void dump_single_message(MessageBuffer_t SendBuffer)
 {
-  ESP_LOGV(TAG, "Message Dump");
-  Serial.println(" ");
-  Serial.print(" P:");
-  Serial.print(SendBuffer.MessagePort);
-  Serial.print(" S:");
-  Serial.print(SendBuffer.MessageSize);
-  Serial.print(" ** ");
+  char hex_string[5];
+  ESP_LOGI(TAG, "Lora TX Message Port: %d  Size: %d", SendBuffer.MessagePort, SendBuffer.MessageSize);
+
+  Serial.println("Payload:");
   for (int p = 0; p < SendBuffer.MessageSize; p++)
   {
-    Serial.print(SendBuffer.Message[p]);
+    sprintf(hex_string, "0x%02X", SendBuffer.Message[p]);
+    Serial.print(hex_string);
     Serial.print(" ");
   }
   Serial.println();
@@ -193,6 +201,7 @@ void dump_single_message(MessageBuffer_t SendBuffer)
 
 void setup_lora()
 {
+#if (HAS_LORA)
   log_display("Setup LORA");
   // LMIC init
   os_init();
@@ -216,9 +225,18 @@ void setup_lora()
   LMIC.dn2Dr = DR_SF9;
 
   // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
-  LMIC_setDrTxpow(DR_SF12, 14);
+  LMIC_setDrTxpow(LORA_DATARATE, 14);
 
   t_LORA_send_from_queue(&sendjob);
+
+  ESP_LOGI(TAG, "IBM LMIC version %d.%d.%d", LMIC_VERSION_MAJOR,
+           LMIC_VERSION_MINOR, LMIC_VERSION_BUILD);
+  ESP_LOGI(TAG, "Arduino LMIC version %d.%d.%d.%d",
+           ARDUINO_LMIC_VERSION_GET_MAJOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_MINOR(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_PATCH(ARDUINO_LMIC_VERSION),
+           ARDUINO_LMIC_VERSION_GET_LOCAL(ARDUINO_LMIC_VERSION));
+#endif
 }
 
 void onEvent(ev_t ev)
@@ -258,8 +276,6 @@ void onEvent(ev_t ev)
   case EV_TXCOMPLETE:
     log_display("EV_TXCOMPLETE");
     dataBuffer.data.txCounter++;
-
-    digitalWrite(BUILTIN_LED, LOW);
     if (LMIC.txrxFlags & TXRX_ACK)
     {
       log_display("Received Ack");
@@ -282,31 +298,27 @@ void onEvent(ev_t ev)
         }
       }
 
-
-      switch ( LMIC.frame[LMIC.dataBeg + 1] )
+      switch (LMIC.frame[LMIC.dataBeg + 1])
       {
-        case TTN_COMMAND_RESET_COULOMB:
-          Serial.println(F("TTN Command: Reset Coulomb Counter"));
-          #if (HAS_PMU)
-          pmu.ClearCoulombcounter();    
-          #endif       
-          break;  
-
-        case TTN_COMMAND_SLEEP:
-           Serial.println(F("TTN Command: Sleep"));
-           ESP32_sleep();
+      case TTN_COMMAND_RESET_COULOMB:
+        Serial.println(F("TTN Command: Reset Coulomb Counter"));
+#if (HAS_PMU)
+        pmu.ClearCoulombcounter();
+#endif
         break;
-        
-        default:
-         Serial.println(F("TTN Command unknown"));
+
+      case TTN_COMMAND_SLEEP:
+        Serial.println(F("TTN Command: Sleep"));
+        ESP32_sleep();
+        break;
+
+      default:
+        Serial.println(F("TTN Command unknown"));
         break;
       }
-
-
-
     }
     // Schedule next transmission
-    log_display("Next TX started");
+    ESP_LOGI(TAG, "Next TX started");
     // Next TX is scheduled after TX_COMPLETE event.
     os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(LORA_TX_INTERVAL), t_LORA_send_from_queue);
     break;

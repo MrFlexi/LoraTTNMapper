@@ -5,6 +5,8 @@
 
 #if (USE_WEBSERVER)
  extern AsyncWebServer server;
+ 
+ void setup_webserver();
 #endif
 
 #endif

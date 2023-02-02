@@ -1,17 +1,12 @@
-#ifndef _PAYLOAD_H_
-#define _PAYLOAD_H_
+#pragma once
 
 #include "globals.h"
+#include "databuffer.h"
 #include "gps.h"
 
 extern void SendPayload(uint8_t port);
 extern void lora_queue_init(void);
 void AXP192_powerevent_IRQ(void);
-
-
-// MyDevices CayenneLPP 1.0 channels for Synamic sensor payload format
-// all payload goes out on LoRa FPort 1
-#if (PAYLOAD_ENCODER == 3)
 
 #define LPP_GPS_CHANNEL 20
 #define LPP_COUNT_WIFI_CHANNEL 21
@@ -27,6 +22,7 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_AIR_CHANNEL 31
 #define LPP_BOOTCOUNT_CHANNEL 40
 #define LPP_FIRMWARE_CHANNEL 99
+#define LPP_SOIL_CHANNEL1    101
 
 
 // MyDevices CayenneLPP 2.0 types for Packed Sensor Payload, not using channels,
@@ -41,7 +37,12 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_HUMIDITY 104     // 1 byte, 0.5 % unsigned
 #define LPP_BAROMETER 115    // 2 bytes, hPa unsigned MSB
 
-#endif
+#define LPP_PMU 201           // 12 bytes PMU values
+#define LPP_SOIL_MOISTURE 202
+#define LPP_BME 203           // 4 bytes
+#define LPP_DEVICE 204        // 2 byte metadata, 4 bytes payload   device info
+#define LPP_HCSR04_DISTANCE   205        // 2 byte metadata, 2 bytes payload   device info
+
 
 class PayloadConvert {
 
@@ -54,6 +55,7 @@ public:
   uint8_t getSize(void);
   uint8_t *getBuffer(void);  
   void addFloat(uint8_t channel, float value);
+  void addFloatN(uint8_t channel, uint8_t sensor, float value);
   void addCount(uint8_t channel, uint16_t value);
   void addStatus(uint16_t voltage, uint64_t uptime, float cputemp, uint32_t mem,
                  uint8_t reset1, uint8_t reset2);
@@ -61,25 +63,19 @@ public:
   void addVoltage(uint8_t channel, float value);
   void addCurrent(uint8_t channel, float value);
   void addTemperature(uint8_t channel, float value);
-  void addBMETemp(uint8_t channel,  DataBuffer dataBuffer);
+  void addBMETemp(uint8_t channel);
+  void addDeviceData(uint8_t channel);
+  void addPMU(uint8_t channel);
   void addGPS_TTN(TinyGPSPlus tGps);
   void addGPS_LPP(uint8_t channel, TinyGPSPlus tGps); 
   void addButton(uint8_t value);
   void addSensor(uint8_t[]);
   void addTime(time_t value);
 
-#if (PAYLOAD_ENCODER == 3) // format plain
-
 private:
   uint8_t *buffer;
   uint8_t maxsize;
   uint8_t cursor;
-
-#else
-#error No valid payload converter defined!
-#endif
 };
 
 extern PayloadConvert payload;
-
-#endif // _PAYLOAD_H_

@@ -3,28 +3,81 @@
 #define _GLOBALS_H
 
 #include <Arduino.h>
-#include <FreeRTOS.h>
+#include <freertos/FreeRTOS.h>
+#include "time.h"
+#include "mytime.h"
+#include "freertos/ringbuf.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+// #include <esp_task_wdt.h>
 
+#define WDT_TIMEOUT 10           // Watchdog time out x seconds
+#define uS_TO_S_FACTOR 1000000UL //* Conversion factor for micro seconds to seconds */
+#define SEALEVELPRESSURE_HPA (1013.25)
+#define LORA_DATARATE DR_SF7
+
+//--------------------------------------------------------------------------
+// Devices
+//--------------------------------------------------------------------------
+// 01    --> T-Beam   W-Lan and BLE defect
+// 02    --> T-Beam   (TTN Mapper)
+//
+//--------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------
+// GPIO
+//--------------------------------------------------------------------------
+// 5,18,19,23,26,27,s 33, 32    --> LORA
+// 35                           --> PMU Interrupt
+// 12,34                        --> GPS
+// 36                           --> ADC Channel 0 --> Poti, Soil Moist Sensor
+//
+//--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
 // Device Settings
 //--------------------------------------------------------------------------
-#define DEVICE_ID  2
 
-#if DEVICE_ID == 1                 // TBEAM-01 Device EU ID = DE00000000000010
+// Define Applications
+#define SUN_TRACKER 1
+#define DEVICE_TRACKER 2
+#define DEVICE_CAMERA_01   10 
+#define DEVICE_SOIL_SENSOR 11
+
+// Choose Application
+// #define DEVICE_ID 2
+#define DEVICE_ID SUN_TRACKER
+//#define DEVICE_ID DEVICE_CAMERA_01
+//#define DEVICE_ID DEVICE_SOIL_SENSOR
+
+
+#if DEVICE_ID == 1 // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_01.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
 
-#if DEVICE_ID == 2                 // TBEAM-02 Device EU ID = DE00000000000011
+#if DEVICE_ID == 2 // TBEAM-02 Device EU ID = DE00000000000011
 #include "device_02.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
 
-#if DEVICE_ID == 3                 // TBEAM-02 Device EU ID = DE00000000000011
+#if DEVICE_ID == 3 //
 #include "device_03.h"
+#include "../src/hal/ttgobeam10.h"
+#endif
+
+#if DEVICE_ID == 4 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_04.h"
+#include "../src/hal/ttgobeam10.h"
+#endif
+
+#if DEVICE_ID == DEVICE_CAMERA_01 // TBEAM-02 Device EU ID = DE00000000000011
+#include "device_cam_01.h"
+#include "../src/hal/ttgoCameraPlus.h"
+#endif
+
+#if DEVICE_ID == DEVICE_SOIL_SENSOR  // TBEAM-01 Device EU ID = DE00000000000010
+#include "soil_sensor.h"
 #include "../src/hal/ttgobeam10.h"
 #endif
 
@@ -33,14 +86,16 @@
   (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
 #define I2C_MUTEX_UNLOCK() (xSemaphoreGive(I2Caccess))
 
-
-
+#include "SPIFFS.h"
 #include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
 #include <Ticker.h>
 #include "esp_sleep.h"
 #include <Wire.h>
+#include "settings.h"
+#include <AnalogSmooth.h>
+#include "databuffer.h"
 
 #if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
 #include "WiFi.h"
@@ -49,25 +104,13 @@ extern WiFiClient wifiClient;
 
 
 #if (USE_WEBSERVER)
-#include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 #include "webserver.h"
 #include "websocket.h"
 #endif
 
-#if (USE_BME280)
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#endif
-
-#if (USE_SERIAL_BT)
-#include "BluetoothSerial.h"
-#endif
-
 #include "gps.h"
-
 #include "esp_log.h"
-//#include <Preferences.h>
 
 //--------------------------------------------------------------------------
 // Wifi Settings
@@ -75,7 +118,6 @@ extern WiFiClient wifiClient;
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
 extern bool wifi_connected;
-
 
 extern volatile bool mpuInterrupt;
 
@@ -85,55 +127,6 @@ enum pmu_power_t
   pmu_power_off,
   pmu_power_sleep
 };
-
-typedef struct
-{
-  float iaq;                // IAQ signal
-  uint8_t iaq_accuracy;     // accuracy of IAQ signal
-  float temperature;        // temperature signal
-  float humidity;           // humidity signal
-  float pressure;           // pressure signal
-  float cpu_temperature;    // raw temperature signal
-  float raw_temperature;    // raw temperature signal
-  float raw_humidity;       // raw humidity signal
-  float gas;                // raw gas sensor signal
-  uint8_t aliveCounter;     // aliveCounter
-  uint8_t LoraQueueCounter; // aliveCounter
-  uint8_t sleepCounter;     // aliveCounter
-  uint8_t MotionCounter;     // aliveCounter
-  uint16_t bootCounter;
-  uint8_t txCounter;        // aliveCounter
-   uint8_t rxCounter;        // aliveCounter
-  uint8_t runmode;          // aliveCounter
-  uint8_t CoronaDeviceCount;
-  uint32_t freeheap;        // free memory
-  uint8_t tx_ack_req;       // request TTN to acknowlede a TX
-  uint16_t potentiometer_a;   //
-  uint32_t bat_ChargeCoulomb = 0;
-  uint32_t bat_DischargeCoulomb = 0;
-  float    bat_DeltamAh = 0;
-  bool  wlan;
-  bool  pictureLoop = true;
-  float firmware_version;
-  uint8_t bytesReceived;
-  lmic_t lmic;
-  float panel_voltage = 0;
-  float panel_current = 0;
-  float bus_voltage = 0;
-  float bus_current = 0;
-  float bat_voltage = 0;
-  float bat_charge_current = 0;
-  float bat_discharge_current = 0;
-  double yaw = 0;
-  double pitch = 0;
-  double roll = 0;
-  String ip_address;
-  uint8_t operation_mode = 0;
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  TinyGPSLocation gps;
-  TinyGPSLocation gps_old;
-  double gps_distance;
-} deviceStatus_t;
 
 // Struct holding payload for data send queue
 typedef struct
@@ -145,25 +138,19 @@ typedef struct
 } MessageBuffer_t;
 
 extern SemaphoreHandle_t I2Caccess;
-
 extern TaskHandle_t irqHandlerTask;
 extern TaskHandle_t moveDisplayHandlerTask;
 extern TaskHandle_t t_cyclic_HandlerTask;
-
 extern QueueHandle_t LoraSendQueue;
-
 
 #include "power.h"
 #include "jsutilities.h"
 #include "display.h"
-
-
 #include "irqhandler.h"
-
 #include "payload.h"
 
-#if (HAS_INA)
-extern SDL_Arduino_INA3221 ina3221;
+#if (HAS_INA3221 || HAS_INA219 || USE_BME280)
+#include "i2c_sensors.h"
 #endif
 
 #if (USE_MQTT)
@@ -174,34 +161,46 @@ extern SDL_Arduino_INA3221 ina3221;
 #include "button.h"
 #endif
 
-#if (USE_DASH)
-#include "dash.h"
-#endif
-
 #if (HAS_LORA)
+#include <lmic.h>
 #include "lora.h"
+#include "payload.h"
 #endif
 
 #if (USE_OTA)
 #include "SecureOTA.h"
 #endif
 
-#if (USE_GYRO)
-#include "gyro.h"
-#endif
-
-#if (USE_BLE_SCANNER)
-#include "ble_scanner.h"
-#endif
-
-
 #if (USE_FASTLED)
 #include <Led.h>
 #endif
 
-#if (USE_POTI)
-#include <AnalogSmooth.h>
+#if (USE_POTI || USE_SOIL_MOISTURE)
 #include "poti.h"
+#endif
+
+#if (USE_CAMERA)
+#include <camera.h>
+#endif
+
+#if (USE_DISTANCE_SENSOR_HCSR04)        // Ultrasonic distance sensor
+#include "sensor_hcsr04.h"
+#endif
+
+#if (USE_I2C_MICROPHONE)
+#include "sensor_sound.h"
+#endif
+
+#if (USE_SUN_POSITION)
+#include "Helios.h"
+#endif
+
+#if (USE_PWM_SERVO)
+#include "servo.h"
+#endif
+
+#if (USE_BLE_SERVER)
+#include "ble_server.h"
 #endif
 
 #endif

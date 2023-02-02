@@ -8,7 +8,7 @@
 
 #if (USE_WEBSERVER)
 
- extern AsyncWebSocket ws;
+extern AsyncWebSocket ws;
 
 void t_broadcast_message(void *parameter);
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);

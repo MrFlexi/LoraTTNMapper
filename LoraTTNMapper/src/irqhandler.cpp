@@ -28,7 +28,8 @@ void irqHandler(void *pvParameters)
                     portMAX_DELAY);   // wait forever
 
 #if (USE_INTERRUPTS)
-
+//mqtt_send_irq();
+      
 // button pressed?
 #if (USE_BUTTON)
     if (InterruptStatusRegister & BUTTON_IRQ)
@@ -39,7 +40,9 @@ void irqHandler(void *pvParameters)
 #if (HAS_PMU)
 #if (USE_PMU_INTERRUPT)
     if (InterruptStatusRegister & PMU_IRQ_BIT)
+    {
       AXP192_event_handler();
+    }  
 #endif
 #endif
 
@@ -64,6 +67,7 @@ void irqHandler(void *pvParameters)
 void IRAM_ATTR ButtonIRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  ESP_LOGI(TAG, "Button IRQ");
 
   xTaskNotifyFromISR(irqHandlerTask, BUTTON_IRQ, eSetBits,
                      &xHigherPriorityTaskWoken);
@@ -78,6 +82,7 @@ void IRAM_ATTR PMU_IRQ()
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   InterruptStatusRegister |= PMU_IRQ_BIT;
+  ESP_LOGI(TAG, "PMU IRQ");
 
   xTaskNotifyFromISR(irqHandlerTask, PMU_IRQ_BIT, eSetBits,
                      &xHigherPriorityTaskWoken);
@@ -87,24 +92,6 @@ void IRAM_ATTR PMU_IRQ()
 }
 #endif
 
-#if (USE_GYRO)
-#if (WAKEUP_BY_MOTION)
-void IRAM_ATTR GYRO_IRQ()
-{
-  mpuInterrupt = true;
-
-  InterruptStatusRegister |= GYRO_IRQ_BIT; // Set Gyro Interrupt Bit
-
-  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-  xTaskNotifyFromISR(irqHandlerTask, GYRO_IRQ_BIT, eSetBits,
-                     &xHigherPriorityTaskWoken);
-
-  if (xHigherPriorityTaskWoken)
-    portYIELD_FROM_ISR();
-}
-#endif
-#endif
 
 void mask_user_IRQ()
 {

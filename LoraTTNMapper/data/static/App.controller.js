@@ -7,8 +7,9 @@ sap.ui.define([
 	'sap/ui/model/json/JSONModel',
 	'sap/m/Popover',
 	'sap/m/UploadCollectionParameter',
-	'sap/m/Button'
-], function (jQuery, Fragment, MessageToast, Formatter, Controller, JSONModel, Popover, Button) {
+	'sap/m/Button',
+	"sap/ui/Device",
+], function (jQuery, Fragment, MessageToast, Formatter, Controller, JSONModel, Popover, Button, Device) {
 	"use strict";
 
 	var oModelData           = new sap.ui.model.json.JSONModel();
@@ -19,13 +20,19 @@ sap.ui.define([
 	var CController = Controller.extend("view.App", {		
 		
 		onInit: function() {
-
 			var oView = this.getView();
+
+			// Determine visible tiles in carousel
+			var visibleTiles = 1;
+			
+			var oSettingsModel = new JSONModel({ pagesCount: visibleTiles });
+			this.getView().setModel(oSettingsModel, "settings");
 
 			// Dynamisches Menü						
 			var MenuModel = new JSONModel("./static/menu.json");
-			oView.setModel(MenuModel);
-			
+			oView.setModel(MenuModel);			
+
+
 			 
 			ws.onopen = function() {                  
 				// Web Socket is connected, send data using send()			

@@ -1,6 +1,7 @@
 #include "globals.h"
 
 HardwareSerial GPSSerial(1);
+static const char TAG[] = __FILE__;
 
 void Neo6m::init()
 {
@@ -18,6 +19,7 @@ void Neo6m::encode()
     while (GPSSerial.available())
     {
       char data = GPSSerial.read();
+      //Serial.print(data);
       tGps.encode(data);
     }
   }
@@ -152,6 +154,11 @@ void Neo6m::getDistance()
   if (checkGpsFix()) // IS a GPS Position available
   {
     dataBuffer.data.gps = tGps.location; // Save actual position
+    // Build Date/Time
+    char sz[32];
+    sprintf(dataBuffer.data.gps_datetime, "%02d-%02d-%02d %02d:%02d:%02d ", 
+      tGps.date.month(),  tGps.date.day(),  tGps.date.year(), tGps.time.hour(), tGps.time.minute(), tGps.time.second());
+    
 
     if (dataBuffer.data.gps_old.lat() == 0.0) // Store first available position in gps_old for later distance calculation
     {
@@ -166,6 +173,7 @@ void Neo6m::getDistance()
   }
   else dataBuffer.data.gps_distance = 0;
   ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
+  ESP_LOGI(TAG, "GPS Time %s", dataBuffer.data.gps_datetime);
 }
 
 void Neo6m::resetDistance()
@@ -183,10 +191,7 @@ void Neo6m::resetDistance()
   }
   else dataBuffer.data.gps_distance = 0;
   ESP_LOGI(TAG, "GPS Distance %f", dataBuffer.data.gps_distance);
-
-
   }
-
   
 }
 Neo6m gps;
