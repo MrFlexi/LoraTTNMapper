@@ -95,12 +95,7 @@ int vprintf_into_spiffs(const char *szFormat, va_list args)
 }
 #endif
 
-//--------------------------------------------------------------------------
-// OTA Settings
-//--------------------------------------------------------------------------
-#include "SecureOTA.h"
-const uint16_t OTA_CHECK_INTERVAL = 3000; // ms
-uint32_t _lastOTACheck = 0;
+
 bool wifi_connected = false;
 
 //--------------------------------------------------------------------------
