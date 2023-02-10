@@ -125,7 +125,8 @@ enum pmu_power_t
 {
   pmu_power_on,
   pmu_power_off,
-  pmu_power_sleep
+  pmu_power_sleep,
+  pmu_power_sleep_all
 };
 
 // Struct holding payload for data send queue

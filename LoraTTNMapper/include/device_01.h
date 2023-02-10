@@ -21,7 +21,8 @@
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
-#define HAS_PMU 1
+#define HAS_PMU 
+#define PMU_SLEEP_ALL_OFF 1
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1

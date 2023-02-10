@@ -212,6 +212,15 @@ void AXP192_power(pmu_power_t powerlevel)
     ESP_LOGI(TAG, "AXP power ON");
     break;
 
+    case pmu_power_sleep_all:
+    pmu.setPowerOutPut(AXP192_DCDC1, AXP202_OFF); // OLED on T-Beam v1.0
+    pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
+    pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
+       //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    ESP_LOGI(TAG, "AXP power SLEEP");
+    break;
+
   case pmu_power_sleep:
     // we don't cut off DCDC1, because then display blocks i2c bus
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
@@ -540,6 +549,9 @@ void ESP32_sleep()
 #endif
 
 #if (HAS_PMU)
+#if (PMU_SLEEP_ALL_OFF)
+ AXP192_power(pmu_power_sleep_all);
+#else
   AXP192_power(pmu_power_sleep);
 #endif
 
