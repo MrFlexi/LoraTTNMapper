@@ -6,10 +6,6 @@
 		},
 		{
 			"path": "..\\..\\AXP202X_Library"
-		},
-		{
-			"name": "FirstFlow",
-			"path": "../../M5Core2/FirstFlow"
 		}
 	],
 	"settings": {
