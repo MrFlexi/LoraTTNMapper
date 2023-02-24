@@ -1,7 +1,7 @@
 #include "globals.h"
 
 HardwareSerial GPSSerial(1);
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 void Neo6m::init()
 {

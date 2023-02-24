@@ -31,7 +31,6 @@
 #define USE_WIFI 0
 #define USE_WIFI_MANAGER 0
 #define USE_WEBSERVER   0
-#define USE_CAYENNE 0
 #define USE_MQTT 0
 #define USE_MQTT_SENSORS 0
 #define USE_MQTT_TRAIN 0
@@ -82,7 +81,7 @@
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes
-#define TIME_TO_SLEEP_BAT_HIGH  6
+#define TIME_TO_SLEEP_BAT_HIGH  1
 #define TIME_TO_SLEEP_BAT_MID 18
 #define TIME_TO_SLEEP_BAT_LOW  54
 #define BAT_LOW   37         // 3.7 Volt

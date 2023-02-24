@@ -3,7 +3,7 @@
 #include "power.h"
 
 // Local logging tag
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 #if (HAS_IP5306)
 

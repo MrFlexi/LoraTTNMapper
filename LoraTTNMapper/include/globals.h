@@ -112,6 +112,8 @@ extern WiFiClient wifiClient;
 #include "gps.h"
 #include "esp_log.h"
 
+
+
 //--------------------------------------------------------------------------
 // Wifi Settings
 //--------------------------------------------------------------------------
@@ -167,9 +169,6 @@ extern QueueHandle_t LoraSendQueue;
 #include "payload.h"
 #endif
 
-#if (USE_OTA)
-#include "SecureOTA.h"
-#endif
 
 #if (USE_FASTLED)
 #include <Led.h>

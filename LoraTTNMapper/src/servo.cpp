@@ -4,7 +4,7 @@
 #include <Preferences.h>
 
 Preferences prefs;
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 #define servo1_pin 0
 #define servo2_pin 1
@@ -69,9 +69,9 @@ void calc_sun()
   //----------------------------------------
   //Serial.println();
   //Serial.println();
-  Serial.println("Sun Azimuth and Elevation Munich");
+  
 
-  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour + 1 , dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
+  helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon + 1 , dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour + 1 , dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   //helios.calcSunPos(2023, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, 12, dataBuffer.data.timeinfo.tm_min, 00.00, 11.57754, 48.13641);
   ESP_LOGI(TAG, "Azimuth: %lf5.1 Elevation: %lf5.1", helios.dAzimuth, helios.dElevation);
   

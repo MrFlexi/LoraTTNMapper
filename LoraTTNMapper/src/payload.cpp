@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "payload.h"
 
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 PayloadConvert::PayloadConvert(uint8_t size)
 {

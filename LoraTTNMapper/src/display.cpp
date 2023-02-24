@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "display.h"
 
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 //-------------------------------------------------------------------------------
 // 128*64 Pixel --> Center = 64*32

@@ -3,7 +3,7 @@
 #include "time.h"
 #include <sys/time.h>
 
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
