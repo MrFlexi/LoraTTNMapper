@@ -11,12 +11,9 @@ void loadConfiguration()
 {
 
   DynamicJsonDocument doc(2048);
-
-
     unsigned int totalBytes = SPIFFS.totalBytes();
     unsigned int usedBytes = SPIFFS.usedBytes();
     float freeKBytes = 0;
-
     freeKBytes = ( totalBytes - usedBytes ) / 1024 ;
  
     Serial.println("SPIFF File sistem info.");
@@ -29,11 +26,9 @@ void loadConfiguration()
     Serial.print(freeKBytes);
     Serial.println(" kBytes"); 
     Serial.println();
-
-
+  
   // Open file for reading
   File file = SPIFFS.open(filename);
-
   DeserializationError error = deserializeJson(doc, file);
   if (error)
   {
@@ -43,10 +38,8 @@ void loadConfiguration()
   {
     ESP_LOGI(TAG, "Loading settings ");
     serializeJsonPretty(doc, Serial);
-
     const char *value = doc["settings"]["sleep_time"];
     dataBuffer.settings.sleep_time = atoi(doc["settings"]["sleep_time"]);
-
     if (dataBuffer.settings.sleep_time > 0)
     {
     }
