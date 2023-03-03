@@ -206,9 +206,10 @@ void AXP192_power(pmu_power_t powerlevel)
   default:
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
+    delay(100);
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
-    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
-    //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    //pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
     ESP_LOGI(TAG, "AXP power ON");
     break;
 
@@ -217,7 +218,7 @@ void AXP192_power(pmu_power_t powerlevel)
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
        //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
-    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
     ESP_LOGI(TAG, "AXP power SLEEP");
     break;
 
@@ -230,6 +231,33 @@ void AXP192_power(pmu_power_t powerlevel)
     break;
   }
 }
+
+
+void AXP192_power_line(pmu_power_t powerlevel)
+{
+
+  switch (powerlevel)
+  {
+
+ case pmu_power_on:
+    pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON);
+    ESP_LOGI(TAG, "AXP power line ON");
+    break;
+
+ case pmu_power_off:
+    pmu.setPowerOutPut(AXP192_DCDC1, AXP202_OFF);
+    ESP_LOGI(TAG, "AXP power line OFF");
+    break;
+  }
+}
+
+
+
+
+
+
+
+
 
 void AXP192_power_gps(bool on)
 {
@@ -328,7 +356,7 @@ void AXP192_init(void)
   {
 
     // configure AXP192
-    pmu.setDCDC1Voltage(3300);              // for external OLED display
+    
     pmu.setTimeOutShutdown(false);          // no automatic shutdown
     pmu.setTSmode(AXP_TS_PIN_MODE_DISABLE); // TS pin mode off to save power
 
@@ -337,14 +365,14 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_BATT_CUR_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
-
-    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
+    delay(100);
     pmu.EnableCoulombcounter();
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
     pmu.setChargeControlCur(AXP1XX_CHARGE_CUR_450MA);
     //pmu.setChargeControlCur(dataBuffer.settings.bat_max_charge_current);
 
+    pmu.setDCDC1Voltage(3300);              // for external OLED display
     pmu.setVoffVoltage(AXP202_VOFF_VOLTAGE33);
     // switch power rails on
     AXP192_power(pmu_power_on);
@@ -540,7 +568,12 @@ void ESP32_sleep()
 #endif
 
 #if (HAS_PMU)
-  AXP192_power(pmu_power_sleep);
+#if DEVICE_ID == SUN_TRACKER
+AXP192_power(pmu_power_off);
+#else
+AXP192_power(pmu_power_sleep);
+#endif
+  
 #endif
 
 #if (USE_FASTLED)
@@ -555,7 +588,7 @@ void ESP32_sleep()
   #endif
   showPage(PAGE_SLEEP);
   ESP_LOGI(TAG, "Deep Sleep started");
-  
+  Wire.end();
   esp_deep_sleep_start();
   Serial.println("This will never be printed");
 }

@@ -148,6 +148,8 @@ void servo_move_to_sun()
   {    
     calc_sun();
 
+    AXP192_power_line(pmu_power_on);
+
     uint8_t servo1_pos = (uint8_t) dataBuffer.data.sun_azimuth - 79; // 90-11 Grad Servoanpassung
     uint8_t servo2_pos = (uint8_t) dataBuffer.data.sun_elevation;
    
@@ -164,17 +166,14 @@ void servo_move_to_sun()
     if ((servo2_pos >= 0) && (servo2_pos <= 180))
       Servo2.attach(servo2_pin, servo2_pos);
 
-    //if (servo1_pos >= 0)
-    //  Servo1.startEaseTo(servo1_pos, speed);
-    //if (servo2_pos >= 0)
-    //  Servo2.startEaseTo(servo2_pos, speed);
-    delay(2000);
-    // readRegisters();    
+    delay(5000);
+   
     ESP_LOGI(TAG, "Servos detached");
 
     Servo2.detach();
     Servo1.detach();
-    // readRegisters();
+    AXP192_power_line(pmu_power_off);
+
   }
   else
   {
@@ -193,6 +192,7 @@ void servo_move_to_last_position()
   ESP_LOGI(TAG, "Moving Servos to last position from flash");
   get_servo_position_from_flash(&servo1_pos, &servo2_pos);  
 
+  AXP192_power_line(pmu_power_on);
   Servo1.setEasingType(EASE_CUBIC_IN_OUT);
    if ((servo1_pos >= 0) && (servo1_pos <= 180))
     Servo1.attach(servo1_pin, servo1_pos);
@@ -205,7 +205,7 @@ void servo_move_to_last_position()
 
   Servo1.detach();
   Servo2.detach();
-  //ESP_LOGI(TAG, "Servos detached");
+  AXP192_power_line(pmu_power_off);
 }
 
 #endif

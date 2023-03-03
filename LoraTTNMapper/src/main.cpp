@@ -494,17 +494,7 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
-
-// LED Sunrise
-#ifdef HAS_LED
-  ledcSetup(0, 10000, 8);
-  ledcAttachPin(HAS_LED, 0);
-  for (int dutyCycle = 0; dutyCycle <= 255; dutyCycle++)
-  {
-    ledcWrite(0, dutyCycle);
-    delay(5);
-  }
-#endif
+  delay(100);
 
   //--------------------------------------------------------------------
   // Load Settings
@@ -539,11 +529,6 @@ void setup()
   print_wakeup_reason();
   printLocalTime();
   display_chip_info();
-  Serial.println(dataBuffer.to_json());
-  Serial.println(dataBuffer.getError());
-#if (HAS_GPS)
-  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
-#endif
 
   // I2c access management for RTOS bus access
   I2Caccess = xSemaphoreCreateMutex(); //
@@ -556,7 +541,6 @@ void setup()
 #else
   Wire.begin(SDA, SCL, 400000);
 #endif
-  i2c_scan();
 
 #if (HAS_IP5306)
   setupPowerIP5306();
@@ -570,6 +554,8 @@ void setup()
   AXP192_power_gps(ON);
   delay(1000);
 #endif
+
+  i2c_scan();
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280)
   ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
@@ -593,7 +579,7 @@ void setup()
 #if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
   // Turn off Bluetooth
-  log_display("Bluethooth off");
+    ESP_LOGI(TAG, "Bluethooth off");
   btStop();
 #endif
 
@@ -601,16 +587,6 @@ void setup()
   setup_mqtt();
 #endif
 
-//---------------------------------------------------------------
-// OTA Update
-//---------------------------------------------------------------
-#if (USE_OTA)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    _lastOTACheck = millis();
-    checkFirmwareUpdates();
-  }
-#endif
 
 #if (USE_GYRO)
   setup_gyro();
@@ -622,12 +598,8 @@ void setup()
   // gps.softwareReset();
   gps.wakeup();
   delay(500); // Wait for GPS beeing stable
-#endif
-
-#if (HAS_LORA)
-  setup_lora();
-  lora_queue_init();
-  delay(500);
+ 
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
 
 #if (USE_BUTTON)
@@ -653,6 +625,9 @@ void setup()
 #endif
 
 #if (HAS_LORA)
+  setup_lora();
+  lora_queue_init();
+  delay(500);
   t_enqueue_LORA_messages();
 #endif
 
@@ -737,7 +712,6 @@ void setup()
 
   dataBuffer.data.runmode = 1; // Switch from Terminal Mode to page Display
   ESP_LOGI(TAG, "Setup done");
-  ESP_LOGI(TAG, "#----------------------------------------------------------#");
 
   //---------------------------------------------------------------
   // Watchdog

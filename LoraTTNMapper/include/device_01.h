@@ -19,7 +19,7 @@
 #define HAS_INA3221  0
 #define HAS_INA219  0
 #define USE_GPS 1
-#define USE_DISPLAY 1
+#define USE_DISPLAY 0
 
 #define HAS_PMU 1
 #define USE_INTERRUPTS 1
@@ -81,7 +81,7 @@
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes
-#define TIME_TO_SLEEP_BAT_HIGH  1
+#define TIME_TO_SLEEP_BAT_HIGH  6
 #define TIME_TO_SLEEP_BAT_MID 18
 #define TIME_TO_SLEEP_BAT_LOW  54
 #define BAT_LOW   37         // 3.7 Volt
