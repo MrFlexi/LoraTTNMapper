@@ -3,7 +3,7 @@
 
 //---------------------------------------------------------
 // Upload data to ESP 32 SPIFFS
-// pio run -t uploadfs
+// pio run -t uploadfs   !! close Serial Monitor before !!
 //---------------------------------------------------------
 #include "globals.h"
 
@@ -460,6 +460,7 @@ void t_sleep()
 void setup_wifi()
 {
 #if (USE_WIFI)
+ ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
   IPAddress ip;
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
@@ -479,12 +480,13 @@ void setup_wifi()
     dataBuffer.data.wlan = true;
     ip = WiFi.localIP();
     Serial.println(ip);
+    ESP_LOGI(TAG, "IP: %s",  ip.toString());
     dataBuffer.data.ip_address = ip.toString();
   }
   else
   {
     // Turn off WiFi if no connection was made
-    log_display("WIFI OFF");
+    ESP_LOGI(TAG, "WIFI OFF");
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
@@ -582,6 +584,7 @@ void setup()
   dataBuffer.data.tx_ack_req = 0;
 
 #if (USE_DISPLAY)
+ ESP_LOGI(TAG, "-----------  Setup display   -----------");
   setup_display();
   showPage(PAGE_BOOT);
 #endif
@@ -593,23 +596,12 @@ void setup()
 #if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
   // Turn off Bluetooth
-  log_display("Bluethooth off");
+   ESP_LOGI(TAG, "Bluetooth OFF");
   btStop();
 #endif
 
 #if (USE_MQTT)
   setup_mqtt();
-#endif
-
-//---------------------------------------------------------------
-// OTA Update
-//---------------------------------------------------------------
-#if (USE_OTA)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    _lastOTACheck = millis();
-    checkFirmwareUpdates();
-  }
 #endif
 
 #if (USE_GYRO)

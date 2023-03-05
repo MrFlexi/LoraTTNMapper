@@ -16,7 +16,7 @@
 #define USE_BUTTON 1
 
 #define USE_BLE 0
-#define USE_BLE_SERVER 1
+#define USE_BLE_SERVER 0
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 #define USE_SUN_POSITION 1
@@ -41,7 +41,7 @@
 
 #define USE_POTI 0
 
-#define displayRefreshIntervall 10       // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
@@ -49,7 +49,7 @@
 #define LORA_DATARATE DR_SF10
 
 #define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  30 // Update Webpage
+#define sendWebsocketIntervall  5 // Update Webpage
 #define sunTrackerRefreshIntervall 120
 
 #define PAYLOAD_ENCODER 3

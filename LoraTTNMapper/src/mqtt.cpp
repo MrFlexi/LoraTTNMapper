@@ -183,6 +183,7 @@ void reconnect()
 
 void setup_mqtt()
 {
+   ESP_LOGI(TAG, "-----------  Setup I2c MQTT  -----------");
   if (WiFi.status() == WL_CONNECTED)
   {
     MqttClient.setServer(mqtt_server, 1883);
@@ -195,13 +196,8 @@ void setup_mqtt()
       reconnect();
     }
     ESP_LOGI(TAG, "MQTT connected");
-    log_display("MQTT connected");
     MqttClient.publish(mqtt_topic, "ESP32 is alive...");
-
   }
-
-
-
 }
 
 void mqtt_send()

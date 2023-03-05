@@ -214,7 +214,7 @@ void setup_display(void)
   switch (DEVICE_ID)
   {
   case SUN_TRACKER:
-    displayRegisterPagesSunTracker();
+    //displayRegisterPagesSunTracker();
     break;
   default:
     displayRegisterPages();
