@@ -35,8 +35,22 @@ String DataBuffer::to_json_web()
   sensors_0["subheader"] = "Charge current";
   sensors_0["value"] = data.bat_charge_current;
   sensors_0["unit"] = "mA";
+  if (data.bat_charge_current > 0)
+  {
   sensors_0["indicator"] = "Up";
   sensors_0["valueColor"] = "Good";
+  }
+  else
+  {
+  sensors_0["indicator"] = "Down";
+  sensors_0["valueColor"] = "Bad";
+  }
+
+  JsonObject sensors_21 = sensors.createNestedObject();
+  sensors_21["name"] = "Battery";
+  sensors_21["subheader"] = "Coulomb";
+  sensors_21["value"] = data.bat_DeltamAh;
+  sensors_21["unit"] = "mAh";
 
   JsonObject sensors_2 = sensors.createNestedObject();
   sensors_2["name"] = "Bus";
@@ -87,6 +101,17 @@ JsonObject sensors_8 = sensors.createNestedObject();
   sensors_8["subheader"] = s;
   sensors_8["value"] = s;
   sensors_8["unit"] = "";
+
+
+JsonObject sensors_9 = sensors.createNestedObject();
+  sensors_9["name"] = "Deep sleep";
+  sensors_9["subheader"] = "in";
+  sensors_9["value"] = dataBuffer.data.MotionCounter;
+  sensors_9["unit"] = "Min";
+  
+  
+  
+  
   serializeJson(doc, JsonStr);
   return JsonStr;
 }

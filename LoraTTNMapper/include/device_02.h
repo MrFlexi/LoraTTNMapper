@@ -39,6 +39,7 @@
 #define FASTLED_SHOW_DEGREE 0
 #define FASTLED_SHOW_POTI 0
 
+#define USE_SUN_POSITION 1
 #define USE_POTI 0
 
 #define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic

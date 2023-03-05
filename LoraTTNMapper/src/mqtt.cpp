@@ -76,6 +76,11 @@ void callback(char *topic, byte *payload, unsigned int length)
   String action = String(action_in);
   ESP_LOGI(TAG, " action: %s  value: %s", action.c_str(), value);
 
+  if (action == "sleep")
+  {
+    ESP32_sleep();
+  }
+
 #if (USE_FASTLED)
   if (action == "LED_HeatColor")
   {
@@ -124,6 +129,8 @@ void callback(char *topic, byte *payload, unsigned int length)
     servo_move_to( servo_number , servo_position);
   }  
 #endif
+
+
 
 #if (HAS_PMU)
   if (action == "set_bat_max_charge_current")

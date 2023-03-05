@@ -207,8 +207,8 @@ void AXP192_power(pmu_power_t powerlevel)
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_ON);  // Lora on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_ON);  // Gps on T-Beam V1.0
     pmu.setPowerOutPut(AXP192_DCDC1, AXP202_ON); // OLED on T-Beam v1.0
-    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
-    //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
+    //pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
     ESP_LOGI(TAG, "AXP power ON");
     break;
 
@@ -217,7 +217,7 @@ void AXP192_power(pmu_power_t powerlevel)
     pmu.setPowerOutPut(AXP192_LDO3, AXP202_OFF); // gps off
     pmu.setPowerOutPut(AXP192_LDO2, AXP202_OFF); // lora off
        //pmu.setChgLEDMode(AXP20X_LED_BLINK_1HZ);
-    pmu.setChgLEDMode(AXP20X_LED_LOW_LEVEL);
+    pmu.setChgLEDMode(AXP20X_LED_OFF);
     ESP_LOGI(TAG, "AXP power SLEEP");
     break;
 
@@ -338,7 +338,6 @@ void AXP192_init(void)
     pmu.adc1Enable(AXP202_VBUS_VOL_ADC1, true);
     pmu.adc1Enable(AXP202_VBUS_CUR_ADC1, true);
 
-    ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
     pmu.EnableCoulombcounter();
     ESP_LOGI(TAG, "CoulombReg: %d", pmu.getCoulombRegister());
 
