@@ -239,6 +239,11 @@ void t_sunTracker() // Intervall: Display Refresh
   ESP_LOGI(TAG, "Sun Tracker");
   ESP_LOGI(TAG, "------------------------------------------------");
 
+
+#if (HAS_PMU)
+AXP192_get_mpp();
+#endif
+
 #if (USE_SUN_POSITION)
 #if (USE_PWM_SERVO)
   servo_move_to_sun();

@@ -37,13 +37,13 @@ String DataBuffer::to_json_web()
   sensors_0["unit"] = "mA";
   if (data.bat_charge_current > 0)
   {
-  sensors_0["indicator"] = "Up";
-  sensors_0["valueColor"] = "Good";
+    sensors_0["indicator"] = "Up";
+    sensors_0["valueColor"] = "Good";
   }
   else
   {
-  sensors_0["indicator"] = "Down";
-  sensors_0["valueColor"] = "Bad";
+    sensors_0["indicator"] = "Down";
+    sensors_0["valueColor"] = "Bad";
   }
 
   JsonObject sensors_21 = sensors.createNestedObject();
@@ -66,7 +66,6 @@ String DataBuffer::to_json_web()
   sensors_3["indicator"] = "Up";
   sensors_3["valueColor"] = "Good";
 
-
   sprintf(s, "%04.2g", data.sun_elevation);
   JsonObject sensors_4 = sensors.createNestedObject();
   sensors_4["name"] = "Sun position";
@@ -86,33 +85,47 @@ String DataBuffer::to_json_web()
   sensors_6["name"] = "Servo 1";
   sensors_6["subheader"] = "position";
   sensors_6["value"] = data.servo1;
-  sensors_6["unit"] = "degree"; 
+  sensors_6["unit"] = "degree";
 
- JsonObject sensors_7 = sensors.createNestedObject();
+  JsonObject sensors_7 = sensors.createNestedObject();
   sensors_7["name"] = "Servo 2";
   sensors_7["subheader"] = "position";
   sensors_7["value"] = data.servo2;
   sensors_7["unit"] = "degree";
 #endif
 
-JsonObject sensors_8 = sensors.createNestedObject();
+  JsonObject sensors_8 = sensors.createNestedObject();
   strftime(s, sizeof(s), "%H:%M:%S", &dataBuffer.data.timeinfo);
   sensors_8["name"] = "Time";
   sensors_8["subheader"] = s;
   sensors_8["value"] = s;
   sensors_8["unit"] = "";
 
-
-JsonObject sensors_9 = sensors.createNestedObject();
+  JsonObject sensors_9 = sensors.createNestedObject();
   sensors_9["name"] = "Deep sleep";
   sensors_9["subheader"] = "in";
   sensors_9["value"] = dataBuffer.data.MotionCounter;
   sensors_9["unit"] = "Min";
-  
-  
-  
-  
+
+  JsonObject sensors_10 = sensors.createNestedObject();
+  strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
+  sensors_10["name"] = "Max Power Point";
+  sensors_10["subheader"] = s;
+  sensors_10["value"] = dataBuffer.data.mpp_max_bat_charge_power;
+  sensors_10["unit"] = "mW";
+
+  JsonArray mpp = doc.createNestedArray("mpp");
+  for (int i = 0; i < 13; i++)
+  {
+    JsonObject mpp_line = mpp.createNestedObject();
+    mpp_line["pmu_charge_setting"] = dataBuffer.data.mpp_values[i].pmu_charge_setting;
+    mpp_line["bus_voltage"] = dataBuffer.data.mpp_values[i].bus_voltage;
+    mpp_line["bat_charge_current"] = dataBuffer.data.mpp_values[i].bat_charge_current;
+    mpp_line["bat_charge_power"] = dataBuffer.data.mpp_values[i].bat_charge_power;
+  }
+
   serializeJson(doc, JsonStr);
+  serializeJson(doc, Serial);
   return JsonStr;
 }
 
@@ -134,7 +147,7 @@ String DataBuffer::to_json()
 
   // Battery Management
   measurement["bat_voltage"] = data.bat_voltage;
-  measurement["bat_charge_current"] = data.bat_charge_current;    
+  measurement["bat_charge_current"] = data.bat_charge_current;
   measurement["bat_fuel_gauge"] = data.bat_DeltamAh;
   measurement["bus_voltage"] = data.bus_voltage;
   measurement["bus_current"] = data.bus_current;
@@ -146,7 +159,7 @@ String DataBuffer::to_json()
 #endif
 
   // Device
-  measurement["dev_sleep_time"] = settings.sleep_time;  
+  measurement["dev_sleep_time"] = settings.sleep_time;
   measurement["dev_boot_counter"] = data.bootCounter;
 
   // BME280
@@ -161,7 +174,7 @@ String DataBuffer::to_json()
 
 // Camera
 #if (USE_CAMERA)
-  //ESP_LOGI(TAG, "ImageSize base64: %d", data.image_buffer.length);
+  // ESP_LOGI(TAG, "ImageSize base64: %d", data.image_buffer.length);
   measurement["image_url"] = data.image_url;
   measurement["image"] = String(data.image_buffer);
 #endif

@@ -8,6 +8,20 @@
 #include <globals.h>
 #include <gps.h>
 
+#if (HAS_PMU)
+  typedef struct
+  {
+      int pmu_charge_setting;
+      float panel_voltage = 0;
+      float panel_current = 0;
+      float bus_voltage = 0;
+      uint16_t bus_current = 0;
+      float bat_voltage = 0;
+      uint16_t bat_charge_current = 0;
+      uint16_t bat_charge_power = 0;
+  }  ty_mpp;
+#endif
+
 typedef struct
 {
   float iaq;                // IAQ signal
@@ -37,6 +51,13 @@ typedef struct
   uint32_t bat_DischargeCoulomb = 0;
   float    bat_DeltamAh = 0;
   uint8_t  bat_max_charge_curr = 0;
+
+  #if (HAS_PMU)
+  int mpp_max_charge_setting = 0;
+  float mpp_max_bat_charge_power = 0;
+  tm mpp_last_timeinfo;
+  ty_mpp mpp_values[13];
+  #endif
   bool  wlan;
   bool  pictureLoop = true;
   float firmware_version;

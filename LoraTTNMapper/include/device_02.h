@@ -9,10 +9,14 @@
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
-#define HAS_PMU 1
+
 #define HAS_INA219  0
 #define USE_INTERRUPTS 1
+
+#define HAS_PMU 1
 #define USE_PMU_INTERRUPT 1
+#define USE_PMU_MPP_TRACKING 1          // Maximum power point tracking for Solar Pannel
+
 #define USE_BUTTON 1
 
 #define USE_BLE 0
@@ -29,7 +33,6 @@
 
 #define USE_WIFI 1
 #define USE_WEBSERVER   1
-#define sendWebsocketIntervall          10 // every x seconds
 #define USE_MQTT 1
 #define USE_MQTT_SENSORS 1
 #define USE_MQTT_TRAIN 0
@@ -49,9 +52,9 @@
 #define LORA_TX_INTERVAL 30           // Transmitt Lora messages
 #define LORA_DATARATE DR_SF10
 
-#define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendMqttIntervall      10 // Cayenne mqtt send intervall                   ---> t_send_cycle
 #define sendWebsocketIntervall  5 // Update Webpage
-#define sunTrackerRefreshIntervall 120
+#define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3
 #define PAYLOAD_BUFFER_SIZE 60

@@ -6,7 +6,7 @@ static const char TAG[] = "";
 #if (USE_MQTT)
 PubSubClient MqttClient(wifiClient);
 
-//const char *mqtt_server = "192.168.1.100"; // Raspberry
+// const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_server = "85.209.49.65"; // Netcup
 const char *mqtt_topic = "mrflexi/device/";
 const char *mqtt_topic_mosi = "/mosi";
@@ -16,7 +16,6 @@ const char *mqtt_topic_traincontroll = "/TrainControll/";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
-
 
 void doConcat(const char *a, const char *b, const char *c, char *out)
 {
@@ -40,7 +39,7 @@ void mqtt_loop()
   }
   else
   {
-    //ESP_LOGE(TAG, "Wifi not connected ");
+    // ESP_LOGE(TAG, "Wifi not connected ");
   }
 }
 
@@ -110,6 +109,14 @@ void callback(char *topic, byte *payload, unsigned int length)
 #endif
   }
 
+  if (action == "mpp")
+  {
+    ESP_LOGI(TAG, "PMU: Find max power point for solar panel");
+#if (HAS_PMU)
+    AXP192_get_mpp();
+#endif
+  }
+
   if (action == "sleep_time")
   {
     dataBuffer.settings.sleep_time = atoi(value);
@@ -118,19 +125,17 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
 
 #if (USE_PWM_SERVO)
-    if (action == "servo")
+  if (action == "servo")
   {
     const char *number = doc["command"]["number"];
     const char *position = doc["command"]["position"];
-    
+
     uint8_t servo_number = atoi(number);
     uint8_t servo_position = atoi(position);
-    ESP_LOGI(TAG, "MQTT: move servo &d to %3d degree", servo_number , servo_position);
-    servo_move_to( servo_number , servo_position);
-  }  
+    ESP_LOGI(TAG, "MQTT: move servo &d to %3d degree", servo_number, servo_position);
+    servo_move_to(servo_number, servo_position);
+  }
 #endif
-
-
 
 #if (HAS_PMU)
   if (action == "set_bat_max_charge_current")
@@ -168,7 +173,7 @@ void reconnect()
       // Attempt to connect
       if (MqttClient.connect(DEVICE_NAME))
       {
-        
+
         MqttClient.publish(mqtt_topic, "connected");
         MqttClient.subscribe(topic_in);
         ESP_LOGI(TAG, "Subscribed to topic %s", topic_in);
@@ -190,7 +195,7 @@ void reconnect()
 
 void setup_mqtt()
 {
-   ESP_LOGI(TAG, "-----------  Setup I2c MQTT  -----------");
+  ESP_LOGI(TAG, "-----------  Setup I2c MQTT  -----------");
   if (WiFi.status() == WL_CONNECTED)
   {
     MqttClient.setServer(mqtt_server, 1883);
@@ -212,9 +217,9 @@ void mqtt_send()
   char topic_out[50];
 
 #if (USE_CAMERA)
-sendPhoto();
-  //dataBuffer.data.buf = (const char*) captureImage()->buf;
-  //Serial.println(strlen(dataBuffer.data.buf));
+  sendPhoto();
+  // dataBuffer.data.buf = (const char*) captureImage()->buf;
+  // Serial.println(strlen(dataBuffer.data.buf));
 #endif
 
   // build MQTT topic e.g.  mrflexi/device/TBEAM-01/data
