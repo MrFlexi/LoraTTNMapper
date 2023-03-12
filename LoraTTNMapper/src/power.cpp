@@ -598,7 +598,9 @@ void ESP32_sleep()
   LED_deepSleep();
 #endif
 
+#if (USE_GPS)
   gps.enable_sleep();
+#endif
   Serial.flush();
 #if (USE_WIFI)
   WiFi.disconnect();

@@ -43,9 +43,10 @@
 #define DEVICE_TRACKER 2
 #define DEVICE_CAMERA_01   10 
 #define DEVICE_SOIL_SENSOR 11
+#define DEVICE_SENSOR_BOARD 12
 
 // Choose Application
-#define DEVICE_ID 2
+#define DEVICE_ID DEVICE_SENSOR_BOARD
 //#define DEVICE_ID SUN_TRACKER
 //#define DEVICE_ID DEVICE_CAMERA_01
 //#define DEVICE_ID DEVICE_SOIL_SENSOR
@@ -79,6 +80,11 @@
 #if DEVICE_ID == DEVICE_SOIL_SENSOR  // TBEAM-01 Device EU ID = DE00000000000010
 #include "soil_sensor.h"
 #include "../src/hal/ttgobeam10.h"
+#endif
+
+#if DEVICE_ID == DEVICE_SENSOR_BOARD // TBEAM-01 Device EU ID = DE00000000000010
+#include "device_sensor_board.h""
+#include "../src/hal/heltecv2.h"
 #endif
 
 #define I2CMUTEXREFRES_MS 40

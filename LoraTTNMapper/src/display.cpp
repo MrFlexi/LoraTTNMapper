@@ -352,6 +352,7 @@ void setup_display(void)
         u8g2.printf("RX RSSI %d SNR %.1d", dataBuffer.data.lmic.rssi, dataBuffer.data.lmic.snr);
         break;
 
+      #if (USE_GPS)
       case PAGE_GPS:
         u8g2.setFont(u8g2_font_ncenB12_tr);
         u8g2.drawStr(1, 15, "GPS");
@@ -367,6 +368,7 @@ void setup_display(void)
         u8g2.setCursor(1, 60);
         u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
         break;
+      #endif
 
 
 
@@ -455,9 +457,11 @@ void setup_display(void)
 
         u8g2.setFont(u8g2_font_profont12_tr);
         u8g2.setCursor(1, 30);
+        #if (USE_GPS)
         u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
         u8g2.setCursor(64, 30);
         u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
+        #endif
 
         u8g2.setCursor(1, 40);
         u8g2.printf("Sun: %.1f %.1f", dataBuffer.data.sun_azimuth, dataBuffer.data.sun_elevation);

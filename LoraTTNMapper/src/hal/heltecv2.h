@@ -13,14 +13,14 @@
 //#define HAS_BME680 GPIO_NUM_4, GPIO_NUM_15 // SDA, SCL
 //#define BME680_ADDR BME680_I2C_ADDR_PRIMARY // connect SDIO of BME680 to GND 
 
-#define HAS_LORA 1       // comment out if device shall not send data via LoRa
+#define HAS_LORA 0      // comment out if device shall not send data via LoRa
 #define CFG_sx1276_radio 1
 
 #define HAS_DISPLAY U8X8_SSD1306_128X64_NONAME_HW_I2C // OLED-Display on board
 #define HAS_LED LED_BUILTIN                           // white LED on board
 #define BUTTON_PIN KEY_BUILTIN                        // button "PROG" on board
 
-#define BAT_MEASURE_ADC ADC2_GPIO13_CHANNEL  // battery probe GPIO pin
+//#define BAT_MEASURE_ADC ADC2_GPIO13_CHANNEL  // battery probe GPIO pin
 #define BAT_MEASURE_ADC_UNIT 2 // ADC 2
 #define BAT_VOLTAGE_DIVIDER 2 // voltage divider 220k/100k on board
 #define EXT_POWER_SW Vext // switches battery power, Vext control 0 = on / 1 = off

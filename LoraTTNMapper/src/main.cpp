@@ -20,6 +20,7 @@ AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
 
+#if (USE_GPS)
 #include <SparkFun_Ublox_Arduino_Library.h> //http://librarymanager/All#SparkFun_Ublox_GPS
 SFE_UBLOX_GPS myGPS;
 int state = 0; // steps through states
@@ -55,6 +56,7 @@ void setup_gps_reset()
   }
   delay(1000);
 }
+#endif
 
 //--------------------------------------------------------------------------
 // log to spiffs
@@ -536,7 +538,6 @@ void setup()
 #endif
 
   dataBuffer.data.runmode = 0;
-  Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
   // Increment boot number and print it every reboot
   ++bootCount;
@@ -546,8 +547,8 @@ void setup()
   print_wakeup_reason();
   printLocalTime();
   display_chip_info();
-  Serial.println(dataBuffer.to_json());
-  Serial.println(dataBuffer.getError());
+  //Serial.println(dataBuffer.to_json());
+  //Serial.println(dataBuffer.getError());
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif

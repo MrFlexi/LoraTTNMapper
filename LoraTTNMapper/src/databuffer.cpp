@@ -107,6 +107,7 @@ String DataBuffer::to_json_web()
   sensors_9["value"] = dataBuffer.data.MotionCounter;
   sensors_9["unit"] = "Min";
 
+ #if (USE_PMU)
   JsonObject sensors_10 = sensors.createNestedObject();
   strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
   sensors_10["name"] = "Max Power Point";
@@ -123,6 +124,7 @@ String DataBuffer::to_json_web()
     mpp_line["bat_charge_current"] = dataBuffer.data.mpp_values[i].bat_charge_current;
     mpp_line["bat_charge_power"] = dataBuffer.data.mpp_values[i].bat_charge_power;
   }
+  #endif
 
   serializeJson(doc, JsonStr);
   serializeJson(doc, Serial);
