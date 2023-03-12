@@ -14,6 +14,8 @@ static const char TAG[] = "";
 #define QUECTEL_GPS_PRIMARY_ADDRESS (0x10)
 #define ADXL345 (0x53)
 #define IP5306_ADDR (0X75)
+#define INA219_PRIMARY_ADDRESS (0X40)
+#define INA219_SECUNDARY_ADDRESS (0X41)
 
 
 int i2c_scan(void) {
@@ -30,7 +32,18 @@ int i2c_scan(void) {
     i2c_ret = Wire.endTransmission();
     if (i2c_ret == 0) {
       devices++;
+
       switch (addr) {
+       case INA219_PRIMARY_ADDRESS:
+       ESP_LOGI(TAG, "0x%X: INA219 Voltage+Current detector", addr);
+       break;
+      
+       switch (addr) {
+       case INA219_SECUNDARY_ADDRESS:
+       ESP_LOGI(TAG, "0x%X: INA219 Voltage+Current detector", addr);
+       break;
+
+      //switch (addr) {
       //case INA3221_ADDRESS:
       //ESP_LOGI(TAG, "0x%X: INA 3221 Voltage+Current detector", addr);
       //  break;
