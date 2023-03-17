@@ -325,8 +325,11 @@ void t_cyclic() // Intervall: Display Refresh
 
 #if (HAS_INA219)
     print_ina219();
-    dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
-    dataBuffer.data.panel_current = ina219.getCurrent_mA();
+    dataBuffer.data.ina219[0].voltage = ina219.getBusVoltage_V();
+    dataBuffer.data.ina219[0].current = ina219.getCurrent_mA();
+    dataBuffer.data.ina219[0].power = ina219.getPower_mW();
+    dataBuffer.data.ina219[0].shuntVoltage = ina219.getShuntVoltage_mV();
+
 #endif
 
 #if (USE_CAMERA)

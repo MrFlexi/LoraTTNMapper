@@ -81,10 +81,10 @@ void displayRegisterPages()
 {
 
   max_page_counter = 0;
-  page_array[max_page_counter] = PAGE_TBEAM;
+  //page_array[max_page_counter] = PAGE_TBEAM;
 
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_MODULS;
+  //max_page_counter++;
+  //page_array[max_page_counter] = PAGE_MODULS;
 
 #if (HAS_LORA)
   max_page_counter++;
@@ -107,13 +107,13 @@ void displayRegisterPages()
 #endif
 
 #if (USE_BME280)
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_SENSORS;
+  //max_page_counter++;
+  //page_array[max_page_counter] = PAGE_SENSORS;
 #endif
 
 #if (USE_SUN_POSITION)
-  max_page_counter++;
-  page_array[max_page_counter] = PAGE_SUN;
+  //max_page_counter++;
+  //page_array[max_page_counter] = PAGE_SUN;
 #endif
 }
 
@@ -377,11 +377,12 @@ void setup_display(void)
       case PAGE_SOLAR:
         u8g2.setFont(u8g2_font_ncenB12_tr);
         u8g2.drawStr(1, 15, "Solar Panel");
-        u8g2.setFont(u8g2_font_profont12_tr);
 
 #if (HAS_INA3221 || HAS_INA219)
         u8g2.setCursor(1, 30);
-        u8g2.printf("In: %.2f V  %.0f mA ", dataBuffer.data.panel_voltage, dataBuffer.data.panel_current);
+        u8g2.printf("In: %.2f V  %.0f mA ", dataBuffer.data.ina219[0].voltage, dataBuffer.data.ina219[0].current);
+u8g2.setCursor(1, 45);
+u8g2.printf("In: %.2f mW", dataBuffer.data.ina219[0].power);
 #endif
 
 #if (HAS_PMU)
@@ -389,7 +390,7 @@ void setup_display(void)
         u8g2.printf("PMU Bus: %.2fV  %.0fmA ", dataBuffer.data.bus_voltage, dataBuffer.data.bus_current);
 #else
         u8g2.setCursor(1, 40);
-        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+        //u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
 #endif
         break;
 
@@ -412,7 +413,7 @@ void setup_display(void)
         u8g2.printf("Fuel:   %.0fmAh ", dataBuffer.data.bat_DeltamAh);
 #else
         u8g2.setCursor(1, 40);
-        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+        //u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
 #endif
 
         break;
@@ -481,7 +482,7 @@ void setup_display(void)
         u8g2.printf("Fuel: %.0fmAh ", dataBuffer.data.bat_DeltamAh);
 #else
         u8g2.setCursor(1, 25);
-        u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
+        //u8g2.printf("Bat: %.2fV", dataBuffer.data.bat_voltage);
 #endif
 
         if (dataBuffer.data.MotionCounter <= 0)

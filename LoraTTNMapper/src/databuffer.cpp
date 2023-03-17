@@ -24,6 +24,7 @@ String DataBuffer::to_json_web()
   doc.clear();
   JsonArray sensors = doc.createNestedArray("sensors");
 
+#if (HAS_PMU)
   JsonObject sensors_1 = sensors.createNestedObject();
   sensors_1["name"] = "Battery";
   sensors_1["subheader"] = "Voltage";
@@ -65,6 +66,7 @@ String DataBuffer::to_json_web()
   sensors_3["unit"] = "mA";
   sensors_3["indicator"] = "Up";
   sensors_3["valueColor"] = "Good";
+#endif
 
   sprintf(s, "%04.2g", data.sun_elevation);
   JsonObject sensors_4 = sensors.createNestedObject();
@@ -107,7 +109,7 @@ String DataBuffer::to_json_web()
   sensors_9["value"] = dataBuffer.data.MotionCounter;
   sensors_9["unit"] = "Min";
 
- #if (USE_PMU)
+ #if (HAS_PMU)
   JsonObject sensors_10 = sensors.createNestedObject();
   strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
   sensors_10["name"] = "Max Power Point";
@@ -126,8 +128,25 @@ String DataBuffer::to_json_web()
   }
   #endif
 
+  #if (HAS_INA219)
+  JsonObject sensors_11 = sensors.createNestedObject();
+  sensors_11["name"] = "Solar Panel";
+  sensors_11["subheader"] = dataBuffer.data.ina219[0].voltage;
+  sensors_11["value"] = dataBuffer.data.ina219[0].current;
+  sensors_11["unit"] = "V/mA";
+  #endif
+
+  
+  #if (HAS_INA219)
+  JsonObject sensors_12 = sensors.createNestedObject();
+  sensors_12["name"] = "Solar Panel";
+  sensors_12["subheader"] = "Power";
+  sensors_12["value"] = dataBuffer.data.ina219[0].power;
+  sensors_12["unit"] = "mW";
+  #endif
+
   serializeJson(doc, JsonStr);
-  serializeJson(doc, Serial);
+  //serializeJson(doc, Serial);
   return JsonStr;
 }
 
@@ -148,16 +167,20 @@ String DataBuffer::to_json()
   JsonObject measurement = doc.createNestedObject("measurement");
 
   // Battery Management
+  #if ( HAS_PMU) 
   measurement["bat_voltage"] = data.bat_voltage;
   measurement["bat_charge_current"] = data.bat_charge_current;
   measurement["bat_fuel_gauge"] = data.bat_DeltamAh;
   measurement["bus_voltage"] = data.bus_voltage;
   measurement["bus_current"] = data.bus_current;
   measurement["bat_max_charge_curr"] = settings.bat_max_charge_current;
+  #endif
 
 #if (HAS_INA219)
-  measurement["panel_voltage"] = data.panel_voltage;
-  measurement["panel_current"] = data.panel_current;
+  measurement["panel_voltage"] = data.ina219[0].voltage;
+  measurement["panel_current"] = data.ina219[0].current;
+  measurement["panel_power"] = data.ina219[0].power;
+
 #endif
 
   // Device

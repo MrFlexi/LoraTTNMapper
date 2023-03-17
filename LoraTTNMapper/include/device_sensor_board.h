@@ -51,15 +51,15 @@
 #define USE_PWM_SERVO 0                 // Uses external I2C Servo expander
 #define USE_SUN_POSITION 1
 
-#define displayRefreshIntervall 3      // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 2      // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 6          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL  30            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF10
 
-#define sendMqttIntervall      5 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  5 // Update Webpage
+#define sendMqttIntervall      15 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall  2 // Update Webpage
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3
