@@ -3,7 +3,7 @@
 
 //---------------------------------------------------------
 // Upload data to ESP 32 SPIFFS
-// pio run -t uploadfs
+// pio run -t uploadfs   !! close Serial Monitor before !!
 //---------------------------------------------------------
 #include "globals.h"
 
@@ -12,12 +12,15 @@
 // AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
-static const char TAG[] = __FILE__;
+//static const char TAG[] = __FILE__;
+static const char TAG[] = "";
+
 
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
 
+#if (USE_GPS)
 #include <SparkFun_Ublox_Arduino_Library.h> //http://librarymanager/All#SparkFun_Ublox_GPS
 SFE_UBLOX_GPS myGPS;
 int state = 0; // steps through states
@@ -53,6 +56,7 @@ void setup_gps_reset()
   }
   delay(1000);
 }
+#endif
 
 //--------------------------------------------------------------------------
 // log to spiffs
@@ -181,86 +185,7 @@ void setup_filesystem()
   delay(100);
 }
 
-//--------------------------------------------------------------------------
-// Cayenne MyDevices Integration
-//--------------------------------------------------------------------------
 
-#if (USE_CAYENNE)
-#define CAYENNE_PRINT Serial
-
-#include <CayenneMQTTESP32.h>
-char username[] = "ecddac20-a0eb-11e9-94e9-493d67fd755e";
-char password[] = "0010d05f8ccd918d0f8a45451950f8b80200e594";
-char clientID[] = "44257070-b074-11e9-80af-177b80d8d7b2"; // DE001-Balkon
-
-CAYENNE_CONNECTED()
-{
-  log_display("Cayenne connected...");
-}
-
-CAYENNE_DISCONNECTED()
-{
-  log_display("Cayenne connection lost...");
-  bool disconnected = true;
-  while (disconnected)
-  {
-    if (WiFi.status() == WL_CONNECTED)
-    {
-      log_display("Wifi is back...");
-      disconnected = false;
-    }
-    else
-    {
-      log_display("No wifi...");
-    }
-    delay(100);
-  }
-}
-
-CAYENNE_OUT_DEFAULT()
-{
-}
-
-void Cayenne_send(void)
-{
-
-  log_display("Cayenne send");
-
-  Cayenne.celsiusWrite(1, dataBuffer.data.temperature);
-  // Cayenne.virtualWrite(11, dataBuffer.data.gps.lat(), dataBuffer.data.gps.lng(),dataBuffer.data.gps.tGps.altitude.meters(),"gps","m");
-  Cayenne.virtualWrite(2, dataBuffer.data.humidity, "rel_hum", "p");
-
-  Cayenne.virtualWrite(10, dataBuffer.data.panel_voltage, "voltage", "Volts");
-  Cayenne.virtualWrite(12, dataBuffer.data.panel_current, "current", "Milliampere");
-
-  Cayenne.virtualWrite(20, dataBuffer.data.bus_voltage, "voltage", "Volts");
-  Cayenne.virtualWrite(21, dataBuffer.data.bus_current, "current", "Milliampere");
-
-  Cayenne.virtualWrite(30, dataBuffer.data.bat_voltage, "voltage", "Volts");
-  Cayenne.virtualWrite(31, dataBuffer.data.bat_charge_current, "current", "Milliampere");
-  Cayenne.virtualWrite(32, dataBuffer.data.bat_discharge_current, "current", "Milliampere");
-  Cayenne.virtualWrite(33, dataBuffer.data.bat_DeltamAh, "current", "Milliampere");
-
-  Cayenne.virtualWrite(40, dataBuffer.data.bootCounter, "counter", "Analog");
-}
-
-// Default function for processing actuator commands from the Cayenne Dashboard.
-// You can also use functions for specific channels, e.g CAYENNE_IN(1) for channel 1 commands.
-CAYENNE_IN_DEFAULT()
-{
-  log_display("Cayenne data received");
-  CAYENNE_LOG("Channel %u, value %s", request.channel, getValue.asString());
-  // Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
-  switch (request.channel)
-  {
-  case 1:
-    Serial.println("Cayenne: Reset Coulomb Counter");
-    pmu.ClearCoulombcounter();
-    break;
-  }
-}
-
-#endif
 
 String stringOne = "";
 
@@ -315,6 +240,11 @@ void t_sunTracker() // Intervall: Display Refresh
   ESP_LOGI(TAG, "------------------------------------------------");
   ESP_LOGI(TAG, "Sun Tracker");
   ESP_LOGI(TAG, "------------------------------------------------");
+
+
+#if (HAS_PMU)
+AXP192_get_mpp();
+#endif
 
 #if (USE_SUN_POSITION)
 #if (USE_PWM_SERVO)
@@ -395,8 +325,11 @@ void t_cyclic() // Intervall: Display Refresh
 
 #if (HAS_INA219)
     print_ina219();
-    dataBuffer.data.panel_voltage = ina219.getBusVoltage_V();
-    dataBuffer.data.panel_current = ina219.getCurrent_mA();
+    dataBuffer.data.ina219[0].voltage = ina219.getBusVoltage_V();
+    dataBuffer.data.ina219[0].current = ina219.getCurrent_mA();
+    dataBuffer.data.ina219[0].power = ina219.getPower_mW();
+    dataBuffer.data.ina219[0].shuntVoltage = ina219.getShuntVoltage_mV();
+
 #endif
 
 #if (USE_CAMERA)
@@ -445,7 +378,7 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
-
+ 
   printLocalTime();
 
 #if (USE_GPS_MOTION)
@@ -525,6 +458,7 @@ void t_sleep()
 #endif
 
   // Goto Deep Sleep
+  ESP_LOGI(TAG, "Deep sleep in %d min.", dataBuffer.data.MotionCounter );
   if (dataBuffer.data.MotionCounter <= 0)
   {
     ESP32_sleep();
@@ -536,6 +470,7 @@ void t_sleep()
 void setup_wifi()
 {
 #if (USE_WIFI)
+ ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
   IPAddress ip;
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
@@ -555,12 +490,13 @@ void setup_wifi()
     dataBuffer.data.wlan = true;
     ip = WiFi.localIP();
     Serial.println(ip);
+    ESP_LOGI(TAG, "IP: %s",  ip.toString());
     dataBuffer.data.ip_address = ip.toString();
   }
   else
   {
     // Turn off WiFi if no connection was made
-    log_display("WIFI OFF");
+    ESP_LOGI(TAG, "WIFI OFF");
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
@@ -605,7 +541,6 @@ void setup()
 #endif
 
   dataBuffer.data.runmode = 0;
-  Serial.println("Runmode: " + String(dataBuffer.data.runmode));
 
   // Increment boot number and print it every reboot
   ++bootCount;
@@ -615,8 +550,8 @@ void setup()
   print_wakeup_reason();
   printLocalTime();
   display_chip_info();
-  Serial.println(dataBuffer.to_json());
-  Serial.println(dataBuffer.getError());
+  //Serial.println(dataBuffer.to_json());
+  //Serial.println(dataBuffer.getError());
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
@@ -630,7 +565,7 @@ void setup()
 #if (I2C_SDA)
   Wire.begin(I2C_SDA, I2C_SCL, 100000);
 #else
-  Wire.begin(SDA, SCL, 100000);
+  Wire.begin(SDA, SCL, 400000);
 #endif
   i2c_scan();
 
@@ -658,6 +593,7 @@ void setup()
   dataBuffer.data.tx_ack_req = 0;
 
 #if (USE_DISPLAY)
+ ESP_LOGI(TAG, "-----------  Setup display   -----------");
   setup_display();
   showPage(PAGE_BOOT);
 #endif
@@ -669,23 +605,12 @@ void setup()
 #if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
   // Turn off Bluetooth
-  log_display("Bluethooth off");
+   ESP_LOGI(TAG, "Bluetooth OFF");
   btStop();
 #endif
 
 #if (USE_MQTT)
   setup_mqtt();
-#endif
-
-//---------------------------------------------------------------
-// OTA Update
-//---------------------------------------------------------------
-#if (USE_OTA)
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    _lastOTACheck = millis();
-    checkFirmwareUpdates();
-  }
 #endif
 
 #if (USE_GYRO)

@@ -1,7 +1,9 @@
 #include "globals.h"
 
+#if (USE_GPS)
+
 HardwareSerial GPSSerial(1);
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 void Neo6m::init()
 {
@@ -195,3 +197,5 @@ void Neo6m::resetDistance()
   
 }
 Neo6m gps;
+
+#endif

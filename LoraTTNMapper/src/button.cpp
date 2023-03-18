@@ -4,7 +4,7 @@
 Button *b = NULL;
 
 // Local logging tag
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 void button_init(int pin)
 {

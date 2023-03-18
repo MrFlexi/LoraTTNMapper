@@ -1,7 +1,10 @@
 #include "globals.h"
 #include "i2c_sensors.h"
 
+static const char TAG[] = "";
+
 #if (HAS_INA219)
+
 Adafruit_INA219 ina219;
 
 void print_ina219()

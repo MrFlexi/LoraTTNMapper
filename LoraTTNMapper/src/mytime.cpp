@@ -3,7 +3,7 @@
 #include "time.h"
 #include <sys/time.h>
 
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
@@ -121,6 +121,8 @@ void set_time_from_gps()
 
 void setup_time()
 {
+
+   ESP_LOGI(TAG, "-----------  Setup Time from WLAN or GPS   -----------");
   struct tm timeinfo;
   // Init and get the time if availabe via Internet
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);

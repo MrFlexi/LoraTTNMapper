@@ -1,88 +1,103 @@
 <mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f" xmlns:cards="sap.f.cards"
-	xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" controllerName="view.App">
+	xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:t="sap.ui.table" controllerName="view.App">
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
 			<tnt:ToolHeader>
-				<Button
-					id="sideNavigationToggleButton"
-					icon="sap-icon://menu2"
-					type="Transparent"
-					press=".onSideNavButtonPress">
+				<Button id="sideNavigationToggleButton" icon="sap-icon://menu2" type="Transparent" press=".onSideNavButtonPress">
 					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow" />
+						<OverflowToolbarLayoutData priority="NeverOverflow"/>
 					</layoutData>
 				</Button>
-				<Image height="1.5rem"
-					   class="sapUiSmallMarginBegin"
-					   src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg" />
+				<Image height="1.5rem" class="sapUiSmallMarginBegin" src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg"/>
 				<Title level="H1" text="ESP32 Monitor">
 					<layoutData>
-						<OverflowToolbarLayoutData shrinkable="true" />
+						<OverflowToolbarLayoutData shrinkable="true"/>
 					</layoutData>
 				</Title>
-				
-				<ToolbarSpacer width="20px" />
+				<ToolbarSpacer width="20px"/>
 				<Button text="Tools" type="Transparent">
 					<layoutData>
-						<OverflowToolbarLayoutData priority="Low" />
+						<OverflowToolbarLayoutData priority="Low"/>
 					</layoutData>
 				</Button>
-				<tnt:ToolHeaderUtilitySeparator />
+				<tnt:ToolHeaderUtilitySeparator/>
 				<ToolbarSpacer>
 					<layoutData>
-						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px" />
+						<OverflowToolbarLayoutData priority="NeverOverflow" minWidth="20px"/>
 					</layoutData>
 				</ToolbarSpacer>
 			</tnt:ToolHeader>
 		</tnt:header>
-		
 		<tnt:mainContents>
 			<NavContainer id="pageContainer" initialPage="root1">
 				<pages>
-					<ScrollContainer
-						id="root1"
-						horizontal="false"
-						vertical="true"
-						height="100%">
-						
-				<l:Grid containerQuery="true" defaultSpan="XL12 L12 M12 S12" width="100%">
-					<l:VerticalLayout width="100%" class="gridWrapper">
-						<FlexBox alignItems="Center" 
-								 alignContent="Center" direction="Row" renderType="Bare" wrap="Wrap" 
-								 width="100%" displayInline="true" fitContainer="true" 
-						items="{dataBuffer>/sensors}">
-							<items>
-								<GenericTile header="{dataBuffer>name}" 
-											 subheader="{dataBuffer>subheader}" press="onTilePress"
-											 class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
-									<TileContent unit="{dataBuffer>unit}" footer="">
-										<NumericContent scale="M" 
-														value="{dataBuffer>value}" 
-														valueColor="{dataBuffer>valueColor}"
-														indicator="{dataBuffer>indicator}"
-														withMargin="false"/>
-									</TileContent>
-								</GenericTile>
-							</items>
-						</FlexBox>
-					</l:VerticalLayout>
-				</l:Grid>
-
-			
-				</ScrollContainer>
-					<ScrollContainer
-						id="page1"
-						horizontal="false"
-						vertical="true"
-						height="100%">
-						<Text text="This is the first page" />
+					<ScrollContainer id="root1" horizontal="false" vertical="true" height="100%">
+						<l:Grid containerQuery="true" defaultSpan="XL12 L12 M12 S12" width="100%">
+							<l:VerticalLayout width="100%" class="gridWrapper">
+								<FlexBox alignItems="Center" alignContent="Center" direction="Row" renderType="Bare" wrap="Wrap" width="100%" displayInline="true"
+									fitContainer="true" items="{dataBuffer>/sensors}">
+									<items>
+										<GenericTile header="{dataBuffer>name}" subheader="{dataBuffer>subheader}" press="onTilePress"
+											class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+											<TileContent unit="{dataBuffer>unit}" footer="">
+												<NumericContent scale="M" value="{dataBuffer>value}" valueColor="{dataBuffer>valueColor}" indicator="{dataBuffer>indicator}"
+													withMargin="false"/>
+											</TileContent>
+										</GenericTile>
+									</items>
+								</FlexBox>
+							</l:VerticalLayout>
+							<l:VerticalLayout width="100%" class="gridWrapper">
+								<l:content>
+									<VBox class="sapUiSmallMargin"></VBox>
+								</l:content>
+							</l:VerticalLayout>
+							<l:VerticalLayout width="100%" class="gridWrapper">
+							<t:Table rows="{dataBuffer>/mpp}" selectionMode="MultiToggle"  paste="onPaste" ariaLabelledBy="title">
+								<t:extension>
+									<OverflowToolbar style="Clear">
+										<Title id="title" text="Maximum Power Point MPP"/>
+										<ToolbarSpacer/>
+										<Button icon="sap-icon://sorting-ranking" tooltip="Sort ascending across Categories and Name" press="sortCategoriesAndName"/>
+										<Button icon="sap-icon://sort" tooltip="Sort Categories in addition to current sorting" press="sortCategories"/>
+										<Button icon="sap-icon://decline" tooltip="Clear all sortings" press="clearAllSortings"/>
+									</OverflowToolbar>
+								</t:extension>
+								<t:columns>
+									<t:Column id="maxloadsetting" sortProperty="maxloadsetting" width="11rem">
+										<Label text="MaxLoadSetting"/>
+										<t:template>
+											<Text text="{dataBuffer>pmu_charge_setting}" wrapping="false"/>
+										</t:template>
+									</t:Column>
+									<t:Column width="11rem">
+										<Label text="Bus Voltage V"/>
+										<t:template>
+											<Text text="{dataBuffer>bus_voltage}"/>
+										</t:template>
+									</t:Column>
+									<t:Column width="11rem">
+										<Label text="Charge current mA"/>
+										<t:template>
+											<Text text="{dataBuffer>bat_charge_current}"/>
+										</t:template>
+									</t:Column>
+									<t:Column width="11rem">
+										<Label text="Charge power mW "/>
+										<t:template>
+											<Text text="{dataBuffer>bat_charge_power}"/>
+										</t:template>
+									</t:Column>
+								</t:columns>
+							</t:Table>
+						</l:VerticalLayout>
+						</l:Grid>
 					</ScrollContainer>
-					<ScrollContainer
-						id="root2"
-						horizontal="false"
-						vertical="true"
-						height="100%">
-						<Text text="This is the root page of the second element" />
+					<ScrollContainer id="page1" horizontal="false" vertical="true" height="100%">
+						<Text text="This is the first page"/>
+					</ScrollContainer>
+					<ScrollContainer id="root2" horizontal="false" vertical="true" height="100%">
+						<Text text="This is the root page of the second element"/>
 					</ScrollContainer>
 				</pages>
 			</NavContainer>

@@ -12,28 +12,27 @@
 
 #pragma once
 
-#define DEVICE_NAME "mrflexi-01"
+#define DEVICE_NAME "sensor-01"
 #define USE_OTA 0
-#define USE_BME280 0
-#define HAS_LORA 1
+#define USE_BME280 1
+#define HAS_LORA 0
 #define HAS_INA3221  0
-#define HAS_INA219  0
-#define USE_GPS 1
-#define USE_DISPLAY 0
+#define HAS_INA219  1
+#define USE_GPS 0
+#define USE_DISPLAY 1
 
-#define HAS_PMU 1
-#define PMU_SLEEP_ALL_OFF 1
-#define USE_INTERRUPTS 1
-#define USE_PMU_INTERRUPT 1
-#define USE_BUTTON 1
+#define HAS_PMU 0
+#define USE_INTERRUPTS 0
+#define USE_PMU_INTERRUPT 0
+#define USE_BUTTON 0
 
 #define USE_SPIFF_LOGGING 0
 
-#define USE_WIFI 0
+#define USE_WIFI 1
 #define USE_WIFI_MANAGER 0
-#define USE_WEBSERVER   0
-#define USE_MQTT 0
-#define USE_MQTT_SENSORS 0
+#define USE_WEBSERVER   1
+#define USE_MQTT 1
+#define USE_MQTT_SENSORS 1
 #define USE_MQTT_TRAIN 0
 
 #define USE_FASTLED 0
@@ -49,18 +48,18 @@
 #define HCSR04_trigger_pin  GPIO_NUM_2
 #define HCSR04_echo_pin     GPIO_NUM_13
 
-#define USE_PWM_SERVO 1                 // Uses external I2C Servo expander
+#define USE_PWM_SERVO 0                 // Uses external I2C Servo expander
 #define USE_SUN_POSITION 1
 
-#define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
-#define displayMoveIntervall 7          // shift to next display page               ---> t_moveDisplay
+#define displayRefreshIntervall 2      // get sensor values and update display     ---> t_cyclic
+#define displayMoveIntervall 6          // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
 #define LORA_TX_INTERVAL  30            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF10
 
 #define sendMqttIntervall      15 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  5 // Update Webpage
+#define sendWebsocketIntervall  2 // Update Webpage
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3
@@ -74,11 +73,11 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1          // Main switch
+#define ESP_SLEEP 0          // Main switch
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  1 // // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes

@@ -43,10 +43,11 @@
 #define DEVICE_TRACKER 2
 #define DEVICE_CAMERA_01   10 
 #define DEVICE_SOIL_SENSOR 11
+#define DEVICE_SENSOR_BOARD 12
 
 // Choose Application
-// #define DEVICE_ID 2
-#define DEVICE_ID SUN_TRACKER
+#define DEVICE_ID DEVICE_SENSOR_BOARD
+//#define DEVICE_ID SUN_TRACKER
 //#define DEVICE_ID DEVICE_CAMERA_01
 //#define DEVICE_ID DEVICE_SOIL_SENSOR
 
@@ -81,6 +82,11 @@
 #include "../src/hal/ttgobeam10.h"
 #endif
 
+#if DEVICE_ID == DEVICE_SENSOR_BOARD // TBEAM-01 Device EU ID = DE00000000000010
+#include "device_sensor_board.h""
+#include "../src/hal/heltecv2.h"
+#endif
+
 #define I2CMUTEXREFRES_MS 40
 #define I2C_MUTEX_LOCK() \
   (xSemaphoreTake(I2Caccess, pdMS_TO_TICKS(I2CMUTEXREFRES_MS)) == pdTRUE)
@@ -111,6 +117,8 @@ extern WiFiClient wifiClient;
 
 #include "gps.h"
 #include "esp_log.h"
+
+
 
 //--------------------------------------------------------------------------
 // Wifi Settings
@@ -168,9 +176,6 @@ extern QueueHandle_t LoraSendQueue;
 #include "payload.h"
 #endif
 
-#if (USE_OTA)
-#include "SecureOTA.h"
-#endif
 
 #if (USE_FASTLED)
 #include <Led.h>

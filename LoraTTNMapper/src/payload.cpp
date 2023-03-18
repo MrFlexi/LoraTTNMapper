@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "payload.h"
 
-static const char TAG[] = __FILE__;
+static const char TAG[] = "";
 
 PayloadConvert::PayloadConvert(uint8_t size)
 {
@@ -102,6 +102,7 @@ void PayloadConvert::addDeviceData(uint8_t channel){
 }
 
 
+#if (HAS_PMU)
 void PayloadConvert::addPMU(uint8_t channel)
 {
 
@@ -128,6 +129,7 @@ void PayloadConvert::addPMU(uint8_t channel)
   buffer[cursor++] = highByte(out);
   buffer[cursor++] = lowByte(out);
 }
+#endif
 
 void PayloadConvert::addGPS_TTN(TinyGPSPlus tGps)
 {
