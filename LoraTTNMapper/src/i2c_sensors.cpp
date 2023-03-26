@@ -5,11 +5,12 @@ static const char TAG[] = "";
 
 #if (HAS_INA219)
 
-Adafruit_INA219 ina219;
+//Adafruit_INA219 ina219;
+Adafruit_INA219 ina219(0x41);
 
 void print_ina219()
 {
-  Serial.println("");
+  Serial.println("---- INA 219 Current Sensor ----");
   float shuntvoltage = 0;
   float busvoltage = 0;
   float current_mA = 0;
@@ -45,10 +46,11 @@ void setup_ina219()
   ESP_LOGI(TAG, "Setup INA 219");
   if (!ina219.begin())
   {
-    Serial.println("Failed to find INA219 chip");
+     ESP_LOGI(TAG, "Could not find a valid INA219 sensor");
   }
   else
   {
+    ESP_LOGI(TAG, "INA219 sensor found");
     print_ina219();
   }
 }

@@ -29,79 +29,75 @@ void t_enqueue_LORA_messages()
     ESP_LOGE(TAG, "LORA send queue not initalized. Aborting.");
     return;
   }
-  
-    // -----------------------------------------------------------------------------
-    //   Port 1: TTN Mapper
-    // -----------------------------------------------------------------------------
+
+  // -----------------------------------------------------------------------------
+  //   Port 1: TTN Mapper
+  // -----------------------------------------------------------------------------
 #if (USE_GPS)
-    if (gps.checkGpsFix())
+  if (gps.checkGpsFix())
+  {
+    if (gps.tGps.location.lat() > 0)
     {
-      if (gps.tGps.location.lat() > 0)
-      {
-        payload.reset();
-        payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
-        payload.enqueue_port(1);
-      }
+      payload.reset();
+      payload.addGPS_TTN(gps.tGps); // TTN-Mapper format will be re-generated in TTN Payload converter
+      payload.enqueue_port(1);
     }
+  }
 #endif
 
-    // -----------------------------------------------------------------------------
-    //   Port 2: Cayenne My Devices
-    // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  //   Port 2: Cayenne My Devices
+  // -----------------------------------------------------------------------------
 
-    //payload.reset();
-    //payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
-    //payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
+  // payload.reset();
+  // payload.addCount(LPP_BOOTCOUNT_CHANNEL, dataBuffer.data.bootCounter);
+  // payload.addFloat(LPP_FIRMWARE_CHANNEL, dataBuffer.data.firmware_version);
 
-//#if (USE_GPS)
-//    if (gps.checkGpsFix())
-//    {
-//      //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
-//    }
-//#endif
-
-
+  // #if (USE_GPS)
+  //     if (gps.checkGpsFix())
+  //     {
+  //       //payload.addGPS_LPP(5, gps.tGps); // Format for Cayenne LPP Message
+  //     }
+  // #endif
 
 #if (HAS_INA3221 || HAS_INA219)
-    payload.addVoltage(10, dataBuffer.data.panel_voltage);
-    payload.addVoltage(12, dataBuffer.data.panel_current);
+  payload.addVoltage(10, dataBuffer.data.panel_voltage);
+  payload.addVoltage(12, dataBuffer.data.panel_current);
 #endif
 
+  // payload.enqueue_port(2); // send data
 
-   //payload.enqueue_port(2); // send data
+  // -----------------------------------------------------------------------------
+  //   Port 3: Device --> TTN, no payload concerter --> NodeRed --> Influxdb
+  //   Payload will be converted to Json-InfluxDB format in NodeRed
+  // -----------------------------------------------------------------------------
+  payload.reset();
 
-     // -----------------------------------------------------------------------------
-    //   Port 3: Device --> TTN, no payload concerter --> NodeRed --> Influxdb
-    //   Payload will be converted to Json-InfluxDB format in NodeRed
-    // -----------------------------------------------------------------------------
-    payload.reset();
+#if (HAS_PMU)
+  payload.addPMU(01); //(channel, 10 bytes)
+#endif
 
-    #if( HAS PMU)
-    payload.addPMU(01);      //(channel, 10 bytes)
-    #endif
+#if (USE_SOIL_MOISTURE)
+  payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+#endif
 
-    #if (USE_SOIL_MOISTURE)
-    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
-    #endif
+#if (USE_SOIL_MOISTURE)
+  payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
+#endif
 
-    #if (USE_SOIL_MOISTURE)
-    payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
-    #endif
-
-    #if (USE_DISTANCE_SENSOR_HCSR04)
+#if (USE_DISTANCE_SENSOR_HCSR04)
   // HC-SR04 Sonic distance sensor
   payload.addFloatN(0x01, LPP_HCSR04_DISTANCE, dataBuffer.data.hcsr04_distance);
-  //measurement["HCSR04_Distance"] = data.hcsr04_distance;
+  // measurement["HCSR04_Distance"] = data.hcsr04_distance;
 #endif
 
+#if (USE_BME280)
+  payload.addBMETemp(01); // (channel, 4 bytes)
+#endif
 
-    #if (USE_BME280)
-    payload.addBMETemp(01); // (channel, 4 bytes)
-    #endif
+  payload.addDeviceData(0); // (channel, 4 bytes)
+  payload.enqueue_port(2);  // send data
 
-    payload.addDeviceData(0); // (channel, 4 bytes)
-    payload.enqueue_port(2); // send data    
-    
 #endif
 }
 

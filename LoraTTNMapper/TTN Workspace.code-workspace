@@ -6,6 +6,10 @@
 		},
 		{
 			"path": "..\\..\\AXP202X_Library"
+		},
+		{
+			"name": "ESP32_OTA",
+			"path": "../../ESP32/ESP32_OTA"
 		}
 	],
 	"settings": {

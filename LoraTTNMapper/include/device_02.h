@@ -2,15 +2,13 @@
 #pragma once
 
 #define DEVICE_NAME "mrflexi-02"
-#define USE_OTA 0
 #define USE_BME280 1
 #define HAS_LORA 1
-#define USE_DASH 0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
 
-#define HAS_INA219  0
+#define HAS_INA219  1
 #define USE_INTERRUPTS 1
 
 #define HAS_PMU 1
@@ -24,6 +22,7 @@
 #define USE_BLE_SCANNER 0               // Corona Warn App
 #define USE_SERIAL_BT 0
 #define USE_SUN_POSITION 1
+#define USE_PWM_SERVO 1                 // Uses external I2C Servo expander
 
 #define USE_SOIL_MOISTURE 0 
 
@@ -45,7 +44,7 @@
 #define USE_SUN_POSITION 1
 #define USE_POTI 0
 
-#define displayRefreshIntervall 5       // get sensor values and update display     ---> t_cyclic
+#define displayRefreshIntervall 5      // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 10         // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 60 // Queue Lora messages
@@ -53,7 +52,7 @@
 #define LORA_DATARATE DR_SF10
 
 #define sendMqttIntervall      10 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall  5 // Update Webpage
+#define sendWebsocketIntervall  2 // Update Webpage
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3
@@ -70,7 +69,7 @@
 //--------------------------------------------------------------------------
 // ESP Sleep Mode
 //--------------------------------------------------------------------------
-#define ESP_SLEEP 1          // Main switch
+#define ESP_SLEEP 0         // Main switch
 
 
 #define TIME_TO_SLEEP 54                        // sleep for n minute if no uto power mode

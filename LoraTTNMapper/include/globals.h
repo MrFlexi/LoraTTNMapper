@@ -39,15 +39,19 @@
 //--------------------------------------------------------------------------
 
 // Define Applications
-#define SUN_TRACKER 1
+
+#define DEVICE_TTN_MAPPER 1
 #define DEVICE_TRACKER 2
 #define DEVICE_CAMERA_01   10 
 #define DEVICE_SOIL_SENSOR 11
 #define DEVICE_SENSOR_BOARD 12
+#define DEVICE_SUN_TRACKER 13
 
 // Choose Application
-#define DEVICE_ID DEVICE_SENSOR_BOARD
+#define DEVICE_ID DEVICE_TTN_MAPPER
+//#define DEVICE_ID DEVICE_SENSOR_BOARD
 //#define DEVICE_ID SUN_TRACKER
+//#define DEVICE_ID DEVICE_TRACKER
 //#define DEVICE_ID DEVICE_CAMERA_01
 //#define DEVICE_ID DEVICE_SOIL_SENSOR
 
@@ -84,7 +88,7 @@
 
 #if DEVICE_ID == DEVICE_SENSOR_BOARD // TBEAM-01 Device EU ID = DE00000000000010
 #include "device_sensor_board.h""
-#include "../src/hal/heltecv2.h"
+#include "../src/hal/ttgobeam10.h"
 #endif
 
 #define I2CMUTEXREFRES_MS 40

@@ -16,4 +16,6 @@ void servo_pwm_test();
 void servo_move_to( uint8_t servo_number, uint8_t servo_position );
 void servo_move_to_sun();
 void servo_move_to_last_position();
+void panel_switch_on();
+void panel_switch_off();
 

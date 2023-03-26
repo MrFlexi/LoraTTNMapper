@@ -6,15 +6,17 @@
 // pio run -t uploadfs   !! close Serial Monitor before !!
 //---------------------------------------------------------
 #include "globals.h"
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 
 // Defaults to window size 10
 #if (USE_POTI)
 // AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
-//static const char TAG[] = __FILE__;
+// static const char TAG[] = __FILE__;
 static const char TAG[] = "";
-
 
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
@@ -45,13 +47,13 @@ void setup_gps_reset()
     myGPS.disableNMEAMessage(UBX_NMEA_GSV, COM_PORT_UART1);
     myGPS.disableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
 
-    //myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+    // myGPS.disableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
     myGPS.enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
 
     myGPS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
 
     myGPS.disableNMEAMessage(UBX_NMEA_ZDA, COM_PORT_UART1);
-    //myGPS.enableNMEAMessage(UBX_NMEA_ZDA, COM_PORT_UART1);
+    // myGPS.enableNMEAMessage(UBX_NMEA_ZDA, COM_PORT_UART1);
     myGPS.saveConfiguration(); // Save the current settings to flash and BBR
   }
   delay(1000);
@@ -98,7 +100,6 @@ int vprintf_into_spiffs(const char *szFormat, va_list args)
   return ret;
 }
 #endif
-
 
 bool wifi_connected = false;
 
@@ -161,6 +162,56 @@ Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 Ticker sunTicker;
 
+
+void setup_ota() {
+  
+  // Port defaults to 3232
+   ArduinoOTA.setPort(3232);
+
+  // Hostname defaults to esp3232-[MAC]
+   ArduinoOTA.setHostname(DEVICE_NAME);
+
+  // No authentication by default
+  // ArduinoOTA.setPassword("admin");
+
+  // Password can be set with it's md5 value as well
+  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
+  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
+
+  ArduinoOTA
+    .onStart([]() {
+      String type;
+      if (ArduinoOTA.getCommand() == U_FLASH)
+        type = "sketch";
+      else // U_SPIFFS
+        type = "filesystem";
+
+      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+      Serial.println("Start updating " + type);
+    })
+    .onEnd([]() {
+      Serial.println("\nEnd");
+    })
+    .onProgress([](unsigned int progress, unsigned int total) {
+      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    })
+    .onError([](ota_error_t error) {
+      Serial.printf("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    });
+
+  ArduinoOTA.begin();
+
+  Serial.println("Ready");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+
 void setup_filesystem()
 {
   //---------------------------------------------------------------
@@ -185,10 +236,6 @@ void setup_filesystem()
   delay(100);
 }
 
-
-
-String stringOne = "";
-
 void touch_callback()
 {
   // placeholder callback function
@@ -208,18 +255,20 @@ void t_mqtt_cycle()
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
+  {
 
 #if (USE_MQTT_SENSORS)
     mqtt_send();
 #endif
 #if (USE_MQTT_TRAIN)
-  if (dataBuffer.data.potentiometer_a_changed)
-  {
-    mqtt_send_lok(1, dataBuffer.data.potentiometer_a, 1);
-    dataBuffer.data.potentiometer_a_changed = false;
+    if (dataBuffer.data.potentiometer_a_changed)
+    {
+      mqtt_send_lok(1, dataBuffer.data.potentiometer_a, 1);
+      dataBuffer.data.potentiometer_a_changed = false;
+    }
+#endif
+#endif
   }
-#endif
-#endif
 }
 
 void t_cyclicRTOS(void *pvParameters)
@@ -241,16 +290,15 @@ void t_sunTracker() // Intervall: Display Refresh
   ESP_LOGI(TAG, "Sun Tracker");
   ESP_LOGI(TAG, "------------------------------------------------");
 
-
 #if (HAS_PMU)
-AXP192_get_mpp();
+  AXP192_get_mpp();
 #endif
 
 #if (USE_SUN_POSITION)
 #if (USE_PWM_SERVO)
   servo_move_to_sun();
-   Serial.println();
-    Serial.println();
+  Serial.println();
+  Serial.println();
 #endif
 #endif
 }
@@ -262,7 +310,7 @@ void t_cyclic() // Intervall: Display Refresh
   Serial.println();
   Serial.println();
 
-  handle_time(); //get time and write to dataBuffer
+  handle_time(); // get time and write to dataBuffer
 
 #if (USE_BLE_SERVER)
   ble_send();
@@ -270,7 +318,7 @@ void t_cyclic() // Intervall: Display Refresh
 
   dataBuffer.data.freeheap = ESP.getFreeHeap();
   dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
-  //ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
+  // ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
   //   I2C opperations
@@ -324,6 +372,16 @@ void t_cyclic() // Intervall: Display Refresh
 #endif
 
 #if (HAS_INA219)
+    if (ina219.getBusVoltage_V() < 50)
+    {
+      ESP_LOGI(TAG, "Cut-Off Solar Panel at: %.2fV", dataBuffer.data.ina219[0].voltage);
+      panel_switch_off();
+      delay(400);
+      ESP_LOGI(TAG, "Solar Panel OFF: %.2fV ", ina219.getBusVoltage_V());
+      panel_switch_on();
+      ESP_LOGI(TAG, "Solar Panel ON: %.2fV ", ina219.getBusVoltage_V());
+    }
+
     print_ina219();
     dataBuffer.data.ina219[0].voltage = ina219.getBusVoltage_V();
     dataBuffer.data.ina219[0].current = ina219.getCurrent_mA();
@@ -361,7 +419,7 @@ void t_cyclic() // Intervall: Display Refresh
   ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture);
 #endif
 
-  //esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
+  // esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
 
 #if (CYCLIC_SHOW_LOG)
   ESP_LOGI(TAG, "Runmode %d", dataBuffer.data.runmode);
@@ -378,7 +436,7 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
- 
+
   printLocalTime();
 
 #if (USE_GPS_MOTION)
@@ -458,7 +516,7 @@ void t_sleep()
 #endif
 
   // Goto Deep Sleep
-  ESP_LOGI(TAG, "Deep sleep in %d min.", dataBuffer.data.MotionCounter );
+  ESP_LOGI(TAG, "Deep sleep in %d min.", dataBuffer.data.MotionCounter);
   if (dataBuffer.data.MotionCounter <= 0)
   {
     ESP32_sleep();
@@ -470,7 +528,7 @@ void t_sleep()
 void setup_wifi()
 {
 #if (USE_WIFI)
- ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
+  ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
   IPAddress ip;
   // WIFI Setup
   WiFi.begin(ssid, wifiPassword);
@@ -490,7 +548,7 @@ void setup_wifi()
     dataBuffer.data.wlan = true;
     ip = WiFi.localIP();
     Serial.println(ip);
-    ESP_LOGI(TAG, "IP: %s",  ip.toString());
+    ESP_LOGI(TAG, "IP: %s", ip.toString());
     dataBuffer.data.ip_address = ip.toString();
   }
   else
@@ -550,8 +608,8 @@ void setup()
   print_wakeup_reason();
   printLocalTime();
   display_chip_info();
-  //Serial.println(dataBuffer.to_json());
-  //Serial.println(dataBuffer.getError());
+  // Serial.println(dataBuffer.to_json());
+  // Serial.println(dataBuffer.getError());
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
@@ -567,6 +625,7 @@ void setup()
 #else
   Wire.begin(SDA, SCL, 400000);
 #endif
+  delay(500);
   i2c_scan();
 
 #if (HAS_IP5306)
@@ -593,7 +652,7 @@ void setup()
   dataBuffer.data.tx_ack_req = 0;
 
 #if (USE_DISPLAY)
- ESP_LOGI(TAG, "-----------  Setup display   -----------");
+  ESP_LOGI(TAG, "-----------  Setup display   -----------");
   setup_display();
   showPage(PAGE_BOOT);
 #endif
@@ -605,7 +664,7 @@ void setup()
 #if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
   // Turn off Bluetooth
-   ESP_LOGI(TAG, "Bluetooth OFF");
+  ESP_LOGI(TAG, "Bluetooth OFF");
   btStop();
 #endif
 
@@ -677,6 +736,8 @@ void setup()
   setup_time();
 
 #if (USE_PWM_SERVO)
+  setup_servo_pwm();
+  panel_switch_on();
   servo_move_to_last_position();
 #endif
 
@@ -684,6 +745,7 @@ void setup()
   setup_ble();
 #endif
 
+setup_ota();
   // get sensor values once
   t_cyclic();
 
@@ -768,4 +830,7 @@ void loop()
 #if (USE_BUTTON)
   readButton();
 #endif
+
+ ArduinoOTA.handle();
+
 }

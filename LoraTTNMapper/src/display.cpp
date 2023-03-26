@@ -81,7 +81,7 @@ void displayRegisterPages()
 {
 
   max_page_counter = 0;
-  //page_array[max_page_counter] = PAGE_TBEAM;
+  page_array[max_page_counter] = PAGE_TBEAM;
 
   //max_page_counter++;
   //page_array[max_page_counter] = PAGE_MODULS;
@@ -213,7 +213,7 @@ void setup_display(void)
 
   switch (DEVICE_ID)
   {
-  case SUN_TRACKER:
+  case DEVICE_SUN_TRACKER:
     //displayRegisterPagesSunTracker();
     break;
   default:
@@ -303,15 +303,12 @@ void setup_display(void)
       case PAGE_TBEAM:
         u8g2.setFont(u8g2_font_profont12_tr);
         u8g2.setCursor(1, 15);
-        u8g2.printf("Mr Flexi TTN %.2f", dataBuffer.data.firmware_version);
+        u8g2.printf("%s", DEVICE_NAME);
 
         u8g2.setCursor(1, 30);
-        u8g2.printf("Deep Sleep in: %2d ", dataBuffer.data.MotionCounter);
+        u8g2.printf("Deep Sleep: %2d / %3d ", dataBuffer.data.MotionCounter,  dataBuffer.settings.sleep_time);
 
         u8g2.setCursor(1, 45);
-        u8g2.printf("Deep Sleep for: %3d", dataBuffer.settings.sleep_time);
-
-        u8g2.setCursor(1, 60);
         u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
         u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
         break;
@@ -369,10 +366,6 @@ void setup_display(void)
         u8g2.printf("Dist:%.0f m Lat %.0f", dataBuffer.data.gps_distance, dataBuffer.data.gps_old.lat());
         break;
       #endif
-
-
-
-      
 
       case PAGE_SOLAR:
         u8g2.setFont(u8g2_font_ncenB12_tr);

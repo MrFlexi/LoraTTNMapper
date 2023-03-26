@@ -16,7 +16,7 @@ void DataBuffer::get()
 
 String DataBuffer::to_json_web()
 {
-  const int capacity = JSON_OBJECT_SIZE(100) + JSON_OBJECT_SIZE(2);
+  const int capacity = JSON_OBJECT_SIZE(200) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
   char s[20];
@@ -117,6 +117,7 @@ String DataBuffer::to_json_web()
   sensors_10["value"] = dataBuffer.data.mpp_max_bat_charge_power;
   sensors_10["unit"] = "mW";
 
+  // Tabelle 
   JsonArray mpp = doc.createNestedArray("mpp");
   for (int i = 0; i < 13; i++)
   {
@@ -134,10 +135,7 @@ String DataBuffer::to_json_web()
   sensors_11["subheader"] = dataBuffer.data.ina219[0].voltage;
   sensors_11["value"] = dataBuffer.data.ina219[0].current;
   sensors_11["unit"] = "V/mA";
-  #endif
-
   
-  #if (HAS_INA219)
   JsonObject sensors_12 = sensors.createNestedObject();
   sensors_12["name"] = "Solar Panel";
   sensors_12["subheader"] = "Power";
@@ -150,10 +148,10 @@ String DataBuffer::to_json_web()
   return JsonStr;
 }
 
+ // Json format suitable for direct input to INFLUX DB
 String DataBuffer::to_json()
 {
-  // Json format suitable for direct input to INFLUX DB
-
+ 
   const int capacity = JSON_OBJECT_SIZE(100) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
