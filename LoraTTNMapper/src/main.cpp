@@ -166,7 +166,7 @@ Ticker sunTicker;
 void setup_ota() {
   
   // Port defaults to 3232
-   ArduinoOTA.setPort(3232);
+  // ArduinoOTA.setPort(3232);
 
   // Hostname defaults to esp3232-[MAC]
    ArduinoOTA.setHostname(DEVICE_NAME);
@@ -188,6 +188,9 @@ void setup_ota() {
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       Serial.println("Start updating " + type);
+#if (USE_DISPLAY)
+      showPage(PAGE_OTA);
+#endif
     })
     .onEnd([]() {
       Serial.println("\nEnd");
@@ -626,7 +629,7 @@ void setup()
   Wire.begin(SDA, SCL, 400000);
 #endif
   delay(500);
-  i2c_scan();
+ 
 
 #if (HAS_IP5306)
   setupPowerIP5306();
@@ -640,6 +643,8 @@ void setup()
   AXP192_power_gps(ON);
   delay(1000);
 #endif
+
+ i2c_scan();
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280)
   ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");

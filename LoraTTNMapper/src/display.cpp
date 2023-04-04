@@ -313,6 +313,17 @@ void setup_display(void)
         u8g2.printf("IP: %s ", dataBuffer.data.ip_address);
         break;
 
+       case PAGE_OTA:
+         u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.setCursor(1, 15);
+        u8g2.printf("OTA Update");
+
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("reboot after sucess");
+
+        break;
+
       case PAGE_MODULS:
         u8g2.setFont(u8g2_font_ncenB12_tr);
         sprintf(sbuf, "Moduls");

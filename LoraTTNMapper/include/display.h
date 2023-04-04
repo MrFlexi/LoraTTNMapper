@@ -31,6 +31,7 @@
 
 #define PAGE_SLEEP 20         // Pages > 20 are not in the picture loop
 #define PAGE_BOOT 21
+#define PAGE_OTA 22
 
 // assume 4x6 font, define width and height
 #define U8LOG_WIDTH 32
