@@ -22,7 +22,7 @@
 #define USE_DISPLAY 1
 
 #define HAS_PMU 1
-#define PMU_SLEEP_ALL_OFF 1
+#define PMU_SLEEP_ALL_OFF 0    // Error I2C Interface on reboot  On TBEAM must be 0
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 1
@@ -78,7 +78,7 @@
 
 
 #define TIME_TO_SLEEP 10       // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  6 // // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
 
 #define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes

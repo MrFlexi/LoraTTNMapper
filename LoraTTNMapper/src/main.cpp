@@ -664,7 +664,7 @@ void setup()
 
   setup_wifi();
   calibrate_voltage();
-  delay(500);
+  delay(100);
 
 #if (USE_SERIAL_BT || USE_BLE_SCANNER || USE_BLE_SERVER)
 #else
