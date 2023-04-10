@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.5.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -176,8 +176,8 @@
 <connect gate="G$1" pin="MOSI" pad="24"/>
 <connect gate="G$1" pin="RST" pad="3"/>
 <connect gate="G$1" pin="RX" pad="25"/>
-<connect gate="G$1" pin="SCL" pad="17"/>
-<connect gate="G$1" pin="SDA" pad="18"/>
+<connect gate="G$1" pin="SCL" pad="18"/>
+<connect gate="G$1" pin="SDA" pad="17"/>
 <connect gate="G$1" pin="TX" pad="26"/>
 </connects>
 <technologies>

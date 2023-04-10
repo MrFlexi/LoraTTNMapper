@@ -6595,12 +6595,11 @@ Based on  the following source:
 <sheets>
 <sheet>
 <plain>
-<text x="-30.48" y="111.76" size="1.778" layer="91">GPIO04 FAST Led
+<text x="-30.48" y="111.76" size="1.778" layer="91">GPIO04 FAST Ledl
 GPIO15 Servo Power Rail
-GPIO36 Servo Power Rail 2
-GPIO13 Servo 1 Signal
-GPIO04 Servo 2 Signal</text>
-<text x="-30.48" y="124.46" size="1.778" layer="91"></text>
+GPIO35 Servo 1 Signal
+GPIO32 Servo 2 Signal</text>
+<text x="-30.48" y="124.46" size="1.778" layer="91">GPIO 4 = Gyro Interrupt</text>
 <text x="17.78" y="119.38" size="1.778" layer="97">Todo: Servo 2 an Power Rail</text>
 </plain>
 <instances>
@@ -6775,6 +6774,25 @@ GPIO04 Servo 2 Signal</text>
 <wire x1="172.72" y1="71.12" x2="160.02" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 <segment>
+<wire x1="231.14" y1="76.2" x2="233.68" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="233.68" y1="76.2" x2="248.92" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="248.92" y1="76.2" x2="248.92" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="SERVO_1" gate="A" pin="2"/>
+<wire x1="233.68" y1="76.2" x2="233.68" y2="40.64" width="0.1524" layer="91"/>
+<pinref part="IC2" gate="A" pin="CD+"/>
+<wire x1="233.68" y1="40.64" x2="233.68" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="233.68" y1="35.56" x2="205.74" y2="35.56" width="0.1524" layer="91"/>
+<junction x="233.68" y="76.2"/>
+<junction x="205.74" y="35.56"/>
+<wire x1="248.92" y1="60.96" x2="256.54" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="SERVO_2/GPIO32" gate="A" pin="2"/>
+<wire x1="256.54" y1="40.64" x2="233.68" y2="40.64" width="0.1524" layer="91"/>
+<junction x="233.68" y="40.64"/>
+<junction x="256.54" y="60.96"/>
+<junction x="256.54" y="40.64"/>
+<label x="226.06" y="76.2" size="1.778" layer="95"/>
+</segment>
+<segment>
 <pinref part="3V4" gate="G$1" pin="VDD"/>
 <pinref part="GPIO_BUS" gate="A" pin="8"/>
 <wire x1="66.04" y1="17.78" x2="66.04" y2="12.7" width="0.1524" layer="91"/>
@@ -6787,7 +6805,6 @@ GPIO04 Servo 2 Signal</text>
 <pinref part="GND1" gate="1" pin="GND"/>
 <wire x1="76.2" y1="38.1" x2="76.2" y2="35.56" width="0.1524" layer="91"/>
 <junction x="76.2" y="38.1"/>
-<junction x="76.2" y="35.56"/>
 </segment>
 <segment>
 <pinref part="OLED_DISPLAY" gate="A" pin="1"/>
@@ -7001,26 +7018,8 @@ GPIO04 Servo 2 Signal</text>
 <label x="246.38" y="15.24" size="1.778" layer="95"/>
 <junction x="254" y="17.78"/>
 </segment>
-<segment>
-<wire x1="248.92" y1="60.96" x2="256.54" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="SERVO_1" gate="A" pin="2"/>
-<label x="238.76" y="60.96" size="1.778" layer="95"/>
-<junction x="256.54" y="60.96"/>
-</segment>
-<segment>
-<wire x1="248.92" y1="40.64" x2="256.54" y2="40.64" width="0.1524" layer="91"/>
-<pinref part="SERVO_2/GPIO32" gate="A" pin="2"/>
-<label x="241.3" y="40.64" size="1.778" layer="95"/>
-<junction x="256.54" y="40.64"/>
-</segment>
-<segment>
-<wire x1="205.74" y1="35.56" x2="213.36" y2="35.56" width="0.1524" layer="91"/>
-<pinref part="IC2" gate="A" pin="CD+"/>
-<label x="208.28" y="33.02" size="1.778" layer="95"/>
-<junction x="205.74" y="35.56"/>
-</segment>
 </net>
-<net name="POWER_RAIL_1_GND" class="0">
+<net name="POWER_RAIL_1_VDD" class="0">
 <segment>
 <pinref part="SERVO_1" gate="A" pin="1"/>
 <pinref part="IC2" gate="A" pin="O1"/>
@@ -7040,7 +7039,7 @@ GPIO04 Servo 2 Signal</text>
 <wire x1="205.74" y1="50.8" x2="205.74" y2="48.26" width="0.1524" layer="91"/>
 <junction x="205.74" y="50.8"/>
 <junction x="205.74" y="48.26"/>
-<label x="205.74" y="60.96" size="1.778" layer="95"/>
+<label x="213.36" y="60.96" size="1.778" layer="95"/>
 </segment>
 <segment>
 <wire x1="60.96" y1="12.7" x2="60.96" y2="-20.32" width="0.1524" layer="91"/>
@@ -7050,6 +7049,12 @@ GPIO04 Servo 2 Signal</text>
 </segment>
 </net>
 <net name="GPIO35" class="0">
+<segment>
+<pinref part="SERVO_1" gate="A" pin="3"/>
+<wire x1="256.54" y1="63.5" x2="236.22" y2="63.5" width="0.1524" layer="91"/>
+<label x="238.76" y="63.5" size="1.778" layer="95"/>
+<junction x="256.54" y="63.5"/>
+</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="GPIO35"/>
 <wire x1="58.42" y1="38.1" x2="58.42" y2="33.02" width="0.1524" layer="91"/>
@@ -7064,6 +7069,12 @@ GPIO04 Servo 2 Signal</text>
 </segment>
 </net>
 <net name="GPIO32" class="0">
+<segment>
+<pinref part="SERVO_2/GPIO32" gate="A" pin="3"/>
+<wire x1="256.54" y1="43.18" x2="243.84" y2="43.18" width="0.1524" layer="91"/>
+<label x="241.3" y="43.18" size="1.778" layer="95"/>
+<junction x="256.54" y="43.18"/>
+</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="GPIO32"/>
 <wire x1="60.96" y1="38.1" x2="60.96" y2="33.02" width="0.1524" layer="91"/>
@@ -7198,6 +7209,14 @@ GPIO04 Servo 2 Signal</text>
 </net>
 <net name="GPIO33" class="0">
 <segment>
+<pinref part="GPIO_BUS" gate="A" pin="1"/>
+<wire x1="48.26" y1="12.7" x2="48.26" y2="10.16" width="0.1524" layer="91"/>
+<label x="45.72" y="-2.54" size="1.778" layer="95" rot="R90"/>
+<junction x="48.26" y="10.16"/>
+<wire x1="48.26" y1="10.16" x2="48.26" y2="2.54" width="0.1524" layer="91"/>
+<junction x="48.26" y="12.7"/>
+</segment>
+<segment>
 <pinref part="U$1" gate="G$1" pin="GPIO33"/>
 <wire x1="63.5" y1="38.1" x2="63.5" y2="33.02" width="0.1524" layer="91"/>
 <label x="63.5" y="25.4" size="1.778" layer="95" rot="R90"/>
@@ -7251,12 +7270,6 @@ GPIO04 Servo 2 Signal</text>
 <wire x1="55.88" y1="10.16" x2="55.88" y2="7.62" width="0.1524" layer="91"/>
 <junction x="55.88" y="12.7"/>
 </segment>
-<segment>
-<pinref part="SERVO_1" gate="A" pin="3"/>
-<wire x1="256.54" y1="63.5" x2="248.92" y2="63.5" width="0.1524" layer="91"/>
-<label x="238.76" y="63.5" size="1.778" layer="95"/>
-<junction x="256.54" y="63.5"/>
-</segment>
 </net>
 <net name="GPIO02" class="0">
 <segment>
@@ -7287,18 +7300,11 @@ GPIO04 Servo 2 Signal</text>
 <pinref part="U$1" gate="G$1" pin="GPIO04"/>
 <wire x1="55.88" y1="73.66" x2="55.88" y2="78.74" width="0.1524" layer="91"/>
 <label x="55.88" y="78.74" size="1.778" layer="95" rot="R90"/>
-<junction x="55.88" y="73.66"/>
 </segment>
 <segment>
 <wire x1="15.24" y1="12.7" x2="15.24" y2="17.78" width="0.1524" layer="91"/>
 <pinref part="GPIO04" gate="A" pin="1"/>
 <label x="15.24" y="20.32" size="1.778" layer="95" rot="R90"/>
-</segment>
-<segment>
-<pinref part="SERVO_2/GPIO32" gate="A" pin="3"/>
-<wire x1="256.54" y1="43.18" x2="248.92" y2="43.18" width="0.1524" layer="91"/>
-<label x="241.3" y="43.18" size="1.778" layer="95"/>
-<junction x="256.54" y="43.18"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -7330,39 +7336,28 @@ GPIO04 Servo 2 Signal</text>
 <junction x="254" y="22.86"/>
 </segment>
 </net>
+<net name="GPIO00" class="0">
+<segment>
+<pinref part="IC2" gate="A" pin="I4"/>
+<pinref part="IC2" gate="A" pin="I5"/>
+<wire x1="180.34" y1="45.72" x2="180.34" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="IC2" gate="A" pin="I6"/>
+<wire x1="180.34" y1="43.18" x2="180.34" y2="40.64" width="0.1524" layer="91"/>
+<junction x="180.34" y="43.18"/>
+<pinref part="IC2" gate="A" pin="I7"/>
+<wire x1="180.34" y1="40.64" x2="180.34" y2="38.1" width="0.1524" layer="91"/>
+<junction x="180.34" y="40.64"/>
+<junction x="180.34" y="45.72"/>
+<junction x="180.34" y="38.1"/>
+<wire x1="180.34" y1="45.72" x2="175.26" y2="45.72" width="0.1524" layer="91"/>
+<label x="175.26" y="48.26" size="1.778" layer="95" rot="R180"/>
+</segment>
+</net>
 <net name="GPIO36" class="0">
 <segment>
 <wire x1="48.26" y1="38.1" x2="48.26" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="GPIO36"/>
 <label x="45.72" y="33.02" size="1.778" layer="95" rot="R270"/>
-<junction x="48.26" y="38.1"/>
-</segment>
-<segment>
-<pinref part="IC2" gate="A" pin="I7"/>
-<pinref part="IC2" gate="A" pin="I6"/>
-<pinref part="IC2" gate="A" pin="I4"/>
-<pinref part="IC2" gate="A" pin="I5"/>
-<wire x1="180.34" y1="45.72" x2="180.34" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="180.34" y1="43.18" x2="180.34" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="180.34" y1="40.64" x2="180.34" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="180.34" y1="45.72" x2="172.72" y2="45.72" width="0.1524" layer="91"/>
-<label x="167.64" y="45.72" size="1.778" layer="95"/>
-<junction x="180.34" y="45.72"/>
-<junction x="180.34" y="43.18"/>
-<junction x="180.34" y="40.64"/>
-<junction x="180.34" y="38.1"/>
-</segment>
-</net>
-<net name="GPIO39" class="0">
-<segment>
-<pinref part="GPIO_BUS" gate="A" pin="1"/>
-<wire x1="48.26" y1="12.7" x2="48.26" y2="7.62" width="0.1524" layer="91"/>
-<label x="45.72" y="5.08" size="1.778" layer="95" rot="R270"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="GPIO39"/>
-<wire x1="50.8" y1="38.1" x2="50.8" y2="33.02" width="0.1524" layer="91"/>
-<label x="50.8" y="25.4" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 </nets>

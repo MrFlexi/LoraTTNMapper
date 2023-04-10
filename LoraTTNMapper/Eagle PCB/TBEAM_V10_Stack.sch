@@ -232,8 +232,8 @@
 <connect gate="G$1" pin="MOSI" pad="24"/>
 <connect gate="G$1" pin="RST" pad="3"/>
 <connect gate="G$1" pin="RX" pad="25"/>
-<connect gate="G$1" pin="SCL" pad="17"/>
-<connect gate="G$1" pin="SDA" pad="18"/>
+<connect gate="G$1" pin="SCL" pad="18"/>
+<connect gate="G$1" pin="SDA" pad="17"/>
 <connect gate="G$1" pin="TX" pad="26"/>
 </connects>
 <technologies>
@@ -11557,6 +11557,7 @@ Grid 5.00 mm&lt;p&gt;
 <part name="INA219" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X6" device="" package3d_urn="urn:adsk.eagle:package:22472/2"/>
 <part name="SOLAR_IN" library="con-wago-500" library_urn="urn:adsk.eagle:library:195" deviceset="W237-102" device="" package3d_urn="urn:adsk.eagle:package:10688/1"/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
+<part name="U$2" library="TTGO T-Beam V10" deviceset="ESP32DEVKITV1" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -11718,6 +11719,9 @@ GPIO32 Servo 2 Signal</text>
 </instance>
 <instance part="GND2" gate="1" x="-12.7" y="193.04" smashed="yes">
 <attribute name="VALUE" x="-15.24" y="190.5" size="1.778" layer="96"/>
+</instance>
+<instance part="U$2" gate="G$1" x="-71.12" y="162.56" smashed="yes">
+<attribute name="NAME" x="-97.79" y="167.64" size="1.27" layer="95" rot="R90"/>
 </instance>
 </instances>
 <busses>

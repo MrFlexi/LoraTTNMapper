@@ -3049,6 +3049,9 @@ design rules under a new name.</description>
 <attribute name="POPULARITY" value="32" x="87.63" y="8.89" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="82.59" y="1.27" size="1.27" layer="27" ratio="10"/>
 </element>
+<element name="U$2" library="TTGO T-Beam V10" package="ESP32-DEVKITV1" value="ESP32DEVKITV1" x="27.94" y="-16.51" smashed="yes">
+<attribute name="NAME" x="3.81" y="-2.54" size="1.27" layer="21"/>
+</element>
 </elements>
 <signals>
 <signal name="VDD">
@@ -3104,22 +3107,22 @@ design rules under a new name.</description>
 <wire x1="20.31" y1="74.73" x2="35.55" y2="49.96" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCL">
-<contactref element="U$1" pad="17"/>
+<contactref element="U$1" pad="18"/>
 <contactref element="BME280" pad="2"/>
 <contactref element="OLED_DISPLAY" pad="3"/>
 <contactref element="INA219" pad="4"/>
+<wire x1="72.39" y1="26.67" x2="72.39" y2="35.56" width="0" layer="19" extent="1-1"/>
 <wire x1="54.61" y1="43.18" x2="72.39" y2="35.56" width="0" layer="19" extent="1-1"/>
-<wire x1="30.47" y1="74.73" x2="54.61" y2="43.18" width="0" layer="19" extent="1-1"/>
-<wire x1="72.39" y1="26.67" x2="54.61" y2="43.18" width="0" layer="19" extent="1-1"/>
+<wire x1="27.93" y1="74.73" x2="54.61" y2="43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
-<contactref element="U$1" pad="18"/>
+<contactref element="U$1" pad="17"/>
 <contactref element="OLED_DISPLAY" pad="4"/>
 <contactref element="BME280" pad="1"/>
 <contactref element="INA219" pad="3"/>
+<wire x1="69.85" y1="26.67" x2="69.85" y2="35.56" width="0" layer="19" extent="1-1"/>
 <wire x1="57.15" y1="43.18" x2="69.85" y2="35.56" width="0" layer="19" extent="1-1"/>
-<wire x1="27.93" y1="74.73" x2="57.15" y2="43.18" width="0" layer="19" extent="1-1"/>
-<wire x1="69.85" y1="26.67" x2="57.15" y2="43.18" width="0" layer="19" extent="1-1"/>
+<wire x1="30.47" y1="74.73" x2="57.15" y2="43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO15">
 <contactref element="U$1" pad="4"/>

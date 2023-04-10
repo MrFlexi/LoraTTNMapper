@@ -148,31 +148,31 @@
 <wire x1="100" y1="0" x2="100" y2="80" width="0" layer="20"/>
 <wire x1="100" y1="80" x2="0" y2="80" width="0" layer="20"/>
 <wire x1="0" y1="80" x2="0" y2="0" width="0" layer="20"/>
-<text x="62.23" y="67.31" size="1.016" layer="21" rot="R90">SCL</text>
-<text x="64.77" y="67.31" size="1.016" layer="21" rot="R90">SDA</text>
-<text x="57.15" y="67.31" size="1.016" layer="21" rot="R90">GND</text>
+<text x="62.23" y="64.77" size="1.016" layer="21" rot="R90">SCL</text>
+<text x="64.77" y="64.77" size="1.016" layer="21" rot="R90">SDA</text>
+<text x="57.15" y="64.77" size="1.016" layer="21" rot="R90">GND</text>
 <text x="66.04" y="30.48" size="1.016" layer="21">SDA</text>
 <text x="66.04" y="33.02" size="1.016" layer="21">SCL</text>
 <text x="66.04" y="35.56" size="1.016" layer="21">GND</text>
-<text x="59.69" y="67.31" size="1.016" layer="21" rot="R90">VDD</text>
+<text x="59.69" y="64.77" size="1.016" layer="21" rot="R90">VDD</text>
 <text x="66.04" y="38.1" size="1.016" layer="21">VDD Switchable</text>
 <text x="10.16" y="38.1" size="1.016" layer="21" rot="R180">GND</text>
-<text x="20.32" y="69.85" size="1.016" layer="21" rot="R90">GND</text>
+<text x="20.32" y="72.39" size="1.016" layer="21" rot="R270">GND</text>
 <text x="7.62" y="39.37" size="1.016" layer="21">+5V</text>
 <hole x="38.1" y="62.23" drill="7.62"/>
 <hole x="87.63" y="59.69" drill="7.62"/>
 <text x="7.62" y="27.94" size="1.016" layer="21">+5V</text>
-<text x="7.62" y="25.4" size="1.016" layer="21">GND</text>
-<text x="83.82" y="38.1" size="1.016" layer="21" rot="R180">VDD</text>
-<text x="83.82" y="29.21" size="1.016" layer="21" rot="R180">GND</text>
-<text x="21.59" y="21.59" size="1.016" layer="21" rot="R270">SDA</text>
-<text x="17.78" y="17.78" size="1.016" layer="21" rot="R270">SCL</text>
-<text x="15.24" y="17.78" size="1.016" layer="21" rot="R270">GND</text>
-<text x="11.43" y="21.59" size="1.016" layer="21" rot="R180">VDD Switchable</text>
-<text x="21.59" y="72.39" size="1.016" layer="21" rot="R270">VDD Switchable</text>
-<text x="34.29" y="69.85" size="1.016" layer="21" rot="R90">VDD</text>
-<text x="29.21" y="69.85" size="1.016" layer="21" rot="R90">SCL</text>
-<text x="31.75" y="69.85" size="1.016" layer="21" rot="R90">SDA</text>
+<text x="10.16" y="26.67" size="1.016" layer="21" rot="R180">GND</text>
+<text x="83.82" y="30.48" size="1.016" layer="21" rot="R180">VDD</text>
+<text x="83.82" y="36.83" size="1.016" layer="21" rot="R180">GND</text>
+<text x="15.24" y="12.7" size="1.016" layer="21" rot="R270">SDA</text>
+<text x="13.97" y="10.16" size="1.016" layer="21" rot="R90">SCL</text>
+<text x="11.43" y="10.16" size="1.016" layer="21" rot="R90">GND</text>
+<text x="5.08" y="10.16" size="1.016" layer="21" rot="R90">VDD Switchable</text>
+<text x="22.86" y="72.39" size="1.016" layer="21" rot="R270">VDD Switchable</text>
+<text x="33.02" y="72.39" size="1.016" layer="21" rot="R270">VDD</text>
+<text x="27.94" y="72.39" size="1.016" layer="21" rot="R270">SCL</text>
+<text x="30.48" y="72.39" size="1.016" layer="21" rot="R270">SDA</text>
 <text x="36.83" y="52.07" size="1.016" layer="21" rot="R90">GND</text>
 <text x="16.51" y="52.07" size="1.016" layer="21" rot="R90">GPIO15</text>
 <text x="19.05" y="52.07" size="1.016" layer="21" rot="R90">GPIO35</text>
@@ -181,14 +181,22 @@
 <text x="16.51" y="52.07" size="1.016" layer="21" rot="R90">GPIO15</text>
 <text x="26.67" y="52.07" size="1.016" layer="21" rot="R90">GPIO25</text>
 <text x="39.37" y="52.07" size="1.016" layer="21" rot="R90">+5V</text>
-<text x="39.37" y="30.48" size="1.016" layer="21" rot="R270">GND</text>
-<text x="41.91" y="22.86" size="1.016" layer="21" rot="R270">VDD Switchable</text>
-<text x="38.1" y="27.94" size="1.016" layer="21" rot="R90">SCL</text>
-<text x="35.56" y="27.94" size="1.016" layer="21" rot="R90">SDA</text>
-<text x="33.02" y="27.94" size="1.016" layer="21" rot="R90">Vin-</text>
-<text x="30.48" y="27.94" size="1.016" layer="21" rot="R90">Vin+</text>
-<text x="5.08" y="33.02" size="1.016" layer="21">GPIO13</text>
-<text x="5.08" y="44.45" size="1.016" layer="21">GPIO4</text>
+<text x="33.02" y="19.05" size="1.016" layer="21" rot="R90">GND</text>
+<text x="30.48" y="19.05" size="1.016" layer="21" rot="R90">VDD Switchable</text>
+<text x="35.56" y="19.05" size="1.016" layer="21" rot="R90">SCL</text>
+<text x="38.1" y="19.05" size="1.016" layer="21" rot="R90">SDA</text>
+<text x="40.64" y="19.05" size="1.016" layer="21" rot="R90">Vin-</text>
+<text x="43.18" y="19.05" size="1.016" layer="21" rot="R90">Vin+</text>
+<text x="5.08" y="33.02" size="1.016" layer="21">GPIO35</text>
+<text x="5.08" y="44.45" size="1.016" layer="21">GPIO32</text>
+<text x="36.83" y="5.08" size="1.016" layer="21" rot="R90">GND</text>
+<text x="39.37" y="5.08" size="1.016" layer="21" rot="R90">VDD</text>
+<text x="34.29" y="5.08" size="1.016" layer="21" rot="R90">VDD Power Rail</text>
+<text x="21.59" y="5.08" size="1.016" layer="21" rot="R90">GPIO33</text>
+<text x="24.13" y="5.08" size="1.016" layer="21" rot="R90">GPIO25</text>
+<text x="26.67" y="5.08" size="1.016" layer="21" rot="R90">GPIO14</text>
+<text x="29.21" y="5.08" size="1.016" layer="21" rot="R90">GPIO13</text>
+<text x="31.75" y="5.08" size="1.016" layer="21" rot="R90">GPIO02</text>
 <text x="88.9" y="12.7" size="1.27" layer="22" rot="MR0">----------------------------------
     GPIO 04  = FAST Led
     GPIO 15  = Power Rail  1
@@ -211,13 +219,14 @@
 <wire x1="0" y1="0" x2="0" y2="80.01" width="0.1524" layer="21"/>
 <text x="8.89" y="8.89" size="1.27" layer="28" rot="MR90">GND</text>
 <text x="11.43" y="8.89" size="1.27" layer="28" rot="MR90">+5v</text>
+<text x="16.51" y="6.35" size="1.27" layer="28" rot="MR90">GPIO04</text>
 <wire x1="99.06" y1="78.74" x2="1.27" y2="78.74" width="0.1524" layer="28"/>
 <wire x1="1.27" y1="78.74" x2="1.27" y2="1.27" width="0.1524" layer="28"/>
 <wire x1="1.27" y1="1.27" x2="99.06" y2="1.27" width="0.1524" layer="28"/>
 <wire x1="99.06" y1="1.27" x2="99.06" y2="78.74" width="0.1524" layer="28"/>
 <text x="45.72" y="40.64" size="1.016" layer="25">VDD Switchable</text>
-<text x="52.07" y="36.83" size="1.016" layer="25">Power Rail 1</text>
-<text x="59.69" y="76.2" size="1.016" layer="21" rot="R180">I2C Display</text>
+<text x="52.07" y="35.56" size="1.016" layer="25">Power Rail</text>
+<text x="60.96" y="69.85" size="1.016" layer="21" rot="R180">I2C Display</text>
 <text x="1.27" y="43.18" size="1.016" layer="21" rot="R270">Servo 1</text>
 <text x="1.27" y="31.75" size="1.016" layer="21" rot="R270">Servo 2</text>
 <text x="40.64" y="44.45" size="1.016" layer="21" rot="R180">ULN2003</text>
@@ -225,15 +234,11 @@
 <text x="74.93" y="68.58" size="1.016" layer="21">GND</text>
 <text x="80.01" y="68.58" size="1.016" layer="21">+5V</text>
 <text x="72.39" y="71.12" size="1.016" layer="21" rot="R90">Power Rail 2</text>
-<text x="2.54" y="5.08" size="1.016" layer="21">39</text>
-<text x="5.08" y="5.08" size="1.016" layer="21">25</text>
-<text x="7.62" y="5.08" size="1.016" layer="21">14</text>
-<text x="10.16" y="5.08" size="1.016" layer="21">13</text>
-<text x="12.7" y="5.08" size="1.016" layer="21">2</text>
-<text x="16.51" y="5.08" size="1.016" layer="21" rot="R90">Rail1 GND</text>
-<text x="19.05" y="5.08" size="1.016" layer="21" rot="R90">GND</text>
-<text x="21.59" y="5.08" size="1.016" layer="21" rot="R90">VDD</text>
-<text x="52.07" y="34.29" size="1.016" layer="25">Power Rail 2</text>
+<text x="64.77" y="22.86" size="1.016" layer="21">Power Selector 
+A=Buck Converter
+B= 5V LDO</text>
+<text x="81.28" y="26.67" size="1.016" layer="21">A</text>
+<text x="78.74" y="26.67" size="1.016" layer="21">B</text>
 </plain>
 <libraries>
 <library name="TTGO T-Beam V10">
@@ -1519,21 +1524,21 @@ for trimmer refence see : &lt;u&gt;www.electrospec-inc.com/cross_references/trim
 &lt;/table&gt;
 &lt;/BODY&gt;&lt;/HTML&gt;</description>
 <packages>
-<package name="R0603">
+<package name="R1206">
 <description>&lt;b&gt;RESISTOR&lt;/b&gt;</description>
-<wire x1="-0.432" y1="-0.356" x2="0.432" y2="-0.356" width="0.1524" layer="51"/>
-<wire x1="0.432" y1="0.356" x2="-0.432" y2="0.356" width="0.1524" layer="51"/>
-<wire x1="-1.473" y1="0.983" x2="1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="0.983" x2="1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="-0.983" x2="-1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="-1.473" y1="-0.983" x2="-1.473" y2="0.983" width="0.0508" layer="39"/>
-<smd name="1" x="-0.85" y="0" dx="1" dy="1.1" layer="1"/>
-<smd name="2" x="0.85" y="0" dx="1" dy="1.1" layer="1"/>
-<text x="-0.635" y="0.635" size="1.27" layer="25">&gt;NAME</text>
-<text x="-0.635" y="-1.905" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="0.4318" y1="-0.4318" x2="0.8382" y2="0.4318" layer="51"/>
-<rectangle x1="-0.8382" y1="-0.4318" x2="-0.4318" y2="0.4318" layer="51"/>
-<rectangle x1="-0.1999" y1="-0.4001" x2="0.1999" y2="0.4001" layer="35"/>
+<wire x1="0.9525" y1="-0.8128" x2="-0.9652" y2="-0.8128" width="0.1524" layer="51"/>
+<wire x1="0.9525" y1="0.8128" x2="-0.9652" y2="0.8128" width="0.1524" layer="51"/>
+<wire x1="-2.473" y1="0.983" x2="2.473" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="0.983" x2="2.473" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="-0.983" x2="-2.473" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="-2.473" y1="-0.983" x2="-2.473" y2="0.983" width="0.0508" layer="39"/>
+<smd name="2" x="1.422" y="0" dx="1.6" dy="1.803" layer="1"/>
+<smd name="1" x="-1.422" y="0" dx="1.6" dy="1.803" layer="1"/>
+<text x="-1.27" y="1.27" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1.27" y="-2.54" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-1.6891" y1="-0.8763" x2="-0.9525" y2="0.8763" layer="51"/>
+<rectangle x1="0.9525" y1="-0.8763" x2="1.6891" y2="0.8763" layer="51"/>
+<rectangle x1="-0.3" y1="-0.7" x2="0.3" y2="0.7" layer="35"/>
 </package>
 </packages>
 </library>
@@ -1918,6 +1923,100 @@ Based on  the following source:
 </package3d>
 </packages3d>
 </library>
+<library name="linear-technology" urn="urn:adsk.eagle:library:261">
+<description>&lt;b&gt;Linear Technology Devices&lt;/b&gt;&lt;p&gt;
+http://www.linear-tech.com&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SOT223" urn="urn:adsk.eagle:footprint:15993/1" library_version="4">
+<description>&lt;b&gt;Small Outline Transistor&lt;/b&gt;</description>
+<wire x1="3.2766" y1="1.778" x2="3.2766" y2="-1.778" width="0.2032" layer="21"/>
+<wire x1="3.2766" y1="-1.778" x2="-3.2766" y2="-1.778" width="0.2032" layer="21"/>
+<wire x1="-3.2766" y1="-1.778" x2="-3.2766" y2="1.778" width="0.2032" layer="21"/>
+<wire x1="-3.2766" y1="1.778" x2="3.2766" y2="1.778" width="0.2032" layer="21"/>
+<smd name="1" x="-2.3114" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="2" x="0" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="3" x="2.3114" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="4" x="0" y="3.099" dx="3.6" dy="2.2" layer="1"/>
+<text x="-3.6068" y="-3.302" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="4.8768" y="-3.302" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<rectangle x1="-1.6002" y1="1.8034" x2="1.6002" y2="3.6576" layer="51"/>
+<rectangle x1="-0.4318" y1="-3.6576" x2="0.4318" y2="-1.8034" layer="51"/>
+<rectangle x1="-2.7432" y1="-3.6576" x2="-1.8796" y2="-1.8034" layer="51"/>
+<rectangle x1="1.8796" y1="-3.6576" x2="2.7432" y2="-1.8034" layer="51"/>
+<rectangle x1="-1.6002" y1="1.8034" x2="1.6002" y2="3.6576" layer="51"/>
+<rectangle x1="-0.4318" y1="-3.6576" x2="0.4318" y2="-1.8034" layer="51"/>
+<rectangle x1="-2.7432" y1="-3.6576" x2="-1.8796" y2="-1.8034" layer="51"/>
+<rectangle x1="1.8796" y1="-3.6576" x2="2.7432" y2="-1.8034" layer="51"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="SOT223" urn="urn:adsk.eagle:package:16063/1" type="box" library_version="4">
+<description>Small Outline Transistor</description>
+<packageinstances>
+<packageinstance name="SOT223"/>
+</packageinstances>
+</package3d>
+</packages3d>
+</library>
+<library name="JLC PCB Basic Parts_loc">
+<description>&lt;h1&gt;(JL@C) JLC PCB Basic Parts Eagle Library with LCSC Part Numbers&lt;/h1&gt; &lt;h2&gt;by Combinatix, &lt;a href='https://github.com/Combinatix/JLCPCB-Basic-Parts/'&gt;https://github.com/Combinatix/JLCPCB-Basic-Parts/&lt;/a&gt;&lt;/h2&gt; &lt;h3&gt;This library contains a selection of &lt;i&gt;BASIC&lt;/i&gt; parts supplied by JLC PCB manufacturer, including their order codes (LCSC Part Number)&lt;/h3&gt; &lt;hr&gt; &lt;p&gt;Every part has these attributes:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;b&gt;LCSC_DATASHEET&lt;/b&gt; = Datasheet url for the selected part&lt;/li&gt; &lt;li&gt;&lt;b&gt;LCSC_PART&lt;/b&gt; = LCSC Part numbers - it matches the products listed at &lt;a href="https://jlcpcb.com/parts"&gt;https://jlcpcb.com/parts&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;b&gt;LCSC_PRICE1_EUR&lt;/b&gt; = Price of EACH, if specified by JLC PCB in their export csv&lt;/li&gt; &lt;li&gt;&lt;b&gt;LCSC_ROTATION_CCW&lt;/b&gt; = Rotation correction that ULP script reads during CPL export. This can solve a package rotation incompatibility&lt;/li&gt; &lt;li&gt;&lt;b&gt;PROPERTIES&lt;/b&gt; = Part's basic properties for your quick reference.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Catalog Last Update: 2022-01-15&lt;/p&gt; &lt;b&gt;Version History:&lt;/b&gt; &lt;p&gt;2021-12-01: Added Dual Opamps (SOIC 8), Bug fixes (rotation problems)&lt;/p&gt; &lt;p&gt;2021-12-01: Added SMD Inductors 0402 - 1206. Updated and unified parts descriptions to be more consistent&lt;/p&gt; &lt;p&gt;2021-11-30: First BETA release. Library contains SMD Resistors, Capacitors, Diodes, SOT-23 Transistors&lt;/p&gt; &lt;p&gt;&lt;/p&gt;</description>
+<packages>
+<package name="SOT23" urn="urn:adsk.eagle:footprint:28669/1" locally_modified="yes">
+<description>&lt;b&gt;SOT-23&lt;/b&gt;</description>
+<wire x1="0.6604" y1="-1.4224" x2="-0.6604" y2="-1.4224" width="0.1524" layer="51"/>
+<wire x1="-0.6604" y1="-1.4224" x2="-0.6604" y2="1.4224" width="0.1524" layer="51"/>
+<wire x1="-0.6604" y1="1.4224" x2="0.6604" y2="1.4224" width="0.1524" layer="51"/>
+<wire x1="0.6604" y1="1.4224" x2="0.6604" y2="-1.4224" width="0.1524" layer="51"/>
+<smd name="3" x="1.1" y="0" dx="1" dy="1.4" layer="1" rot="R270"/>
+<smd name="2" x="-1.1" y="-0.95" dx="1" dy="1.4" layer="1" rot="R270"/>
+<smd name="1" x="-1.1" y="0.95" dx="1" dy="1.4" layer="1" rot="R270"/>
+<text x="-1.905" y="1.905" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1.905" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="0.7747" y1="-0.2921" x2="1.2319" y2="0.2921" layer="51" rot="R270"/>
+<rectangle x1="-1.2319" y1="-1.2319" x2="-0.7747" y2="-0.6477" layer="51" rot="R270"/>
+<rectangle x1="-1.2319" y1="0.6477" x2="-0.7747" y2="1.2319" layer="51" rot="R270"/>
+<wire x1="-2.159" y1="1.778" x2="-2.159" y2="-1.778" width="0.127" layer="39"/>
+<wire x1="-2.159" y1="-1.778" x2="1.143" y2="-1.778" width="0.127" layer="39"/>
+<wire x1="-2.159" y1="1.778" x2="1.143" y2="1.778" width="0.127" layer="39"/>
+<wire x1="1.143" y1="1.778" x2="1.143" y2="0.889" width="0.127" layer="39"/>
+<wire x1="1.143" y1="0.889" x2="2.159" y2="0.889" width="0.127" layer="39"/>
+<wire x1="2.159" y1="0.889" x2="2.159" y2="-0.889" width="0.127" layer="39"/>
+<wire x1="2.159" y1="-0.889" x2="1.143" y2="-0.889" width="0.127" layer="39"/>
+<wire x1="1.143" y1="-0.889" x2="1.143" y2="-1.778" width="0.127" layer="39"/>
+</package>
+<package name="R0805" urn="urn:adsk.eagle:footprint:23045/1">
+<description>&lt;b&gt;RESISTOR&lt;/b&gt;&lt;p&gt;</description>
+<wire x1="-0.41" y1="0.635" x2="0.41" y2="0.635" width="0.1524" layer="51"/>
+<wire x1="-0.41" y1="-0.635" x2="0.41" y2="-0.635" width="0.1524" layer="51"/>
+<wire x1="-1.973" y1="0.983" x2="1.973" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="1.973" y1="0.983" x2="1.973" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="1.973" y1="-0.983" x2="-1.973" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="-1.973" y1="-0.983" x2="-1.973" y2="0.983" width="0.0508" layer="39"/>
+<smd name="1" x="-0.95" y="0" dx="1.3" dy="1.5" layer="1"/>
+<smd name="2" x="0.95" y="0" dx="1.3" dy="1.5" layer="1"/>
+<text x="-0.635" y="1.27" size="1.27" layer="25">&gt;NAME</text>
+<text x="-0.635" y="-2.54" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="0.4064" y1="-0.6985" x2="1.0564" y2="0.7015" layer="51"/>
+<rectangle x1="-1.0668" y1="-0.6985" x2="-0.4168" y2="0.7015" layer="51"/>
+<rectangle x1="-0.1999" y1="-0.5001" x2="0.1999" y2="0.5001" layer="35"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="SOT23" urn="urn:adsk.eagle:package:28738/2" type="model">
+<description>SOT-23</description>
+<packageinstances>
+<packageinstance name="SOT23"/>
+</packageinstances>
+</package3d>
+<package3d name="R0805" urn="urn:adsk.eagle:package:23553/2" type="model">
+<description>RESISTOR</description>
+<packageinstances>
+<packageinstance name="R0805"/>
+</packageinstances>
+</package3d>
+</packages3d>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -2104,8 +2203,8 @@ Based on  the following source:
 </autorouter>
 <elements>
 <element name="U$1" library="TTGO T-Beam V10" package="ESP32-DEVKITV1" value="ESP32DEVKITV1" x="30.48" y="63.5" smashed="yes"/>
-<element name="OLED_DISPLAY" library="pinhead" package="1X04" value="" x="60.96" y="72.39" smashed="yes">
-<attribute name="VALUE" x="54.61" y="74.295" size="1.27" layer="27"/>
+<element name="OLED_DISPLAY" library="pinhead" package="1X04" value="" x="60.96" y="62.23" smashed="yes">
+<attribute name="VALUE" x="54.61" y="64.135" size="1.27" layer="27"/>
 </element>
 <element name="BME280" library="pinhead" package="1X04" value="" x="63.5" y="35.56" smashed="yes" rot="R90">
 <attribute name="NAME" x="67.2338" y="42.4688" size="1.27" layer="25" ratio="10"/>
@@ -2116,18 +2215,22 @@ Based on  the following source:
 <attribute name="VALUE" x="8.255" y="24.13" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="SERVO_2/GPIO32" library="pinhead" package="1X03" value="Servo_2" x="5.08" y="39.37" smashed="yes" rot="R90"/>
-<element name="LED1" library="led" package="SML1206" value="Power Rail" x="48.26" y="36.83" smashed="yes" rot="R180"/>
-<element name="R1" library="resistor" package="R0603" value="470" x="27.94" y="19.05" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.21" y="22.86" size="1.27" layer="25" rot="R180"/>
+<element name="LED1" library="led" package="SML1206" value="Power Rail" x="48.26" y="35.56" smashed="yes" rot="R180">
+<attribute name="NAME" x="49.76" y="34.56" size="1.27" layer="25" rot="R180"/>
 </element>
-<element name="R2" library="resistor" package="R0603" value="470" x="15.24" y="30.48" smashed="yes"/>
-<element name="R3" library="resistor" package="R0603" value="470" x="15.24" y="41.91" smashed="yes">
-<attribute name="NAME" x="16.51" y="38.1" size="1.27" layer="25" rot="R90"/>
+<element name="R1" library="resistor" package="R1206" value="220" x="48.26" y="48.26" smashed="yes" rot="R180">
+<attribute name="NAME" x="49.53" y="52.07" size="1.27" layer="25" rot="R180"/>
 </element>
-<element name="INA219" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X06" package3d_urn="urn:adsk.eagle:package:22472/2" value="" x="35.56" y="25.4" smashed="yes">
-<attribute name="NAME" x="26.5938" y="31.0388" size="1.27" layer="25" ratio="10"/>
-<attribute name="POPULARITY" value="79" x="35.56" y="25.4" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="27.94" y="22.225" size="1.27" layer="27"/>
+<element name="R2" library="resistor" package="R1206" value="220" x="15.24" y="31.75" smashed="yes" rot="R90">
+<attribute name="NAME" x="19.05" y="33.02" size="1.27" layer="25" rot="R180"/>
+</element>
+<element name="R3" library="resistor" package="R1206" value="220" x="15.24" y="40.64" smashed="yes" rot="R270">
+<attribute name="NAME" x="11.43" y="39.37" size="1.27" layer="25"/>
+</element>
+<element name="INA219" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X06" package3d_urn="urn:adsk.eagle:package:22472/2" value="" x="36.83" y="16.51" smashed="yes" rot="R180">
+<attribute name="NAME" x="45.7962" y="10.8712" size="1.27" layer="25" ratio="10" rot="R180"/>
+<attribute name="POPULARITY" value="79" x="36.83" y="16.51" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="44.45" y="19.685" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="SOLAR_IN" library="con-wago-500" library_urn="urn:adsk.eagle:library:195" package="W237-102" package3d_urn="urn:adsk.eagle:package:10688/1" value="" x="95.25" y="49.53" smashed="yes" rot="R270">
 <attribute name="MF" value="" x="95.25" y="49.53" size="1.778" layer="27" rot="R270" display="off"/>
@@ -2147,10 +2250,10 @@ Based on  the following source:
 <attribute name="POPULARITY" value="4" x="88.9" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="99.06" y="42.164" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="BATTERY_SWITCH" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="74.93" y="49.53" smashed="yes">
-<attribute name="NAME" x="68.5038" y="52.6288" size="1.27" layer="25" ratio="10"/>
-<attribute name="POPULARITY" value="98" x="74.93" y="49.53" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="72.39" y="46.355" size="1.27" layer="27"/>
+<element name="BATTERY_SWITCH" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="" x="80.01" y="63.5" smashed="yes">
+<attribute name="NAME" x="74.8538" y="58.9788" size="1.27" layer="25" ratio="10"/>
+<attribute name="POPULARITY" value="98" x="80.01" y="63.5" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="77.47" y="60.325" size="1.27" layer="27"/>
 </element>
 <element name="BAT_IN" library="wirepad" library_urn="urn:adsk.eagle:library:412" package="SMD2,54-5,08" package3d_urn="urn:adsk.eagle:package:30841/1" value="" x="74.93" y="68.58" smashed="yes" rot="MR0">
 <attribute name="NAME" x="76.43" y="66.08" size="1.27" layer="26" rot="MR90"/>
@@ -2162,12 +2265,12 @@ Based on  the following source:
 <attribute name="POPULARITY" value="21" x="83.82" y="68.58" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="83.82" y="68.58" size="0.0254" layer="28" rot="MR0"/>
 </element>
-<element name="I2C" library="pinhead" package="1X04" value="" x="16.51" y="25.4" smashed="yes" rot="R180">
-<attribute name="NAME" x="25.4762" y="24.8412" size="1.27" layer="25" ratio="10" rot="R180"/>
-<attribute name="VALUE" x="21.59" y="28.575" size="1.27" layer="27" rot="R180"/>
+<element name="I2C" library="pinhead" package="1X04" value="" x="11.43" y="20.32" smashed="yes" rot="R180">
+<attribute name="NAME" x="20.3962" y="19.7612" size="1.27" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="16.51" y="23.495" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="I2C1" library="pinhead" package="1X04" value="" x="16.51" y="20.32" smashed="yes" rot="R180">
-<attribute name="VALUE" x="21.59" y="23.495" size="1.27" layer="27" rot="R180"/>
+<element name="I2C1" library="pinhead" package="1X04" value="" x="11.43" y="15.24" smashed="yes" rot="R180">
+<attribute name="VALUE" x="16.51" y="18.415" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="V5" library="con-wago-500" library_urn="urn:adsk.eagle:library:195" package="W237-102" package3d_urn="urn:adsk.eagle:package:10688/1" value="" x="93.98" y="71.12" smashed="yes" rot="R90">
 <attribute name="MF" value="" x="93.98" y="71.12" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2177,18 +2280,23 @@ Based on  the following source:
 <attribute name="POPULARITY" value="32" x="93.98" y="71.12" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="101.6" y="66.08" size="1.27" layer="27" ratio="10" rot="R90"/>
 </element>
-<element name="GPIO_BUS" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X08" package3d_urn="urn:adsk.eagle:package:22409/2" value="" x="12.7" y="2.54" smashed="yes">
-<attribute name="POPULARITY" value="67" x="12.7" y="2.54" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="2.54" y="-0.635" size="1.27" layer="27"/>
+<element name="GPIO_BUS" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X08" package3d_urn="urn:adsk.eagle:package:22409/2" value="" x="30.48" y="2.54" smashed="yes">
+<attribute name="NAME" x="11.3538" y="1.8288" size="1.27" layer="25" ratio="10"/>
+<attribute name="POPULARITY" value="67" x="30.48" y="2.54" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="20.32" y="-0.635" size="1.27" layer="27"/>
 </element>
-<element name="LED4" library="led" package="SML1206" value="VDD Switchable" x="48.26" y="39.37" smashed="yes" rot="R180"/>
-<element name="R4" library="resistor" package="R0603" value="470" x="36.83" y="20.32" smashed="yes">
-<attribute name="NAME" x="39.37" y="19.05" size="1.27" layer="25"/>
+<element name="LED4" library="led" package="SML1206" value="VDD Switchable" x="48.26" y="39.37" smashed="yes" rot="R180">
+<attribute name="NAME" x="49.76" y="38.37" size="1.27" layer="25" rot="R180"/>
 </element>
-<element name="GPIO04" library="pinhead" package="1X03" value="FAST LED" x="29.21" y="10.16" smashed="yes" rot="MR0">
-<attribute name="VALUE" x="33.02" y="6.985" size="1.27" layer="28" rot="MR0"/>
+<element name="R4" library="resistor" package="R1206" value="220" x="48.26" y="44.45" smashed="yes">
+<attribute name="NAME" x="50.8" y="43.18" size="1.27" layer="25"/>
 </element>
-<element name="LED2" library="led" package="SML1206" value="GPIO35" x="10.16" y="30.48" smashed="yes"/>
+<element name="GPIO04" library="pinhead" package="1X03" value="FAST LED" x="11.43" y="6.35" smashed="yes" rot="MR0">
+<attribute name="VALUE" x="15.24" y="3.175" size="1.27" layer="28" rot="MR0"/>
+</element>
+<element name="LED2" library="led" package="SML1206" value="GPIO35" x="10.16" y="30.48" smashed="yes">
+<attribute name="NAME" x="8.66" y="31.48" size="1.27" layer="25"/>
+</element>
 <element name="LED3" library="led" package="SML1206" value="GPIO32" x="10.16" y="41.91" smashed="yes">
 <attribute name="NAME" x="8.66" y="42.91" size="1.27" layer="25"/>
 </element>
@@ -2200,20 +2308,83 @@ Based on  the following source:
 <attribute name="POPULARITY" value="32" x="78.74" y="73.66" size="1.016" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="83.78" y="81.28" size="1.27" layer="27" ratio="10" rot="R180"/>
 </element>
-<element name="LED5" library="led" package="SML1206" value="Power Rail" x="3.81" y="8.89" smashed="yes" rot="R90"/>
-<element name="R5" library="resistor" package="R0603" value="470" x="3.81" y="13.97" smashed="yes" rot="R90"/>
-<element name="LED6" library="led" package="SML1206" value="Power Rail" x="6.35" y="8.89" smashed="yes" rot="R90"/>
-<element name="R6" library="resistor" package="R0603" value="470" x="6.35" y="13.97" smashed="yes" rot="R90"/>
-<element name="LED7" library="led" package="SML1206" value="Power Rail" x="8.89" y="8.89" smashed="yes" rot="R90"/>
-<element name="R7" library="resistor" package="R0603" value="470" x="8.89" y="13.97" smashed="yes" rot="R90"/>
-<element name="LED8" library="led" package="SML1206" value="Power Rail" x="11.43" y="8.89" smashed="yes" rot="R90">
-<attribute name="VALUE" x="13.93" y="7.39" size="1.27" layer="27" rot="R90"/>
+<element name="GPIO01" library="pinhead" package="1X03" value="FAST LED" x="80.01" y="24.13" smashed="yes" rot="R180"/>
+<element name="IC1" library="linear-technology" library_urn="urn:adsk.eagle:library:261" package="SOT223" package3d_urn="urn:adsk.eagle:package:16063/1" value="LT1963EST-1.8" x="52.07" y="27.94" smashed="yes">
+<attribute name="MF" value="" x="52.07" y="27.94" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="LT1963EST-1.8" x="52.07" y="27.94" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="48.4632" y="24.638" size="1.27" layer="25" rot="R90"/>
+<attribute name="OC_FARNELL" value="1503436" x="52.07" y="27.94" size="1.778" layer="27" display="off"/>
+<attribute name="OC_NEWARK" value="57M7538" x="52.07" y="27.94" size="1.778" layer="27" display="off"/>
+<attribute name="POPULARITY" value="0" x="52.07" y="27.94" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="56.9468" y="24.638" size="1.27" layer="27" rot="R90"/>
 </element>
-<element name="R8" library="resistor" package="R0603" value="470" x="11.43" y="13.97" smashed="yes" rot="R90"/>
-<element name="LED9" library="led" package="SML1206" value="Power Rail" x="48.26" y="34.29" smashed="yes" rot="R180"/>
-<element name="R9" library="resistor" package="R0603" value="470" x="31.75" y="20.32" smashed="yes">
-<attribute name="NAME" x="31.115" y="20.955" size="1.27" layer="25"/>
-<attribute name="VALUE" x="31.115" y="18.415" size="1.27" layer="27"/>
+<element name="T1" library="JLC PCB Basic Parts_loc" package="SOT23" package3d_urn="urn:adsk.eagle:package:28738/2" value="T_P-MOSFET_AO3401A_ALPHA_SOT23-GSD" x="64.77" y="55.88" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/1810171817_Alpha---Omega-Semicon-AO3401A_C15127.pdf" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C15127" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="180" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="67241" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="62.865" y="57.785" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="30V 4A 44mOhm@10V,4.3A 1.4W 1.3V@250A P Channel SOT-23-3L MOSFETs ROHS" x="64.77" y="55.88" size="1.016" layer="27" display="off"/>
+</element>
+<element name="T2" library="JLC PCB Basic Parts_loc" package="SOT23" package3d_urn="urn:adsk.eagle:package:28738/2" value="T_PNP_SS8550-Y2_CHANGJ_SOT23-BEC" x="58.42" y="54.61" smashed="yes" rot="R180">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/1810161212_Changjiang-Electronics-Tech--CJ-SS8550-Y2_C8542.pdf" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+<attribute name="LCSC_PART" value="C8542" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="180" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+<attribute name="LCSC_STOCK" value="416493" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="60.325" y="52.705" size="1.27" layer="25" rot="R180"/>
+<attribute name="PROPERTIES" value="25V 300mW 1.5A 200@100mA,1V 100MHz 500mV@800mA,80mA PNP +150°C@(Tj) SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS" x="58.42" y="54.61" size="1.016" layer="27" rot="R180" display="off"/>
+</element>
+<element name="R5" library="JLC PCB Basic Parts_loc" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="R_10R_0805" x="2.54" y="-19.05" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/2110251730_UNI-ROYAL-Uniroyal-Elec-0805W8F100JT5E_C17415.pdf" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C17415" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="0" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="868321" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="1.905" y="-17.78" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="±1% 1/8W Thick Film Resistors 150V ±200ppm -55°C~+155°C 10Ohm 0805  ROHS" x="2.54" y="-19.05" size="1.016" layer="27" display="off"/>
+<attribute name="VALUE" x="1.905" y="-21.59" size="1.27" layer="27"/>
+</element>
+<element name="R6" library="JLC PCB Basic Parts_loc" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="R_10R_0805" x="2.54" y="-25.4" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/2110251730_UNI-ROYAL-Uniroyal-Elec-0805W8F100JT5E_C17415.pdf" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C17415" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="0" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="868321" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="1.905" y="-24.13" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="±1% 1/8W Thick Film Resistors 150V ±200ppm -55°C~+155°C 10Ohm 0805  ROHS" x="2.54" y="-25.4" size="1.016" layer="27" display="off"/>
+<attribute name="VALUE" x="1.905" y="-27.94" size="1.27" layer="27"/>
+</element>
+<element name="T3" library="JLC PCB Basic Parts_loc" package="SOT23" package3d_urn="urn:adsk.eagle:package:28738/2" value="T_NPN_SS8050_CHANGJ_SOT23-BEC" x="2.54" y="-33.02" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/1811052004_Changjiang-Electronics-Tech--CJ-SS8050_C2150.pdf" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C2150" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="180" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="1125240" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="0.635" y="-31.115" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="25V 300mW 1.5A 200@100mA,1V 100MHz 500mV@800mA,80mA NPN +150°C@(Tj) SOT-23(SOT-23-3) Bipolar Transistors - BJT ROHS" x="2.54" y="-33.02" size="1.016" layer="27" display="off"/>
+<attribute name="VALUE" x="0.635" y="-36.195" size="1.27" layer="27"/>
+</element>
+<element name="R7" library="JLC PCB Basic Parts_loc" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="R_1.8K_0805" x="2.54" y="-40.64" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/2110251730_UNI-ROYAL-Uniroyal-Elec-0805W8F1801T5E_C17398.pdf" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C17398" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="0" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="115868" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="1.905" y="-39.37" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="±1% 125mW Thick Film Resistors 150V ±100ppm -55°C~+155°C 1.8kOhm 0805  ROHS" x="2.54" y="-40.64" size="1.016" layer="27" display="off"/>
+<attribute name="VALUE" x="1.905" y="-43.18" size="1.27" layer="27"/>
+</element>
+<element name="R8" library="JLC PCB Basic Parts_loc" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="R_1.8K_0805" x="2.54" y="-46.99" smashed="yes">
+<attribute name="LCSC_DATASHEET" value="https://datasheet.lcsc.com/lcsc/2110251730_UNI-ROYAL-Uniroyal-Elec-0805W8F1801T5E_C17398.pdf" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PART" value="C17398" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_PRICE1_EUR" value="" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_ROTATION_CCW" value="0" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="LCSC_STOCK" value="115868" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="NAME" x="1.905" y="-45.72" size="1.27" layer="25"/>
+<attribute name="PROPERTIES" value="±1% 125mW Thick Film Resistors 150V ±100ppm -55°C~+155°C 1.8kOhm 0805  ROHS" x="2.54" y="-46.99" size="1.016" layer="27" display="off"/>
+<attribute name="VALUE" x="1.905" y="-49.53" size="1.27" layer="27"/>
 </element>
 </elements>
 <signals>
@@ -2221,8 +2392,8 @@ Based on  the following source:
 <contactref element="U$1" pad="16"/>
 <contactref element="OLED_DISPLAY" pad="2"/>
 <contactref element="GPIO_BUS" pad="8"/>
-<wire x1="33.01" y1="74.73" x2="59.69" y2="72.39" width="0" layer="19" extent="1-1"/>
-<wire x1="21.59" y1="2.54" x2="33.01" y2="74.73" width="0" layer="19" extent="1-1"/>
+<wire x1="33.01" y1="74.73" x2="59.69" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="39.37" y1="2.54" x2="33.01" y2="74.73" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <contactref element="U$1" pad="12"/>
@@ -2257,21 +2428,32 @@ Based on  the following source:
 <vertex x="100.33" y="0"/>
 <vertex x="0" y="0"/>
 </polygon>
-<contactref element="LED5" pad="C"/>
-<contactref element="LED6" pad="C"/>
-<contactref element="LED7" pad="C"/>
-<contactref element="LED8" pad="C"/>
-<contactref element="LED9" pad="C"/>
-<wire x1="50.01" y1="36.83" x2="50.01" y2="39.37" width="0" layer="19" extent="1-1"/>
-<wire x1="50.01" y1="34.29" x2="50.01" y2="36.83" width="0" layer="19" extent="1-1"/>
-<wire x1="42.545" y1="35.0266" x2="50.01" y2="36.83" width="0" layer="19" extent="1-1"/>
-<wire x1="39.37" y1="25.4" x2="42.545" y2="35.0266" width="0" layer="19" extent="1-1"/>
-<wire x1="8.41" y1="30.48" x2="15.24" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="11.43" y1="7.14" x2="19.05" y2="2.54" width="0" layer="19" extent="1-1"/>
-<wire x1="8.89" y1="7.14" x2="11.43" y2="7.14" width="0" layer="19" extent="1-1"/>
-<wire x1="6.35" y1="7.14" x2="8.89" y2="7.14" width="0" layer="19" extent="1-1"/>
-<wire x1="3.81" y1="7.14" x2="6.35" y2="7.14" width="0" layer="19" extent="1-1"/>
+<contactref element="IC1" pad="4"/>
+<contactref element="IC1" pad="2"/>
+<contactref element="R5" pad="1"/>
+<contactref element="T3" pad="2"/>
+<wire x1="93.98" y1="47.03" x2="95.25" y2="68.62" width="0" layer="19" extent="1-1"/>
+<wire x1="86.19" y1="36.52" x2="93.98" y2="47.03" width="0" layer="19" extent="1-1"/>
+<wire x1="63.5" y1="36.83" x2="86.19" y2="36.52" width="0" layer="19" extent="1-1"/>
+<wire x1="52.07" y1="31.039" x2="63.5" y2="36.83" width="0" layer="19" extent="1-1"/>
+<wire x1="50.01" y1="35.56" x2="52.07" y2="31.039" width="0" layer="19" extent="1-1"/>
+<wire x1="50.01" y1="39.37" x2="50.01" y2="35.56" width="0" layer="19" extent="1-1"/>
+<wire x1="52.07" y1="24.8412" x2="52.07" y2="31.039" width="0" layer="19" extent="1-1"/>
+<wire x1="42.545" y1="35.0266" x2="50.01" y2="35.56" width="0" layer="19" extent="1-1"/>
+<wire x1="35.55" y1="49.96" x2="42.545" y2="35.0266" width="0" layer="19" extent="1-1"/>
+<wire x1="33.02" y1="16.51" x2="52.07" y2="24.8412" width="0" layer="19" extent="1-1"/>
+<wire x1="36.83" y1="2.54" x2="33.02" y2="16.51" width="0" layer="19" extent="1-1"/>
+<wire x1="56.388" y1="2.794" x2="36.83" y2="2.54" width="0" layer="19" extent="1-1"/>
+<wire x1="10.16" y1="15.24" x2="33.02" y2="16.51" width="0" layer="19" extent="1-1"/>
+<wire x1="10.16" y1="20.32" x2="10.16" y2="15.24" width="0" layer="19" extent="1-1"/>
+<wire x1="8.89" y1="6.35" x2="10.16" y2="15.24" width="0" layer="19" extent="1-1"/>
+<wire x1="8.41" y1="30.48" x2="10.16" y2="20.32" width="0" layer="19" extent="1-1"/>
 <wire x1="8.41" y1="41.91" x2="8.41" y2="30.48" width="0" layer="19" extent="1-1"/>
+<wire x1="57.15" y1="62.23" x2="50.01" y2="39.37" width="0" layer="19" extent="1-1"/>
+<wire x1="1.59" y1="-19.05" x2="8.89" y2="6.35" width="0" layer="19" extent="1-1"/>
+<wire x1="1.44" y1="-33.97" x2="1.59" y2="-19.05" width="0" layer="19" extent="1-1"/>
+<wire x1="20.31" y1="74.73" x2="35.55" y2="49.96" width="0" layer="19" extent="1-1"/>
+<wire x1="96.012" y1="2.794" x2="86.19" y2="36.52" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCL">
 <contactref element="BME280" pad="2"/>
@@ -2280,11 +2462,11 @@ Based on  the following source:
 <contactref element="I2C" pad="2"/>
 <contactref element="I2C1" pad="2"/>
 <contactref element="U$1" pad="18"/>
-<wire x1="27.93" y1="74.73" x2="62.23" y2="72.39" width="0" layer="19" extent="1-1"/>
-<wire x1="63.5" y1="34.29" x2="62.23" y2="72.39" width="0" layer="19" extent="1-1"/>
-<wire x1="36.83" y1="25.4" x2="63.5" y2="34.29" width="0" layer="19" extent="1-1"/>
-<wire x1="17.78" y1="25.4" x2="36.83" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="17.78" y1="20.32" x2="17.78" y2="25.4" width="0" layer="19" extent="1-1"/>
+<wire x1="27.93" y1="74.73" x2="62.23" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="63.5" y1="34.29" x2="62.23" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="35.56" y1="16.51" x2="63.5" y2="34.29" width="0" layer="19" extent="1-1"/>
+<wire x1="12.7" y1="20.32" x2="35.56" y2="16.51" width="0" layer="19" extent="1-1"/>
+<wire x1="12.7" y1="15.24" x2="12.7" y2="20.32" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
 <contactref element="OLED_DISPLAY" pad="4"/>
@@ -2293,11 +2475,11 @@ Based on  the following source:
 <contactref element="I2C" pad="1"/>
 <contactref element="I2C1" pad="1"/>
 <contactref element="U$1" pad="17"/>
-<wire x1="30.47" y1="74.73" x2="64.77" y2="72.39" width="0" layer="19" extent="1-1"/>
-<wire x1="63.5" y1="31.75" x2="64.77" y2="72.39" width="0" layer="19" extent="1-1"/>
-<wire x1="34.29" y1="25.4" x2="63.5" y2="31.75" width="0" layer="19" extent="1-1"/>
-<wire x1="20.32" y1="25.4" x2="34.29" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="20.32" y1="20.32" x2="20.32" y2="25.4" width="0" layer="19" extent="1-1"/>
+<wire x1="30.47" y1="74.73" x2="64.77" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="63.5" y1="31.75" x2="64.77" y2="62.23" width="0" layer="19" extent="1-1"/>
+<wire x1="38.1" y1="16.51" x2="63.5" y2="31.75" width="0" layer="19" extent="1-1"/>
+<wire x1="15.24" y1="20.32" x2="38.1" y2="16.51" width="0" layer="19" extent="1-1"/>
+<wire x1="15.24" y1="15.24" x2="15.24" y2="20.32" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO15">
 <contactref element="U$1" pad="4"/>
@@ -2305,7 +2487,7 @@ Based on  the following source:
 <contactref element="R1" pad="2"/>
 <contactref element="IC2" pad="2"/>
 <contactref element="IC2" pad="3"/>
-<wire x1="36.195" y1="35.0266" x2="27.09" y2="19.05" width="0" layer="19" extent="1-1"/>
+<wire x1="36.195" y1="35.0266" x2="46.838" y2="48.26" width="0" layer="19" extent="1-1"/>
 <wire x1="34.925" y1="35.0266" x2="36.195" y2="35.0266" width="0" layer="19" extent="1-1"/>
 <wire x1="33.655" y1="35.0266" x2="34.925" y2="35.0266" width="0" layer="19" extent="1-1"/>
 <wire x1="15.23" y1="49.96" x2="33.655" y2="35.0266" width="0" layer="19" extent="1-1"/>
@@ -2319,9 +2501,9 @@ Based on  the following source:
 <contactref element="IC2" pad="9"/>
 <wire x1="38.09" y1="49.96" x2="81.24" y2="74.93" width="0" layer="19" extent="1-1"/>
 <wire x1="42.545" y1="41.1734" x2="38.09" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="29.21" y1="10.16" x2="42.545" y2="41.1734" width="0" layer="19" extent="1-1"/>
-<wire x1="5.08" y1="27.94" x2="29.21" y2="10.16" width="0" layer="19" extent="1-1"/>
-<wire x1="5.08" y1="39.37" x2="5.08" y2="27.94" width="0" layer="19" extent="1-1"/>
+<wire x1="5.08" y1="39.37" x2="38.09" y2="49.96" width="0" layer="19" extent="1-1"/>
+<wire x1="5.08" y1="27.94" x2="5.08" y2="39.37" width="0" layer="19" extent="1-1"/>
+<wire x1="11.43" y1="6.35" x2="5.08" y2="27.94" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="POWER_RAIL_1_GND">
 <contactref element="SERVO_1" pad="1"/>
@@ -2334,23 +2516,31 @@ Based on  the following source:
 <wire x1="33.655" y1="41.1734" x2="34.925" y2="41.1734" width="0" layer="19" extent="1-1"/>
 <wire x1="5.08" y1="36.83" x2="33.655" y2="41.1734" width="0" layer="19" extent="1-1"/>
 <wire x1="5.08" y1="25.4" x2="5.08" y2="36.83" width="0" layer="19" extent="1-1"/>
-<wire x1="16.51" y1="2.54" x2="5.08" y2="25.4" width="0" layer="19" extent="1-1"/>
+<wire x1="34.29" y1="2.54" x2="5.08" y2="25.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO35">
+<contactref element="SERVO_1" pad="3"/>
 <contactref element="U$1" pad="5"/>
+<contactref element="R2" pad="2"/>
+<wire x1="15.24" y1="33.172" x2="17.77" y2="49.96" width="0" layer="19" extent="1-1"/>
+<wire x1="5.08" y1="30.48" x2="15.24" y2="33.172" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO32">
+<contactref element="SERVO_2/GPIO32" pad="3"/>
 <contactref element="U$1" pad="6"/>
+<contactref element="R3" pad="2"/>
+<wire x1="15.24" y1="39.218" x2="20.31" y2="49.96" width="0" layer="19" extent="1-1"/>
+<wire x1="5.08" y1="41.91" x2="15.24" y2="39.218" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$4">
 <contactref element="R1" pad="1"/>
 <contactref element="LED1" pad="A"/>
-<wire x1="28.79" y1="19.05" x2="46.51" y2="36.83" width="0" layer="19" extent="1-1"/>
+<wire x1="46.51" y1="35.56" x2="49.682" y2="48.26" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$6">
 <contactref element="R3" pad="1"/>
 <contactref element="LED3" pad="A"/>
-<wire x1="11.91" y1="41.91" x2="14.39" y2="41.91" width="0" layer="19" extent="1-1"/>
+<wire x1="11.91" y1="41.91" x2="15.24" y2="42.062" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VDD_SWITCHABLE">
 <contactref element="U$1" pad="20"/>
@@ -2359,94 +2549,88 @@ Based on  the following source:
 <contactref element="I2C" pad="4"/>
 <contactref element="I2C1" pad="4"/>
 <contactref element="R4" pad="2"/>
-<wire x1="63.5" y1="39.37" x2="37.68" y2="20.32" width="0" layer="19" extent="1-1"/>
-<wire x1="41.91" y1="25.4" x2="63.5" y2="39.37" width="0" layer="19" extent="1-1"/>
-<wire x1="12.7" y1="25.4" x2="41.91" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="12.7" y1="20.32" x2="12.7" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="22.85" y1="74.73" x2="37.68" y2="20.32" width="0" layer="19" extent="1-1"/>
+<wire x1="63.5" y1="39.37" x2="49.682" y2="44.45" width="0" layer="19" extent="1-1"/>
+<wire x1="30.48" y1="16.51" x2="63.5" y2="39.37" width="0" layer="19" extent="1-1"/>
+<wire x1="7.62" y1="20.32" x2="30.48" y2="16.51" width="0" layer="19" extent="1-1"/>
+<wire x1="7.62" y1="15.24" x2="7.62" y2="20.32" width="0" layer="19" extent="1-1"/>
+<wire x1="22.85" y1="74.73" x2="49.682" y2="44.45" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="V_IN_+">
-<contactref element="SOLAR_IN" pad="1"/>
 <contactref element="INA219" pad="1"/>
-<wire x1="29.21" y1="25.4" x2="93.98" y2="52.03" width="0" layer="19" extent="1-1"/>
+<contactref element="T1" pad="3"/>
+<wire x1="65.87" y1="55.88" x2="43.18" y2="16.51" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="V_OUT_+">
 <contactref element="INA219" pad="2"/>
 <contactref element="U$2" pad="IN+"/>
-<wire x1="31.75" y1="25.4" x2="56.388" y2="20.066" width="0" layer="19" extent="1-1"/>
+<contactref element="IC1" pad="1"/>
+<wire x1="40.64" y1="16.51" x2="56.388" y2="20.066" width="0" layer="19" extent="1-1"/>
+<wire x1="49.7586" y1="24.8412" x2="40.64" y2="16.51" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$1">
 </signal>
 <signal name="N$7">
 </signal>
 <signal name="N$8">
-<contactref element="U$2" pad="OUT+"/>
 <contactref element="X1" pad="1"/>
 <contactref element="V5" pad="2"/>
+<contactref element="GPIO01" pad="2"/>
 <wire x1="86.19" y1="29.52" x2="95.25" y2="73.62" width="0" layer="19" extent="1-1"/>
-<wire x1="96.012" y1="20.066" x2="86.19" y2="29.52" width="0" layer="19" extent="1-1"/>
+<wire x1="80.01" y1="24.13" x2="86.19" y2="29.52" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$9">
 <contactref element="BATTERY_SWITCH" pad="1"/>
 <contactref element="BAT_IN" pad="1"/>
-<wire x1="73.66" y1="49.53" x2="74.93" y2="68.58" width="0" layer="19" extent="16-16"/>
+<wire x1="78.74" y1="63.5" x2="74.93" y2="68.58" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="N$10">
 <contactref element="BATTERY_SWITCH" pad="2"/>
 <contactref element="BAT_OUT" pad="1"/>
-<wire x1="76.2" y1="49.53" x2="83.82" y2="68.58" width="0" layer="19" extent="16-16"/>
+<wire x1="81.28" y1="63.5" x2="83.82" y2="68.58" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="GPIO33">
+<contactref element="GPIO_BUS" pad="1"/>
 <contactref element="U$1" pad="7"/>
+<wire x1="21.59" y1="2.54" x2="22.85" y2="49.96" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO25">
 <contactref element="U$1" pad="8"/>
 <contactref element="GPIO_BUS" pad="2"/>
-<contactref element="R6" pad="2"/>
-<wire x1="6.35" y1="2.54" x2="25.39" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="6.35" y1="14.82" x2="6.35" y2="2.54" width="0" layer="19" extent="1-1"/>
+<wire x1="24.13" y1="2.54" x2="25.39" y2="49.96" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO14">
 <contactref element="U$1" pad="9"/>
 <contactref element="GPIO_BUS" pad="3"/>
-<contactref element="R7" pad="2"/>
-<wire x1="8.89" y1="2.54" x2="27.93" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="8.89" y1="14.82" x2="8.89" y2="2.54" width="0" layer="19" extent="1-1"/>
+<contactref element="R7" pad="1"/>
+<contactref element="R8" pad="1"/>
+<wire x1="26.67" y1="2.54" x2="27.93" y2="49.96" width="0" layer="19" extent="1-1"/>
+<wire x1="1.59" y1="-40.64" x2="26.67" y2="2.54" width="0" layer="19" extent="1-1"/>
+<wire x1="1.59" y1="-46.99" x2="1.59" y2="-40.64" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO13">
 <contactref element="U$1" pad="10"/>
 <contactref element="GPIO_BUS" pad="4"/>
-<contactref element="SERVO_1" pad="3"/>
-<contactref element="R2" pad="2"/>
-<wire x1="16.09" y1="30.48" x2="30.47" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="5.08" y1="30.48" x2="16.09" y2="30.48" width="0" layer="19" extent="1-1"/>
-<wire x1="11.43" y1="2.54" x2="5.08" y2="30.48" width="0" layer="19" extent="1-1"/>
+<wire x1="29.21" y1="2.54" x2="30.47" y2="49.96" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO02">
 <contactref element="U$1" pad="11"/>
 <contactref element="GPIO_BUS" pad="5"/>
-<contactref element="GPIO04" pad="1"/>
-<contactref element="R8" pad="2"/>
-<wire x1="31.75" y1="10.16" x2="33.01" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="13.97" y1="2.54" x2="31.75" y2="10.16" width="0" layer="19" extent="1-1"/>
-<wire x1="11.43" y1="14.82" x2="13.97" y2="2.54" width="0" layer="19" extent="1-1"/>
+<wire x1="31.75" y1="2.54" x2="33.01" y2="49.96" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$11">
 <contactref element="R4" pad="1"/>
 <contactref element="LED4" pad="A"/>
-<wire x1="46.51" y1="39.37" x2="35.98" y2="20.32" width="0" layer="19" extent="1-1"/>
+<wire x1="46.51" y1="39.37" x2="46.838" y2="44.45" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GPIO04">
 <contactref element="U$1" pad="23"/>
-<contactref element="SERVO_2/GPIO32" pad="3"/>
-<contactref element="R3" pad="2"/>
-<wire x1="5.08" y1="41.91" x2="15.23" y2="74.73" width="0" layer="19" extent="1-1"/>
-<wire x1="16.09" y1="41.91" x2="5.08" y2="41.91" width="0" layer="19" extent="1-1"/>
+<contactref element="GPIO04" pad="1"/>
+<wire x1="13.97" y1="6.35" x2="15.23" y2="74.73" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$5">
 <contactref element="R2" pad="1"/>
 <contactref element="LED2" pad="A"/>
-<wire x1="11.91" y1="30.48" x2="14.39" y2="30.48" width="0" layer="19" extent="1-1"/>
+<wire x1="11.91" y1="30.48" x2="15.24" y2="30.328" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$12">
 <contactref element="IC2" pad="13"/>
@@ -2465,47 +2649,52 @@ Based on  the following source:
 <contactref element="IC2" pad="6"/>
 <contactref element="IC2" pad="4"/>
 <contactref element="IC2" pad="5"/>
-<contactref element="R9" pad="1"/>
 <wire x1="40.005" y1="35.0266" x2="41.275" y2="35.0266" width="0" layer="19" extent="1-1"/>
 <wire x1="38.735" y1="35.0266" x2="40.005" y2="35.0266" width="0" layer="19" extent="1-1"/>
 <wire x1="37.465" y1="35.0266" x2="38.735" y2="35.0266" width="0" layer="19" extent="1-1"/>
 <wire x1="7.61" y1="49.96" x2="37.465" y2="35.0266" width="0" layer="19" extent="1-1"/>
-<wire x1="30.9" y1="20.32" x2="37.465" y2="35.0266" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="GPIO39">
-<contactref element="GPIO_BUS" pad="1"/>
-<contactref element="U$1" pad="2"/>
-<contactref element="R5" pad="2"/>
-<wire x1="3.81" y1="14.82" x2="10.15" y2="49.96" width="0" layer="19" extent="1-1"/>
-<wire x1="3.81" y1="2.54" x2="3.81" y2="14.82" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$13">
-<contactref element="R5" pad="1"/>
-<contactref element="LED5" pad="A"/>
-<wire x1="3.81" y1="13.12" x2="3.81" y2="10.64" width="0" layer="19" extent="1-1"/>
+<signal name="BUCK-CONVERTER">
+<contactref element="U$2" pad="OUT+"/>
+<contactref element="GPIO01" pad="1"/>
+<wire x1="82.55" y1="24.13" x2="96.012" y2="20.066" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$14">
-<contactref element="U$1" pad="3"/>
+<contactref element="IC1" pad="3"/>
+<contactref element="GPIO01" pad="3"/>
+<wire x1="54.3814" y1="24.8412" x2="77.47" y2="24.13" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$13">
+<contactref element="SOLAR_IN" pad="1"/>
+<contactref element="T1" pad="2"/>
+<contactref element="T2" pad="2"/>
+<wire x1="63.67" y1="54.93" x2="93.98" y2="52.03" width="0" layer="19" extent="1-1"/>
+<wire x1="59.52" y1="55.56" x2="63.67" y2="54.93" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$15">
-<contactref element="R6" pad="1"/>
-<contactref element="LED6" pad="A"/>
-<wire x1="6.35" y1="10.64" x2="6.35" y2="13.12" width="0" layer="19" extent="1-1"/>
+<contactref element="T1" pad="1"/>
+<contactref element="T2" pad="3"/>
+<contactref element="R5" pad="2"/>
+<wire x1="57.32" y1="54.61" x2="3.49" y2="-19.05" width="0" layer="19" extent="1-1"/>
+<wire x1="63.67" y1="56.83" x2="57.32" y2="54.61" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$16">
-<contactref element="LED7" pad="A"/>
-<contactref element="R7" pad="1"/>
-<wire x1="8.89" y1="10.64" x2="8.89" y2="13.12" width="0" layer="19" extent="1-1"/>
+<contactref element="T2" pad="1"/>
+<contactref element="R6" pad="1"/>
+<wire x1="59.52" y1="53.66" x2="1.59" y2="-25.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$17">
-<contactref element="LED8" pad="A"/>
-<contactref element="R8" pad="1"/>
-<wire x1="11.43" y1="10.64" x2="11.43" y2="13.12" width="0" layer="19" extent="1-1"/>
+<contactref element="T3" pad="3"/>
+<contactref element="R6" pad="2"/>
+<wire x1="3.49" y1="-25.4" x2="3.64" y2="-33.02" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$18">
-<contactref element="LED9" pad="A"/>
-<contactref element="R9" pad="2"/>
-<wire x1="32.6" y1="20.32" x2="46.51" y2="34.29" width="0" layer="19" extent="1-1"/>
+<contactref element="T3" pad="1"/>
+<contactref element="R7" pad="2"/>
+<contactref element="R8" pad="2"/>
+<contactref element="R8" pad="2"/>
+<wire x1="3.49" y1="-40.64" x2="3.49" y2="-46.99" width="0" layer="19" extent="1-1"/>
+<wire x1="1.44" y1="-32.07" x2="3.49" y2="-40.64" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
