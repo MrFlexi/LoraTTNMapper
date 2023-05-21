@@ -14,10 +14,10 @@
 
 #define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 1
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 #define HAS_INA3221  0
-#define HAS_INA219  0
+#define HAS_INA219  1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -49,8 +49,9 @@
 #define HCSR04_trigger_pin  GPIO_NUM_2
 #define HCSR04_echo_pin     GPIO_NUM_13
 
-#define USE_PWM_SERVO 0                 // Uses external I2C Servo expander
+#define USE_PWM_SERVO 1                // Uses external I2C Servo expander
 #define USE_SUN_POSITION 1
+
 
 #define displayRefreshIntervall 4       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 8          // shift to next display page               ---> t_moveDisplay
@@ -80,6 +81,9 @@
 #define TIME_TO_SLEEP 10       // sleep for n minute
 #define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4 // // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10 // after n Lora TX events
+
+#define USE_GPS_MOTION 1
+#define GPS_MOTION_DISTANCE 20  // Meter
 
 #define AUTO_POWER_SAVE 1   // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6

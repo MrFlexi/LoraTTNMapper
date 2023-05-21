@@ -194,7 +194,7 @@ void panel_switch_on()
     ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
-    Servo3.setHigh();
+    //Servo3.setHigh();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
 }
@@ -206,7 +206,7 @@ void panel_switch_off()
     ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
   else
   {
-    Servo3.setLow();
+    //Servo3.setLow();
     I2C_MUTEX_UNLOCK(); // release i2c bus access
   }
 }
