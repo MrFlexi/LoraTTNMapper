@@ -41,7 +41,11 @@
 			"cmath": "cpp",
 			"fstream": "cpp",
 			"utility": "cpp",
-			"iterator": "cpp"
+			"iterator": "cpp",
+			"deque": "cpp",
+			"unordered_set": "cpp",
+			"string_view": "cpp",
+			"initializer_list": "cpp"
 		}
 	}
 }

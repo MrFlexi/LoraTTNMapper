@@ -14,10 +14,10 @@
 
 #define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 1
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 #define HAS_INA3221  0
-#define HAS_INA219  0
+#define HAS_INA219  1
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -49,7 +49,7 @@
 #define HCSR04_trigger_pin  GPIO_NUM_2
 #define HCSR04_echo_pin     GPIO_NUM_13
 
-#define USE_PWM_SERVO 0                 // Uses external I2C Servo expander
+#define USE_PWM_SERVO 1                // Uses external I2C Servo expander
 #define USE_SUN_POSITION 1
 
 #define displayRefreshIntervall 4       // get sensor values and update display     ---> t_cyclic
