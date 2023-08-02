@@ -7,17 +7,17 @@
 // GPIO 02   Output Distance Sensor Trigger
 // GPIO 13   Input  Distance Sensor Echo
 // GPIO 35   APX    PMU Interrupt Pin
-// GPIO 36   ADC1   Soil Moisture
+// GPIO 36   ADC1   Soil Moisture       PIN VP
 //----------------------------------------------------------------
 
 #pragma once
 
 #define DEVICE_NAME "mrflexi-01"
-#define USE_OTA 1
-#define USE_BME280 1
+#define USE_OTA 0
+#define USE_BME280 0
 #define HAS_LORA 1
 #define HAS_INA3221  0
-#define HAS_INA219  1
+#define HAS_INA219  0
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
@@ -42,16 +42,15 @@
 #define FASTLED_SHOW_POTI 0
 
 #define USE_BLE_SERVER 0
-#define USE_POTI 0
-#define USE_SOIL_MOISTURE 0
+#define USE_POTI 1
+#define USE_SOIL_MOISTURE 1
 
-#define USE_DISTANCE_SENSOR_HCSR04 0       // Ultrasonic distance sensor
+#define USE_DISTANCE_SENSOR_HCSR04 0      // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_2
 #define HCSR04_echo_pin     GPIO_NUM_13
 
-#define USE_PWM_SERVO 1                // Uses external I2C Servo expander
-#define USE_SUN_POSITION 1
-
+#define USE_PWM_SERVO 0                // Uses external I2C Servo expander
+#define USE_SUN_POSITION 0
 
 #define displayRefreshIntervall 4       // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 8          // shift to next display page               ---> t_moveDisplay

@@ -28,6 +28,8 @@
 #define PAGE_GYRO 7
 #define PAGE_POTI 8
 #define PAGE_SUN 9
+#define PAGE_SPRINKLER 10
+
 
 #define PAGE_SLEEP 20         // Pages > 20 are not in the picture loop
 #define PAGE_BOOT 21

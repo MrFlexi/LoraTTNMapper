@@ -8,7 +8,10 @@
 #include "globals.h"
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
+
+#if (USE_OTA)
 #include <ArduinoOTA.h>
+#endif
 
 // Defaults to window size 10
 #if (USE_POTI)
@@ -163,6 +166,7 @@ Ticker LORAsendMessageTicker;
 Ticker sunTicker;
 
 
+#if (USE_OTA)
 void setup_ota() {
   
   // Port defaults to 3232
@@ -213,6 +217,7 @@ void setup_ota() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 }
+#endif
 
 
 void setup_filesystem()
@@ -750,7 +755,9 @@ void setup()
   setup_ble();
 #endif
 
+#if (USE_OTA)
 setup_ota();
+#endif
   // get sensor values once
   t_cyclic();
 
@@ -836,6 +843,8 @@ void loop()
   readButton();
 #endif
 
+#if (USE_OTA)
  ArduinoOTA.handle();
+#endif
 
 }

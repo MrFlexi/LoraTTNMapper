@@ -115,6 +115,11 @@ void displayRegisterPages()
   //max_page_counter++;
   //page_array[max_page_counter] = PAGE_SUN;
 #endif
+
+#if (USE_SOIL_MOISTURE)
+ max_page_counter++;
+  page_array[max_page_counter] = PAGE_SPRINKLER;
+#endif
 }
 
 void log_display(String s)
@@ -473,6 +478,20 @@ u8g2.printf("In: %.2f mW", dataBuffer.data.ina219[0].power);
         u8g2.setCursor(1, 60);
         u8g2.printf("Servo: %d  %d", dataBuffer.data.servo1, dataBuffer.data.servo2);
         break;
+
+        case PAGE_SPRINKLER:
+
+        u8g2.setFont(u8g2_font_ncenB12_tr);
+        u8g2.drawStr(1, 15, "Sprinkler");
+
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
+        u8g2.printf("Soil moistr: %.0f", dataBuffer.data.soil_moisture);
+        u8g2.setCursor(1, 40);
+        u8g2.printf("Water level: %d ", dataBuffer.data.hcsr04_distance);
+        break;
+
+
 
       case PAGE_SLEEP:
         u8g2.setFont(u8g2_font_ncenB12_tr);
