@@ -107,13 +107,13 @@ void displayRegisterPages()
 #endif
 
 #if (USE_BME280)
-  //max_page_counter++;
-  //page_array[max_page_counter] = PAGE_SENSORS;
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SENSORS;
 #endif
 
 #if (USE_SUN_POSITION)
-  //max_page_counter++;
-  //page_array[max_page_counter] = PAGE_SUN;
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SUN;
 #endif
 
 #if (USE_SOIL_MOISTURE)

@@ -14,7 +14,7 @@
 
 #define DEVICE_NAME "mrflexi-01"
 #define USE_OTA 0
-#define USE_BME280 0
+#define USE_BME280 1
 #define HAS_LORA 1
 #define HAS_INA3221  0
 #define HAS_INA219  0
@@ -43,7 +43,7 @@
 
 #define USE_BLE_SERVER 0
 #define USE_POTI 1
-#define USE_SOIL_MOISTURE 1
+#define USE_SOIL_MOISTURE 0
 
 #define USE_DISTANCE_SENSOR_HCSR04 0      // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_2
@@ -59,8 +59,8 @@
 #define LORA_TX_INTERVAL  30            // Transmitt Lora messages
 #define LORA_DATARATE DR_SF10
 
-#define sendMqttIntervall      60 // Cayenne mqtt send intervall                   ---> t_send_cycle
-#define sendWebsocketIntervall 5 // Update Webpage
+#define sendMqttIntervall      30 // Cayenne mqtt send intervall                   ---> t_send_cycle
+#define sendWebsocketIntervall 15 // Update Webpage
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3

@@ -39,7 +39,7 @@ void mqtt_loop()
   }
   else
   {
-    // ESP_LOGE(TAG, "Wifi not connected ");
+    ESP_LOGE(TAG, "Wifi not connected ");
   }
 }
 
