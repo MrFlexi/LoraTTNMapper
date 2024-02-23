@@ -63,7 +63,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     message += (char)payload[i];
   }
 
-  // Convert Payload to a JSON object
+  // Convert Payload to a JSON object new
   StaticJsonDocument<500> doc;
   deserializeJson(doc, message);
   serializeJsonPretty(doc, Serial);
@@ -239,6 +239,35 @@ void mqtt_send()
     ESP_LOGE(TAG, "Mqtt not connected");
   }
 }
+
+#if (USE_MPU6050)
+void mqtt_send_mpu()
+{
+  char topic_out[40];
+  JsonDocument doc;
+  String JsonStr;
+
+  // build MQTT topic e.g.
+  doConcat(mqtt_topic, "MotionTracking", "", topic_out);
+  doc.clear();
+  doc["yaw"] = dataBuffer.data.yaw;
+  doc["pitch"] = dataBuffer.data.pitch;
+  doc["roll"] = dataBuffer.data.roll;
+ 
+  serializeJson(doc, JsonStr);
+
+  if (MqttClient.connected())
+  {
+    MqttClient.publish(topic_out, JsonStr.c_str());
+    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+    ESP_LOGI(TAG, "Payload: %s", JsonStr);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Mqtt not connected");
+  }
+}
+#endif
 
 void mqtt_send_lok(int id, uint16_t speed, int dir)
 {

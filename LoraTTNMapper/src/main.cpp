@@ -402,6 +402,10 @@ void t_cyclic() // Intervall: Display Refresh
   get_mpu6050_data();
 #endif
 
+#if (USE_VL53L1X)
+  get_VL53L1X_data();
+#endif  
+
 #if (USE_CAMERA)
     showCameraImageTFT();
 #endif
@@ -741,6 +745,10 @@ void setup()
 #if (USE_MPU6050)
 setup_mpu6050();
 #endif
+
+#if (USE_VL53L1X)
+  setup_VL53L1X();
+#endif  
 
 #if (USE_I2C_MICROPHONE)
   setup_sound_rtos();

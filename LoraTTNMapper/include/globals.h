@@ -220,4 +220,8 @@ extern QueueHandle_t LoraSendQueue;
 #include "modules/sensor_mpu6050.h";
 #endif
 
+#if (USE_VL53L1X)
+#include "modules/sensor_VL53L1X.h";
+#endif
+
 #endif

@@ -16,14 +16,22 @@ void DataBuffer::get()
 
 String DataBuffer::to_json_web()
 {
-  const int capacity = JSON_OBJECT_SIZE(200) + JSON_OBJECT_SIZE(2);
-  StaticJsonDocument<capacity> doc;
+
+  JsonDocument doc;
   String JsonStr;
   char s[20];
-
   doc.clear();
-  JsonArray sensors = doc.createNestedArray("sensors");
 
+  JsonArray rawdata = doc.createNestedArray("RawData");
+  JsonArray motionsensor = doc.createNestedArray("MotionSensor");
+  JsonObject motion = motionsensor.createNestedObject();
+  motion["yaw"] = dataBuffer.data.yaw;
+  motion["pitch"] = dataBuffer.data.pitch;
+  motion["roll"] = dataBuffer.data.roll;
+
+
+// Dynamic Tiles on OPENUI5 Dashboard
+  JsonArray sensors = doc.createNestedArray("tiles");
 #if (HAS_PMU)
   JsonObject sensors_1 = sensors.createNestedObject();
   sensors_1["name"] = "Battery";
@@ -157,6 +165,14 @@ String DataBuffer::to_json_web()
   sensors_13["subheader"] = dataBuffer.data.yaw;
   sensors_13["value"] = dataBuffer.data.pitch;
   sensors_13["unit"] = "d";
+  #endif
+
+  #if (USE_VL53L1X)
+  JsonObject sensors_14 = sensors.createNestedObject();
+  sensors_14["name"] = "Lidar Distance";
+  sensors_14["subheader"] = "VL53L1X";
+  sensors_14["value"] = dataBuffer.data.LidarDistanceMM;
+  sensors_14["unit"] = "mm";
   #endif
 
   serializeJson(doc, JsonStr);

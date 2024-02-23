@@ -16,6 +16,9 @@ static const char TAG[] = "";
 #define IP5306_ADDR (0X75)
 #define INA219_PRIMARY_ADDRESS (0X40)
 #define INA219_SECONDARY_ADDRESS (0X41)
+#define MPU6050_ADDRESS (0X68)
+#define VL53L1X_ADDRESS (0X52)
+
 
 int i2c_scan(void)
 {
@@ -80,6 +83,14 @@ int i2c_scan(void)
 
       case ADXL345:
         ESP_LOGI(TAG, "0x%X: ADXL345 3 Axis Accel", addr);
+        break;
+
+      case MPU6050_ADDRESS:
+        ESP_LOGI(TAG, "0x%X: MPU6050 6-Axis Accel", addr);
+        break;
+
+        case VL53L1X_ADDRESS:
+        ESP_LOGI(TAG, "0x%X: VL53L1x Lidar distance sensor", addr);
         break;
 
       case IP5306_ADDR:
