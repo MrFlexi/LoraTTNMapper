@@ -89,9 +89,9 @@ typedef struct
   float panel_current = 0;
 
   float soil_moisture = 0;
-  double yaw = 0;
-  double pitch = 0;
-  double roll = 0;
+  float yaw = 0;
+  float pitch = 0;
+  float roll = 0;
   String ip_address;
   String image_url = "/get_last_detected";
   uint8_t operation_mode = 0;

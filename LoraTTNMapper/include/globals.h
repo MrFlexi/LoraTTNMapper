@@ -48,8 +48,8 @@
 #define DEVICE_SUN_TRACKER 13
 
 // Choose Application
-#define DEVICE_ID DEVICE_TTN_MAPPER
-//#define DEVICE_ID DEVICE_SENSOR_BOARD
+//#define DEVICE_ID DEVICE_TTN_MAPPER
+#define DEVICE_ID DEVICE_SENSOR_BOARD
 //#define DEVICE_ID SUN_TRACKER
 //#define DEVICE_ID DEVICE_TRACKER
 //#define DEVICE_ID DEVICE_CAMERA_01
@@ -182,7 +182,7 @@ extern QueueHandle_t LoraSendQueue;
 
 
 #if (USE_FASTLED)
-#include <Led.h>
+#include "modules/Led.h"
 #endif
 
 #if (USE_POTI || USE_SOIL_MOISTURE)
@@ -190,7 +190,7 @@ extern QueueHandle_t LoraSendQueue;
 #endif
 
 #if (USE_CAMERA)
-#include <camera.h>
+#include "modules/camera.h"
 #endif
 
 #if (USE_DISTANCE_SENSOR_HCSR04)        // Ultrasonic distance sensor
@@ -211,6 +211,10 @@ extern QueueHandle_t LoraSendQueue;
 
 #if (USE_BLE_SERVER)
 #include "ble_server.h"
+#endif
+
+#if (USE_MPU6050)
+#include "modules/sensor_mpu6050.h";
 #endif
 
 #endif

@@ -68,6 +68,7 @@ String DataBuffer::to_json_web()
   sensors_3["valueColor"] = "Good";
 #endif
 
+#if (USE_SUN_POSITION)
   sprintf(s, "%04.2g", data.sun_elevation);
   JsonObject sensors_4 = sensors.createNestedObject();
   sensors_4["name"] = "Sun position";
@@ -81,6 +82,29 @@ String DataBuffer::to_json_web()
   sensors_5["subheader"] = "azimuth";
   sensors_5["value"] = s;
   sensors_5["unit"] = "degree";
+
+ #if (HAS_PMU)
+  JsonObject sensors_10 = sensors.createNestedObject();
+  strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
+  sensors_10["name"] = "Max Power Point";
+  sensors_10["subheader"] = s;
+  sensors_10["value"] = dataBuffer.data.mpp_max_bat_charge_power;
+  sensors_10["unit"] = "mW";
+
+  // Tabelle 
+  JsonArray mpp = doc.createNestedArray("mpp");
+  for (int i = 0; i < 13; i++)
+  {
+    JsonObject mpp_line = mpp.createNestedObject();
+    mpp_line["pmu_charge_setting"] = dataBuffer.data.mpp_values[i].pmu_charge_setting;
+    mpp_line["bus_voltage"] = dataBuffer.data.mpp_values[i].bus_voltage;
+    mpp_line["bat_charge_current"] = dataBuffer.data.mpp_values[i].bat_charge_current;
+    mpp_line["bat_charge_power"] = dataBuffer.data.mpp_values[i].bat_charge_power;
+  }
+  #endif
+
+
+#endif
 
 #if (USE_PWM_SERVO)
   JsonObject sensors_6 = sensors.createNestedObject();
@@ -103,31 +127,15 @@ String DataBuffer::to_json_web()
   sensors_8["value"] = s;
   sensors_8["unit"] = "";
 
+  #if (ESP_SLEEP)
   JsonObject sensors_9 = sensors.createNestedObject();
   sensors_9["name"] = "Deep sleep";
   sensors_9["subheader"] = "in";
   sensors_9["value"] = dataBuffer.data.MotionCounter;
   sensors_9["unit"] = "Min";
-
- #if (HAS_PMU)
-  JsonObject sensors_10 = sensors.createNestedObject();
-  strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
-  sensors_10["name"] = "Max Power Point";
-  sensors_10["subheader"] = s;
-  sensors_10["value"] = dataBuffer.data.mpp_max_bat_charge_power;
-  sensors_10["unit"] = "mW";
-
-  // Tabelle 
-  JsonArray mpp = doc.createNestedArray("mpp");
-  for (int i = 0; i < 13; i++)
-  {
-    JsonObject mpp_line = mpp.createNestedObject();
-    mpp_line["pmu_charge_setting"] = dataBuffer.data.mpp_values[i].pmu_charge_setting;
-    mpp_line["bus_voltage"] = dataBuffer.data.mpp_values[i].bus_voltage;
-    mpp_line["bat_charge_current"] = dataBuffer.data.mpp_values[i].bat_charge_current;
-    mpp_line["bat_charge_power"] = dataBuffer.data.mpp_values[i].bat_charge_power;
-  }
   #endif
+
+
 
   #if (HAS_INA219)
   JsonObject sensors_11 = sensors.createNestedObject();
@@ -143,8 +151,16 @@ String DataBuffer::to_json_web()
   sensors_12["unit"] = "mW";
   #endif
 
+  #if (USE_MPU6050)
+  JsonObject sensors_13 = sensors.createNestedObject();
+  sensors_13["name"] = "MPU650";
+  sensors_13["subheader"] = dataBuffer.data.yaw;
+  sensors_13["value"] = dataBuffer.data.pitch;
+  sensors_13["unit"] = "d";
+  #endif
+
   serializeJson(doc, JsonStr);
-  //serializeJson(doc, Serial);
+  //serializeJson(doc, Serial);s
   return JsonStr;
 }
 
@@ -200,6 +216,12 @@ String DataBuffer::to_json()
   // ESP_LOGI(TAG, "ImageSize base64: %d", data.image_buffer.length);
   measurement["image_url"] = data.image_url;
   measurement["image"] = String(data.image_buffer);
+#endif
+
+#if (USE_MPU6050)
+  measurement["yaw"] = data.yaw;
+  measurement["pitch"] = data.pitch;
+  measurement["roll"] = data.roll;
 #endif
 
   // Add the "location"

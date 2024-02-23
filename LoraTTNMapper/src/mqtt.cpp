@@ -8,6 +8,7 @@ PubSubClient MqttClient(wifiClient);
 
 // const char *mqtt_server = "192.168.1.100"; // Raspberry
 const char *mqtt_server = "85.209.49.65"; // Netcup
+uint16_t    mqtt_port = 41845;
 const char *mqtt_topic = "mrflexi/device/";
 const char *mqtt_topic_mosi = "/mosi";
 const char *mqtt_topic_miso = "/miso";
@@ -167,13 +168,13 @@ void reconnect()
   if (WiFi.status() == WL_CONNECTED)
   {
     // Loop until we're reconnected
-    while (!MqttClient.connected())
+    while (!MqttClient.connected() && i < 2 )
     {
       ESP_LOGI(TAG, "Attempting MQTT connection...");
       // Attempt to connect
-      if (MqttClient.connect(DEVICE_NAME))
+      if (MqttClient.connect(DEVICE_NAME, "drumol", "nc:13Arequipa"))
       {
-
+        ESP_LOGI(TAG, "MQTT connected");
         MqttClient.publish(mqtt_topic, "connected");
         MqttClient.subscribe(topic_in);
         ESP_LOGI(TAG, "Subscribed to topic %s", topic_in);
@@ -182,9 +183,9 @@ void reconnect()
       {
         ESP_LOGE(TAG, "failed, rc=");
         Serial.print(MqttClient.state());
-        ESP_LOGE(TAG, " try again in 5 seconds");
+        ESP_LOGE(TAG, "try again in 1 seconds");
         // Wait 5 seconds before retrying
-        delay(500);
+        delay(1000);
       }
       i++;
     }
@@ -198,7 +199,7 @@ void setup_mqtt()
   ESP_LOGI(TAG, "-----------  Setup I2c MQTT  -----------");
   if (WiFi.status() == WL_CONNECTED)
   {
-    MqttClient.setServer(mqtt_server, 1883);
+    MqttClient.setServer(mqtt_server, mqtt_port);
     MqttClient.setCallback(callback);
     MqttClient.setBufferSize(500);
     MqttClient.setSocketTimeout(120);
@@ -207,8 +208,10 @@ void setup_mqtt()
     {
       reconnect();
     }
-    ESP_LOGI(TAG, "MQTT connected");
-    MqttClient.publish(mqtt_topic, "ESP32 is alive...");
+     if (MqttClient.connected())
+    {
+        MqttClient.publish(mqtt_topic, "ESP32 is alive...");
+    }
   }
 }
 

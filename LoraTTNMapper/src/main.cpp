@@ -398,6 +398,10 @@ void t_cyclic() // Intervall: Display Refresh
 
 #endif
 
+#if (USE_MPU6050)
+  get_mpu6050_data();
+#endif
+
 #if (USE_CAMERA)
     showCameraImageTFT();
 #endif
@@ -732,6 +736,10 @@ void setup()
 
 #if (USE_DISTANCE_SENSOR_HCSR04)
   setup_hcsr04_rtos();
+#endif
+
+#if (USE_MPU6050)
+setup_mpu6050();
 #endif
 
 #if (USE_I2C_MICROPHONE)
