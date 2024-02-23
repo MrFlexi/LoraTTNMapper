@@ -16,14 +16,22 @@ void DataBuffer::get()
 
 String DataBuffer::to_json_web()
 {
-  const int capacity = JSON_OBJECT_SIZE(200) + JSON_OBJECT_SIZE(2);
-  StaticJsonDocument<capacity> doc;
+
+  JsonDocument doc;
   String JsonStr;
   char s[20];
-
   doc.clear();
-  JsonArray sensors = doc.createNestedArray("sensors");
 
+  JsonArray rawdata = doc.createNestedArray("RawData");
+  JsonArray motionsensor = doc.createNestedArray("MotionSensor");
+  JsonObject motion = motionsensor.createNestedObject();
+  motion["yaw"] = dataBuffer.data.yaw;
+  motion["pitch"] = dataBuffer.data.pitch;
+  motion["roll"] = dataBuffer.data.roll;
+
+
+// Dynamic Tiles on OPENUI5 Dashboard
+  JsonArray sensors = doc.createNestedArray("tiles");
 #if (HAS_PMU)
   JsonObject sensors_1 = sensors.createNestedObject();
   sensors_1["name"] = "Battery";

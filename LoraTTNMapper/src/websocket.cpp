@@ -15,7 +15,7 @@ void t_broadcast_message(void *parameter)
   {
     ESP_LOGI(TAG, "WebSocket broadcast");
     ws.textAll(dataBuffer.to_json_web());
-    vTaskDelay(sendWebsocketIntervall * 1000);
+    vTaskDelay(sendWebsocketIntervall);
   }
 }
 
