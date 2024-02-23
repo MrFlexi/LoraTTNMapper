@@ -62,7 +62,7 @@
 #define LORA_DATARATE DR_SF10
 
 #define sendMqttIntervall      15 // Cayenne mqtt send intervall in seconds         ---> t_send_cycle
-#define sendWebsocketIntervall  100 // Send messages via WebSockets   in in Milliseconds  1000 = 1s
+#define sendWebsocketIntervall  200 // Send messages via WebSockets   in in Milliseconds  1000 = 1s
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3

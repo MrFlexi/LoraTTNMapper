@@ -22,15 +22,21 @@ String DataBuffer::to_json_web()
   char s[20];
   doc.clear();
 
-  JsonArray rawdata = doc.createNestedArray("RawData");
-  JsonArray motionsensor = doc.createNestedArray("MotionSensor");
-  JsonObject motion = motionsensor.createNestedObject();
-  motion["yaw"] = dataBuffer.data.yaw;
-  motion["pitch"] = dataBuffer.data.pitch;
-  motion["roll"] = dataBuffer.data.roll;
+  JsonObject Sensors = doc["Sensors"].to<JsonObject>();
+  JsonObject Sensors_MotionSensor = Sensors["MotionSensor"].to<JsonObject>();
+  Sensors_MotionSensor["yaw"] = dataBuffer.data.yaw;
+  Sensors_MotionSensor["pitch"] = dataBuffer.data.pitch;
+  Sensors_MotionSensor["roll"] = dataBuffer.data.roll;
 
+  JsonObject Sensors_sensor2 = Sensors["DistanceSensor"].to<JsonObject>();
+  Sensors_sensor2["distance"] = dataBuffer.data.LidarDistanceMM;
 
-// Dynamic Tiles on OPENUI5 Dashboard
+//JsonArray tiles = doc["tiles"].to<JsonArray>();
+//JsonObject tiles_0 = tiles.add<JsonObject>();
+//tiles_0["timestamp"] = "2024-02-23T10:00:00";
+//tiles_0["value"] = 123;
+
+  // Dynamic Tiles on OPENUI5 Dashboard
   JsonArray sensors = doc.createNestedArray("tiles");
 #if (HAS_PMU)
   JsonObject sensors_1 = sensors.createNestedObject();
@@ -91,7 +97,7 @@ String DataBuffer::to_json_web()
   sensors_5["value"] = s;
   sensors_5["unit"] = "degree";
 
- #if (HAS_PMU)
+#if (HAS_PMU)
   JsonObject sensors_10 = sensors.createNestedObject();
   strftime(s, sizeof(s), "from %H:%M:%S", &dataBuffer.data.mpp_last_timeinfo);
   sensors_10["name"] = "Max Power Point";
@@ -99,7 +105,7 @@ String DataBuffer::to_json_web()
   sensors_10["value"] = dataBuffer.data.mpp_max_bat_charge_power;
   sensors_10["unit"] = "mW";
 
-  // Tabelle 
+  // Tabelle
   JsonArray mpp = doc.createNestedArray("mpp");
   for (int i = 0; i < 13; i++)
   {
@@ -109,8 +115,7 @@ String DataBuffer::to_json_web()
     mpp_line["bat_charge_current"] = dataBuffer.data.mpp_values[i].bat_charge_current;
     mpp_line["bat_charge_power"] = dataBuffer.data.mpp_values[i].bat_charge_power;
   }
-  #endif
-
+#endif
 
 #endif
 
@@ -135,55 +140,53 @@ String DataBuffer::to_json_web()
   sensors_8["value"] = s;
   sensors_8["unit"] = "";
 
-  #if (ESP_SLEEP)
+#if (ESP_SLEEP)
   JsonObject sensors_9 = sensors.createNestedObject();
   sensors_9["name"] = "Deep sleep";
   sensors_9["subheader"] = "in";
   sensors_9["value"] = dataBuffer.data.MotionCounter;
   sensors_9["unit"] = "Min";
-  #endif
+#endif
 
-
-
-  #if (HAS_INA219)
+#if (HAS_INA219)
   JsonObject sensors_11 = sensors.createNestedObject();
   sensors_11["name"] = "Solar Panel";
   sensors_11["subheader"] = dataBuffer.data.ina219[0].voltage;
   sensors_11["value"] = dataBuffer.data.ina219[0].current;
   sensors_11["unit"] = "V/mA";
-  
+
   JsonObject sensors_12 = sensors.createNestedObject();
   sensors_12["name"] = "Solar Panel";
   sensors_12["subheader"] = "Power";
   sensors_12["value"] = dataBuffer.data.ina219[0].power;
   sensors_12["unit"] = "mW";
-  #endif
+#endif
 
-  #if (USE_MPU6050)
+#if (USE_MPU6050)
   JsonObject sensors_13 = sensors.createNestedObject();
-  sensors_13["name"] = "MPU650";
-  sensors_13["subheader"] = dataBuffer.data.yaw;
-  sensors_13["value"] = dataBuffer.data.pitch;
+  sensors_13["name"] = "Gyro";
+  sensors_13["subheader"] = "Yaw";
+  sensors_13["value"] = dataBuffer.data.yaw;
   sensors_13["unit"] = "d";
-  #endif
+#endif
 
-  #if (USE_VL53L1X)
+#if (USE_VL53L1X)
   JsonObject sensors_14 = sensors.createNestedObject();
   sensors_14["name"] = "Lidar Distance";
   sensors_14["subheader"] = "VL53L1X";
   sensors_14["value"] = dataBuffer.data.LidarDistanceMM;
   sensors_14["unit"] = "mm";
-  #endif
+#endif
 
   serializeJson(doc, JsonStr);
-  //serializeJson(doc, Serial);s
+  // serializeJson(doc, Serial);s
   return JsonStr;
 }
 
- // Json format suitable for direct input to INFLUX DB
+// Json format suitable for direct input to INFLUX DB
 String DataBuffer::to_json()
 {
- 
+
   const int capacity = JSON_OBJECT_SIZE(100) + JSON_OBJECT_SIZE(2);
   StaticJsonDocument<capacity> doc;
   String JsonStr;
@@ -196,15 +199,15 @@ String DataBuffer::to_json()
 
   JsonObject measurement = doc.createNestedObject("measurement");
 
-  // Battery Management
-  #if ( HAS_PMU) 
+// Battery Management
+#if (HAS_PMU)
   measurement["bat_voltage"] = data.bat_voltage;
   measurement["bat_charge_current"] = data.bat_charge_current;
   measurement["bat_fuel_gauge"] = data.bat_DeltamAh;
   measurement["bus_voltage"] = data.bus_voltage;
   measurement["bus_current"] = data.bus_current;
   measurement["bat_max_charge_curr"] = settings.bat_max_charge_current;
-  #endif
+#endif
 
 #if (HAS_INA219)
   measurement["panel_voltage"] = data.ina219[0].voltage;

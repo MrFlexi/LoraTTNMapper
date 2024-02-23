@@ -11,7 +11,7 @@ void setup_VL53L1X()
   sensor.setTimeout(500);
   if (!sensor.init())
   {
-    Serial.println("Failed to detect and initialize sensor!");
+    Serial.println("Failed to initialize Lidar VL53L1X sensor!");
     while (1);
   }
 
@@ -21,19 +21,20 @@ void setup_VL53L1X()
   // medium and long distance modes. See the VL53L1X datasheet for more
   // information on range and timing limits.
   sensor.setDistanceMode(VL53L1X::Long);
-  sensor.setMeasurementTimingBudget(50000);
+  sensor.setMeasurementTimingBudget(100000);   // 100ms
 
   // Start continuous readings at a rate of one measurement every 50 ms (the
   // inter-measurement period). This period should be at least as long as the
   // timing budget.
-  sensor.startContinuous(50);
+  sensor.startContinuous(200);
  
 }
 
 void get_VL53L1X_data()
 {
   sensor.read();
-  Serial.print("range: ");
+  Serial.println();
+  Serial.print("Dist.: ");
   Serial.print(sensor.ranging_data.range_mm);
   Serial.print("\tstatus: ");
   Serial.print(VL53L1X::rangeStatusToString(sensor.ranging_data.range_status));

@@ -3,7 +3,10 @@
 
 //---------------------------------------------------------
 // Upload data to ESP 32 SPIFFS
-// pio run -t uploadfs   !! close Serial Monitor before !!
+// 0. !! close Serial Monitor  !!
+// 1. Open Platform IO extension --> Miscellaneous
+// 2. Open PlatformIO Core CLI
+// 3. pio run -t uploadfs
 //---------------------------------------------------------
 #include "globals.h"
 #include <ESPmDNS.h>
@@ -165,15 +168,15 @@ Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 Ticker sunTicker;
 
-
 #if (USE_OTA)
-void setup_ota() {
-  
+void setup_ota()
+{
+
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
   // Hostname defaults to esp3232-[MAC]
-   ArduinoOTA.setHostname(DEVICE_NAME);
+  ArduinoOTA.setHostname(DEVICE_NAME);
 
   // No authentication by default
   // ArduinoOTA.setPassword("admin");
@@ -183,33 +186,32 @@ void setup_ota() {
   // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
 
   ArduinoOTA
-    .onStart([]() {
-      String type;
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
-      else // U_SPIFFS
-        type = "filesystem";
+      .onStart([]()
+               {
+                 String type;
+                 if (ArduinoOTA.getCommand() == U_FLASH)
+                   type = "sketch";
+                 else // U_SPIFFS
+                   type = "filesystem";
 
-      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      Serial.println("Start updating " + type);
+                 // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+                 Serial.println("Start updating " + type);
 #if (USE_DISPLAY)
-      showPage(PAGE_OTA);
+                 showPage(PAGE_OTA);
 #endif
-    })
-    .onEnd([]() {
-      Serial.println("\nEnd");
-    })
-    .onProgress([](unsigned int progress, unsigned int total) {
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-    })
-    .onError([](ota_error_t error) {
+               })
+      .onEnd([]()
+             { Serial.println("\nEnd"); })
+      .onProgress([](unsigned int progress, unsigned int total)
+                  { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
+      .onError([](ota_error_t error)
+               {
       Serial.printf("Error[%u]: ", error);
       if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
       else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
       else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
       else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
-    });
+      else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
 
   ArduinoOTA.begin();
 
@@ -218,7 +220,6 @@ void setup_ota() {
   Serial.println(WiFi.localIP());
 }
 #endif
-
 
 void setup_filesystem()
 {
@@ -399,12 +400,27 @@ void t_cyclic() // Intervall: Display Refresh
 #endif
 
 #if (USE_MPU6050)
-  get_mpu6050_data();
+
+    //unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
+    get_mpu6050_data();
+    //unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    //unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    //Serial.print("Laufzeit get_mpu6050_data() ");
+    //Serial.print(executionTime);
+    //Serial.println(" Millisekunden");
+
 #endif
 
 #if (USE_VL53L1X)
-  get_VL53L1X_data();
-#endif  
+    //startTime = millis(); // Zeit vor dem Funktionsaufruf
+    get_VL53L1X_data();
+    //endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    //executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    //Serial.print("Laufzeit get_VL53L1X_data() ");
+    //Serial.print(executionTime);
+    //Serial.println(" Millisekunden");
+
+#endif
 
 #if (USE_CAMERA)
     showCameraImageTFT();
@@ -642,7 +658,6 @@ void setup()
   Wire.begin(SDA, SCL, 400000);
 #endif
   delay(500);
- 
 
 #if (HAS_IP5306)
   setupPowerIP5306();
@@ -657,7 +672,7 @@ void setup()
   delay(1000);
 #endif
 
- i2c_scan();
+  i2c_scan();
 
 #if (HAS_INA3221 || HAS_INA219 || USE_BME280)
   ESP_LOGI(TAG, "-----------  Setup I2c devices   -----------");
@@ -743,12 +758,12 @@ void setup()
 #endif
 
 #if (USE_MPU6050)
-setup_mpu6050();
+  setup_mpu6050();
 #endif
 
 #if (USE_VL53L1X)
   setup_VL53L1X();
-#endif  
+#endif
 
 #if (USE_I2C_MICROPHONE)
   setup_sound_rtos();
@@ -772,7 +787,7 @@ setup_mpu6050();
 #endif
 
 #if (USE_OTA)
-setup_ota();
+  setup_ota();
 #endif
   // get sensor values once
   t_cyclic();
@@ -860,7 +875,6 @@ void loop()
 #endif
 
 #if (USE_OTA)
- ArduinoOTA.handle();
+  ArduinoOTA.handle();
 #endif
-
 }
