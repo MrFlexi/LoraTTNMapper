@@ -49,6 +49,7 @@
 
 
 #define USE_MPU6050  1
+#define USE_VL53L1X 1
 
 #define USE_PWM_SERVO 0                // Uses external I2C Servo expander
 #define USE_SUN_POSITION 0

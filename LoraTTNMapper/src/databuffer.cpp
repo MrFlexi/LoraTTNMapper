@@ -167,6 +167,14 @@ String DataBuffer::to_json_web()
   sensors_13["unit"] = "d";
   #endif
 
+  #if (USE_VL53L1X)
+  JsonObject sensors_14 = sensors.createNestedObject();
+  sensors_14["name"] = "Lidar Distance";
+  sensors_14["subheader"] = "VL53L1X";
+  sensors_14["value"] = dataBuffer.data.LidarDistanceMM;
+  sensors_14["unit"] = "mm";
+  #endif
+
   serializeJson(doc, JsonStr);
   //serializeJson(doc, Serial);s
   return JsonStr;

@@ -92,6 +92,7 @@ typedef struct
   float yaw = 0;
   float pitch = 0;
   float roll = 0;
+  uint16_t LidarDistanceMM = 0;
   String ip_address;
   String image_url = "/get_last_detected";
   uint8_t operation_mode = 0;
