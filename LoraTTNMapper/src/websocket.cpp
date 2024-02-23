@@ -1,9 +1,10 @@
 #include "globals.h"
-#include "websocket.h"
+
 
 static const char TAG[] = __FILE__;
 
 #if (USE_WEBSERVER)
+#include "websocket.h"
 AsyncWebSocket ws("/ws");
 
 void t_broadcast_message(void *parameter)

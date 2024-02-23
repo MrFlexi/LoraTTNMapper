@@ -1,6 +1,8 @@
 // Basic config
 #include "globals.h"
+
 #include "power.h"
+
 
 // Local logging tag
 static const char TAG[] = "";

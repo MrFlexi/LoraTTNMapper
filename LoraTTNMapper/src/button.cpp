@@ -1,4 +1,6 @@
 #include "globals.h"
+
+#if (USE_BUTTON)
 #include "button.h"
 
 Button *b = NULL;
@@ -43,3 +45,4 @@ void readButton()
 {
   b->update();
 }
+#endif

@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include "globals.h"
+
+#if (USE_PWM_SERVO)
 #include "ServoEasing.hpp"
 #include <Preferences.h>
-
 Preferences prefs;
+#endif
+
+
 static const char TAG[] = "";
 
 #define servo1_pin 0

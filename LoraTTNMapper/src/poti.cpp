@@ -1,4 +1,6 @@
 #include <Arduino.h>
+
+#if (USE_POTI)
 #include <driver/adc.h>
 #include <esp_adc_cal.h>
 #include "globals.h"
@@ -118,3 +120,4 @@ void poti_setup_RTOS()
       NULL,
       0); /* Task handle. */
 }
+#endif

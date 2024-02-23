@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include "globals.h"
-#include <driver/i2s.h>
+
 
 #if (HAS_I2C_MICROPHONE)
+#include <driver/i2s.h>
 
 // TTF Display   i2s  Port 1 
 // Sound Sensor  i2S  Port 2

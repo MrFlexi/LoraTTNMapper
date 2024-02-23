@@ -119,7 +119,10 @@ extern WiFiClient wifiClient;
 #include "websocket.h"
 #endif
 
+#if(USE_GPS)
 #include "gps.h"
+#endif
+
 #include "esp_log.h"
 
 
