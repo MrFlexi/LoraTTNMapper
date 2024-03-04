@@ -12,21 +12,20 @@
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 
-#if (USE_OTA)
-#include <ArduinoOTA.h>
-#endif
-
-// Defaults to window size 10
-#if (USE_POTI)
-// AnalogSmooth Poti_A = AnalogSmooth();
-#endif
-
-// static const char TAG[] = __FILE__;
 static const char TAG[] = "";
 
 AnalogSmooth smooth_temp = AnalogSmooth();
 AnalogSmooth smooth_discur = AnalogSmooth();
 AnalogSmooth smooth_batvol = AnalogSmooth();
+
+// Define PID parameters
+#include <PID_v1.h> // PID library
+
+#define ANGLE_OFFSET 0
+double setpoint = 0; // Desired angle (horizontal)
+double input, output;
+double Kp = 1, Ki = 1, Kd = 1; // PID constants
+PID pid(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
 
 #if (USE_GPS)
 #include <SparkFun_Ublox_Arduino_Library.h> //http://librarymanager/All#SparkFun_Ublox_GPS
@@ -66,53 +65,14 @@ void setup_gps_reset()
 }
 #endif
 
-//--------------------------------------------------------------------------
-// log to spiffs
-//--------------------------------------------------------------------------
 
-#if (USE_SPIFF_LOGGING)
-static char log_print_buffer[512];
-
-int vprintf_into_spiffs(const char *szFormat, va_list args)
-{
-  // write evaluated format string into buffer
-  int ret = vsnprintf(log_print_buffer, sizeof(log_print_buffer), szFormat, args);
-
-  dataBuffer.settings.log_print_buffer = log_print_buffer;
-
-  Serial.print("via link");
-  Serial.println(log_print_buffer);
-
-  // output is now in buffer. write to file.
-  if (ret >= 0)
-  {
-    if (!SPIFFS.exists("/LOGS.txt"))
-    {
-      File writeLog = SPIFFS.open("/LOGS.txt", FILE_WRITE);
-      if (!writeLog)
-        Serial.println("Couldn't open spiffs_log.txt");
-      delay(50);
-      writeLog.close();
-    }
-
-    File spiffsLogFile = SPIFFS.open("/LOGS.txt", FILE_APPEND);
-    // debug output
-    // printf("[Writing to SPIFFS] %.*s", ret, log_print_buffer);
-    spiffsLogFile.write((uint8_t *)log_print_buffer, (size_t)ret);
-    // to be safe in case of crashes: flush the output
-    spiffsLogFile.flush();
-    spiffsLogFile.close();
-  }
-  return ret;
-}
-#endif
 
 bool wifi_connected = false;
 
 //--------------------------------------------------------------------------
 // Wifi Settings
 //--------------------------------------------------------------------------
-#if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
+#if (USE_WEBSERVER ||  USE_MQTT || USE_WIFI)
 WiFiClient wifiClient;
 #endif
 
@@ -168,58 +128,7 @@ Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 Ticker sunTicker;
 
-#if (USE_OTA)
-void setup_ota()
-{
 
-  // Port defaults to 3232
-  // ArduinoOTA.setPort(3232);
-
-  // Hostname defaults to esp3232-[MAC]
-  ArduinoOTA.setHostname(DEVICE_NAME);
-
-  // No authentication by default
-  // ArduinoOTA.setPassword("admin");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-
-  ArduinoOTA
-      .onStart([]()
-               {
-                 String type;
-                 if (ArduinoOTA.getCommand() == U_FLASH)
-                   type = "sketch";
-                 else // U_SPIFFS
-                   type = "filesystem";
-
-                 // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-                 Serial.println("Start updating " + type);
-#if (USE_DISPLAY)
-                 showPage(PAGE_OTA);
-#endif
-               })
-      .onEnd([]()
-             { Serial.println("\nEnd"); })
-      .onProgress([](unsigned int progress, unsigned int total)
-                  { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
-      .onError([](ota_error_t error)
-               {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
-
-  ArduinoOTA.begin();
-
-  Serial.println("Ready");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-}
-#endif
 
 void setup_filesystem()
 {
@@ -245,22 +154,12 @@ void setup_filesystem()
   delay(100);
 }
 
-void touch_callback()
-{
-  // placeholder callback function
-}
-
 //---------------------------------------------------------------------------------
-// Send Messages via Cayenne or MQTT
+// Send Messages via MQTT
 //---------------------------------------------------------------------------------
 
 void t_mqtt_cycle()
 {
-
-#if (USE_CAYENNE)
-  if (WiFi.status() == WL_CONNECTED)
-    Cayenne_send();
-#endif
 
 #if (USE_MQTT)
   if (WiFi.status() == WL_CONNECTED)
@@ -269,13 +168,7 @@ void t_mqtt_cycle()
 #if (USE_MQTT_SENSORS)
     mqtt_send();
 #endif
-#if (USE_MQTT_TRAIN)
-    if (dataBuffer.data.potentiometer_a_changed)
-    {
-      mqtt_send_lok(1, dataBuffer.data.potentiometer_a, 1);
-      dataBuffer.data.potentiometer_a_changed = false;
-    }
-#endif
+
 #endif
   }
 }
@@ -288,29 +181,7 @@ void t_cyclicRTOS(void *pvParameters)
   }
 }
 
-//---------------------------------------------------------------------------------
-// Get sensor values and update display
-//---------------------------------------------------------------------------------
-void t_sunTracker() // Intervall: Display Refresh
-{
-  Serial.println();
-  Serial.println();
-  ESP_LOGI(TAG, "------------------------------------------------");
-  ESP_LOGI(TAG, "Sun Tracker");
-  ESP_LOGI(TAG, "------------------------------------------------");
 
-#if (HAS_PMU)
-  AXP192_get_mpp();
-#endif
-
-#if (USE_SUN_POSITION)
-#if (USE_PWM_SERVO)
-  servo_move_to_sun();
-  Serial.println();
-  Serial.println();
-#endif
-#endif
-}
 
 void t_cyclic() // Intervall: Display Refresh
 {
@@ -325,8 +196,8 @@ void t_cyclic() // Intervall: Display Refresh
   ble_send();
 #endif
 
-  dataBuffer.data.freeheap = ESP.getFreeHeap();
-  dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
+  //dataBuffer.data.freeheap = ESP.getFreeHeap();
+  //dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
   // ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
@@ -409,6 +280,20 @@ void t_cyclic() // Intervall: Display Refresh
     //Serial.print(executionTime);
     //Serial.println(" Millisekunden");
 
+   input = dataBuffer.data.roll + ANGLE_OFFSET;
+  
+  pid.Compute(); // Compute PID
+  
+  // Map the PID output to servo angle
+  int servoAngle = map(output, -90, 90, 0, 180);
+  
+  // Move servo smoothly using ServoEasing
+  servo_move_to(1,servoAngle);
+  
+  Serial.print("Angle: ");
+  Serial.print(input);
+  Serial.print("  Output: ");
+  Serial.println(output);
 #endif
 
 #if (USE_VL53L1X)
@@ -420,10 +305,6 @@ void t_cyclic() // Intervall: Display Refresh
     //Serial.print(executionTime);
     //Serial.println(" Millisekunden");
 
-#endif
-
-#if (USE_CAMERA)
-    showCameraImageTFT();
 #endif
 
     I2C_MUTEX_UNLOCK(); // release i2c bus access
@@ -438,17 +319,6 @@ void t_cyclic() // Intervall: Display Refresh
   {
     dataBuffer.data.LoraQueueCounter = 0;
   }
-#endif
-
-// Calculate Soil Moisture
-#if (USE_SOIL_MOISTURE)
-  if (dataBuffer.data.potentiometer_a_changed)
-  {
-    dataBuffer.data.soil_moisture = (float)dataBuffer.data.potentiometer_a / 1000;
-    dataBuffer.data.potentiometer_a_changed = false;
-    ESP_LOGI(TAG, "Soil moisture changed %.2f ", dataBuffer.data.soil_moisture);
-  }
-  ESP_LOGI(TAG, "Soil moisture %.2f ", dataBuffer.data.soil_moisture);
 #endif
 
   // esp_log_write(ESP_LOG_INFO, TAG, "BME280  %.1f C/%.1f% \n", dataBuffer.data.temperature, dataBuffer.data.humidity);
@@ -468,8 +338,7 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
-
-  printLocalTime();
+ printLocalTime();
 
 #if (USE_GPS_MOTION)
   gps.getDistance();
@@ -520,12 +389,6 @@ void t_sleep()
   }
 #endif
 
-// Check if if solar panel is adjusted
-#if (USE_SUN_POSITION)
-  if (dataBuffer.settings.sunTrackerPositionAdjusted)
-    dataBuffer.data.MotionCounter = 0;
-#endif
-
   // Check if number of Lora-TX events has been reached
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
     dataBuffer.data.MotionCounter = 0;
@@ -536,14 +399,6 @@ void t_sleep()
   {
     dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
     gps.resetDistance();
-  }
-#endif
-
-#if (USE_BLE_SERVER)
-  if (dataBuffer.data.ble_device_connected)
-  {
-    ESP_LOGI(TAG, "No Deep Sleep, BLE still connected");
-    dataBuffer.data.MotionCounter = TIME_TO_NEXT_SLEEP_WITHOUT_MOTION;
   }
 #endif
 
@@ -596,23 +451,11 @@ void setup_wifi()
 void setup()
 {
   Serial.begin(115200);
-
-// LED Sunrise
-#ifdef HAS_LED
-  ledcSetup(0, 10000, 8);
-  ledcAttachPin(HAS_LED, 0);
-  for (int dutyCycle = 0; dutyCycle <= 255; dutyCycle++)
-  {
-    ledcWrite(0, dutyCycle);
-    delay(5);
-  }
-#endif
-
   //--------------------------------------------------------------------
   // Load Settings
   //--------------------------------------------------------------------
   setup_filesystem();
-  loadConfiguration();
+  //loadConfiguration();
 
   //--------------------------------------------------------------------
   // Logging
@@ -640,8 +483,7 @@ void setup()
   print_wakeup_reason();
   printLocalTime();
   display_chip_info();
-  // Serial.println(dataBuffer.to_json());
-  // Serial.println(dataBuffer.getError());
+
 #if (HAS_GPS)
   ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
 #endif
@@ -759,36 +601,25 @@ void setup()
 
 #if (USE_MPU6050)
   setup_mpu6050();
+  pid.SetMode(AUTOMATIC);
+  pid.SetOutputLimits(-90, 90); // Limit servo movement
 #endif
 
 #if (USE_VL53L1X)
   setup_VL53L1X();
 #endif
 
-#if (USE_I2C_MICROPHONE)
-  setup_sound_rtos();
-#endif
-
-#if (USE_CAMERA)
-  setupCam();
-#endif
-
-  // Get date/time from Internet or GPS
+// Get date/time from Internet or GPS
   setup_time();
 
 #if (USE_PWM_SERVO)
   setup_servo_pwm();
-  panel_switch_on();
-  servo_move_to_last_position();
 #endif
 
 #if (USE_BLE_SERVER)
   setup_ble();
 #endif
 
-#if (USE_OTA)
-  setup_ota();
-#endif
   // get sensor values once
   t_cyclic();
 
@@ -803,10 +634,6 @@ void setup()
 
 #if (USE_MQTT)
   sendCycleTicker.attach(sendMqttIntervall, t_mqtt_cycle);
-#endif
-
-#if (USE_SUN_POSITION)
-  sunTicker.attach(sunTrackerRefreshIntervall, t_sunTracker);
 #endif
 
 #if (HAS_LORA)
@@ -870,11 +697,4 @@ void loop()
   mqtt_loop();
 #endif
 
-#if (USE_BUTTON)
-  readButton();
-#endif
-
-#if (USE_OTA)
-  ArduinoOTA.handle();
-#endif
 }

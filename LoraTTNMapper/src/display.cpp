@@ -216,14 +216,7 @@ void setup_display(void)
   u8g2.enableUTF8Print();
 #endif
 
-  switch (DEVICE_ID)
-  {
-  case DEVICE_SUN_TRACKER:
-    //displayRegisterPagesSunTracker();
-    break;
-  default:
-    displayRegisterPages();
-  }
+displayRegisterPages();
 }
 
   void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
