@@ -9,6 +9,36 @@
 
 let scene, camera, rendered, cube;
 
+function degrees_to_radians(degrees)
+{
+  var pi = Math.PI;
+  return degrees * (pi/180);
+}
+
+const socket = new WebSocket('ws://' + location.host + '/echo');
+      socket.addEventListener('message', ev => {
+        console.log(ev.data);
+        let MPU = JSON.parse(ev.data);   
+
+        ServoLeft.rotation.x = degrees_to_radians(MPU["ServoLeft"]);
+        ServoLeft.rotation.y = 0;
+        ServoLeft.rotation.z = 0;
+
+        ServoRight.rotation.x = degrees_to_radians(MPU["ServoRight"]);
+        ServoRight.rotation.y = 0;
+        ServoRight.rotation.z = 0;
+
+        Plane.rotation.z = degrees_to_radians(MPU["roll"]);
+
+        renderer.render(scene, camera);  
+        document.getElementById("yaw").innerHTML = MPU["yaw"];
+        document.getElementById("pitch").innerHTML = MPU["pitch"];
+        document.getElementById("roll").innerHTML = MPU["roll"];    
+        document.getElementById("ServoLeft").innerHTML = MPU["ServoLeft"];
+        document.getElementById("ServoRight").innerHTML = MPU["ServoRight"];
+
+      });
+
 function parentWidth(elem) {
   return elem.parentElement.clientWidth;
 }
@@ -22,22 +52,42 @@ function init3D(){
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xffffff);
 
-  camera = new THREE.PerspectiveCamera(75, parentWidth(document.getElementById("3Dcube")) / parentHeight(document.getElementById("3Dcube")), 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(45, parentWidth(document.getElementById("3Dcube")) / parentHeight(document.getElementById("3Dcube")), 1, 500);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(parentWidth(document.getElementById("3Dcube")), parentHeight(document.getElementById("3Dcube")));
 
   document.getElementById('3Dcube').appendChild(renderer.domElement);
 
-  const geometry = new THREE.BoxGeometry( 5, 1, 1 );
-  const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-  cube = new THREE.Mesh( geometry, material );
-  scene.add( cube );
+  const geometry = new THREE.BoxGeometry( 4, 0.1, 1 );  
+  const material = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+  ServoLeft   = new THREE.Mesh( geometry, material );  
+  ServoRight  = new THREE.Mesh( geometry, material );  
+  scene.add( ServoLeft );
+  scene.add( ServoRight );
+
+  const geometryPlane = new THREE.BoxGeometry( 8, 1, 2 );  
+  const materialPlane = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+  Plane   = new THREE.Mesh( geometryPlane, materialPlane );  
+  scene.add( Plane );
+
+  ServoLeft.position.x = -10;
+  ServoRight.position.x = 10;
+
+  //const box2 = new THREE.Box3();
+  //box2.setFromCenterAndSize( new THREE.Vector3( 1, 1, 1 ), new THREE.Vector3( 2, 1, 3 ) );
+  //const helper = new THREE.Box3Helper( box2, 0xff8000 );
+  //scene.add( helper );
+
+  const gridHelper = new THREE.GridHelper( 10, 10, 0xff0000 );
+  scene.add( gridHelper );
   
   
-  camera.position.x = 1;
-  camera.position.y = 1;
-  camera.position.z = 5;
+  camera.position.x = 0;
+  camera.position.y = 5;
+  camera.position.z = 7;  
+  camera.lookAt( 0, 0, 0 );
+
   renderer.render(scene, camera);
 }
 
@@ -56,47 +106,6 @@ window.addEventListener('resize', onWindowResize, false);
 // Create the 3D representation
 init3D();
 
-// Create events for the sensor readings
-if (!!window.EventSource) {
-  var source = new EventSource('/events');
-
-  source.addEventListener('open', function(e) {
-    console.log("Events Connected");
-  }, false);
-
-  source.addEventListener('error', function(e) {
-    if (e.target.readyState != EventSource.OPEN) {
-      console.log("Events Disconnected");
-    }
-  }, false);
-
-  source.addEventListener('gyro_readings', function(e) {
-    //console.log("gyro_readings", e.data);
-    var obj = JSON.parse(e.data);
-    document.getElementById("gyroX").innerHTML = obj.gyroX;
-    document.getElementById("gyroY").innerHTML = obj.gyroY;
-    document.getElementById("gyroZ").innerHTML = obj.gyroZ;
-
-    // Change cube rotation after receiving the readinds
-    cube.rotation.x = obj.gyroY;
-    cube.rotation.z = obj.gyroX;
-    cube.rotation.y = obj.gyroZ;
-    renderer.render(scene, camera);
-  }, false);
-
-  source.addEventListener('temperature_reading', function(e) {
-    console.log("temperature_reading", e.data);
-    document.getElementById("temp").innerHTML = e.data;
-  }, false);
-
-  source.addEventListener('accelerometer_readings', function(e) {
-    console.log("accelerometer_readings", e.data);
-    var obj = JSON.parse(e.data);
-    document.getElementById("accX").innerHTML = obj.accX;
-    document.getElementById("accY").innerHTML = obj.accY;
-    document.getElementById("accZ").innerHTML = obj.accZ;
-  }, false);
-}
 
 function resetPosition(element){
   init3D();
