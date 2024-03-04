@@ -7,8 +7,6 @@
 */
 
 
-
-
 let scene, camera, rendered, cube;
 
 function parentWidth(elem) {
