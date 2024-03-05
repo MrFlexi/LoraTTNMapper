@@ -22,6 +22,13 @@ String DataBuffer::to_json_web()
   char s[20];
   doc.clear();
 
+  doc["yaw"] = dataBuffer.data.yaw;
+  doc["pitch"] = dataBuffer.data.pitch;
+  doc["roll"] = dataBuffer.data.roll;
+  
+  doc["ServoLeft"] = dataBuffer.data.ServoLeft;
+  doc["ServoRight"] = dataBuffer.data.ServoRight;
+
   JsonObject Sensors = doc["Sensors"].to<JsonObject>();
   JsonObject Sensors_MotionSensor = Sensors["MotionSensor"].to<JsonObject>();
   Sensors_MotionSensor["yaw"] = dataBuffer.data.yaw;

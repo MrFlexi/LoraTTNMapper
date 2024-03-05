@@ -79,6 +79,8 @@ typedef struct
   bool pictureLoop = true;
   float firmware_version;
   uint8_t bytesReceived;
+  int8_t ServoLeft;
+  int8_t ServoRight;
   uint8_t servo1;
   uint8_t servo2;
   double sun_azimuth;

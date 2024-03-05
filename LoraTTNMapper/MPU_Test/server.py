@@ -12,12 +12,15 @@ sock = Sock(app)
 
 client_list = []
 
-MPU={ 
+MPU={     
     "yaw" : 0, 
     "pitch" : 0,  
     "roll" : 10,      
-    "ServoLeft" :-45,
-    "ServoRight" :45
+    "ServoLeft" :-90,
+    "ServoRight" :0,
+    "Ki": 1,
+    "Kp": 1,
+    "Kd": 1
 } 
 
 def send_time():
