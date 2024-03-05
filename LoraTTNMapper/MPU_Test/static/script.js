@@ -15,6 +15,23 @@ function degrees_to_radians(degrees)
   return degrees * (pi/180);
 }
 
+const ail_kpi_slider = document.querySelector("#ail_kpi_slider");  // Slider 
+const ail_kpi_value  = document.querySelector("#ail_kpi_label");   // Anzeige
+ail_kpi_value.textContent = ail_kpi_slider.value;
+
+ail_kpi_slider.addEventListener("input", (event) => {
+  ail_kpi_value.textContent = concat("Ki=", event.target.value);
+ 
+  const msg = {
+    action: "PIDChanged",
+    Kpi: event.target.value,   
+    date: Date.now(),
+  };
+
+  socket.send(JSON.stringify(msg));
+});
+
+
 const socket = new WebSocket('ws://' + location.host + '/echo');
       socket.addEventListener('message', ev => {
         console.log(ev.data);
@@ -80,8 +97,7 @@ function init3D(){
   //scene.add( helper );
 
   const gridHelper = new THREE.GridHelper( 10, 10, 0xff0000 );
-  scene.add( gridHelper );
-  
+  scene.add( gridHelper );  
   
   camera.position.x = 0;
   camera.position.y = 5;

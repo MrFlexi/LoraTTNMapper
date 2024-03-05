@@ -43,7 +43,8 @@ def echo(sock):
     sock.send("Webservice connected")    
     while True:
         data = sock.receive()
-        sock.send(data)
+        print(data)
+                
         
 if __name__ == '__main__':
     t = threading.Thread(target=send_time)
