@@ -14,17 +14,13 @@
 
 static const char TAG[] = "";
 
-AnalogSmooth smooth_temp = AnalogSmooth();
-AnalogSmooth smooth_discur = AnalogSmooth();
-AnalogSmooth smooth_batvol = AnalogSmooth();
-
 // Define PID parameters
 #include <PID_v1.h> // PID library
 
 #define ANGLE_OFFSET 0
 double setpoint = 0; // Desired angle (horizontal)
 double input, output;
-double Kp = 1, Ki = 1, Kd = 1; // PID constants
+double Kp = 1, Ki = 0, Kd = 1; // PID constants
 PID pid(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
 
 #if (USE_GPS)
@@ -65,14 +61,12 @@ void setup_gps_reset()
 }
 #endif
 
-
-
 bool wifi_connected = false;
 
 //--------------------------------------------------------------------------
 // Wifi Settings
 //--------------------------------------------------------------------------
-#if (USE_WEBSERVER ||  USE_MQTT || USE_WIFI)
+#if (USE_WEBSERVER || USE_MQTT || USE_WIFI)
 WiFiClient wifiClient;
 #endif
 
@@ -116,6 +110,7 @@ touch_pad_t touchPin;
 
 TaskHandle_t irqHandlerTask = NULL;
 TaskHandle_t task_broadcast_message = NULL;
+TaskHandle_t task_cyclicRTOS = NULL;
 TaskHandle_t moveDisplayHandlerTask = NULL;
 TaskHandle_t t_cyclic_HandlerTask = NULL;
 TaskHandle_t t_sunTracker_HandlerTask = NULL;
@@ -127,8 +122,6 @@ Ticker sendMessageTicker;
 Ticker sendCycleTicker;
 Ticker LORAsendMessageTicker;
 Ticker sunTicker;
-
-
 
 void setup_filesystem()
 {
@@ -178,10 +171,54 @@ void t_cyclicRTOS(void *pvParameters)
   DataBuffer foo;
   while (1)
   {
+    //   I2C opperations
+    if (!I2C_MUTEX_LOCK())
+      ESP_LOGE(TAG, "[%0.3f] i2c mutex lock failed", millis() / 1000.0);
+    else
+    {
+
+#if (USE_MPU6050)
+
+      // unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
+      get_mpu6050_data();
+      // unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
+      // unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+      // Serial.print("Laufzeit get_mpu6050_data() ");
+      // Serial.print(executionTime);
+      // Serial.println(" Millisekunden");
+
+      input = dataBuffer.data.roll + ANGLE_OFFSET;
+
+      pid.Compute(); // Compute PID
+
+      // Map the PID output to servo angle
+      int servoAngle = map(output, -90, 90, 0, 180);
+      int getKd = pid.GetKd();
+      int getKp = pid.GetKp();
+      int getKi = pid.GetKi();
+
+      // Move servo smoothly using ServoEasing
+      servo_move_to(1, servoAngle);
+      ESP_LOGI(TAG, "Roll %d  --> Servo %d    Kp %d Kd %d  Ki %d", dataBuffer.data.roll, servoAngle, getKd, getKp, getKi );
+#endif
+
+#if (USE_VL53L1X)
+      // startTime = millis(); // Zeit vor dem Funktionsaufruf
+      get_VL53L1X_data();
+      // endTime = millis();                  // Zeit nach dem Funktionsaufruf
+      // executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+      // Serial.print("Laufzeit get_VL53L1X_data() ");
+      // Serial.print(executionTime);
+      // Serial.println(" Millisekunden");
+
+#endif
+
+      I2C_MUTEX_UNLOCK(); // release i2c bus access
+    }
+
   }
+   vTaskDelay(200);
 }
-
-
 
 void t_cyclic() // Intervall: Display Refresh
 {
@@ -196,9 +233,9 @@ void t_cyclic() // Intervall: Display Refresh
   ble_send();
 #endif
 
-  //dataBuffer.data.freeheap = ESP.getFreeHeap();
-  //dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
-  // ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
+  // dataBuffer.data.freeheap = ESP.getFreeHeap();
+  // dataBuffer.data.cpu_temperature = (temprature_sens_read() - 32) / 1.8;
+  //  ESP_LOGI(TAG, "ESP free heap: %d", dataBuffer.data.freeheap);
   dataBuffer.data.aliveCounter++;
 
   //   I2C opperations
@@ -270,40 +307,40 @@ void t_cyclic() // Intervall: Display Refresh
 
 #endif
 
-#if (USE_MPU6050)
+#if (USE_MPU6050_N)
 
-    //unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
+    // unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
     get_mpu6050_data();
-    //unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
-    //unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
-    //Serial.print("Laufzeit get_mpu6050_data() ");
-    //Serial.print(executionTime);
-    //Serial.println(" Millisekunden");
+    // unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    // unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    // Serial.print("Laufzeit get_mpu6050_data() ");
+    // Serial.print(executionTime);
+    // Serial.println(" Millisekunden");
 
-   input = dataBuffer.data.roll + ANGLE_OFFSET;
-  
-  pid.Compute(); // Compute PID
-  
-  // Map the PID output to servo angle
-  int servoAngle = map(output, -90, 90, 0, 180);
-  
-  // Move servo smoothly using ServoEasing
-  servo_move_to(1,servoAngle);
-  
-  Serial.print("Angle: ");
-  Serial.print(input);
-  Serial.print("  Output: ");
-  Serial.println(output);
+    input = dataBuffer.data.roll + ANGLE_OFFSET;
+
+    pid.Compute(); // Compute PID
+
+    // Map the PID output to servo angle
+    int servoAngle = map(output, -90, 90, 0, 180);
+
+    // Move servo smoothly using ServoEasing
+    servo_move_to(1, servoAngle);
+    Serial.print(": ");
+    Serial.print("Angle: ");
+    Serial.print(input);
+    Serial.print("  Output: ");
+    Serial.println(output);
 #endif
 
-#if (USE_VL53L1X)
-    //startTime = millis(); // Zeit vor dem Funktionsaufruf
+#if (USE_VL53L1X_n)
+    // startTime = millis(); // Zeit vor dem Funktionsaufruf
     get_VL53L1X_data();
-    //endTime = millis();                  // Zeit nach dem Funktionsaufruf
-    //executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
-    //Serial.print("Laufzeit get_VL53L1X_data() ");
-    //Serial.print(executionTime);
-    //Serial.println(" Millisekunden");
+    // endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    // executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    // Serial.print("Laufzeit get_VL53L1X_data() ");
+    // Serial.print(executionTime);
+    // Serial.println(" Millisekunden");
 
 #endif
 
@@ -338,7 +375,7 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
- printLocalTime();
+  printLocalTime();
 
 #if (USE_GPS_MOTION)
   gps.getDistance();
@@ -455,7 +492,7 @@ void setup()
   // Load Settings
   //--------------------------------------------------------------------
   setup_filesystem();
-  //loadConfiguration();
+  // loadConfiguration();
 
   //--------------------------------------------------------------------
   // Logging
@@ -527,6 +564,8 @@ void setup()
   dataBuffer.data.tx_ack_req = 0;
 
 #if (USE_DISPLAY)
+  Serial.println();
+  Serial.println();
   ESP_LOGI(TAG, "-----------  Setup display   -----------");
   setup_display();
   showPage(PAGE_BOOT);
@@ -609,11 +648,12 @@ void setup()
   setup_VL53L1X();
 #endif
 
-// Get date/time from Internet or GPS
+  // Get date/time from Internet or GPS
   setup_time();
 
 #if (USE_PWM_SERVO)
   setup_servo_pwm();
+  servo_move_to(1, 90);
 #endif
 
 #if (USE_BLE_SERVER)
@@ -647,13 +687,23 @@ void setup()
   if (WiFi.status() == WL_CONNECTED)
   {
     xTaskCreate(
+        t_cyclicRTOS,      /* Task function. */
+        "Update Flight",      /* String with name of task. */
+        10000,                    /* Stack size in bytes. */
+        NULL,                     /* Parameter passed as input of the task */
+        1,                       /* Priority of the task. */
+        &task_cyclicRTOS ); /* Task handle. */
+  }
+#endif
+
+#if (USE_MPU6050)
+    xTaskCreate(
         t_broadcast_message,      /* Task function. */
         "Broadcast Message",      /* String with name of task. */
         10000,                    /* Stack size in bytes. */
         NULL,                     /* Parameter passed as input of the task */
         10,                       /* Priority of the task. */
         &task_broadcast_message); /* Task handle. */
-  }
 #endif
 
 // Interrupt ISR Handler
@@ -696,5 +746,4 @@ void loop()
 #if (USE_MQTT)
   mqtt_loop();
 #endif
-
 }

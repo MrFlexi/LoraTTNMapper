@@ -59,7 +59,7 @@ void setup_servo_pwm()
   uint8_t servo1_pos;
   uint8_t servo2_pos;
   int speed = 500;
-
+  Serial.println(); Serial.println();
   ESP_LOGI(TAG, "Attaching Servos");
   Servo1.attach(servo1_pin);
   Servo1.setEasingType(EASE_CUBIC_IN_OUT);
@@ -73,8 +73,8 @@ void setup_servo_pwm()
 
 void servo_move_to(uint8_t servo_number, uint8_t servo_position)
 {
-  ESP_LOGI(TAG, "Turning Servo %d to %d", servo_number, servo_position);
-  ServoEasing::ServoEasingArray[servo_number]->easeTo(servo_position, 500);
+  //ESP_LOGI(TAG, "Turning Servo %d to %d", servo_number, servo_position);
+  ServoEasing::ServoEasingArray[servo_number]->easeTo(servo_position, 100);
 }
 
 

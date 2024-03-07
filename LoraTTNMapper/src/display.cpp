@@ -549,7 +549,7 @@ u8g2.printf("In: %.2f mW", dataBuffer.data.ina219[0].power);
       else
       {
         page_counter = 0;
-        ESP_LOGI(TAG, "P counter set to 0");
+        //ESP_LOGI(TAG, "P counter set to 0");
       }
       PageNumber = page_array[page_counter];
 
