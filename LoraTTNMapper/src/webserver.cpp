@@ -16,7 +16,7 @@ void setup_webserver()
 
     server.on("/MPU", HTTP_GET, [](AsyncWebServerRequest *request) {
       Serial.println("Index requested");
-      request->send(SPIFFS, "/MPU/index_MPU.html", "text/html");
+      request->send(SPIFFS, "/MPU/index.html", "text/html");
     });
 
     server.on("/log", HTTP_GET, [](AsyncWebServerRequest *request) {
