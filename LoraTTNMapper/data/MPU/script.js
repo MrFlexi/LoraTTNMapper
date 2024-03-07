@@ -60,7 +60,7 @@ buttonSetPID.addEventListener("click", (event) => {
   socket.send(JSON.stringify(data));
 });
 
-const socket = new WebSocket('ws://' + location.host + '/echo');
+const socket = new WebSocket('ws://' + location.host + '/ws');
 socket.addEventListener('message', ev => {
   console.log(ev.data);
   MPU = JSON.parse(ev.data);

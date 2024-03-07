@@ -19,6 +19,14 @@ void setup_webserver()
       request->send(SPIFFS, "/MPU/index.html", "text/html");
     });
 
+     server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/MPU/style.css", "text/css");
+  });
+
+      server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/MPU/script.js", "text/css");
+  });
+
     server.on("/log", HTTP_GET, [](AsyncWebServerRequest *request) {
       if (SPIFFS.exists("/LOGS.txt"))
       {

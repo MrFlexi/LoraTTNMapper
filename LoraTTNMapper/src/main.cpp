@@ -199,6 +199,7 @@ void t_cyclicRTOS(void *pvParameters)
 
       // Move servo smoothly using ServoEasing
       servo_move_to(1, servoAngle);
+      dataBuffer.data.ServoLeft = servoAngle;
       ESP_LOGI(TAG, "Roll %d  --> Servo %d    Kp %d Kd %d  Ki %d", dataBuffer.data.roll, servoAngle, getKd, getKp, getKi );
 #endif
 
