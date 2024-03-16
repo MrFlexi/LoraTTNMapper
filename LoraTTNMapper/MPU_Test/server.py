@@ -27,6 +27,7 @@ def send_time():
     while True:
         sleep(1)       
         MPU["roll"] = MPU["roll"] + 1
+        MPU["yaw"] = MPU["yaw"] + 10
         clients = client_list.copy()
         for client in clients:
             try:

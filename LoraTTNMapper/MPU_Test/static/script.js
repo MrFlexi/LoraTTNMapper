@@ -15,12 +15,58 @@ function degrees_to_radians(degrees) {
 }
 
 data = {
-  "action":"",
+  "action": "",
   "Ki": 0,
   "Kp": 0,
   "Kd": 0
 }
 
+var Gauge1 = new RadialGauge({
+  renderTo: 'G1', minValue: 0,
+  maxValue: 360,
+  majorTicks: [
+    "N - 0 ",
+    "NE",
+    "E - 90",
+    "SE",
+    "S - 180",
+    "SW",
+    "W - 270",
+    "NW",
+    "N"
+  ],
+  minorTicks: 10,
+  ticksAngle: 360,
+  startAngle: 180,
+  strokeTicks: false,
+  highlights: false,
+  colorPlate: "#33a",
+  colorMajorTicks: "#f5f5f5",
+  colorMinorTicks: "#ddd",
+  colorNumbers: "#ccc",
+  colorNeedle: "rgba(240, 128, 128, 1)",
+  colorNeedleEnd: "rgba(255, 160, 122, .9)",
+  valueBox: false,
+  valueTextShadow: false,
+  colorCircleInner: "#fff",
+  colorNeedleCircleOuter: "#ccc",
+  needleCircleSize: 15,
+  needleCircleOuter: false,
+  animationRule: "linear",
+  needleType: "line",
+  needleStart: 10,
+  needleEnd: 99,
+  needleWidth: 5,
+  borders: true,
+  borderInnerWidth: 0,
+  borderMiddleWidth: 0,
+  borderOuterWidth: 10,
+  colorBorderOuter: "#ccc",
+  colorBorderOuterEnd: "#ccc",
+  colorNeedleShadowDown: "#222",
+  borderShadowWidth: 0,
+  animationDuration: 1500
+});
 
 const ail_ki_slider = document.querySelector("#ail_ki_slider");  // Slider 
 const ail_ki_value = document.querySelector("#ail_ki_label");   // Anzeige
@@ -41,22 +87,22 @@ const buttonSetPID = document.querySelector("#buttonSetPID");   // Anzeige
 
 ail_ki_slider.addEventListener("input", (event) => {
   ail_ki_value.textContent = "Ki=" + event.target.value;
-  data.Ki = event.target.value; 
+  data.Ki = event.target.value;
 });
 
 ail_kd_slider.addEventListener("input", (event) => {
   ail_kd_value.textContent = "Kd=" + event.target.value;
-  data.Kd = event.target.value; 
+  data.Kd = event.target.value;
 });
 
 ail_kp_slider.addEventListener("input", (event) => {
   ail_kp_value.textContent = "Kp=" + event.target.value;
-  data.Kp = event.target.value; 
+  data.Kp = event.target.value;
 });
 
 
-buttonSetPID.addEventListener("click", (event) => { 
-  data.action="UpdatePID";
+buttonSetPID.addEventListener("click", (event) => {
+  data.action = "UpdatePID";
   socket.send(JSON.stringify(data));
 });
 
@@ -79,9 +125,11 @@ socket.addEventListener('message', ev => {
   document.getElementById("yaw").innerHTML = MPU["yaw"];
   document.getElementById("pitch").innerHTML = MPU["pitch"];
   document.getElementById("roll").innerHTML = MPU["roll"];
-  ServoLeftValue.innerHTML= MPU["ServoLeft"];
+  ServoLeftValue.innerHTML = MPU["ServoLeft"];
   ServoLeftSlider.value = MPU["ServoLeft"];
-  ServoRightValue.innerHTML= MPU["ServoRight"];
+  ServoRightValue.innerHTML = MPU["ServoRight"];
+
+  Gauge1.value = MPU["yaw"];
 
 
 });
@@ -148,6 +196,10 @@ function onWindowResize() {
 }
 
 window.addEventListener('resize', onWindowResize, false);
+
+window.onload = function () {
+  Gauge1.value = 100;
+}
 
 // Create the 3D representation
 init3D();

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "flask": "^0.2.10",
     "three": "^0.162.0"
   },
   "devDependencies": {
