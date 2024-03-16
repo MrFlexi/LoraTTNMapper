@@ -25,7 +25,7 @@ var Gauge1 = new RadialGauge({
   renderTo: 'G1', minValue: 0,
   maxValue: 360,
   majorTicks: [
-    "N - 0 ",
+    "N",
     "NE",
     "E - 90",
     "SE",
@@ -35,7 +35,7 @@ var Gauge1 = new RadialGauge({
     "NW",
     "N"
   ],
-  minorTicks: 10,
+  minorTicks: 2,
   ticksAngle: 360,
   startAngle: 180,
   strokeTicks: false,

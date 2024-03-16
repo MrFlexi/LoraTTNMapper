@@ -5,6 +5,10 @@ import time, datetime
 import threading
 import json
 
+#  .venv\Scripts\activate
+# pip freeze > requirements.txt
+# pip install -r requirements.txt
+
 app = Flask(__name__)
 
 #app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
