@@ -253,6 +253,7 @@ void mqtt_send_mpu()
   doc["yaw"] = dataBuffer.data.yaw;
   doc["pitch"] = dataBuffer.data.pitch;
   doc["roll"] = dataBuffer.data.roll;
+  doc["distance"] = dataBuffer.data.LidarDistanceMM;
  
   serializeJson(doc, JsonStr);
 
