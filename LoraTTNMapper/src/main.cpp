@@ -401,24 +401,24 @@ void t_cyclic() // Intervall: Display Refresh
 
 #if (USE_MPU6050)
 
-    //unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
+    // unsigned long startTime = millis(); // Zeit vor dem Funktionsaufruf
     get_mpu6050_data();
-    //unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
-    //unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
-    //Serial.print("Laufzeit get_mpu6050_data() ");
-    //Serial.print(executionTime);
-    //Serial.println(" Millisekunden");
+    // unsigned long endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    // unsigned long executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    // Serial.print("Laufzeit get_mpu6050_data() ");
+    // Serial.print(executionTime);
+    // Serial.println(" Millisekunden");
 
 #endif
 
 #if (USE_VL53L1X)
-    //startTime = millis(); // Zeit vor dem Funktionsaufruf
+    // startTime = millis(); // Zeit vor dem Funktionsaufruf
     get_VL53L1X_data();
-    //endTime = millis();                  // Zeit nach dem Funktionsaufruf
-    //executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
-    //Serial.print("Laufzeit get_VL53L1X_data() ");
-    //Serial.print(executionTime);
-    //Serial.println(" Millisekunden");
+    // endTime = millis();                  // Zeit nach dem Funktionsaufruf
+    // executionTime = endTime - startTime; // Berechne die Laufzeit der Funktion
+    // Serial.print("Laufzeit get_VL53L1X_data() ");
+    // Serial.print(executionTime);
+    // Serial.println(" Millisekunden");
 
 #endif
 
@@ -468,9 +468,7 @@ void t_cyclic() // Intervall: Display Refresh
 //---------------------------------------------------------------------------------
 void t_sleep()
 {
-
   printLocalTime();
-
 #if (USE_GPS_MOTION)
   gps.getDistance();
 #endif
@@ -530,7 +528,7 @@ void t_sleep()
   if (dataBuffer.data.txCounter >= SLEEP_AFTER_N_TX_COUNT)
     dataBuffer.data.MotionCounter = 0;
 
-// Check if GPS position has been changed. If so stay alive
+// Check if GPS position has been changed
 #if (USE_GPS_MOTION)
   if (dataBuffer.data.gps_distance > GPS_MOTION_DISTANCE)
   {
@@ -560,9 +558,18 @@ void t_sleep()
 void setup_wifi()
 {
 #if (USE_WIFI)
+  // Set your Static IP address
+  IPAddress local_IP(192, 168, 1, 111);
+  IPAddress gateway(192, 168, 1, 1);
+  IPAddress subnet(255, 255, 0, 0);
+
   ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
   IPAddress ip;
-  // WIFI Setup
+  // Configures static IP address
+  // if (!WiFi.config(local_IP, gateway, subnet))
+  //{
+  //  Serial.println("STA Failed to configure");
+  //}
   WiFi.begin(ssid, wifiPassword);
 
   ESP_LOGI(TAG, "Connecting to WiFi..");
@@ -590,6 +597,20 @@ void setup_wifi()
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
+#endif
+}
+
+void setup_wifi_AP()
+{
+#if (USE_WIFI_AP)
+  const char *ssid_ap = "ESP32-Access-Point";
+  const char *password_ap = "Linde+123";
+  ESP_LOGI(TAG, "-----------  Setup WIFI Access Point  -----------");
+  WiFi.softAP(ssid_ap, password_ap);
+
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(IP);
 #endif
 }
 
@@ -690,7 +711,11 @@ void setup()
   showPage(PAGE_BOOT);
 #endif
 
+#if (USE_WIFI_AP)
+  setup_wifi_AP();
+#else
   setup_wifi();
+#endif
   calibrate_voltage();
   delay(100);
 
@@ -867,7 +892,10 @@ void loop()
 #endif
 
 #if (USE_MQTT)
+#if (USE_WIFI_AP)
+#else
   mqtt_loop();
+#endif
 #endif
 
 #if (USE_BUTTON)

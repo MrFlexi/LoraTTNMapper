@@ -167,6 +167,9 @@ void Neo6m::getDistance()
       dataBuffer.data.gps_old = tGps.location;
     }
   }
+  else
+  ESP_LOGI(TAG, "GPS Distance NO FIX");
+
 
   if (( dataBuffer.data.gps.lat() != 0.0 ) && ( dataBuffer.data.gps_old.lat() != 0.0))
   {

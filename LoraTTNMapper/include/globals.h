@@ -48,8 +48,8 @@
 #define DEVICE_SUN_TRACKER 13
 
 // Choose Application
-//#define DEVICE_ID DEVICE_TTN_MAPPER
-#define DEVICE_ID DEVICE_SENSOR_BOARD
+#define DEVICE_ID DEVICE_TTN_MAPPER
+//#define DEVICE_ID DEVICE_SENSOR_BOARD
 //#define DEVICE_ID SUN_TRACKER
 //#define DEVICE_ID DEVICE_TRACKER
 //#define DEVICE_ID DEVICE_CAMERA_01
@@ -132,6 +132,7 @@ extern WiFiClient wifiClient;
 //--------------------------------------------------------------------------
 const char ssid[] = "MrFlexi";
 const char wifiPassword[] = "Linde-123";
+
 extern bool wifi_connected;
 
 extern volatile bool mpuInterrupt;

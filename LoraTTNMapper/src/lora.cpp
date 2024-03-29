@@ -43,6 +43,8 @@ void t_enqueue_LORA_messages()
       payload.enqueue_port(1);
     }
   }
+  else
+   ESP_LOGE(TAG, "LORA GPS NO FIX.");
 #endif
 
   // -----------------------------------------------------------------------------

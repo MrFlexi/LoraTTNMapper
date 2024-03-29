@@ -170,7 +170,15 @@ String DataBuffer::to_json_web()
   sensors_13["unit"] = "d";
 #endif
 
+ JsonObject sensor_gps = sensors.createNestedObject();
+  sensor_gps["name"] = "GPS";
+  sensor_gps["subheader"] = "Distance";
+  sensor_gps["value"] = dataBuffer.data.gps_distance;
+  sensor_gps["unit"] = "m";
+
 #if (USE_VL53L1X)
+ 
+
   JsonObject sensors_14 = sensors.createNestedObject();
   sensors_14["name"] = "Lidar Distance";
   sensors_14["subheader"] = "VL53L1X";
@@ -179,7 +187,7 @@ String DataBuffer::to_json_web()
 #endif
 
   serializeJson(doc, JsonStr);
-  // serializeJson(doc, Serial);s
+  //Serial.println(JsonStr);
   return JsonStr;
 }
 

@@ -17,6 +17,7 @@ const char *mqtt_topic_traincontroll = "/TrainControll/";
 
 long lastMsgAlive = 0;
 long lastMsgDist = 0;
+uint8_t mqtt_reconnect_counter = 0;
 
 void doConcat(const char *a, const char *b, const char *c, char *out)
 {
@@ -29,18 +30,20 @@ void mqtt_loop()
 {
 
   // MQTT Connection
-  if (WiFi.status() == WL_CONNECTED)
+  if ( (WiFi.status() == WL_CONNECTED) && ( mqtt_reconnect_counter < 2 ) )
   {
     if (!MqttClient.connected())
     {
-      ESP_LOGE(TAG, "MQTT Client not connected ");
+      mqtt_reconnect_counter ++;
+      ESP_LOGE(TAG, "MQTT Client reconnect %d", mqtt_reconnect_counter);
       reconnect();
+
     }
     MqttClient.loop();
   }
   else
   {
-    ESP_LOGE(TAG, "Wifi not connected ");
+    //ESP_LOGE(TAG, "Wifi not connected ");
   }
 }
 
@@ -163,14 +166,13 @@ void reconnect()
   // build MQTT topic e.g.  mrflexi/device/soil_moisture-01/data
   doConcat(mqtt_topic, DEVICE_NAME, mqtt_topic_mosi, topic_in);
 
-  int i = 0;
 
   if (WiFi.status() == WL_CONNECTED)
   {
     // Loop until we're reconnected
-    while (!MqttClient.connected() && i < 2 )
+    while (!MqttClient.connected() && mqtt_reconnect_counter < 2 )
     {
-      ESP_LOGI(TAG, "Attempting MQTT connection...");
+      ESP_LOGI(TAG, "Attempting MQTT connection %d", mqtt_reconnect_counter);
       // Attempt to connect
       if (MqttClient.connect(DEVICE_NAME, "drumol", "nc:13Arequipa"))
       {
@@ -187,7 +189,7 @@ void reconnect()
         // Wait 5 seconds before retrying
         delay(1000);
       }
-      i++;
+      mqtt_reconnect_counter++;
     }
   }
   else
