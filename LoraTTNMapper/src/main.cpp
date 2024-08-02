@@ -775,7 +775,6 @@ void loop()
 #else
   mqtt_loop();
 #endif
-#endif
 
 #if (USE_BUTTON)
   readButton();
