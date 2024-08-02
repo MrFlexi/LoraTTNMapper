@@ -15,7 +15,21 @@ void setup_webserver()
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               {
       Serial.println("Index requested");
-      request->send(SPIFFS, "/index.html", "text/html"); });
+      request->send(SPIFFS, "/index.html", "text/html");
+    });
+
+    server.on("/MPU", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("Index requested");
+      request->send(SPIFFS, "/MPU/index.html", "text/html");
+    });
+
+     server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/MPU/style.css", "text/css");
+  });
+
+      server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/MPU/script.js", "text/css");
+  });
 
     server.on("/log", HTTP_GET, [](AsyncWebServerRequest *request)
               {

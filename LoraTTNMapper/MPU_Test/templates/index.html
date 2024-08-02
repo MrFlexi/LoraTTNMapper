@@ -1,0 +1,81 @@
+<!--
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com/esp32-mpu-6050-web-server/
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>ESP Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js"></script>
+  <script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script>
+</head>
+
+<body>
+  <header class="topnav">
+    <h1><i class="far fa-compass"></i> MPU6050 <i class="far fa-compass"></i></h1>
+  </header>
+
+  <div class="content">
+    <div class="cards">
+      <div class="card">
+        <p class="card-title">Plane orientation</p>
+        <p><span class="reading">Yaw: <span id="yaw"></span> d</span></p>
+        <p><span class="reading">Pitch: <span id="pitch"></span> d</span></p>
+        <p><span class="reading">Roll: <span id="roll"></span> d</span></p>
+      </div>
+
+
+      <div class="card">
+        <p class="card-title">Aileron Servos</p>
+        <input type="range" id="ServoLeftSlider" name="ServoLeft" min="-90" max="90" step="1" />
+        <label id="ServoLeftLabel" for="ServoLeftSlider">Left=0</label>
+
+        <input type="range" id="ServoRightSlider" name="ServoRight" min="-90" max="90" step="1" />
+        <label id="ServoRightLabel" for="ServoRightSlider">Right=0</label>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Aileron PID Settings</p>
+        <div>
+          <input type="range" id="ail_ki_slider" name="Ki" min="0" max="5" step="0.01" />
+          <label id="ail_ki_label" for="ail_kpd">Ki</label>
+        </div>
+        <div>
+          <input type="range" id="ail_kp_slider" name="Kp" min="0" max="5" step="0.01" />
+          <label id="ail_kp_label" for="ail_kp">Kp</label>
+        </div>
+        <div>
+          <input type="range" id="ail_kd_slider" name="Kd" min="0" max="5" step="0.01" />
+          <label id="ail_kd_label" for="ail_kd">Kd</label>
+        </div>
+        <button id="buttonSetPID">Update ESP32 PID values</button>
+      </div>
+
+
+      <div class="card">
+        <div class="canvas-gauges">
+          <canvas data-type="radial-gauge" id="G1"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="cube-content">
+    <div id="3Dcube"></div>
+  </div>
+
+  <script type="text/javascript" src="{{ url_for('static', filename = 'script.js') }}"></script>
+</body>
+
+</html>

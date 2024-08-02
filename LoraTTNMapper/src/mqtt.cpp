@@ -232,8 +232,8 @@ void mqtt_send()
 
   if (MqttClient.connected())
   {
-    ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
-    ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
+    //ESP_LOGI(TAG, "MQTT send:  %s", topic_out);
+    //ESP_LOGI(TAG, "Payload: %s", dataBuffer.to_json().c_str());
     MqttClient.publish(topic_out, dataBuffer.to_json().c_str());
   }
   else
