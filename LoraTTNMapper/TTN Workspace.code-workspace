@@ -3,6 +3,17 @@
 		{
 			"name": "LoraTTNMapper",
 			"path": "."
+		},
+		{
+			"path": "..\\..\\AXP202X_Library"
+		},
+		{
+			"name": "ESP32_OTA",
+			"path": "../../ESP32/ESP32_OTA"
+		},
+		{
+			"name": "esp32-cam-webserver",
+			"path": "../../esp32-cam-webserver"
 		}
 	],
 	"settings": {

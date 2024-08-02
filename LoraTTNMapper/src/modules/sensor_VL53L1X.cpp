@@ -33,16 +33,16 @@ void setup_VL53L1X()
 void get_VL53L1X_data()
 {
   sensor.read();
-  //Serial.println();
-  //Serial.print("Dist.: ");
-  //Serial.print(sensor.ranging_data.range_mm);
-  //Serial.print("\tstatus: ");
-  //Serial.print(VL53L1X::rangeStatusToString(sensor.ranging_data.range_status));
-  //Serial.print("\tpeak signal: ");
-  //Serial.print(sensor.ranging_data.peak_signal_count_rate_MCPS);
-  //Serial.print("\tambient: ");
-  //Serial.print(sensor.ranging_data.ambient_count_rate_MCPS);
-  //Serial.println();
+  Serial.println();
+  Serial.print("Dist.: ");
+  Serial.print(sensor.ranging_data.range_mm);
+  Serial.print("\tstatus: ");
+  Serial.print(VL53L1X::rangeStatusToString(sensor.ranging_data.range_status));
+  Serial.print("\tpeak signal: ");
+  Serial.print(sensor.ranging_data.peak_signal_count_rate_MCPS);
+  Serial.print("\tambient: ");
+  Serial.print(sensor.ranging_data.ambient_count_rate_MCPS);
+  Serial.println();
 
   dataBuffer.data.LidarDistanceMM = sensor.ranging_data.range_mm;
 }

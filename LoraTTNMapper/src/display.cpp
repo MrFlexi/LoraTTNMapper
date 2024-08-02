@@ -216,7 +216,14 @@ void setup_display(void)
   u8g2.enableUTF8Print();
 #endif
 
-displayRegisterPages();
+  switch (DEVICE_ID)
+  {
+  case DEVICE_SUN_TRACKER:
+    //displayRegisterPagesSunTracker();
+    break;
+  default:
+    displayRegisterPages();
+  }
 }
 
   void drawSymbol(u8g2_uint_t x, u8g2_uint_t y, uint8_t symbol)
@@ -549,7 +556,7 @@ u8g2.printf("In: %.2f mW", dataBuffer.data.ina219[0].power);
       else
       {
         page_counter = 0;
-        //ESP_LOGI(TAG, "P counter set to 0");
+        ESP_LOGI(TAG, "P counter set to 0");
       }
       PageNumber = page_array[page_counter];
 

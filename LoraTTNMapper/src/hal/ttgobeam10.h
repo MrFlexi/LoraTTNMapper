@@ -47,6 +47,6 @@
 #define HAS_LED                 GPIO_NUM_4      // onboard red LED
 
 // GPS settings
-#define HAS_GPS                 1                       // use on board GPS
+#define HAS_GPS         1                       // use on board GPS
 
 #endif

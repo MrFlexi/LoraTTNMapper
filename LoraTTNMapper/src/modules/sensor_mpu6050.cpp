@@ -107,13 +107,13 @@ void get_mpu6050_data()
     mpu.dmpGetQuaternion(&quat, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &quat);
     mpu.dmpGetYawPitchRoll(ypr, &quat, &gravity);
-    //Serial.print("ypr\t");
-    //Serial.print(ypr[0] * 180 / M_PI);
-    //Serial.print("\t");
-    //Serial.print(ypr[1] * 180 / M_PI);
-    //Serial.print("\t");
-    //Serial.print(ypr[2] * 180 / M_PI);
-    //Serial.print("\t");
+    Serial.print("ypr\t");
+    Serial.print(ypr[0] * 180 / M_PI);
+    Serial.print("\t");
+    Serial.print(ypr[1] * 180 / M_PI);
+    Serial.print("\t");
+    Serial.print(ypr[2] * 180 / M_PI);
+    Serial.print("\t");
    
 
     dataBuffer.data.yaw = ypr[0] * 180 / M_PI;

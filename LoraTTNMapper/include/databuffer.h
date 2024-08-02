@@ -79,8 +79,6 @@ typedef struct
   bool pictureLoop = true;
   float firmware_version;
   uint8_t bytesReceived;
-  int8_t ServoLeft;
-  int8_t ServoRight;
   uint8_t servo1;
   uint8_t servo2;
   double sun_azimuth;
@@ -91,9 +89,9 @@ typedef struct
   float panel_current = 0;
 
   float soil_moisture = 0;
-  int yaw = 0;
-  int pitch = 0;
-  int roll = 0;
+  float yaw = 0;
+  float pitch = 0;
+  float roll = 0;
   uint16_t LidarDistanceMM = 0;
   String ip_address;
   String image_url = "/get_last_detected";

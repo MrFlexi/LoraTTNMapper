@@ -20,7 +20,7 @@
 #define USE_GPS 0
 #define USE_DISPLAY 1
 
-#define HAS_PMU 0
+#define HAS_PMU 1
 #define USE_INTERRUPTS 1
 #define USE_PMU_INTERRUPT 1
 #define USE_BUTTON 0
@@ -41,6 +41,7 @@
 
 #define USE_BLE_SERVER 0
 #define USE_POTI 0
+#define USE_SOIL_MOISTURE 0
 
 #define USE_DISTANCE_SENSOR_HCSR04 0       // Ultrasonic distance sensor
 #define HCSR04_trigger_pin  GPIO_NUM_2
@@ -50,7 +51,8 @@
 #define USE_MPU6050  1
 #define USE_VL53L1X 1
 
-#define USE_PWM_SERVO 1                // Uses external I2C Servo expander
+#define USE_PWM_SERVO 0                // Uses external I2C Servo expander
+#define USE_SUN_POSITION 0
 
 #define displayRefreshIntervall 2      // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 6          // shift to next display page               ---> t_moveDisplay

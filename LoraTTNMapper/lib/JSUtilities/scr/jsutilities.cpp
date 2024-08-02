@@ -27,7 +27,6 @@ int i2c_scan(void)
   int devices = 0;
    Wire.setClock(100000);
 
-  Serial.println(); Serial.println();
   ESP_LOGI(TAG, "Starting I2C bus scan...");
 
   for (addr = 8; addr <= 119; addr++)
