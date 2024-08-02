@@ -798,7 +798,7 @@ void setup()
   setupCam();
 #endif
 
-  // Get date/time from Internet or GPS
+  // Get date/time from Internet or GPS 
   setup_time();
 
 #if (USE_PWM_SERVO)
