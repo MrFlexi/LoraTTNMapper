@@ -461,6 +461,11 @@ void t_cyclic() // Intervall: Display Refresh
   AXP192_showstatus();
 #endif
 #endif
+
+
+#if (USE_WIFICOUNTER)
+dataBuffer.data.wifi_count = wifi_count_get();
+#endif
 }
 
 //---------------------------------------------------------------------------------

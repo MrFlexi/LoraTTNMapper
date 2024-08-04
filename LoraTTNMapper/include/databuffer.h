@@ -105,6 +105,7 @@ typedef struct
   char gps_datetime[32];
   tm timeinfo;
   bool ble_device_connected = false;
+  uint16_t wifi_count;
 #if (HAS_INA219)
   ty_ina219 ina219[2];
 #endif

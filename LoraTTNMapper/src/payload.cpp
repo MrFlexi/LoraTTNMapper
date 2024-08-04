@@ -131,6 +131,20 @@ void PayloadConvert::addPMU(uint8_t channel)
 }
 #endif
 
+#if (USE_WIFICOUNTER)
+void PayloadConvert::addWifiCount(uint8_t channel)
+{
+
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_WIFI_COUNT;
+
+  uint16_t out = dataBuffer.data.wifi_count;
+  buffer[cursor++] = highByte(out);
+  buffer[cursor++] = lowByte(out);  
+}
+#endif
+
+
 void PayloadConvert::addGPS_TTN(TinyGPSPlus tGps)
 {
 

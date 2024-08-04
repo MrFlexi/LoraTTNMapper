@@ -42,7 +42,7 @@ void AXP192_powerevent_IRQ(void);
 #define LPP_BME 203           // 4 bytes
 #define LPP_DEVICE 204        // 2 byte metadata, 4 bytes payload   device info
 #define LPP_HCSR04_DISTANCE   205        // 2 byte metadata, 2 bytes payload   device info
-
+#define LPP_WIFI_COUNT   206  // 2 byte metadata, 2 bytes payload 
 
 class PayloadConvert {
 
@@ -65,6 +65,7 @@ public:
   void addTemperature(uint8_t channel, float value);
   void addBMETemp(uint8_t channel);
   void addDeviceData(uint8_t channel);
+  void addWifiCount(uint8_t channel);
   void addPMU(uint8_t channel);
   void addGPS_TTN(TinyGPSPlus tGps);
   void addGPS_LPP(uint8_t channel, TinyGPSPlus tGps); 

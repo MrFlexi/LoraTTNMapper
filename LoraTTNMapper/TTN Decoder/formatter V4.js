@@ -8,7 +8,8 @@ function lppDecode(bytes) {
         0xca: { 'size': 2, 'name': 'soil_moisture', 'signed': true, 'divisor': 100 },
         0xcb: { 'size': 4, 'name': 'bme280', 'signed': true, 'divisor': [100, 100] },
         0xcc: { 'size': 4, 'name': 'device', 'signed': false, 'divisor': [1, 1, 1] },
-        0xcd: { 'size': 2, 'name': 'hcsr04_distance', 'signed': false, 'divisor': [1] }
+        0xcd: { 'size': 2, 'name': 'hcsr04_distance', 'signed': false, 'divisor': [1] },
+        0xce: { 'size': 2, 'name': 'wifi_count', 'signed': false, 'divisor': [1] }
     };
 
     function isObject(item) {
@@ -159,27 +160,3 @@ function decodeUplink(input) {
     }
 
 }
-
-
-// ab hier code um die Funktion zu testen
-
-// Data Format [Channel, Type, data0,data1...., Channel, Type, Data0, Data1, ...]
-
-//let buffer = new Uint8Array([0x01, 0xcb, 0x00,0xff,0x00,0xff]);     // 0xcb = BME280
-//let buffer = new Uint8Array([0x01, 0xca, 0x00,0xff]);               // 0xca = SOIL Moisture
-//let buffer = new Uint8Array([0x01, 0xcc, 0x00,0x01,0x00,0x01]);     // 0xcc = Device Info
-  let buffer = new Uint8Array([0x01, 0xcd, 0x00,0x01]);     // 0xcc = Device Info
-//let buffer = new Uint8Array([0x01, 0xc9, 0x00,0xff,0x00,0xff,0x01, 0xca, 0x00,0xff,0x03,0xe8]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8
-
-//let buffer = new Uint8Array([0x01, 0xc9, 0x00, 0xff, 0x00, 0xff, 0x01, 0xca, 0x00, 0xff, 0x03, 0xe8, 0x01, 0xca, 0x00, 0xff, 0x01, 0xcb, 0x00, 0x10, 0x00, 0x20]);     // PMU  TTN Test Data -->  01 c9 00 ff 00 ff 01 ca 00 ff 03 e8 01 ca 00 ff
-
-console.log(buffer);
-var ttn = {
-    bytes: buffer,
-    fPort: 2
-};
-console.log(ttn);
-
-var a = decodeUplink(ttn);
-console.log(a);
-

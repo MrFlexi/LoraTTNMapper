@@ -82,11 +82,11 @@
 #define ESP_SLEEP 1                             // Main switch
 
 #define TIME_TO_SLEEP 10                        // sleep for n minute
-#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  4    // sleep after n minutes without movement or
+#define TIME_TO_NEXT_SLEEP_WITHOUT_MOTION  10    // sleep after n minutes without movement or
 #define SLEEP_AFTER_N_TX_COUNT 10               // after n Lora TX events
 
 #define USE_GPS_MOTION 1
-#define GPS_MOTION_DISTANCE 20                  // Reset sleep if moved for x Meter
+#define GPS_MOTION_DISTANCE 50                  // Reset sleep if moved for x Meter
 
 #define AUTO_POWER_SAVE 1                       // If battery voltage < 3.7  --> sleep for 54 Minutes
 #define TIME_TO_SLEEP_BAT_HIGH  6

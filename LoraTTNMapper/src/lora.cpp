@@ -79,6 +79,11 @@ void t_enqueue_LORA_messages()
   payload.addPMU(01); //(channel, 10 bytes)
 #endif
 
+#if (USE_WIFICOUNTER)
+  payload.addWifiCount(01); //(channel, 4 bytes)
+#endif
+
+
 #if (USE_SOIL_MOISTURE)
   payload.addFloatN(0x01, LPP_SOIL_MOISTURE, dataBuffer.data.soil_moisture);
 #endif
