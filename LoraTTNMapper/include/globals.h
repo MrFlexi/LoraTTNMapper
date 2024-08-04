@@ -225,4 +225,13 @@ extern QueueHandle_t LoraSendQueue;
 #include "modules/sensor_VL53L1X.h";
 #endif
 
+#if (USE_WIFISCANNER)
+#include "wifiscan.h"
+#endif
+
+#if (USE_WIFICOUNTER)
+#include "wifi_counter.h"
+#endif
+
+
 #endif

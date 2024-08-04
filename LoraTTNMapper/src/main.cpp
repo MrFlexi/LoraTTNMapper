@@ -798,7 +798,7 @@ void setup()
   setupCam();
 #endif
 
-  // Get date/time from Internet or GPS 
+  // Get date/time from Internet or GPS
   setup_time();
 
 #if (USE_PWM_SERVO)
@@ -809,6 +809,10 @@ void setup()
 
 #if (USE_BLE_SERVER)
   setup_ble();
+#endif
+
+#if (USE_WIFICOUNTER)
+  setup_wifi_counter();
 #endif
 
 #if (USE_OTA)
@@ -904,5 +908,9 @@ void loop()
 
 #if (USE_OTA)
   ArduinoOTA.handle();
+#endif
+
+#if (USE_WIFICOUNTER)
+  wifi_counter_loop();
 #endif
 }

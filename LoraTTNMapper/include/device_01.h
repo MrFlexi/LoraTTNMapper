@@ -22,6 +22,9 @@
 #define USE_GPS 1
 #define USE_DISPLAY 1
 
+#define USE_WIFISCANNER 0
+#define USE_WIFICOUNTER 1
+
 #define HAS_PMU 1
 #define PMU_SLEEP_ALL_OFF 0    // Error I2C Interface on reboot  On TBEAM must be 0
 #define USE_INTERRUPTS 1
