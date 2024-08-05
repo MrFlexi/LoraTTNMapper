@@ -62,7 +62,7 @@
 
 #define LORAenqueueMessagesIntervall 30         // Queue Lora messages
 #define LORA_TX_INTERVAL  15                    // Transmitt Lora messages
-#define LORA_DATARATE DR_SF10
+#define LORA_DATARATE DR_SF12
 
 #define sendMqttIntervall      60               // Mqtt send intervall in s                ---> t_send_cycle
 #define sendWebsocketIntervall 15000              // WebSocket send intervall in ms 
