@@ -34,6 +34,20 @@ static wifi_country_t country;
 
 static wifi_country_t wifi_country = {.cc = "DE", .schan = 1, .nchan = 13}; // Most recent esp32 library struct
 
+// Struktur für die MAC-Daten
+struct MacData
+{
+  char mac_adr[18];
+  char date[11];
+  char first_seen[9];
+  char last_seen[9];
+};
+
+// Maximale Anzahl von MAC-Datensätzen
+const int maxMacListSize = 200;
+MacData macListArray[maxMacListSize];
+u_int8_t macListSize = 0;
+
 typedef struct
 {
   unsigned frame_ctrl : 16;
@@ -51,62 +65,60 @@ typedef struct
   uint8_t payload[0]; /* network data ended with 4 bytes csum (CRC32) */
 } wifi_ieee80211_packet_t;
 
-//---------------------------------------------------------------------------------
-// Create a DynamicJsonDocument
-// Create the root object + an array named "mac_list" in the root object
-//---------------------------------------------------------------------------------
-DynamicJsonDocument doc(2048);
-JsonObject root = doc.to<JsonObject>();
-JsonArray macList = root.createNestedArray("mac_list");
 
-auto addUniqueObject = [](JsonArray &array, String mac_adr, const char *date, const char *first_seen, const char *last_seen)
+void printMacList()
 {
-  bool dublette = false;
-  uint8_t dub_cnt = 0;
-
-  dublette == false;
-
-  Serial.print("Array:"); Serial.print(array.isNull()); // false
-
-  ESP_LOGI(TAG, "Core %d:", xPortGetCoreID());
-
-  if (xSemaphoreTake(mutex, MUTEXREFRES_MS))
+  // Ausgabe der MAC-Daten
+  for (int i = 0; i < macListSize; i++)
   {
+    Serial.println("MAC Address: " + String(macListArray[i].mac_adr));
+    Serial.println("Date: " + String(macListArray[i].date));
+    Serial.println("First Seen: " + String(macListArray[i].first_seen));
+  }
+}
 
-    // Check if the mac_adr already exists in the array
-    for (JsonObject obj : array)
+// Funktion zum Hinzufügen oder Aktualisieren eines Datensatzes
+void UpdateMacListArray(const char *mac, const char *date, const char *time)
+{
+  for (int i = 0; i < macListSize; i++)
+  {
+    // Prüfen, ob der MAC-Adresse-Eintrag bereits existiert
+    if (strcmp(macListArray[i].mac_adr, mac) == 0)
     {
-         //Serial.println("---- Check ---");
-         //Serial.println(obj["mac_adr"].as<String>());
-         //Serial.println(mac_adr);
-
-      if (obj["mac_adr"] == mac_adr)
-      {
-        // The mac_adr already exists, do not add a new object
-        //Serial.println("dublette");
-        dublette = true;
-        dub_cnt++;
-        break;
-      }
-    }
-
-    if (dublette == false)
-    {
-      
-      JsonObject new_obj = array.createNestedObject();      
-      new_obj["mac_adr"] = mac_adr;
-      new_obj["date"] = date;
-      new_obj["first_seen"] = first_seen;
-      new_obj["last_seen"] = last_seen;
-      Serial.print("--> MAC added: "); Serial.println(mac_adr); 
+      // MAC-Adresse gefunden, `last_seen` aktualisieren
+      strncpy(macListArray[i].last_seen, time, sizeof(macListArray[i].last_seen) - 1);
+      macListArray[i].last_seen[sizeof(macListArray[i].last_seen) - 1] = '\0';
+      Serial.print("Update MAC:");
+      Serial.println(mac);
+      return;
     }
   }
-  else
+
+  // Neuen Datensatz hinzufügen, wenn die MAC-Adresse nicht gefunden wurde
+  if (macListSize < maxMacListSize)
   {
-    Serial.println("=====> Mutex locked <=====");
+    strncpy(macListArray[macListSize].mac_adr, mac, sizeof(macListArray[macListSize].mac_adr) - 1);
+    macListArray[macListSize].mac_adr[sizeof(macListArray[macListSize].mac_adr) - 1] = '\0';
+
+    strncpy(macListArray[macListSize].date, date, sizeof(macListArray[macListSize].date) - 1);
+    macListArray[macListSize].date[sizeof(macListArray[macListSize].date) - 1] = '\0';
+
+    strncpy(macListArray[macListSize].first_seen, time, sizeof(macListArray[macListSize].first_seen) - 1);
+    macListArray[macListSize].first_seen[sizeof(macListArray[macListSize].first_seen) - 1] = '\0';
+
+    strncpy(macListArray[macListSize].last_seen, time, sizeof(macListArray[macListSize].last_seen) - 1);
+    macListArray[macListSize].last_seen[sizeof(macListArray[macListSize].last_seen) - 1] = '\0';
+
+    Serial.print("Append MAC:");
+    Serial.println(mac);
+
+    macListSize++;
   }
-  xSemaphoreGive(mutex);  
-};
+
+  printMacList();
+}
+
+
 
 //----------------------------------------------------------------------------------------
 //       File Handling
@@ -114,12 +126,16 @@ auto addUniqueObject = [](JsonArray &array, String mac_adr, const char *date, co
 String get_filename()
 {
   char filename[30];
-  sprintf(filename, "/maclist_%04d%02d%02d.json", dataBuffer.data.timeinfo.tm_year, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday);
+  // sprintf(filename, "/maclist_%04d%02d%02d-%02d%02d%02d.json", dataBuffer.data.timeinfo.tm_year, dataBuffer.data.timeinfo.tm_mon, dataBuffer.data.timeinfo.tm_mday, dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec);
+  // return String(filename);
   return String("/maclist.json");
 }
 
 void load_file()
 {
+
+  DynamicJsonDocument doc(4096);
+  JsonObject root = doc.to<JsonObject>();
 
   ESP_LOGI(TAG, "Core %d:", xPortGetCoreID());
   String filename = get_filename();
@@ -161,12 +177,42 @@ void load_file()
   {
     ESP_LOGI(TAG, "Json loaded ");
     serializeJsonPretty(doc, Serial);
+
+    // Extrahiere die "mac_list" Komponente
+    JsonArray macListJson = doc["mac_list"];
+
+    // Übertrage die JSON-Daten in das Array
+
+    for (JsonObject macObj : macListJson)
+    {
+      if (macListSize >= maxMacListSize)
+        break;
+      strlcpy(macListArray[macListSize].mac_adr, macObj["mac_adr"], sizeof(macListArray[macListSize].mac_adr));
+      strlcpy(macListArray[macListSize].date, macObj["date"], sizeof(macListArray[macListSize].date));
+      strlcpy(macListArray[macListSize].first_seen, macObj["first_seen"], sizeof(macListArray[macListSize].first_seen));
+      strlcpy(macListArray[macListSize].last_seen, macObj["last_seen"], sizeof(macListArray[macListSize].last_seen));
+      macListSize++;
+    }
+
+    // Ausgabe der MAC-Daten
+    for (int i = 0; i < macListSize; i++)
+    {
+      Serial.println("MAC Address: " + String(macListArray[i].mac_adr));
+      Serial.println("Date: " + String(macListArray[i].date));
+      Serial.println("First Seen: " + String(macListArray[i].first_seen));
+      Serial.println("Last Seen: " + String(macListArray[i].last_seen));
+      Serial.println();
+    }
   }
   file.close();
 }
 
 void save_file()
 {
+
+DynamicJsonDocument doc(4096);
+JsonObject root = doc.to<JsonObject>();
+
 
   String filename = get_filename();
   unsigned int totalBytes = SPIFFS.totalBytes();
@@ -184,6 +230,25 @@ void save_file()
   Serial.print(freeKBytes);
   Serial.println(" kBytes");
   Serial.println();
+
+
+
+// Füge das String-Feld hinzu
+  doc["string"] = "Hello World";
+
+  // Erstelle das mac_list-Array
+  JsonArray macList = doc.createNestedArray("mac_list");
+
+  // Kopiere die Elemente des Arrays in das JSON-Dokument
+  for (int i = 0; i < macListSize; i++) {
+    JsonObject macData = macList.createNestedObject();
+    macData["mac_adr"] = macListArray[i].mac_adr;
+    macData["date"] = macListArray[i].date;
+    macData["first_seen"] = macListArray[i].first_seen;
+    macData["last_seen"] = macListArray[i].last_seen;
+  }
+
+
 
   // Open file for reading
   Serial.print("Saving:");
@@ -306,8 +371,8 @@ void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type)
 
   // const char macAdr = macString;
 
-  addUniqueObject(macList, macString, "04.08.2024", "12:00:00", "13:20:00");
-
+  UpdateMacListArray(macString, "04.08.2024", "13:20:00");
+  // addUniqueObject(macList, macString, "04.08.2024", "12:00:00", "13:20:00");
 
   printf("PACKET TYPE=%s, CHAN=%02d, RSSI=%02d,"
          " ADDR1=%02x:%02x:%02x:%02x:%02x:%02x,"
@@ -325,32 +390,19 @@ void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type)
          /* ADDR3 */
          hdr->addr3[0], hdr->addr3[1], hdr->addr3[2],
          hdr->addr3[3], hdr->addr3[4], hdr->addr3[5]);
-
-  // Serialize the JSON document to a string and print it
-  // Serial.println("After add:");
-  // serializeJsonPretty(doc, output);
-  // Serial.println(output);
-
-  // Count the number of objects in the array
-  size_t objectCount = macList.size();
-  Serial.print("Number of unique objects in 'mac_list': ");
-  Serial.println(objectCount);
 }
 
 u_int16_t wifi_count_get()
 {
-
-  u_int16_t objectCount = macList.size();
-
-  if (objectCount > 0)
+  
+  if (macListSize > 0)
   {
-    // esp_wifi_set_promiscuous(false);  // now switch off monitor mode
-    // delay(100);
-    // save_file();
-    // esp_wifi_set_promiscuous(true);  // now switch off monitor mode
+    esp_wifi_set_promiscuous(false); // now switch off monitor mode
+    delay(100);
+    save_file();
   }
 
-  return objectCount;
+  return macListSize;
 }
 
 void t_getWifiCount(void *parameter)
@@ -364,13 +416,7 @@ void t_getWifiCount(void *parameter)
     esp_wifi_set_promiscuous(true); // now switch on  for 15 seconds
     vTaskDelay(15000);
     esp_wifi_set_promiscuous(false); // now switch OFF  for 30 seconds
-    vTaskDelay(30000);
-    u_int16_t objectCount = macList.size();
-    if (objectCount > 0)
-    {
-      ESP_LOGI(TAG, "Core %d:", xPortGetCoreID());
-      //      save_file();
-    }
+    vTaskDelay(30000);    
   }
 }
 
@@ -398,8 +444,8 @@ void setup_wifi_counter()
     return;
   }
 
-  // load_file();
-  // wifi_sniffer_init();
+  load_file();
+  //  wifi_sniffer_init();
   setup_wificounter_RTOS();
 }
 
