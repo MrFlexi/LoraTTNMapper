@@ -17,9 +17,9 @@ void printLocalTime()
   time(&now);
   localtime_r(&now, &timeinfo);
 
-  dataBuffer.data.timeinfo = timeinfo;
-  dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
-  dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
+  //dataBuffer.data.timeinfo = timeinfo;
+  //dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
+  //dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   //Serial.print("Day of week: ");
   //Serial.println(&timeinfo, "%A");
@@ -148,8 +148,10 @@ void handle_time()
   if (getLocalTime(&timeinfo))
   {
     dataBuffer.data.timeinfo = timeinfo;
-    //dataBuffer.data.timeinfo.tm_year = dataBuffer.data.timeinfo.tm_year + 1900;
-    //dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
+    dataBuffer.data.time.year = timeinfo.tm_year + 1900;
+    dataBuffer.data.time.month = timeinfo.tm_mon + 1;
+    dataBuffer.data.time.day = timeinfo.tm_mday;
+    dataBuffer.data.timeinfo.tm_mon = dataBuffer.data.timeinfo.tm_mon + 1;
     Serial.println(&dataBuffer.data.timeinfo, "%A, %B %d %Y %H:%M:%S");
   }
 }

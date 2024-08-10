@@ -11,7 +11,9 @@ AsyncWebServer server(80);
 void setup_webserver()
 {
   if (WiFi.status() == WL_CONNECTED)
-  {
+  {    
+    Serial.println();
+    Serial.println("----------------- Setup Webserver-------------------------");
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               {
       Serial.println("Index requested");
@@ -49,6 +51,20 @@ void setup_webserver()
       {
         request->send(404, "text/plain", "File not found /settings.jsn");
       } });
+
+      server.on("/maclist", HTTP_GET, [](AsyncWebServerRequest *request){      
+      String filename = get_wificounter_filename();
+            
+      Serial.print("Webserver request:");Serial.println(filename);
+      if (SPIFFS.exists(filename))
+      { 
+        request->send(SPIFFS, filename, "application/json");
+      }
+      else
+      {
+        request->send(404, "text/plain", "File not found ");
+      } 
+      });    
 
     server.begin();
     server.serveStatic("/", SPIFFS, "/");

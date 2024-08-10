@@ -11,6 +11,8 @@
 #include "globals.h"
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
+#include <WiFi.h>
+#include <esp_wifi.h>
 
 #if (USE_OTA)
 #include <ArduinoOTA.h>
@@ -21,7 +23,7 @@
 // AnalogSmooth Poti_A = AnalogSmooth();
 #endif
 
-// static const char TAG[] = __FILE__;
+//static const char TAG[] = __FILE__;
 static const char TAG[] = "";
 
 AnalogSmooth smooth_temp = AnalogSmooth();
@@ -227,6 +229,8 @@ void setup_filesystem()
   // Mounting File System SPIFFS
   //---------------------------------------------------------------
 
+  const bool delete_files = false;
+
   ESP_LOGI(TAG, "Mounting SPIFF Filesystem");
   // External File System Initialisation
   if (!SPIFFS.begin())
@@ -237,12 +241,27 @@ void setup_filesystem()
   File root = SPIFFS.open("/");
   File file = root.openNextFile();
 
-  while (file)
-  {
+// Loop through all files in the root directory
+  
+  while (file) {
+    String fileName = file.name();
     ESP_LOGI(TAG, "%s", file.name());
+    if (delete_files)
+    {
+      if (fileName.startsWith("maclist")) {
+      // Delete file
+      
+      if (SPIFFS.remove("/"+fileName)) {
+        Serial.println("Deleted file: " + fileName);
+      } else {
+        Serial.println("Failed to delete file: " + fileName);
+      }
+      }
+    }    
     file = root.openNextFile();
   }
-  delay(100);
+
+  
 }
 
 void touch_callback()
@@ -276,8 +295,7 @@ void t_mqtt_cycle()
       dataBuffer.data.potentiometer_a_changed = false;
     }
 #endif
-#endif
-  }
+#endif  
 }
 
 void t_cyclicRTOS(void *pvParameters)
@@ -465,6 +483,7 @@ void t_cyclic() // Intervall: Display Refresh
 
 #if (USE_WIFICOUNTER)
 dataBuffer.data.wifi_count = wifi_count_get();
+dataBuffer.data.wifi_count5 = getMacListCountlastMinutes(5);
 #endif
 }
 
@@ -564,20 +583,28 @@ void setup_wifi()
 {
 #if (USE_WIFI)
   // Set your Static IP address
-  IPAddress local_IP(192, 168, 1, 111);
-  IPAddress gateway(192, 168, 1, 1);
-  IPAddress subnet(255, 255, 0, 0);
+  //IPAddress local_IP(192, 168, 1, 111);
+  //IPAddress gateway(192, 168, 1, 1);
+  //IPAddress subnet(255, 255, 0, 0);
 
-  ESP_LOGI(TAG, "-----------  Setup WIFI   -----------");
+  Serial.println();
+  ESP_LOGE(TAG, "-----------  Setup Wifi   -----------");
   IPAddress ip;
   // Configures static IP address
   // if (!WiFi.config(local_IP, gateway, subnet))
   //{
   //  Serial.println("STA Failed to configure");
   //}
+
+    
+esp_wifi_disconnect ();
+esp_wifi_stop ();
+esp_wifi_deinit ();  
+    
+
   WiFi.begin(ssid, wifiPassword);
 
-  ESP_LOGI(TAG, "Connecting to WiFi..");
+  ESP_LOGE(TAG, "Connecting to WiFi..");
   int i = 0;
   wifi_connected = false;
   while ((WiFi.status() != WL_CONNECTED) && (i < 50))
@@ -590,15 +617,14 @@ void setup_wifi()
   {
     wifi_connected = true;
     dataBuffer.data.wlan = true;
-    ip = WiFi.localIP();
-    Serial.println(ip);
-    ESP_LOGI(TAG, "IP: %s", ip.toString());
+    ip = WiFi.localIP();    
     dataBuffer.data.ip_address = ip.toString();
+    Serial.print("IP: "); Serial.println(dataBuffer.data.ip_address);
   }
   else
   {
     // Turn off WiFi if no connection was made
-    ESP_LOGI(TAG, "WIFI OFF");
+    ESP_LOGE(TAG, "WIFI OFF");
     dataBuffer.data.wlan = false;
     WiFi.mode(WIFI_OFF);
   }
@@ -636,9 +662,9 @@ void setup()
 
   //--------------------------------------------------------------------
   // Load Settings
-  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------  
   setup_filesystem();
-  loadConfiguration();
+  //loadConfiguration();
 
   //--------------------------------------------------------------------
   // Logging
@@ -664,13 +690,10 @@ void setup()
 
   // Aditional Info
   print_wakeup_reason();
-  printLocalTime();
   display_chip_info();
   // Serial.println(dataBuffer.to_json());
   // Serial.println(dataBuffer.getError());
-#if (HAS_GPS)
-  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
-#endif
+
 
   // I2c access management for RTOS bus access
   I2Caccess = xSemaphoreCreateMutex(); //
@@ -710,8 +733,7 @@ void setup()
   dataBuffer.data.firmware_version = VERSION;
   dataBuffer.data.tx_ack_req = 0;
 
-#if (USE_DISPLAY)
-  ESP_LOGI(TAG, "-----------  Setup display   -----------");
+#if (USE_DISPLAY)  
   setup_display();
   showPage(PAGE_BOOT);
 #endif
@@ -740,6 +762,10 @@ void setup()
 #endif
 
 #if (USE_GPS)
+#if (HAS_GPS)
+  ESP_LOGI(TAG, "TinyGPS+ version %s", TinyGPSPlus::libraryVersion());
+#endif
+
   // setup_gps_reset(); // Hard reset
   gps.init();
   // gps.softwareReset();
@@ -803,9 +829,6 @@ void setup()
   setupCam();
 #endif
 
-  // Get date/time from Internet or GPS
-  setup_time();
-
 #if (USE_PWM_SERVO)
   setup_servo_pwm();
   panel_switch_on();
@@ -816,8 +839,22 @@ void setup()
   setup_ble();
 #endif
 
+// Get date/time from Internet or GPS
+  setup_time();
+
 #if (USE_WIFICOUNTER)
-  setup_wifi_counter();
+  pinMode(WIFICOUNTER_ACTIVE_PIN, INPUT_PULLUP); // Set GPIO2 as an input
+  int pinState = digitalRead(WIFICOUNTER_ACTIVE_PIN); // Read the state of GPIO2
+
+  if (pinState == HIGH) {
+    Serial.println("GPIO2 is HIGH");
+  } else {
+    Serial.println("GPIO2 is LOW: Activate WIFI Counter");
+    dataBuffer.data.wificounter_active = true;
+    setup_wifi_counter();    
+  }
+
+  
 #endif
 
 #if (USE_OTA)
@@ -916,6 +953,10 @@ void loop()
 #endif
 
 #if (USE_WIFICOUNTER)
+if (dataBuffer.data.wificounter_active)
+{
   wifi_counter_loop();
+}  
+
 #endif
 }

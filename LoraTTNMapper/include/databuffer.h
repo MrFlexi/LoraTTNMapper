@@ -8,6 +8,14 @@
 #include <globals.h>
 #include <gps.h>
 
+
+typedef struct
+{
+  int	day;
+  int	month;
+  int	year; 
+} ty_mytime;
+
 #if (HAS_PMU)
 typedef struct
 {
@@ -104,8 +112,11 @@ typedef struct
   double gps_distance;
   char gps_datetime[32];
   tm timeinfo;
+  ty_mytime time;
   bool ble_device_connected = false;
   uint16_t wifi_count;
+  uint16_t wifi_count5;
+  bool wificounter_active = false;
 #if (HAS_INA219)
   ty_ina219 ina219[2];
 #endif
