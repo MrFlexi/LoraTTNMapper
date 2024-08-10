@@ -12,7 +12,6 @@
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <WiFi.h>
-#include <esp_wifi.h>
 
 #if (USE_OTA)
 #include <ArduinoOTA.h>
@@ -482,8 +481,11 @@ void t_cyclic() // Intervall: Display Refresh
 
 
 #if (USE_WIFICOUNTER)
+if (dataBuffer.data.wificounter_active)
+{
 dataBuffer.data.wifi_count = wifi_count_get();
 dataBuffer.data.wifi_count5 = getMacListCountlastMinutes(5);
+}
 #endif
 }
 
@@ -596,12 +598,9 @@ void setup_wifi()
   //  Serial.println("STA Failed to configure");
   //}
 
+   
     
-esp_wifi_disconnect ();
-esp_wifi_stop ();
-esp_wifi_deinit ();  
-    
-
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, wifiPassword);
 
   ESP_LOGE(TAG, "Connecting to WiFi..");

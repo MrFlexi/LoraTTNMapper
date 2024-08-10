@@ -14,10 +14,22 @@ void setup_webserver()
   {    
     Serial.println();
     Serial.println("----------------- Setup Webserver-------------------------");
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       Serial.println("Index requested");
-      request->send(SPIFFS, "/index.html", "text/html"); });
+
+      if (SPIFFS.exists("/index.html"))
+      {        
+        request->send(SPIFFS, "/index.html", "text/html");
+      }
+      else
+      {
+        request->send(404, "text/plain", "File not found");
+        Serial.println("File not found");
+      } });
+
+    server.on("/hello", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(200, "text/plain", "Hello, world");
+    });      
 
     server.on("/log", HTTP_GET, [](AsyncWebServerRequest *request)
               {
