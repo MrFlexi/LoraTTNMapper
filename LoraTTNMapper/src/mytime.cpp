@@ -64,7 +64,7 @@ time_t epochConverter(TinyGPSDate &d, TinyGPSTime &t)
     timeinfo.tm_year = d.year() - 1900; // TM offset is years from 1970, i.e. 2014 is 44.
     timeinfo.tm_mon = d.month() - 1 ;  // Month, where 0 = jan
     timeinfo.tm_mday = d.day();
-    timeinfo.tm_hour = t.hour();
+    timeinfo.tm_hour = t.hour() + 2;
     timeinfo.tm_min = t.minute();
     timeinfo.tm_sec = t.second();
     time_t epochtime = mktime(&timeinfo);
@@ -77,9 +77,9 @@ time_t epochConverter(TinyGPSDate &d, TinyGPSTime &t)
 
 void set_time_from_gps()
 {
-  struct tm t;
-  time_t t_of_day;
-  struct tm timeinfo;
+  //struct tm t;
+  //time_t t_of_day;
+  //struct tm timeinfo;
 
   unsigned long age, date, time, chars;
   int year;
@@ -102,9 +102,9 @@ void set_time_from_gps()
       ESP_LOGI(TAG, "GPS Year < 2019 ");
 
         
-    t.tm_hour = gps.tGps.time.hour() + 2;
-    t.tm_isdst = 1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
-    t_of_day = mktime(&t);
+    //t.tm_hour = gps.tGps.time.hour() + 2;
+    //t.tm_isdst = 1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
+    //t_of_day = mktime(&t);
 
     struct timeval tv;
     

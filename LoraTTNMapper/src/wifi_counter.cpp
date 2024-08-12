@@ -18,7 +18,6 @@
 static SemaphoreHandle_t mutex;
 
 uint8_t level = 0, channel_rotation = 1;
-uint32_t mac_array[100];
 uint8_t new_mac = 0;
 TimerHandle_t WifiChanTimer;
 
