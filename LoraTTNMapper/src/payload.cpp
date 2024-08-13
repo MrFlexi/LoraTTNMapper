@@ -138,7 +138,7 @@ void PayloadConvert::addWifiCount(uint8_t channel)
   buffer[cursor++] = channel;
   buffer[cursor++] = LPP_WIFI_COUNT;
 
-  uint16_t out = dataBuffer.data.wifi_count;
+  uint16_t out = dataBuffer.wificounter.count;
   buffer[cursor++] = highByte(out);
   buffer[cursor++] = lowByte(out);  
 }

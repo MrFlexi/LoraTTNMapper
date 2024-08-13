@@ -8,12 +8,11 @@
 #include <globals.h>
 #include <gps.h>
 
-
 typedef struct
 {
-  int	day;
-  int	month;
-  int	year; 
+  int day;
+  int month;
+  int year;
 } ty_mytime;
 
 #if (HAS_PMU)
@@ -40,6 +39,16 @@ typedef struct
 } ty_ina219;
 #endif
 
+#if (USE_WIFICOUNTER)
+typedef struct
+{
+  uint16_t count;
+  uint16_t count5;
+  uint16_t fileSize;
+  bool active = false;
+} ty_wificounter;
+#endif
+
 typedef struct
 {
   float iaq;                // IAQ signal
@@ -60,7 +69,8 @@ typedef struct
   uint8_t rxCounter; // aliveCounter
   uint8_t runmode;   // aliveCounter
   uint8_t CoronaDeviceCount;
-  uint32_t freeheap;        // free memory
+  uint32_t freeheap; // free memory
+  u_int32_t spiffsfreeKBytes = 0;
   uint8_t tx_ack_req;       // request TTN to acknowlede a TX
   uint16_t potentiometer_a; //
   uint16_t adc0;            // Voltage in mVolt
@@ -114,9 +124,6 @@ typedef struct
   tm timeinfo;
   ty_mytime time;
   bool ble_device_connected = false;
-  uint16_t wifi_count;
-  uint16_t wifi_count5;
-  bool wificounter_active = false;
 #if (HAS_INA219)
   ty_ina219 ina219[2];
 #endif
@@ -145,6 +152,10 @@ public:
   String to_json_web();
   deviceStatus_t data;
   deviceSettings_t settings;
+#if (USE_WIFICOUNTER)
+  ty_wificounter wificounter;
+#endif
+
   const char *getError() const { return _error; }
 
 private:

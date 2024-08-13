@@ -30,6 +30,7 @@
 #define PAGE_SUN 9
 #define PAGE_SPRINKLER 10
 #define PAGE_WIFICOUNTER 11
+#define PAGE_SYSTEM 12
 
 #define PAGE_SLEEP 20         // Pages > 20 are not in the picture loop
 #define PAGE_BOOT 21

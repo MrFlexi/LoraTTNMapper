@@ -57,6 +57,8 @@
 #define USE_PWM_SERVO 0                         // Uses external I2C Servo expander
 #define USE_SUN_POSITION 0
 
+#define tcyclic2mRefreshIntervall 120           // t_cyclicRtos2m
+
 #define displayRefreshIntervall 4               // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 8                  // shift to next display page               ---> t_moveDisplay
 

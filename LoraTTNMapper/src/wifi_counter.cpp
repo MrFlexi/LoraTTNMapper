@@ -213,21 +213,8 @@ void load_file()
   ESP_LOGI(TAG, "Core %d:", xPortGetCoreID());
   String filename = get_wificounter_filename();
 
-  unsigned int totalBytes = SPIFFS.totalBytes();
-  unsigned int usedBytes = SPIFFS.usedBytes();
-  float freeKBytes = 0;
-  freeKBytes = (totalBytes - usedBytes) / 1024;
-
-  Serial.println("SPIFF File sistem info.");
-
-  Serial.print("Total space: ");
-  Serial.print(totalBytes / 1024);
-  Serial.println(" KBytes");
-
-  Serial.print("Free space: ");
-  Serial.print(freeKBytes);
-  Serial.println(" kBytes");
-  Serial.println();
+  u_int32_t free = get_free_spiffsKB();
+  
 
   // Open file for reading
   Serial.print("Opening:");
@@ -280,6 +267,8 @@ void load_file()
   file.close();
 }
 
+
+
 void save_file()
 {
 
@@ -287,22 +276,7 @@ void save_file()
   JsonObject root = doc.to<JsonObject>();
 
   String filename = get_wificounter_filename();
-  unsigned int totalBytes = SPIFFS.totalBytes();
-  unsigned int usedBytes = SPIFFS.usedBytes();
-  float freeKBytes = 0;
-  freeKBytes = (totalBytes - usedBytes) / 1024;
-
-  Serial.println("SPIFF File sistem info.");
-
-  Serial.print("Total space: ");
-  Serial.print(totalBytes / 1024);
-  Serial.println(" KBytes");
-
-  Serial.print("Free space: ");
-  Serial.print(freeKBytes);
-  Serial.println(" kBytes");
-  Serial.println();
-
+  
   // Füge das String-Feld hinzu
   doc["string"] = "Hello World";
 
@@ -338,6 +312,8 @@ void save_file()
   }
 
   file.close();
+
+  dataBuffer.wificounter.fileSize = u_int16_t(bytesWritten / 1024);
 }
 
 esp_err_t event_handler(void *ctx, system_event_t *event)

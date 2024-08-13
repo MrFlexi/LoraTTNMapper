@@ -86,6 +86,9 @@ void displayRegisterPages()
   // max_page_counter++;
   // page_array[max_page_counter] = PAGE_MODULS;
 
+  max_page_counter++;
+  page_array[max_page_counter] = PAGE_SYSTEM;
+
 #if (HAS_LORA)
   max_page_counter++;
   page_array[max_page_counter] = PAGE_LORA;
@@ -312,16 +315,16 @@ void showPage(int page)
       break;
 
     case PAGE_TBEAM:
-      u8g2.setFont(u8g2_font_profont12_tr);
+      u8g2.setFont(u8g2_font_ncenB12_tr);      
       u8g2.setCursor(1, 15);
       u8g2.printf("%s", DEVICE_NAME);
 
+      u8g2.setFont(u8g2_font_profont12_tr);  
       u8g2.setCursor(1, 30);
       u8g2.printf("Deep Sleep: %2d / %3d ", dataBuffer.data.MotionCounter, dataBuffer.settings.sleep_time);
 
       u8g2.setCursor(1, 45);
-      u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);
-      u8g2.printf("IP: %s ", dataBuffer.data.ip_address.c_str());
+      u8g2.printf("BootCnt: %2d ", dataBuffer.data.bootCounter);      
       break;
 
     case PAGE_OTA:
@@ -381,10 +384,6 @@ void showPage(int page)
       u8g2.printf("Sats:%.2d", gps.tGps.satellites.value());
       u8g2.setCursor(64, 30);  // GPS Time
       u8g2.printf("%02d:%02d:%02d", gps.tGps.time.hour(), gps.tGps.time.minute(), gps.tGps.time.second());
-      
-      u8g2.setCursor(64, 40);  // Real Time from WIFI or GPS
-      u8g2.printf("%02d:%02d:%02d", dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec );
-
       u8g2.setCursor(1, 40);
       u8g2.printf("Alt:%.4g m", gps.tGps.altitude.meters());
       u8g2.setCursor(1, 60);
@@ -472,11 +471,13 @@ void showPage(int page)
     case PAGE_WIFICOUNTER:
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "Wifi Counter");      
-      if (dataBuffer.data.wificounter_active)
+      if (dataBuffer.wificounter.active)
       {
         u8g2.setFont(u8g2_font_ncenB14_tr);
         u8g2.setCursor(1, 45);
-        u8g2.printf("%d/%d", dataBuffer.data.wifi_count,dataBuffer.data.wifi_count5 );        
+        u8g2.printf("%d/%d", dataBuffer.wificounter.count,dataBuffer.wificounter.count5 );        
+        u8g2.setCursor(1, 60);
+        u8g2.printf("Size %d", dataBuffer.wificounter.fileSize );        
       }      
       else
       {
@@ -486,11 +487,20 @@ void showPage(int page)
         u8g2.drawStr(1, 45, "Sniffer: OFF"); 
       break;
       }
-      
 
-      
+
+      case PAGE_SYSTEM:
+      u8g2.setFont(u8g2_font_ncenB12_tr);
+      u8g2.drawStr(1, 15, "System");            
+      u8g2.setFont(u8g2_font_profont12_tr);        
+      u8g2.setCursor(1, 30);        
+      u8g2.printf("%s", dataBuffer.data.ip_address.c_str()); 
+      u8g2.setCursor(1, 40);  // Real Time from WIFI or GPS
+      u8g2.printf("%02d:%02d:%02d", dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec );     
+      u8g2.setCursor(1, 60);  // Free SPIFFS File space
+      u8g2.printf("free SPIFF %02d kB", dataBuffer.data.spiffsfreeKBytes );     
       break;
-
+      
     case PAGE_SUN:
 
       u8g2.setFont(u8g2_font_ncenB12_tr);

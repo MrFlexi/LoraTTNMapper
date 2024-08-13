@@ -106,6 +106,7 @@
 #include "settings.h"
 #include <AnalogSmooth.h>
 #include "databuffer.h"
+#include "tasks.h"
 
 #if (USE_WEBSERVER || USE_CAYENNE || USE_MQTT || USE_WIFI)
 #include "WiFi.h"
