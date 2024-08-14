@@ -26,6 +26,29 @@ u_int32_t get_free_spiffsKB()
 }
 
 
+
+void t_cyclicRtos1m(void *parameter)
+{
+  // Task bound to core 0, Prio 0 =  very low
+  for (;;)
+  {
+    ESP_LOGI(TAG, "t-Cyclic 1m");
+
+    #if (USE_WIFICOUNTER)
+    if (dataBuffer.wificounter.active)
+    {
+      dataBuffer.wificounter.count = wifi_count_get();
+      dataBuffer.wificounter.count5 = getMacListCountlastMinutes(5);
+    }
+    #endif
+
+    
+    vTaskDelay( tcyclic1mRefreshIntervall * 1000 / portTICK_PERIOD_MS );
+  }
+}
+
+
+
 void t_cyclicRtos2m(void *parameter)
 {
   // Task bound to core 0, Prio 0 =  very low
@@ -34,7 +57,7 @@ void t_cyclicRtos2m(void *parameter)
     ESP_LOGI(TAG, "t-Cyclic 2m");
     dataBuffer.data.spiffsfreeKBytes = get_free_spiffsKB();
 
-    vTaskDelay( tcyclic2mRefreshIntervall / portTICK_PERIOD_MS );
+    vTaskDelay( tcyclic2mRefreshIntervall * 1000 / portTICK_PERIOD_MS );
   }
 }
 

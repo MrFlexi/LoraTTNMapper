@@ -470,14 +470,6 @@ void t_mqtt_cycle()
     AXP192_showstatus();
 #endif
 #endif
-
-#if (USE_WIFICOUNTER)
-    if (dataBuffer.wificounter.active)
-    {
-      dataBuffer.wificounter.count = wifi_count_get();
-      dataBuffer.wificounter.count5 = getMacListCountlastMinutes(5);
-    }
-#endif
   }
 
   //---------------------------------------------------------------------------------
@@ -901,6 +893,16 @@ void t_mqtt_cycle()
                             &irqHandlerTask, // task handle
                             1);              // CPU core
 #endif
+
+    ESP_LOGI(TAG, "Starting cyclic tasks every 1 minutes...");
+    xTaskCreatePinnedToCore(t_cyclicRtos1m,      // task function
+                            "t_cyclicRtos1m",    // name of task
+                            4096,            // stack size of task
+                            (void *)1,       // parameter of the task
+                            2,               // priority of the task
+                            &t_cyclic1m_HandlerTask, // task handle
+                            0);              // CPU core
+
 
     ESP_LOGI(TAG, "Starting cyclic tasks every 2 minutes...");
     xTaskCreatePinnedToCore(t_cyclicRtos2m,      // task function

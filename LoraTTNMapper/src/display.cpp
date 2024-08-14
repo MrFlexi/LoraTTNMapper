@@ -473,21 +473,20 @@ void showPage(int page)
       u8g2.drawStr(1, 15, "Wifi Counter");      
       if (dataBuffer.wificounter.active)
       {
-        u8g2.setFont(u8g2_font_ncenB14_tr);
-        u8g2.setCursor(1, 45);
+        u8g2.setFont(u8g2_font_profont12_tr);
+        u8g2.setCursor(1, 30);
         u8g2.printf("%d/%d", dataBuffer.wificounter.count,dataBuffer.wificounter.count5 );        
-        u8g2.setCursor(1, 60);
-        u8g2.printf("Size %d", dataBuffer.wificounter.fileSize );        
+        u8g2.setCursor(1, 45);
+        u8g2.printf("Size %02d kB", dataBuffer.wificounter.fileSize );        
       }      
       else
       {
         u8g2.setFont(u8g2_font_profont12_tr);        
         u8g2.setCursor(1, 30);        
         u8g2.printf("%s", dataBuffer.data.ip_address.c_str());
-        u8g2.drawStr(1, 45, "Sniffer: OFF"); 
-      break;
+        u8g2.drawStr(1, 45, "Sniffer: OFF");       
       }
-
+      break;
 
       case PAGE_SYSTEM:
       u8g2.setFont(u8g2_font_ncenB12_tr);
@@ -502,7 +501,6 @@ void showPage(int page)
       break;
       
     case PAGE_SUN:
-
       u8g2.setFont(u8g2_font_ncenB12_tr);
       u8g2.drawStr(1, 15, "SunTracker");
 

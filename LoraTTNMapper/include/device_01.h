@@ -38,7 +38,7 @@
 #define USE_WIFI_MANAGER 0
 #define USE_WEBSERVER   1
 #define USE_MQTT 0
-#define USE_MQTT_SENSORS 1
+#define USE_MQTT_SENSORS 0
 #define USE_MQTT_TRAIN 0
 
 #define USE_FASTLED 0
@@ -57,17 +57,18 @@
 #define USE_PWM_SERVO 0                         // Uses external I2C Servo expander
 #define USE_SUN_POSITION 0
 
+#define tcyclic1mRefreshIntervall 60           // t_cyclicRtos2m
 #define tcyclic2mRefreshIntervall 120           // t_cyclicRtos2m
 
 #define displayRefreshIntervall 4               // get sensor values and update display     ---> t_cyclic
 #define displayMoveIntervall 8                  // shift to next display page               ---> t_moveDisplay
 
 #define LORAenqueueMessagesIntervall 30         // Queue Lora messages
-#define LORA_TX_INTERVAL  15                    // Transmitt Lora messages
+#define LORA_TX_INTERVAL  30                    // Transmitt Lora messages
 #define LORA_DATARATE DR_SF12
 
 #define sendMqttIntervall      60               // Mqtt send intervall in s                ---> t_send_cycle
-#define sendWebsocketIntervall 15000              // WebSocket send intervall in ms 
+#define sendWebsocketIntervall 30000              // WebSocket send intervall in ms 
 #define sunTrackerRefreshIntervall 60
 
 #define PAYLOAD_ENCODER 3

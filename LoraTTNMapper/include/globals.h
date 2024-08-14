@@ -158,7 +158,8 @@ typedef struct
 extern SemaphoreHandle_t I2Caccess;
 extern TaskHandle_t irqHandlerTask;
 extern TaskHandle_t moveDisplayHandlerTask;
-extern TaskHandle_t t_cyclic_HandlerTask;
+extern TaskHandle_t t_cyclic1m_HandlerTask;
+extern TaskHandle_t t_cyclic2m_HandlerTask;
 extern QueueHandle_t LoraSendQueue;
 
 #include "power.h"

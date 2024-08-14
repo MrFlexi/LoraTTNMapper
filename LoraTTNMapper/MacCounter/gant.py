@@ -9,7 +9,8 @@ import plotly.express as px
 
 # Windows
 # create py -m venv venv  
-# activate in cmd  venv\Scripts\activate
+# activate in cmd  py gant
+
 
 # Verzeichnis mit den JSON-Dateien
 directory = ''
@@ -69,9 +70,12 @@ df['end_time'] = pd.to_datetime(df['end_str'], format='%Y%m%d %H%M%S')
 df = df.drop(columns=['date_str', 'first_str', 'last_str', 'start_str', 'end_str'])
 
 # Calculate the duration
+df = df[(df.end_time != df.start_time)]
 df['duration'] = df['end_time'] - df['start_time']
 
 df = df.sort_values(by='duration', ascending=False)
+
+
 
 
 

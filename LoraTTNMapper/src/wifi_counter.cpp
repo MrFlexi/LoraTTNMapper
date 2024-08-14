@@ -398,8 +398,8 @@ void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type)
   char macString[18]; // Buffer for the formatted string
   String output;
 
-  if (type != WIFI_PKT_MGMT)
-    return;
+  //if (type != WIFI_PKT_MGMT)
+  //  return;
 
   const wifi_promiscuous_pkt_t *ppkt = (wifi_promiscuous_pkt_t *)buff;
   const wifi_ieee80211_packet_t *ipkt = (wifi_ieee80211_packet_t *)ppkt->payload;
@@ -455,9 +455,9 @@ void t_getWifiCount(void *parameter)
   while (1)
   {
     esp_wifi_set_promiscuous(true); // now switch on  for 15 seconds
-    vTaskDelay(15000);
-    esp_wifi_set_promiscuous(false); // now switch OFF  for 30 seconds
     vTaskDelay(30000);
+    esp_wifi_set_promiscuous(false); // now switch OFF  for 30 seconds
+    vTaskDelay(15000);
   }
 }
 
