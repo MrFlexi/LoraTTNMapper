@@ -78,12 +78,12 @@ void printMacList()
 
 u_int32_t convertStringToSeconds(String timeString)
 {
-  int hours, minutes, seconds;  
+  int hours, minutes, seconds;
 
-    // Extract hours, minutes, and seconds from the string
-    hours = timeString.substring(0, 2).toInt();
-    minutes = timeString.substring(2, 4).toInt();
-    seconds = timeString.substring(4, 6).toInt();
+  // Extract hours, minutes, and seconds from the string
+  hours = timeString.substring(0, 2).toInt();
+  minutes = timeString.substring(2, 4).toInt();
+  seconds = timeString.substring(4, 6).toInt();
 
   uint32_t timeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
 
@@ -95,36 +95,43 @@ int getMacListCountlastMinutes(int minutes)
 {
   // Ausgabe der MAC-Daten
   int count = 0;
+  char date[11];
+
+  sprintf(date, "%04d%02d%02d", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
 
   u_int32_t actualTimeInSeconds = dataBuffer.data.timeinfo.tm_hour * 3600 + dataBuffer.data.timeinfo.tm_min * 60 + dataBuffer.data.timeinfo.tm_sec;
-  u_int32_t  startTimeInSeconds = actualTimeInSeconds - (minutes * 60);
+  u_int32_t startTimeInSeconds = actualTimeInSeconds - (minutes * 60);
 
   ESP_LOGI(TAG, "MacList last %d minutes:", minutes);
   ESP_LOGI(TAG, "Actual Time in Seconds: %d ", actualTimeInSeconds);
   ESP_LOGI(TAG, "Last Seen > StartTime %d ", startTimeInSeconds);
-  
+
   for (int i = 0; i < macListSize; i++)
   {
 
-    int lastSeenSeconds = convertStringToSeconds(macListArray[i].last_seen);
-    int firstSeenSeconds = convertStringToSeconds(macListArray[i].first_seen);
-    u_int32_t deltaSeconds = lastSeenSeconds - firstSeenSeconds;   
-      
+    if (strcmp(macListArray[i].date, date) == 0)
+    {
+
+      int lastSeenSeconds = convertStringToSeconds(macListArray[i].last_seen);
+      int firstSeenSeconds = convertStringToSeconds(macListArray[i].first_seen);
+      u_int32_t deltaSeconds = lastSeenSeconds - firstSeenSeconds;
+
       Serial.print("MAC:" + String(macListArray[i].mac_adr));
       Serial.print(" Date:" + String(macListArray[i].date));
       Serial.print(" F:" + String(macListArray[i].first_seen));
       Serial.print(" L:" + String(macListArray[i].last_seen));
-      //Serial.println(" Last Seconds: " + String(lastSeenSeconds));
+      // Serial.println(" Last Seconds: " + String(lastSeenSeconds));
       Serial.print(" delta:" + String(deltaSeconds));
       if (lastSeenSeconds > startTimeInSeconds)
-        { 
-          Serial.println(" * ");
-          count++;
-        }
-        else
-        {
-          Serial.println();
-        }
+      {
+        Serial.println(" * ");
+        count++;
+      }
+      else
+      {
+        Serial.println();
+      }
+    }
   }
   return count;
 }
@@ -137,56 +144,58 @@ void UpdateMacListArray(const char *mac)
   char time[9];
   bool dublette = false;
 
-  if (dataBuffer.data.time.year > 2020 ) 
+  if (dataBuffer.data.time.year > 2020)
   {
 
-  ESP_LOGI(TAG, "Update MacList");  
-  sprintf(date, "%04d%02d%02d", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
-  sprintf(time, "%02d%02d%02d", dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec);
+    ESP_LOGI(TAG, "Update MacList");
+    sprintf(date, "%04d%02d%02d", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
+    sprintf(time, "%02d%02d%02d", dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec);
 
-  for (int i = 0; i < macListSize; i++)
-  {
-    // Prüfen, ob der MAC-Adresse-Eintrag bereits existiert
-    if (strcmp(macListArray[i].mac_adr, mac) == 0)
+    for (int i = 0; i < macListSize; i++)
     {
-      // MAC-Adresse gefunden, `last_seen` aktualisieren
-      strncpy(macListArray[i].last_seen, time, sizeof(macListArray[i].last_seen) - 1);
-      macListArray[i].last_seen[sizeof(macListArray[i].last_seen) - 1] = '\0';
-      Serial.print("Update:"); Serial.println(mac);
-      dublette = true;
+      // Prüfen, ob der MAC-Adresse-Eintrag bereits existiert
+    if ((strcmp(macListArray[i].mac_adr, mac) == 0) && (strcmp(macListArray[i].date, date) == 0))
+    {
+        // MAC-Adresse gefunden, `last_seen` aktualisieren
+        strncpy(macListArray[i].last_seen, time, sizeof(macListArray[i].last_seen) - 1);
+        macListArray[i].last_seen[sizeof(macListArray[i].last_seen) - 1] = '\0';
+        //Serial.print("Update:");
+        //Serial.println(mac);
+        dublette = true;
     }
-  }
+    }
 
-  if (dublette)
-  {
+    if (dublette)
+    {
+    }
+    else
+    {
+      // Neuen Datensatz hinzufügen, wenn die MAC-Adresse nicht gefunden wurde
+      if (macListSize < maxMacListSize)
+      {
+        strncpy(macListArray[macListSize].mac_adr, mac, sizeof(macListArray[macListSize].mac_adr) - 1);
+        macListArray[macListSize].mac_adr[sizeof(macListArray[macListSize].mac_adr) - 1] = '\0';
+
+        strncpy(macListArray[macListSize].date, date, sizeof(macListArray[macListSize].date) - 1);
+        macListArray[macListSize].date[sizeof(macListArray[macListSize].date) - 1] = '\0';
+
+        strncpy(macListArray[macListSize].first_seen, time, sizeof(macListArray[macListSize].first_seen) - 1);
+        macListArray[macListSize].first_seen[sizeof(macListArray[macListSize].first_seen) - 1] = '\0';
+
+        strncpy(macListArray[macListSize].last_seen, time, sizeof(macListArray[macListSize].last_seen) - 1);
+        macListArray[macListSize].last_seen[sizeof(macListArray[macListSize].last_seen) - 1] = '\0';
+
+        //Serial.print("Append:");
+        //Serial.println(mac);
+
+        macListSize++;
+      }
+    }
   }
   else
   {
-    // Neuen Datensatz hinzufügen, wenn die MAC-Adresse nicht gefunden wurde
-    if (macListSize < maxMacListSize)
-    {
-      strncpy(macListArray[macListSize].mac_adr, mac, sizeof(macListArray[macListSize].mac_adr) - 1);
-      macListArray[macListSize].mac_adr[sizeof(macListArray[macListSize].mac_adr) - 1] = '\0';
-
-      strncpy(macListArray[macListSize].date, date, sizeof(macListArray[macListSize].date) - 1);
-      macListArray[macListSize].date[sizeof(macListArray[macListSize].date) - 1] = '\0';
-
-      strncpy(macListArray[macListSize].first_seen, time, sizeof(macListArray[macListSize].first_seen) - 1);
-      macListArray[macListSize].first_seen[sizeof(macListArray[macListSize].first_seen) - 1] = '\0';
-
-      strncpy(macListArray[macListSize].last_seen, time, sizeof(macListArray[macListSize].last_seen) - 1);
-      macListArray[macListSize].last_seen[sizeof(macListArray[macListSize].last_seen) - 1] = '\0';
-
-      Serial.print("Append:");Serial.println(mac);
-
-      macListSize++;
-    }
+    ESP_LOGI(TAG, "Waiting for time synconization WLAN/GPS");
   }
-}  
-else
-{
-  ESP_LOGI(TAG, "Waiting for time synconization WLAN/GPS");
-}  
 }
 
 //----------------------------------------------------------------------------------------
@@ -195,12 +204,12 @@ else
 String get_wificounter_filename()
 {
   char filename[30];
-  //if (dataBuffer.data.time.year > 2023)
+  // if (dataBuffer.data.time.year > 2023)
   //{
-  //  sprintf(filename, "/maclist_%04d%02d%02d.json", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
-  //  return String(filename);
-  //}
-  //else
+  //   sprintf(filename, "/maclist_%04d%02d%02d.json", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
+  //   return String(filename);
+  // }
+  // else
   return String("/maclist.json");
 }
 
@@ -214,7 +223,6 @@ void load_file()
   String filename = get_wificounter_filename();
 
   u_int32_t free = get_free_spiffsKB();
-  
 
   // Open file for reading
   Serial.print("Opening:");
@@ -255,19 +263,17 @@ void load_file()
     }
 
     // Ausgabe der MAC-Daten
-    for (int i = 0; i < macListSize; i++)
-    {
-      Serial.println("MAC: " + String(macListArray[i].mac_adr));
-      Serial.println("Date: " + String(macListArray[i].date));
-      Serial.println("First: " + String(macListArray[i].first_seen));
-      Serial.println("Last: " + String(macListArray[i].last_seen));
-      Serial.println();
-    }
+    //for (int i = 0; i < macListSize; i++)
+    //{
+    //  Serial.println("MAC: " + String(macListArray[i].mac_adr));
+    // Serial.println("Date: " + String(macListArray[i].date));
+    //  Serial.println("First: " + String(macListArray[i].first_seen));
+    //  Serial.println("Last: " + String(macListArray[i].last_seen));
+    //  Serial.println();
+    //}
   }
   file.close();
 }
-
-
 
 void save_file()
 {
@@ -276,7 +282,7 @@ void save_file()
   JsonObject root = doc.to<JsonObject>();
 
   String filename = get_wificounter_filename();
-  
+
   // Füge das String-Feld hinzu
   doc["string"] = "Hello World";
 
@@ -398,8 +404,8 @@ void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type)
   char macString[18]; // Buffer for the formatted string
   String output;
 
-  //if (type != WIFI_PKT_MGMT)
-  //  return;
+  // if (type != WIFI_PKT_MGMT)
+  //   return;
 
   const wifi_promiscuous_pkt_t *ppkt = (wifi_promiscuous_pkt_t *)buff;
   const wifi_ieee80211_packet_t *ipkt = (wifi_ieee80211_packet_t *)ppkt->payload;
@@ -409,10 +415,8 @@ void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type)
   snprintf(macString, sizeof(macString), "%02X:%02X:%02X:%02X:%02X:%02X",
            hdr->addr2[0], hdr->addr2[1], hdr->addr2[2],
            hdr->addr2[3], hdr->addr2[4], hdr->addr2[5]);
- 
 
   UpdateMacListArray(macString);
-  
 
   printf("PACKET TYPE=%s, CHAN=%02d, RSSI=%02d,"
          " ADDR1=%02x:%02x:%02x:%02x:%02x:%02x,"
@@ -442,7 +446,7 @@ u_int16_t wifi_count_get()
     save_file();
   }
 
-  //printMacList();
+  // printMacList();
   return macListSize;
 }
 

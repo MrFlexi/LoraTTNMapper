@@ -75,7 +75,9 @@ df['duration'] = df['end_time'] - df['start_time']
 
 df = df.sort_values(by='duration', ascending=False)
 
-
+# Count occurrences of each unique mac_adr
+mac_counts = df['mac_adr'].value_counts()
+print(mac_counts)
 
 
 
