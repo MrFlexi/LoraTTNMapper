@@ -618,6 +618,10 @@ void ESP32_sleep()
   LED_deepSleep();
 #endif
 
+#if (USE_WIFICOUNTER)
+  wifi_counter_save_file();
+#endif
+
 #if (USE_GPS)
   gps.enable_sleep();
 #endif

@@ -9,6 +9,7 @@
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
 #include "globals.h"
+#include <FS.h>   // SPIFFS Bibliothek
 
 #define WIFI_CHANNEL_SWITCH_INTERVAL 500
 #define WIFI_CHANNEL_MAX 13
@@ -204,12 +205,12 @@ void UpdateMacListArray(const char *mac)
 String get_wificounter_filename()
 {
   char filename[30];
-  // if (dataBuffer.data.time.year > 2023)
-  //{
-  //   sprintf(filename, "/maclist_%04d%02d%02d.json", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day);
-  //   return String(filename);
-  // }
-  // else
+   if (dataBuffer.data.time.year > 2023)
+  {    
+     sprintf(filename, "/maclist_%04d%02d%02d-%02d%02d%02d.json", dataBuffer.data.time.year, dataBuffer.data.time.month, dataBuffer.data.time.day, dataBuffer.data.timeinfo.tm_hour, dataBuffer.data.timeinfo.tm_min, dataBuffer.data.timeinfo.tm_sec);
+     return String(filename);
+   }
+   else
   return String("/maclist.json");
 }
 
@@ -275,7 +276,7 @@ void load_file()
   file.close();
 }
 
-void save_file()
+void wifi_counter_save_file()
 {
 
   DynamicJsonDocument doc(4096);
@@ -299,9 +300,8 @@ void save_file()
     macData["last_seen"] = macListArray[i].last_seen;
   }
 
-  // Open file for reading
-  Serial.print("Saving:");
-  Serial.println(filename);
+  // Open file for reading  
+  Serial.print("Wifi Counter saving:");Serial.println(filename);  
   File file = SPIFFS.open(filename, "w");
   // Serialize the JSON document to the file
   size_t bytesWritten = serializeJson(doc, file);
@@ -443,7 +443,7 @@ u_int16_t wifi_count_get()
   {
     esp_wifi_set_promiscuous(false); // now switch off monitor mode
     delay(100);
-    save_file();
+    //save_file();
   }
 
   // printMacList();
@@ -489,7 +489,7 @@ void setup_wifi_counter()
     return;
   }
 
-  load_file();
+  //  load_file();
   //  wifi_sniffer_init();
   setup_wificounter_RTOS();
 }
@@ -500,4 +500,31 @@ void wifi_counter_loop()
   vTaskDelay(WIFI_CHANNEL_SWITCH_INTERVAL / portTICK_PERIOD_MS);
   wifi_sniffer_set_channel(channel_rotation);
   channel_rotation = (channel_rotation % WIFI_CHANNEL_MAX) + 1;
+}
+
+
+String wificounter_generateHTMLFileList() {
+  String output = "<html><body><h1>File List</h1>";
+  output += "<form action='/download' method='POST'>";
+  output += "<ul>";
+
+
+  File root = SPIFFS.open("/");
+  File file = root.openNextFile();
+  while (file) {
+    String fileName = file.name();
+    Serial.println(fileName);
+    if (fileName.startsWith("maclist")) {
+        output += "<li>";
+        output += "<input type='checkbox' name='files' value='" + fileName + "'>";
+        output += "<label>" + fileName + "</label>";
+        output += "</li>";
+    }
+    file = root.openNextFile();
+  }
+  output += "</ul>";
+  output += "<input type='submit' value='Download Selected'>";
+  output += "</form></body></html>";
+  
+ return (output);
 }
